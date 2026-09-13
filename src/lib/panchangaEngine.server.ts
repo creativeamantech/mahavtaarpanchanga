@@ -1215,7 +1215,7 @@ export function computePanchanga(
   // Find New Moon immediately preceding this day
   let lastNmTime: Astronomy.AstroTime;
   try {
-    lastNmTime = Astronomy.SearchMoonPhase(0, new Date(tSunrise.date.getTime() - 32 * 86400000), 33);
+    lastNmTime = Astronomy.SearchMoonPhase(0, new Date(tSunrise.date.getTime() - 32 * 86400000), 33)!;
   } catch {
     lastNmTime = tSunrise;
   }

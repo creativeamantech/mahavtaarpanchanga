@@ -7,6 +7,7 @@ import { Moon, Sun, Compass } from 'lucide-react';
 interface MoonPhaseVisualizerProps {
   data: PanchangaResponse;
   lang: Language;
+  theme?: any;
 }
 
 export const MoonPhaseVisualizer: React.FC<MoonPhaseVisualizerProps> = ({ data, lang }) => {

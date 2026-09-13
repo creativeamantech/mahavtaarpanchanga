@@ -6,6 +6,7 @@ import { type Language, translations, getLocalizedChoghadiya } from '../i18n';
 interface CurrentMuhurtaWidgetProps {
   data: PanchangaResponse;
   lang: Language;
+  theme?: any;
 }
 
 export const CurrentMuhurtaWidget: React.FC<CurrentMuhurtaWidgetProps> = ({ data, lang }) => {

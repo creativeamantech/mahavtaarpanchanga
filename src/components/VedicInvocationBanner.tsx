@@ -4,6 +4,7 @@ import type { Language } from '../i18n';
 
 interface VedicInvocationBannerProps {
   lang: Language;
+  theme?: any;
 }
 
 export const VedicInvocationBanner: React.FC<VedicInvocationBannerProps> = ({ lang }) => {

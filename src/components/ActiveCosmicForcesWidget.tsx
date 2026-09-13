@@ -30,7 +30,7 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
     const options: Intl.DateTimeFormatOptions = { timeZone, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
     const timeStr = new Intl.DateTimeFormat([], options).format(now);
     const [h, m, s] = timeStr.split(':').map(Number);
-    cityHours = h; cityMinutes = m; citySeconds = s || 0;
+    cityHours = h || 0; cityMinutes = m || 0; citySeconds = s || 0;
   } catch (e) {
     // ignore
   }

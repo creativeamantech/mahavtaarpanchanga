@@ -1,6 +1,7 @@
 export type Language = 'en' | 'hi' | 'sa';
 
 export interface TranslationDictionary {
+  [key: string]: any;
   appName: string;
   appSubtitle: string;
   invocation: string;

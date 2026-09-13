@@ -13,7 +13,7 @@ import type {
   PlanetTransitStatus,
   PlanetTransitionsData,
   TransitType,
-} from '../src/types';
+} from '../types';
 
 interface SanskritNamesData {
   masas: Record<string, string>;
@@ -34,30 +34,17 @@ let citiesData: Record<string, any> = {};
 let sanskritNames: SanskritNamesData | null = null;
 let cityList: { key: string; name: string; country: string; population: number }[] = [];
 
-export function initPanchangaEngine(rootDir: string = process.cwd()) {
-  try {
-    const namesPath = path.join(rootDir, 'data', 'sanskrit_names.json');
-    if (fs.existsSync(namesPath)) {
-      sanskritNames = JSON.parse(fs.readFileSync(namesPath, 'utf-8'));
-    }
-
-    const citiesPath = path.join(rootDir, 'data', 'cities.json');
-    if (fs.existsSync(citiesPath)) {
-      citiesData = JSON.parse(fs.readFileSync(citiesPath, 'utf-8'));
-      cityList = Object.entries(citiesData).map(([key, info]: [string, any]) => {
-        return {
-          key,
-          name: key.split(',')[0].trim(),
-          country: info.country || '',
-          population: Number(info.population) || 0,
-        };
-      });
-      // Sort city list by population descending for intuitive autocomplete
-      cityList.sort((a, b) => b.population - a.population);
-    }
-  } catch (err) {
-    console.error('Failed to initialize panchanga engine data:', err);
-  }
+export function initPanchangaEngine() {
+  if (sanskritNames) return;
+  sanskritNames = rawSanskritNames as unknown as SanskritNamesData;
+  citiesData = rawCities as Record<string, any>;
+  cityList = Object.entries(citiesData).map(([key, info]: [string, any]) => ({
+    key,
+    name: key.split(',')[0].trim(),
+    country: info.country || '',
+    population: Number(info.population) || 0,
+  }));
+  cityList.sort((a, b) => b.population - a.population);
 }
 
 export function searchCities(query: string, limit: number = 10): CityLocation[] {
@@ -1141,7 +1128,7 @@ export function computePanchanga(
   // Search for sunrise from local midnight
   let tSunrise: Astronomy.AstroTime;
   try {
-    tSunrise = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, +1, localMidnight, 1.0, 0.0);
+    tSunrise = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, +1, localMidnight, 1.0, 0.0)!;
   } catch {
     // Fallback if polar day/night or near edge
     tSunrise = Astronomy.MakeTime(new Date(localMidnightMs + 6 * 3600000));
@@ -1150,7 +1137,7 @@ export function computePanchanga(
   // Sunset
   let tSunset: Astronomy.AstroTime;
   try {
-    tSunset = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, -1, tSunrise.date, 1.0, 0.0);
+    tSunset = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, -1, tSunrise.date, 1.0, 0.0)!;
   } catch {
     tSunset = Astronomy.MakeTime(new Date(tSunrise.date.getTime() + 12 * 3600000));
   }
@@ -1158,7 +1145,7 @@ export function computePanchanga(
   // Next sunrise
   let tNextSunrise: Astronomy.AstroTime;
   try {
-    tNextSunrise = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, +1, new Date(tSunrise.date.getTime() + 12 * 3600000), 1.0, 0.0);
+    tNextSunrise = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, +1, new Date(tSunrise.date.getTime() + 12 * 3600000), 1.0, 0.0)!;
   } catch {
     tNextSunrise = Astronomy.MakeTime(new Date(tSunrise.date.getTime() + 24 * 3600000));
   }

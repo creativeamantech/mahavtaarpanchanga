@@ -7,6 +7,7 @@ import { Clock, Info } from 'lucide-react';
 interface MuhurtaTimelineBarProps {
   data: PanchangaResponse;
   lang: Language;
+  theme?: any;
 }
 
 interface TimelineSegment {

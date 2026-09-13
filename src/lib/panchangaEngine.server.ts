@@ -1,6 +1,6 @@
 import * as Astronomy from 'astronomy-engine';
-import fs from 'fs';
-import path from 'path';
+import rawCities from '../data/cities.json';
+import rawSanskritNames from '../data/sanskrit_names.json';
 import type {
   CityLocation,
   CoordinateSelection,

@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiCitiesRouteImport } from './routes/api/cities'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiNearestCityRouteImport } from './routes/api/nearest-city'
+import { Route as ApiPanchangaRouteImport } from './routes/api/panchanga'
+import { Route as ApiPanchangaMonthRouteImport } from './routes/api/panchanga.month'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +26,85 @@ const ApiCitiesRoute = ApiCitiesRouteImport.update({
   path: '/api/cities',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiNearestCityRoute = ApiNearestCityRouteImport.update({
   id: '/api/nearest-city',
   path: '/api/nearest-city',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPanchangaRoute = ApiPanchangaRouteImport.update({
+  id: '/api/panchanga',
+  path: '/api/panchanga',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPanchangaMonthRoute = ApiPanchangaMonthRouteImport.update({
+  id: '/month',
+  path: '/month',
+  getParentRoute: () => ApiPanchangaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/cities': typeof ApiCitiesRoute
+  '/api/health': typeof ApiHealthRoute
   '/api/nearest-city': typeof ApiNearestCityRoute
+  '/api/panchanga': typeof ApiPanchangaRouteWithChildren
+  '/api/panchanga/month': typeof ApiPanchangaMonthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/cities': typeof ApiCitiesRoute
+  '/api/health': typeof ApiHealthRoute
   '/api/nearest-city': typeof ApiNearestCityRoute
+  '/api/panchanga': typeof ApiPanchangaRouteWithChildren
+  '/api/panchanga/month': typeof ApiPanchangaMonthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/cities': typeof ApiCitiesRoute
+  '/api/health': typeof ApiHealthRoute
   '/api/nearest-city': typeof ApiNearestCityRoute
+  '/api/panchanga': typeof ApiPanchangaRouteWithChildren
+  '/api/panchanga/month': typeof ApiPanchangaMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/cities' | '/api/nearest-city'
+  fullPaths:
+    | '/'
+    | '/api/cities'
+    | '/api/health'
+    | '/api/nearest-city'
+    | '/api/panchanga'
+    | '/api/panchanga/month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/cities' | '/api/nearest-city'
-  id: '__root__' | '/' | '/api/cities' | '/api/nearest-city'
+  to:
+    | '/'
+    | '/api/cities'
+    | '/api/health'
+    | '/api/nearest-city'
+    | '/api/panchanga'
+    | '/api/panchanga/month'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/cities'
+    | '/api/health'
+    | '/api/nearest-city'
+    | '/api/panchanga'
+    | '/api/panchanga/month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiCitiesRoute: typeof ApiCitiesRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ApiNearestCityRoute: typeof ApiNearestCityRoute
+  ApiPanchangaRoute: typeof ApiPanchangaRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -75,6 +123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/nearest-city': {
       id: '/api/nearest-city'
       path: '/api/nearest-city'
@@ -82,13 +137,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiNearestCityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/panchanga': {
+      id: '/api/panchanga'
+      path: '/api/panchanga'
+      fullPath: '/api/panchanga'
+      preLoaderRoute: typeof ApiPanchangaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/panchanga/month': {
+      id: '/api/panchanga/month'
+      path: '/month'
+      fullPath: '/api/panchanga/month'
+      preLoaderRoute: typeof ApiPanchangaMonthRouteImport
+      parentRoute: typeof ApiPanchangaRoute
+    }
   }
 }
+
+interface ApiPanchangaRouteChildren {
+  ApiPanchangaMonthRoute: typeof ApiPanchangaMonthRoute
+}
+
+const ApiPanchangaRouteChildren: ApiPanchangaRouteChildren = {
+  ApiPanchangaMonthRoute: ApiPanchangaMonthRoute,
+}
+
+const ApiPanchangaRouteWithChildren = ApiPanchangaRoute._addFileChildren(
+  ApiPanchangaRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiCitiesRoute: ApiCitiesRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ApiNearestCityRoute: ApiNearestCityRoute,
+  ApiPanchangaRoute: ApiPanchangaRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

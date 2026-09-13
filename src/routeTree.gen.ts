@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiCitiesRouteImport } from './routes/api/cities'
+import { Route as ApiNearestCityRouteImport } from './routes/api/nearest-city'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +23,40 @@ const ApiCitiesRoute = ApiCitiesRouteImport.update({
   path: '/api/cities',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiNearestCityRoute = ApiNearestCityRouteImport.update({
+  id: '/api/nearest-city',
+  path: '/api/nearest-city',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/cities': typeof ApiCitiesRoute
+  '/api/nearest-city': typeof ApiNearestCityRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/cities': typeof ApiCitiesRoute
+  '/api/nearest-city': typeof ApiNearestCityRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/cities': typeof ApiCitiesRoute
+  '/api/nearest-city': typeof ApiNearestCityRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/cities'
+  fullPaths: '/' | '/api/cities' | '/api/nearest-city'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/cities'
-  id: '__root__' | '/' | '/api/cities'
+  to: '/' | '/api/cities' | '/api/nearest-city'
+  id: '__root__' | '/' | '/api/cities' | '/api/nearest-city'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiCitiesRoute: typeof ApiCitiesRoute
+  ApiNearestCityRoute: typeof ApiNearestCityRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +75,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/nearest-city': {
+      id: '/api/nearest-city'
+      path: '/api/nearest-city'
+      fullPath: '/api/nearest-city'
+      preLoaderRoute: typeof ApiNearestCityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiCitiesRoute: ApiCitiesRoute,
+  ApiNearestCityRoute: ApiNearestCityRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

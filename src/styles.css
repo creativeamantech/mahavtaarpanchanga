@@ -142,3 +142,311 @@
     color: var(--color-foreground);
   }
 }
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    /* Default Parchment Theme */
+    background-color: #f6f4f0;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(251, 237, 203, 0.4) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(235, 225, 240, 0.4) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(251, 237, 203, 0.4) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(220, 230, 245, 0.4) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: #292524; /* stone-800 */
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Night Sky Dark Theme (Deep Indigo & Charcoal for nighttime viewing) */
+  body.theme-night-sky,
+  [data-theme="nightSky"] body,
+  html.dark body {
+    background-color: #0b0f19;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.75) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.85) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(30, 27, 75, 0.6) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(17, 24, 39, 0.8) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: #f1f5f9;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05), inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+  
+  .glass-header {
+    background: rgba(250, 248, 245, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(214, 211, 209, 0.3);
+  }
+
+  /* Night Sky Glass Card & Header */
+  .theme-night-sky .glass-card,
+  [data-theme="nightSky"] .glass-card,
+  html.dark .glass-card {
+    background: rgba(14, 19, 32, 0.82) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(99, 102, 241, 0.22) !important;
+    box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  }
+
+  .theme-night-sky .glass-header,
+  [data-theme="nightSky"] .glass-header,
+  html.dark .glass-header {
+    background: rgba(11, 15, 25, 0.9) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.24) !important;
+  }
+}
+
+/* Night Sky Context Overrides */
+.theme-night-sky,
+[data-theme="nightSky"],
+html.dark {
+  color-scheme: dark;
+}
+
+.theme-night-sky .bg-white,
+[data-theme="nightSky"] .bg-white,
+html.dark .bg-white {
+  background-color: #12182b !important;
+}
+
+.theme-night-sky .bg-stone-50,
+[data-theme="nightSky"] .bg-stone-50,
+html.dark .bg-stone-50 {
+  background-color: #0d1222 !important;
+}
+
+.theme-night-sky .bg-stone-100,
+[data-theme="nightSky"] .bg-stone-100,
+html.dark .bg-stone-100 {
+  background-color: #161e31 !important;
+}
+
+.theme-night-sky .bg-stone-200,
+[data-theme="nightSky"] .bg-stone-200,
+html.dark .bg-stone-200 {
+  background-color: #1e293b !important;
+}
+
+.theme-night-sky .bg-amber-50,
+[data-theme="nightSky"] .bg-amber-50,
+html.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.09) !important;
+}
+
+.theme-night-sky .bg-amber-100,
+[data-theme="nightSky"] .bg-amber-100,
+html.dark .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+}
+
+.theme-night-sky .bg-emerald-50,
+[data-theme="nightSky"] .bg-emerald-50,
+html.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+}
+
+.theme-night-sky .bg-rose-50,
+[data-theme="nightSky"] .bg-rose-50,
+html.dark .bg-rose-50 {
+  background-color: rgba(244, 63, 94, 0.12) !important;
+}
+
+/* Text Colors */
+.theme-night-sky .text-stone-900,
+.theme-night-sky .text-stone-800,
+[data-theme="nightSky"] .text-stone-900,
+[data-theme="nightSky"] .text-stone-800,
+html.dark .text-stone-900,
+html.dark .text-stone-800 {
+  color: #f8fafc !important;
+}
+
+.theme-night-sky .text-stone-700,
+[data-theme="nightSky"] .text-stone-700,
+html.dark .text-stone-700 {
+  color: #e2e8f0 !important;
+}
+
+.theme-night-sky .text-stone-600,
+.theme-night-sky .text-stone-500,
+[data-theme="nightSky"] .text-stone-600,
+[data-theme="nightSky"] .text-stone-500,
+html.dark .text-stone-600,
+html.dark .text-stone-500 {
+  color: #94a3b8 !important;
+}
+
+.theme-night-sky .text-stone-400,
+[data-theme="nightSky"] .text-stone-400,
+html.dark .text-stone-400 {
+  color: #64748b !important;
+}
+
+.theme-night-sky .text-amber-950,
+.theme-night-sky .text-amber-900,
+.theme-night-sky .text-amber-800,
+[data-theme="nightSky"] .text-amber-950,
+[data-theme="nightSky"] .text-amber-900,
+[data-theme="nightSky"] .text-amber-800,
+html.dark .text-amber-950,
+html.dark .text-amber-900,
+html.dark .text-amber-800 {
+  color: #fbbf24 !important;
+}
+
+.theme-night-sky .text-amber-700,
+.theme-night-sky .text-amber-600,
+[data-theme="nightSky"] .text-amber-700,
+[data-theme="nightSky"] .text-amber-600,
+html.dark .text-amber-700,
+html.dark .text-amber-600 {
+  color: #f59e0b !important;
+}
+
+.theme-night-sky .text-indigo-950,
+.theme-night-sky .text-indigo-900,
+[data-theme="nightSky"] .text-indigo-950,
+[data-theme="nightSky"] .text-indigo-900,
+html.dark .text-indigo-950,
+html.dark .text-indigo-900 {
+  color: #c7d2fe !important;
+}
+
+.theme-night-sky .text-indigo-800,
+.theme-night-sky .text-indigo-700,
+[data-theme="nightSky"] .text-indigo-800,
+[data-theme="nightSky"] .text-indigo-700,
+html.dark .text-indigo-800,
+html.dark .text-indigo-700 {
+  color: #a5b4fc !important;
+}
+
+.theme-night-sky .text-emerald-900,
+.theme-night-sky .text-emerald-950,
+[data-theme="nightSky"] .text-emerald-900,
+[data-theme="nightSky"] .text-emerald-950,
+html.dark .text-emerald-900,
+html.dark .text-emerald-950 {
+  color: #6ee7b7 !important;
+}
+
+.theme-night-sky .text-rose-900,
+.theme-night-sky .text-rose-850,
+[data-theme="nightSky"] .text-rose-900,
+[data-theme="nightSky"] .text-rose-850,
+html.dark .text-rose-900,
+html.dark .text-rose-850 {
+  color: #fca5a5 !important;
+}
+
+/* Borders */
+.theme-night-sky .border-stone-200,
+.theme-night-sky .border-stone-100,
+[data-theme="nightSky"] .border-stone-200,
+[data-theme="nightSky"] .border-stone-100,
+html.dark .border-stone-200,
+html.dark .border-stone-100 {
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.theme-night-sky .border-stone-300,
+[data-theme="nightSky"] .border-stone-300,
+html.dark .border-stone-300 {
+  border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+.theme-night-sky .border-amber-200,
+.theme-night-sky .border-amber-300,
+[data-theme="nightSky"] .border-amber-200,
+[data-theme="nightSky"] .border-amber-300,
+html.dark .border-amber-200,
+html.dark .border-amber-300 {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Inputs & Dialogs */
+.theme-night-sky input,
+.theme-night-sky select,
+[data-theme="nightSky"] input,
+[data-theme="nightSky"] select,
+html.dark input,
+html.dark select {
+  background-color: #141b2f !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+.theme-night-sky #location-modal-dialog,
+.theme-night-sky #settings-modal-dialog,
+[data-theme="nightSky"] #location-modal-dialog,
+[data-theme="nightSky"] #settings-modal-dialog,
+html.dark #location-modal-dialog,
+html.dark #settings-modal-dialog {
+  background-color: rgba(13, 17, 30, 0.96) !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  color: #f1f5f9 !important;
+}
+
+.theme-night-sky #printable-panchanga-dialog,
+[data-theme="nightSky"] #printable-panchanga-dialog,
+html.dark #printable-panchanga-dialog {
+  background-color: #0f1527 !important;
+  border-color: rgba(99, 102, 241, 0.3) !important;
+  color: #f1f5f9 !important;
+}
+
+/* Calendar Cells in Night Sky */
+.theme-night-sky [id^="calendar-cell-"],
+[data-theme="nightSky"] [id^="calendar-cell-"],
+html.dark [id^="calendar-cell-"] {
+  border-color: rgba(99, 102, 241, 0.2) !important;
+}
+
+.theme-night-sky [id^="calendar-cell-"]:hover,
+[data-theme="nightSky"] [id^="calendar-cell-"]:hover,
+html.dark [id^="calendar-cell-"]:hover {
+  background-color: rgba(30, 41, 69, 0.6) !important;
+}
+
+/* Print Overrides: Always clean light background for paper printing */
+@media print {
+  body,
+  .theme-night-sky,
+  [data-theme="nightSky"],
+  html.dark body {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+  }
+}
+
+.font-serif-vedic {
+  font-family: 'Noto Serif Devanagari', 'Cinzel', 'Playfair Display', Georgia, serif;
+}
+
+.font-devanagari {
+  font-family: 'Noto Serif Devanagari', 'Plus Jakarta Sans', sans-serif;
+}

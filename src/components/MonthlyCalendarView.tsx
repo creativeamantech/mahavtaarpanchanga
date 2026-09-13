@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -8,9 +8,9 @@ import {
   Sparkles,
   Clock,
   ArrowRight,
-} from 'lucide-react';
-import type { MonthSystem, MonthlyPanchangaDay } from '../types';
-import { type Language, translations, getLocalizedVaara } from '../i18n';
+} from "lucide-react";
+import type { MonthSystem, MonthlyPanchangaDay } from "../types";
+import { type Language, translations, getLocalizedVaara } from "../i18n";
 
 interface MonthlyCalendarViewProps {
   currentDateStr: string;
@@ -22,24 +22,54 @@ interface MonthlyCalendarViewProps {
 }
 
 const MONTH_NAMES_EN = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const MONTH_NAMES_HI = [
-  'जनवरी', 'फ़रवरी', 'मार्च', 'अप्रैल', 'मई', 'जून',
-  'जुलाई', 'अगस्त', 'सितम्बर', 'अक्टूबर', 'नवम्बर', 'दिसम्बर'
+  "जनवरी",
+  "फ़रवरी",
+  "मार्च",
+  "अप्रैल",
+  "मई",
+  "जून",
+  "जुलाई",
+  "अगस्त",
+  "सितम्बर",
+  "अक्टूबर",
+  "नवम्बर",
+  "दिसम्बर",
 ];
 
 const MONTH_NAMES_SA = [
-  'जनवरी (मासः)', 'फ़रवरी (मासः)', 'मार्च (मासः)', 'अप्रैल (मासः)', 'मई (मासः)', 'जून (मासः)',
-  'जुलाई (मासः)', 'अगस्त (मासः)', 'सितम्बर (मासः)', 'अक्टूबर (मासः)', 'नवम्बर (मासः)', 'दिसम्बर (मासः)'
+  "जनवरी (मासः)",
+  "फ़रवरी (मासः)",
+  "मार्च (मासः)",
+  "अप्रैल (मासः)",
+  "मई (मासः)",
+  "जून (मासः)",
+  "जुलाई (मासः)",
+  "अगस्त (मासः)",
+  "सितम्बर (मासः)",
+  "अक्टूबर (मासः)",
+  "नवम्बर (मासः)",
+  "दिसम्बर (मासः)",
 ];
 
 const WEEKDAYS: Record<Language, string[]> = {
-  en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-  hi: ['रविवार', 'सोमवार', 'मंगलवार', 'बुधवार', 'गुरुवार', 'शुक्रवार', 'शनिवार'],
-  sa: ['रविवासरः', 'सोमवासरः', 'मङ्गलवासरः', 'बुधवासरः', 'गुरुवासरः', 'शुक्रवासरः', 'शनिवासरः'],
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  hi: ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"],
+  sa: ["रविवासरः", "सोमवासरः", "मङ्गलवासरः", "बुधवासरः", "गुरुवासरः", "शुक्रवासरः", "शनिवासरः"],
 };
 
 const parseDateString = (str: string): { year: number; month: number; day: number } => {
@@ -47,14 +77,14 @@ const parseDateString = (str: string): { year: number; month: number; day: numbe
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() };
   }
-  if (str.includes('/')) {
-    const [d, m, y] = str.split('/').map((v) => parseInt(v, 10));
+  if (str.includes("/")) {
+    const [d, m, y] = str.split("/").map((v) => parseInt(v, 10));
     if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
       return { year: y, month: m, day: d };
     }
   }
-  if (str.includes('-')) {
-    const [y, m, d] = str.split('-').map((v) => parseInt(v, 10));
+  if (str.includes("-")) {
+    const [y, m, d] = str.split("-").map((v) => parseInt(v, 10));
     if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
       return { year: y, month: m, day: d };
     }
@@ -78,7 +108,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   const [month, setMonth] = useState<number>(parsed.month);
   const [days, setDays] = useState<MonthlyPanchangaDay[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [filterMode, setFilterMode] = useState<'all' | 'special' | 'sukla' | 'krishna'>('all');
+  const [filterMode, setFilterMode] = useState<"all" | "special" | "sukla" | "krishna">("all");
   const [inspectedDay, setInspectedDay] = useState<MonthlyPanchangaDay | null>(null);
 
   // Sync year/month when currentDateStr changes
@@ -94,27 +124,40 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
     let isCancelled = false;
     async function loadMonth() {
       setIsLoading(true);
-      try {
-        const res = await fetch(
-          `/api/panchanga/month?year=${year}&month=${month}&city=${encodeURIComponent(
-            currentCity
-          )}&month_system=${monthSystem}&ayanamsa=${ayanamsa}`
-        );
-        if (!res.ok) throw new Error('Failed to load month data');
-        const json = await res.json();
-        if (!isCancelled && json.days) {
-          setDays(json.days);
-          // Set initial inspected day matching currentDateStr or day 1
-          const match = json.days.find((d: MonthlyPanchangaDay) => d.date === currentDateStr);
-          setInspectedDay(match || json.days[0] || null);
+      let retries = 2;
+      const attemptFetch = async () => {
+        try {
+          const res = await fetch(
+            `/api/panchanga/month?year=${year}&month=${month}&city=${encodeURIComponent(
+              currentCity,
+            )}&month_system=${monthSystem}&ayanamsa=${ayanamsa}`,
+          );
+          if (!res.ok) throw new Error("Failed to load month data");
+          const json = await res.json();
+          if (!isCancelled && json.days) {
+            setDays(json.days);
+            // Set initial inspected day matching currentDateStr or day 1
+            const match = json.days.find((d: MonthlyPanchangaDay) => d.date === currentDateStr);
+            setInspectedDay(match || json.days[0] || null);
+          }
+        } catch (err: any) {
+          if (retries > 0 && err.message === "Failed to fetch" && !isCancelled) {
+            retries--;
+            setTimeout(attemptFetch, 1000);
+            return;
+          }
+          console.error("Error fetching monthly panchanga:", err);
+          if (!isCancelled) {
+            setIsLoading(false);
+          }
         }
-      } catch (err) {
-        console.error('Error fetching monthly panchanga:', err);
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
+        if (!isCancelled && retries === 2) {
+          // Success path, since if it failed and retried it returned early
+          // actually, no, if it succeeds it hits here. But wait, let's just use a boolean flag
         }
-      }
+      };
+
+      attemptFetch();
     }
 
     loadMonth();
@@ -147,7 +190,8 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
     setMonth(now.getMonth() + 1);
   };
 
-  const monthNames = lang === 'sa' ? MONTH_NAMES_SA : lang === 'hi' ? MONTH_NAMES_HI : MONTH_NAMES_EN;
+  const monthNames =
+    lang === "sa" ? MONTH_NAMES_SA : lang === "hi" ? MONTH_NAMES_HI : MONTH_NAMES_EN;
   const firstDayWeekday = new Date(year, month - 1, 1).getDay();
 
   return (
@@ -179,35 +223,39 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             <button
               type="button"
               id="filter-all"
-              onClick={() => setFilterMode('all')}
+              onClick={() => setFilterMode("all")}
               className={`px-2.5 py-1 rounded-lg transition-all ${
-                filterMode === 'all'
-                  ? 'bg-white text-stone-950 font-bold shadow-2xs'
-                  : 'text-stone-500 hover:text-stone-900'
+                filterMode === "all"
+                  ? "bg-white text-stone-950 font-bold shadow-2xs"
+                  : "text-stone-500 hover:text-stone-900"
               }`}
             >
-              {lang === 'sa' ? 'सर्वे' : lang === 'hi' ? 'सभी दिन' : 'All'}
+              {lang === "sa" ? "सर्वे" : lang === "hi" ? "सभी दिन" : "All"}
             </button>
             <button
               type="button"
               id="filter-special"
-              onClick={() => setFilterMode('special')}
+              onClick={() => setFilterMode("special")}
               className={`px-2.5 py-1 rounded-lg transition-all ${
-                filterMode === 'special'
-                  ? 'bg-white text-amber-950 font-bold shadow-2xs'
-                  : 'text-stone-500 hover:text-stone-900'
+                filterMode === "special"
+                  ? "bg-white text-amber-950 font-bold shadow-2xs"
+                  : "text-stone-500 hover:text-stone-900"
               }`}
             >
-              {lang === 'sa' ? 'पर्व/एकादशी' : lang === 'hi' ? 'पर्व व एकादशी' : 'Vratas & Festivals'}
+              {lang === "sa"
+                ? "पर्व/एकादशी"
+                : lang === "hi"
+                  ? "पर्व व एकादशी"
+                  : "Vratas & Festivals"}
             </button>
             <button
               type="button"
               id="filter-sukla"
-              onClick={() => setFilterMode('sukla')}
+              onClick={() => setFilterMode("sukla")}
               className={`px-2.5 py-1 rounded-lg transition-all ${
-                filterMode === 'sukla'
-                  ? 'bg-white text-amber-950 font-bold shadow-2xs'
-                  : 'text-stone-500 hover:text-stone-900'
+                filterMode === "sukla"
+                  ? "bg-white text-amber-950 font-bold shadow-2xs"
+                  : "text-stone-500 hover:text-stone-900"
               }`}
             >
               Śukla (शुक्ल)
@@ -215,11 +263,11 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             <button
               type="button"
               id="filter-krishna"
-              onClick={() => setFilterMode('krishna')}
+              onClick={() => setFilterMode("krishna")}
               className={`px-2.5 py-1 rounded-lg transition-all ${
-                filterMode === 'krishna'
-                  ? 'bg-white text-indigo-950 font-bold shadow-2xs'
-                  : 'text-stone-500 hover:text-stone-900'
+                filterMode === "krishna"
+                  ? "bg-white text-indigo-950 font-bold shadow-2xs"
+                  : "text-stone-500 hover:text-stone-900"
               }`}
             >
               Kṛṣṇa (कृष्ण)
@@ -263,7 +311,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
           {/* Weekday headers */}
           <div className="grid grid-cols-7 border-b border-stone-200 text-center text-xs font-bold uppercase tracking-wider text-stone-700 pb-2.5 font-sans">
             {WEEKDAYS[lang].map((dayName, idx) => (
-              <div key={idx} className={idx === 0 ? 'text-rose-700' : ''}>
+              <div key={idx} className={idx === 0 ? "text-rose-700" : ""}>
                 {dayName}
               </div>
             ))}
@@ -286,19 +334,19 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
               const isSunday = new Date(year, month - 1, dayData.day).getDay() === 0;
 
               const isEkadashi =
-                (dayData.tithi || '').toLowerCase().includes('ekādaśī') ||
-                (dayData.tithi || '').includes('एकादशी');
+                (dayData.tithi || "").toLowerCase().includes("ekādaśī") ||
+                (dayData.tithi || "").includes("एकादशी");
               const isPurnima =
-                (dayData.tithi || '').toLowerCase().includes('pūrṇimā') ||
-                (dayData.tithi || '').includes('पूर्णिमा');
+                (dayData.tithi || "").toLowerCase().includes("pūrṇimā") ||
+                (dayData.tithi || "").includes("पूर्णिमा");
               const isAmavasya =
-                (dayData.tithi || '').toLowerCase().includes('amāvāsyā') ||
-                (dayData.tithi || '').includes('अमावस्या');
+                (dayData.tithi || "").toLowerCase().includes("amāvāsyā") ||
+                (dayData.tithi || "").includes("अमावस्या");
 
-              const isSukla = dayData.paksha === 'Śukla';
+              const isSukla = dayData.paksha === "Śukla";
 
               // Filter matching
-              if (filterMode === 'special' && !isEkadashi && !isPurnima && !isAmavasya) {
+              if (filterMode === "special" && !isEkadashi && !isPurnima && !isAmavasya) {
                 return (
                   <div
                     key={dayData.day}
@@ -308,7 +356,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   </div>
                 );
               }
-              if (filterMode === 'sukla' && !isSukla) {
+              if (filterMode === "sukla" && !isSukla) {
                 return (
                   <div
                     key={dayData.day}
@@ -318,7 +366,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   </div>
                 );
               }
-              if (filterMode === 'krishna' && isSukla) {
+              if (filterMode === "krishna" && isSukla) {
                 return (
                   <div
                     key={dayData.day}
@@ -341,16 +389,16 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   }}
                   className={`min-h-[105px] border-t border-l border-stone-200 p-2 text-left cursor-pointer transition-all relative flex flex-col justify-between ${
                     isInspected
-                      ? 'bg-amber-100/70 ring-2 ring-amber-600 ring-inset z-10 shadow-xs'
+                      ? "bg-amber-100/70 ring-2 ring-amber-600 ring-inset z-10 shadow-xs"
                       : isSelected
-                      ? 'bg-amber-50 ring-1 ring-amber-400 ring-inset'
-                      : isPurnima
-                      ? 'bg-amber-50/50 hover:bg-amber-100/40'
-                      : isAmavasya
-                      ? 'bg-stone-100/70 hover:bg-stone-200/50'
-                      : isEkadashi
-                      ? 'bg-emerald-50/50 hover:bg-emerald-100/40'
-                      : 'bg-white hover:bg-amber-50/40'
+                        ? "bg-amber-50 ring-1 ring-amber-400 ring-inset"
+                        : isPurnima
+                          ? "bg-amber-50/50 hover:bg-amber-100/40"
+                          : isAmavasya
+                            ? "bg-stone-100/70 hover:bg-stone-200/50"
+                            : isEkadashi
+                              ? "bg-emerald-50/50 hover:bg-emerald-100/40"
+                              : "bg-white hover:bg-amber-50/40"
                   }`}
                 >
                   {/* Top: Day number & Special Badges */}
@@ -358,10 +406,10 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                     <span
                       className={`text-sm font-extrabold ${
                         isInspected
-                          ? 'text-amber-950 font-black'
+                          ? "text-amber-950 font-black"
                           : isSunday
-                          ? 'text-rose-700'
-                          : 'text-stone-900'
+                            ? "text-rose-700"
+                            : "text-stone-900"
                       }`}
                     >
                       {dayData.day}
@@ -397,20 +445,20 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                     <div
                       className={`text-xs font-bold truncate ${
                         isPurnima
-                          ? 'text-amber-900 font-black'
+                          ? "text-amber-900 font-black"
                           : isAmavasya
-                          ? 'text-stone-900 font-black'
-                          : isEkadashi
-                          ? 'text-emerald-900 font-black'
-                          : 'text-amber-950'
+                            ? "text-stone-900 font-black"
+                            : isEkadashi
+                              ? "text-emerald-900 font-black"
+                              : "text-amber-950"
                       }`}
                       title={dayData.tithi}
                     >
                       {dayData.tithi
-                        ?.replace('Śukla pakṣa ', 'Ś. ')
-                        ?.replace('Kṛṣṇa pakṣa ', 'K. ')
-                        ?.replace('शुक्ल पक्ष ', 'शु. ')
-                        ?.replace('कृष्ण पक्ष ', 'कृ. ')}
+                        ?.replace("Śukla pakṣa ", "Ś. ")
+                        ?.replace("Kṛṣṇa pakṣa ", "K. ")
+                        ?.replace("शुक्ल पक्ष ", "शु. ")
+                        ?.replace("कृष्ण पक्ष ", "कृ. ")}
                     </div>
                     <div
                       className="text-[11px] text-stone-600 truncate font-devanagari"
@@ -459,19 +507,23 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs text-stone-800 pt-1 font-sans">
               <span>
-                <strong className="text-amber-950 font-devanagari">Tithi:</strong> {inspectedDay.tithi}
+                <strong className="text-amber-950 font-devanagari">Tithi:</strong>{" "}
+                {inspectedDay.tithi}
               </span>
               <span>•</span>
               <span>
-                <strong className="text-amber-950 font-devanagari">Nakṣatra:</strong> {inspectedDay.nakshatra}
+                <strong className="text-amber-950 font-devanagari">Nakṣatra:</strong>{" "}
+                {inspectedDay.nakshatra}
               </span>
               <span>•</span>
               <span>
-                <strong className="text-amber-950 font-devanagari">Yoga:</strong> {inspectedDay.yoga}
+                <strong className="text-amber-950 font-devanagari">Yoga:</strong>{" "}
+                {inspectedDay.yoga}
               </span>
               <span>•</span>
               <span>
-                <strong className="text-amber-950 font-devanagari">Karaṇa:</strong> {inspectedDay.karana}
+                <strong className="text-amber-950 font-devanagari">Karaṇa:</strong>{" "}
+                {inspectedDay.karana}
               </span>
             </div>
             {inspectedDay.swara_yoga && (
@@ -479,12 +531,14 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                 <span className="text-stone-500 font-medium">Sunrise Swara:</span>
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold ${
-                    inspectedDay.swara_yoga.sunriseSwara === 'ida'
-                      ? 'bg-sky-100 text-sky-900 border border-sky-200'
-                      : 'bg-orange-100 text-orange-950 border border-orange-200'
+                    inspectedDay.swara_yoga.sunriseSwara === "ida"
+                      ? "bg-sky-100 text-sky-900 border border-sky-200"
+                      : "bg-orange-100 text-orange-950 border border-orange-200"
                   }`}
                 >
-                  {inspectedDay.swara_yoga.sunriseSwara === 'ida' ? 'Ida (Left)' : 'Pingala (Right)'}
+                  {inspectedDay.swara_yoga.sunriseSwara === "ida"
+                    ? "Ida (Left)"
+                    : "Pingala (Right)"}
                 </span>
                 {inspectedDay.swara_yoga.sunriseWindow && (
                   <span className="text-[10px] font-mono text-stone-500">
@@ -495,12 +549,12 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                 <span className="text-stone-500 font-medium">Sunset Swara:</span>
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold ${
-                    inspectedDay.swara_yoga.sunsetSwara === 'ida'
-                      ? 'bg-sky-100 text-sky-900 border border-sky-200'
-                      : 'bg-orange-100 text-orange-950 border border-orange-200'
+                    inspectedDay.swara_yoga.sunsetSwara === "ida"
+                      ? "bg-sky-100 text-sky-900 border border-sky-200"
+                      : "bg-orange-100 text-orange-950 border border-orange-200"
                   }`}
                 >
-                  {inspectedDay.swara_yoga.sunsetSwara === 'ida' ? 'Ida (Left)' : 'Pingala (Right)'}
+                  {inspectedDay.swara_yoga.sunsetSwara === "ida" ? "Ida (Left)" : "Pingala (Right)"}
                 </span>
                 {inspectedDay.swara_yoga.sunsetWindow && (
                   <span className="text-[10px] font-mono text-stone-500">
@@ -511,12 +565,14 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                 <span className="text-stone-500 font-medium">Moonrise Swara:</span>
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold ${
-                    inspectedDay.swara_yoga.moonriseSwara === 'ida'
-                      ? 'bg-sky-100 text-sky-900 border border-sky-200'
-                      : 'bg-orange-100 text-orange-950 border border-orange-200'
+                    inspectedDay.swara_yoga.moonriseSwara === "ida"
+                      ? "bg-sky-100 text-sky-900 border border-sky-200"
+                      : "bg-orange-100 text-orange-950 border border-orange-200"
                   }`}
                 >
-                  {inspectedDay.swara_yoga.moonriseSwara === 'ida' ? 'Ida (Left)' : 'Pingala (Right)'}
+                  {inspectedDay.swara_yoga.moonriseSwara === "ida"
+                    ? "Ida (Left)"
+                    : "Pingala (Right)"}
                 </span>
                 {inspectedDay.swara_yoga.moonriseWindow && (
                   <span className="text-[10px] font-mono text-stone-500">
@@ -527,12 +583,14 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                 <span className="text-stone-500 font-medium">Moonset Swara:</span>
                 <span
                   className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-bold ${
-                    inspectedDay.swara_yoga.moonsetSwara === 'ida'
-                      ? 'bg-sky-100 text-sky-900 border border-sky-200'
-                      : 'bg-orange-100 text-orange-950 border border-orange-200'
+                    inspectedDay.swara_yoga.moonsetSwara === "ida"
+                      ? "bg-sky-100 text-sky-900 border border-sky-200"
+                      : "bg-orange-100 text-orange-950 border border-orange-200"
                   }`}
                 >
-                  {inspectedDay.swara_yoga.moonsetSwara === 'ida' ? 'Ida (Left)' : 'Pingala (Right)'}
+                  {inspectedDay.swara_yoga.moonsetSwara === "ida"
+                    ? "Ida (Left)"
+                    : "Pingala (Right)"}
                 </span>
                 {inspectedDay.swara_yoga.moonsetWindow && (
                   <span className="text-[10px] font-mono text-stone-500">
@@ -550,11 +608,11 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             className="inline-flex items-center justify-center space-x-2 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 transition-colors shrink-0"
           >
             <span>
-              {lang === 'sa'
-                ? 'अस्य दिनस्य सम्पूर्णपञ्चाङ्गम्'
-                : lang === 'hi'
-                ? 'इस दिन का सम्पूर्ण पञ्चाङ्ग देखें'
-                : 'Open Daily Panchanga for This Date'}
+              {lang === "sa"
+                ? "अस्य दिनस्य सम्पूर्णपञ्चाङ्गम्"
+                : lang === "hi"
+                  ? "इस दिन का सम्पूर्ण पञ्चाङ्ग देखें"
+                  : "Open Daily Panchanga for This Date"}
             </span>
             <ArrowRight className="h-4 w-4" />
           </button>

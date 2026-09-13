@@ -1,6 +1,6 @@
-import React from 'react';
-import { X, Printer } from 'lucide-react';
-import type { PanchangaResponse } from '../types';
+import React from "react";
+import { X, Printer } from "lucide-react";
+import type { PanchangaResponse } from "../types";
 import {
   type Language,
   translations,
@@ -11,7 +11,7 @@ import {
   getLocalizedVaara,
   getLocalizedMasa,
   getLocalizedRasi,
-} from '../i18n';
+} from "../i18n";
 
 interface PrintablePanchangaProps {
   data: PanchangaResponse;
@@ -82,28 +82,34 @@ export const PrintablePanchanga: React.FC<PrintablePanchangaProps> = ({ data, on
           {/* Vedic Hierarchy Grid */}
           <div className="mt-4 grid grid-cols-2 gap-3 text-xs border-b border-stone-200 pb-4">
             <div>
-              <span className="text-stone-500">{t.samvatsara}:</span>{' '}
+              <span className="text-stone-500">{t.samvatsara}:</span>{" "}
               <span className="font-bold">{data.samvatsara}</span>
             </div>
             <div>
-              <span className="text-stone-500">{t.masa}:</span>{' '}
-              <span className="font-bold">{localizedMasa} ({data.paksha} Pakṣa)</span>
+              <span className="text-stone-500">{t.masa}:</span>{" "}
+              <span className="font-bold">
+                {localizedMasa} ({data.paksha} Pakṣa)
+              </span>
             </div>
             <div>
-              <span className="text-stone-500">{t.ayana}:</span>{' '}
-              <span className="font-bold">{data.ayana} ({data.drik_ayana})</span>
+              <span className="text-stone-500">{t.ayana}:</span>{" "}
+              <span className="font-bold">
+                {data.ayana} ({data.drik_ayana})
+              </span>
             </div>
             <div>
-              <span className="text-stone-500">{t.rtu}:</span>{' '}
-              <span className="font-bold">{data.rtu} ({data.drik_rtu})</span>
+              <span className="text-stone-500">{t.rtu}:</span>{" "}
+              <span className="font-bold">
+                {data.rtu} ({data.drik_rtu})
+              </span>
             </div>
             <div>
-              <span className="text-stone-500">{t.sunSign}:</span>{' '}
-              <span className="font-bold">{getLocalizedRasi(data.sun_rasi || '', lang)}</span>
+              <span className="text-stone-500">{t.sunSign}:</span>{" "}
+              <span className="font-bold">{getLocalizedRasi(data.sun_rasi || "", lang)}</span>
             </div>
             <div>
-              <span className="text-stone-500">{t.moonSign}:</span>{' '}
-              <span className="font-bold">{getLocalizedRasi(data.moon_rasi || '', lang)}</span>
+              <span className="text-stone-500">{t.moonSign}:</span>{" "}
+              <span className="font-bold">{getLocalizedRasi(data.moon_rasi || "", lang)}</span>
             </div>
           </div>
 
@@ -119,11 +125,11 @@ export const PrintablePanchanga: React.FC<PrintablePanchangaProps> = ({ data, on
             </div>
             <div>
               <div className="text-stone-500 text-[11px]">{t.moonrise}</div>
-              <div className="font-bold font-mono text-sm">{data.moonrise || '—'}</div>
+              <div className="font-bold font-mono text-sm">{data.moonrise || "—"}</div>
             </div>
             <div>
               <div className="text-stone-500 text-[11px]">{t.moonset}</div>
-              <div className="font-bold font-mono text-sm">{data.moonset || '—'}</div>
+              <div className="font-bold font-mono text-sm">{data.moonset || "—"}</div>
             </div>
           </div>
 
@@ -136,37 +142,51 @@ export const PrintablePanchanga: React.FC<PrintablePanchangaProps> = ({ data, on
               <div className="flex justify-between py-1 border-b border-stone-100">
                 <span className="font-bold text-stone-700">{t.tithi}:</span>
                 <span className="font-semibold text-right">
-                  {data.tithi?.map((seg) => {
-                    const loc = seg.number ? getLocalizedTithi(seg.number, lang) : seg.name;
-                    return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ''}`;
-                  }).join(', ')}
+                  {data.tithi
+                    ?.map((seg) => {
+                      const loc = seg.number ? getLocalizedTithi(seg.number, lang) : seg.name;
+                      return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ""}`;
+                    })
+                    .join(", ")}
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-stone-100">
                 <span className="font-bold text-stone-700">{t.nakshatra}:</span>
                 <span className="font-semibold text-right">
-                  {data.nakshatra?.map((seg) => {
-                    const loc = seg.number ? getLocalizedNakshatra(seg.number, seg.name, lang) : seg.name;
-                    return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ''}`;
-                  }).join(', ')}
+                  {data.nakshatra
+                    ?.map((seg) => {
+                      const loc = seg.number
+                        ? getLocalizedNakshatra(seg.number, seg.name, lang)
+                        : seg.name;
+                      return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ""}`;
+                    })
+                    .join(", ")}
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-stone-100">
                 <span className="font-bold text-stone-700">{t.yoga}:</span>
                 <span className="font-semibold text-right">
-                  {data.yoga?.map((seg) => {
-                    const loc = seg.number ? getLocalizedYoga(seg.number, seg.name, lang) : seg.name;
-                    return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ''}`;
-                  }).join(', ')}
+                  {data.yoga
+                    ?.map((seg) => {
+                      const loc = seg.number
+                        ? getLocalizedYoga(seg.number, seg.name, lang)
+                        : seg.name;
+                      return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ""}`;
+                    })
+                    .join(", ")}
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-stone-100">
                 <span className="font-bold text-stone-700">{t.karana}:</span>
                 <span className="font-semibold text-right">
-                  {data.karana?.map((seg) => {
-                    const loc = seg.number ? getLocalizedKarana(seg.number, seg.name, lang) : seg.name;
-                    return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ''}`;
-                  }).join(', ')}
+                  {data.karana
+                    ?.map((seg) => {
+                      const loc = seg.number
+                        ? getLocalizedKarana(seg.number, seg.name, lang)
+                        : seg.name;
+                      return `${loc}${seg.ends ? ` (up to ${seg.ends})` : ""}`;
+                    })
+                    .join(", ")}
                 </span>
               </div>
               <div className="flex justify-between py-1">
@@ -183,9 +203,28 @@ export const PrintablePanchanga: React.FC<PrintablePanchangaProps> = ({ data, on
                 {t.inauspiciousTimings}
               </div>
               <div className="space-y-1">
-                <div>Rāhu Kāla: <span className="font-mono font-bold">{data.rahu_kala?.start} - {data.rahu_kala?.end}</span></div>
-                {data.yamaganda && <div>Yamagaṇḍa: <span className="font-mono">{data.yamaganda.start} - {data.yamaganda.end}</span></div>}
-                {data.gulika_kala && <div>Gulikā: <span className="font-mono">{data.gulika_kala.start} - {data.gulika_kala.end}</span></div>}
+                <div>
+                  Rāhu Kāla:{" "}
+                  <span className="font-mono font-bold">
+                    {data.rahu_kala?.start} - {data.rahu_kala?.end}
+                  </span>
+                </div>
+                {data.yamaganda && (
+                  <div>
+                    Yamagaṇḍa:{" "}
+                    <span className="font-mono">
+                      {data.yamaganda.start} - {data.yamaganda.end}
+                    </span>
+                  </div>
+                )}
+                {data.gulika_kala && (
+                  <div>
+                    Gulikā:{" "}
+                    <span className="font-mono">
+                      {data.gulika_kala.start} - {data.gulika_kala.end}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             <div>
@@ -193,16 +232,34 @@ export const PrintablePanchanga: React.FC<PrintablePanchangaProps> = ({ data, on
                 {t.auspiciousTimings}
               </div>
               <div className="space-y-1">
-                {data.abhijit_muhurta && <div>Abhijit: <span className="font-mono font-bold">{data.abhijit_muhurta.start} - {data.abhijit_muhurta.end}</span></div>}
-                {data.brahma_muhurta && <div>Brahma Muhūrta: <span className="font-mono">{data.brahma_muhurta.start} - {data.brahma_muhurta.end}</span></div>}
+                {data.abhijit_muhurta && (
+                  <div>
+                    Abhijit:{" "}
+                    <span className="font-mono font-bold">
+                      {data.abhijit_muhurta.start} - {data.abhijit_muhurta.end}
+                    </span>
+                  </div>
+                )}
+                {data.brahma_muhurta && (
+                  <div>
+                    Brahma Muhūrta:{" "}
+                    <span className="font-mono">
+                      {data.brahma_muhurta.start} - {data.brahma_muhurta.end}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           {/* Eras footer */}
           <div className="mt-6 pt-3 border-t-2 border-stone-800 flex justify-between text-[11px] text-stone-500 font-sans">
-            <div>Śaka: {data.saka_year} • Vikrama: {data.vikrama_year} • Kali: {data.kali_year}</div>
-            <div>Ayanāṁśa: {data.ayanamsa} ({data.ayanamsa_degrees?.toFixed(4)}°)</div>
+            <div>
+              Śaka: {data.saka_year} • Vikrama: {data.vikrama_year} • Kali: {data.kali_year}
+            </div>
+            <div>
+              Ayanāṁśa: {data.ayanamsa} ({data.ayanamsa_degrees?.toFixed(4)}°)
+            </div>
           </div>
         </div>
       </div>

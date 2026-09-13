@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import type { PanchangaResponse, TimingInterval } from '../types';
-import type { Language } from '../i18n';
-import { translations } from '../i18n';
-import { Clock, Info } from 'lucide-react';
+import React, { useState } from "react";
+import type { PanchangaResponse, TimingInterval } from "../types";
+import type { Language } from "../i18n";
+import { translations } from "../i18n";
+import { Clock, Info } from "lucide-react";
 
 interface MuhurtaTimelineBarProps {
   data: PanchangaResponse;
@@ -14,7 +14,7 @@ interface TimelineSegment {
   name: string;
   startMins: number;
   endMins: number;
-  type: 'auspicious' | 'inauspicious' | 'neutral' | 'solar';
+  type: "auspicious" | "inauspicious" | "neutral" | "solar";
   color: string;
   description: string;
 }
@@ -25,7 +25,7 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
 
   const parseMins = (timeStr?: string | null): number | null => {
     if (!timeStr) return null;
-    const parts = timeStr.split(':');
+    const parts = timeStr.split(":");
     if (parts.length < 2) return null;
     const h = parseInt(parts[0], 10);
     const m = parseInt(parts[1], 10);
@@ -36,7 +36,7 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
   const formatMins = (mins: number): string => {
     const h = Math.floor(mins / 60) % 24;
     const m = Math.floor(mins % 60);
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
   };
 
   const segments: TimelineSegment[] = [];
@@ -44,9 +44,9 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
   const addInterval = (
     interval: TimingInterval | undefined | null,
     name: string,
-    type: 'auspicious' | 'inauspicious' | 'neutral',
+    type: "auspicious" | "inauspicious" | "neutral",
     color: string,
-    desc: string
+    desc: string,
   ) => {
     if (!interval || !interval.start || !interval.end) return;
     const s = parseMins(interval.start);
@@ -66,58 +66,34 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
   addInterval(
     data.brahma_muhurta,
     t.brahmaMuhurta,
-    'auspicious',
-    'bg-amber-400',
-    t.brahmaMuhurtaDesc
+    "auspicious",
+    "bg-amber-400",
+    t.brahmaMuhurtaDesc,
   );
 
   // 2. Abhijit Muhurta
-  addInterval(
-    data.abhijit_muhurta,
-    t.abhijit,
-    'auspicious',
-    'bg-emerald-500',
-    t.abhijitDesc
-  );
+  addInterval(data.abhijit_muhurta, t.abhijit, "auspicious", "bg-emerald-500", t.abhijitDesc);
 
   // 3. Rahu Kala
-  addInterval(
-    data.rahu_kala,
-    t.rahuKala,
-    'inauspicious',
-    'bg-rose-500',
-    t.rahuKalaDesc
-  );
+  addInterval(data.rahu_kala, t.rahuKala, "inauspicious", "bg-rose-500", t.rahuKalaDesc);
 
   // 4. Yamaganda
-  addInterval(
-    data.yamaganda,
-    t.yamaganda,
-    'inauspicious',
-    'bg-orange-500',
-    t.yamagandaDesc
-  );
+  addInterval(data.yamaganda, t.yamaganda, "inauspicious", "bg-orange-500", t.yamagandaDesc);
 
   // 5. Gulika Kala
-  addInterval(
-    data.gulika_kala,
-    t.gulikaKala,
-    'inauspicious',
-    'bg-purple-400',
-    t.gulikaKalaDesc
-  );
+  addInterval(data.gulika_kala, t.gulikaKala, "inauspicious", "bg-purple-400", t.gulikaKalaDesc);
 
   // 6. Amrita Kala
   if (data.amrita_kala) {
     data.amrita_kala.forEach((ak, i) => {
-      addInterval(ak, `${t.amritaKala} #${i + 1}`, 'auspicious', 'bg-teal-500', t.amritaKalaDesc);
+      addInterval(ak, `${t.amritaKala} #${i + 1}`, "auspicious", "bg-teal-500", t.amritaKalaDesc);
     });
   }
 
   // 7. Durmuhurta
   if (data.durmuhurta) {
     data.durmuhurta.forEach((dm, i) => {
-      addInterval(dm, `${t.durmuhurta} #${i + 1}`, 'inauspicious', 'bg-red-400', t.durmuhurtaDesc);
+      addInterval(dm, `${t.durmuhurta} #${i + 1}`, "inauspicious", "bg-red-400", t.durmuhurtaDesc);
     });
   }
 
@@ -130,10 +106,7 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
   const sunsetMins = parseMins(data.sunset);
 
   return (
-    <div
-      id="muhurta-timeline-card"
-      className="glass-card rounded-[1.5rem] p-6 sm:p-8"
-    >
+    <div id="muhurta-timeline-card" className="glass-card rounded-[1.5rem] p-6 sm:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-stone-100 pb-3 gap-2">
         <div className="flex items-center space-x-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-800">
@@ -141,18 +114,18 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
           </div>
           <div>
             <h3 className="text-base font-bold text-stone-900 font-serif-vedic">
-              {lang === 'sa'
-                ? '२४-होरात्मक मुहूर्तावलोकनम्'
-                : lang === 'hi'
-                ? '२४ घंटे का दृश्य मुहूर्त चक्र'
-                : '24-Hour Muhūrta Visual Timeline'}
+              {lang === "sa"
+                ? "२४-होरात्मक मुहूर्तावलोकनम्"
+                : lang === "hi"
+                  ? "२४ घंटे का दृश्य मुहूर्त चक्र"
+                  : "24-Hour Muhūrta Visual Timeline"}
             </h3>
             <p className="text-xs text-stone-500 font-sans">
-              {lang === 'sa'
-                ? 'सूर्योदयानुसारं शुभाशुभमुहूर्तानां कालमानम्'
-                : lang === 'hi'
-                ? 'शुभ व अशुभ मुहूर्तों का स्पष्ट कालमान'
-                : 'Interactive diurnal timeline with exact solar transition and periods'}
+              {lang === "sa"
+                ? "सूर्योदयानुसारं शुभाशुभमुहूर्तानां कालमानम्"
+                : lang === "hi"
+                  ? "शुभ व अशुभ मुहूर्तों का स्पष्ट कालमान"
+                  : "Interactive diurnal timeline with exact solar transition and periods"}
             </p>
           </div>
         </div>
@@ -162,17 +135,17 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
           {hoveredSegment ? (
             <span className="flex items-center gap-1.5">
               <span className={`h-2.5 w-2.5 rounded-full ${hoveredSegment.color}`}></span>
-              <strong>{hoveredSegment.name}:</strong> {formatMins(hoveredSegment.startMins)} –{' '}
+              <strong>{hoveredSegment.name}:</strong> {formatMins(hoveredSegment.startMins)} –{" "}
               {formatMins(hoveredSegment.endMins)} ({hoveredSegment.description.slice(0, 35)}...)
             </span>
           ) : (
             <span className="text-stone-400 font-sans text-[11px] flex items-center gap-1">
               <Info className="h-3.5 w-3.5" />
-              {lang === 'sa'
-                ? 'विवरणं द्रष्टुं रेखाखण्डे स्पर्शं कुर्वन्तु'
-                : lang === 'hi'
-                ? 'विवरण देखने हेतु टाइमलाइन पर माउस ले जाएं'
-                : 'Hover or tap segments on timeline to inspect'}
+              {lang === "sa"
+                ? "विवरणं द्रष्टुं रेखाखण्डे स्पर्शं कुर्वन्तु"
+                : lang === "hi"
+                  ? "विवरण देखने हेतु टाइमलाइन पर माउस ले जाएं"
+                  : "Hover or tap segments on timeline to inspect"}
             </span>
           )}
         </div>
@@ -217,7 +190,7 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
                 style={{
                   left: `${leftPct}%`,
                   width: `${widthPct}%`,
-                  zIndex: seg.type === 'inauspicious' ? 10 : 8,
+                  zIndex: seg.type === "inauspicious" ? 10 : 8,
                 }}
               />
             );
@@ -261,11 +234,13 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
         <div className="flex flex-wrap items-center gap-3">
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-            <span>Abhijit / Amṛta ({lang === 'sa' ? 'शुभम्' : lang === 'hi' ? 'शुभ' : 'Auspicious'})</span>
+            <span>
+              Abhijit / Amṛta ({lang === "sa" ? "शुभम्" : lang === "hi" ? "शुभ" : "Auspicious"})
+            </span>
           </span>
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-            <span>Rāhu Kāla ({lang === 'sa' ? 'वर्ज्यम्' : lang === 'hi' ? 'अशुभ' : 'Avoid'})</span>
+            <span>Rāhu Kāla ({lang === "sa" ? "वर्ज्यम्" : lang === "hi" ? "अशुभ" : "Avoid"})</span>
           </span>
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-orange-500"></span>

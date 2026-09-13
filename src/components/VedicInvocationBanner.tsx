@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
-import type { Language } from '../i18n';
+import React, { useState } from "react";
+import { Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import type { Language } from "../i18n";
 
 interface VedicInvocationBannerProps {
   lang: Language;
@@ -22,11 +22,11 @@ export const VedicInvocationBanner: React.FC<VedicInvocationBannerProps> = ({ la
           </div>
           <div>
             <div className="text-xs font-bold uppercase tracking-widest text-amber-900/80 font-sans">
-              {lang === 'sa'
-                ? '॥ श्रीगणेशाय नमः • श्रीसूर्याय नमः ॥'
-                : lang === 'hi'
-                ? '॥ श्री गणेशाय नमः • श्री सूर्य देवाय नमः ॥'
-                : '॥ Śrī Gaṇeśāya Namaḥ • Śrī Sūryāya Namaḥ ॥'}
+              {lang === "sa"
+                ? "॥ श्रीगणेशाय नमः • श्रीसूर्याय नमः ॥"
+                : lang === "hi"
+                  ? "॥ श्री गणेशाय नमः • श्री सूर्य देवाय नमः ॥"
+                  : "॥ Śrī Gaṇeśāya Namaḥ • Śrī Sūryāya Namaḥ ॥"}
             </div>
             <div className="text-sm sm:text-base font-extrabold text-stone-900 font-serif-vedic tracking-wide mt-0.5">
               ॥ तिथेश्च श्रियमाप्नोति वारादायुष्यवर्धनम् । नक्षत्राद्धरते पापं योगाद्रोगनिवारणम् ॥
@@ -43,16 +43,16 @@ export const VedicInvocationBanner: React.FC<VedicInvocationBannerProps> = ({ la
           <Sparkles className="h-3.5 w-3.5 text-amber-700" />
           <span>
             {isExpanded
-              ? lang === 'sa'
-                ? 'संक्षिप्तम्'
-                : lang === 'hi'
-                ? 'संक्षिप्त करें'
-                : 'Hide Significance'
-              : lang === 'sa'
-                ? 'पञ्चाङ्गफलम्'
-                : lang === 'hi'
-                ? 'पञ्चाङ्ग फल जानें'
-                : 'Panchanga Phala'}
+              ? lang === "sa"
+                ? "संक्षिप्तम्"
+                : lang === "hi"
+                  ? "संक्षिप्त करें"
+                  : "Hide Significance"
+              : lang === "sa"
+                ? "पञ्चाङ्गफलम्"
+                : lang === "hi"
+                  ? "पञ्चाङ्ग फल जानें"
+                  : "Panchanga Phala"}
           </span>
           {isExpanded ? (
             <ChevronUp className="h-3.5 w-3.5 text-stone-500" />
@@ -65,37 +65,64 @@ export const VedicInvocationBanner: React.FC<VedicInvocationBannerProps> = ({ la
       {isExpanded && (
         <div className="mt-4 border-t border-amber-200/70 pt-3.5 text-xs text-stone-700 space-y-2.5 font-sans animate-in fade-in duration-200">
           <div className="font-serif-vedic text-stone-900 font-bold text-sm">
-            ॥ करणात् कार्यसिद्धिः स्यात् पञ्चाङ्गस्य फलं महत् । एतेषां श्रवणान्नित्यं गङ्गास्नानफलं लभेत् ॥
+            ॥ करणात् कार्यसिद्धिः स्यात् पञ्चाङ्गस्य फलं महत् । एतेषां श्रवणान्नित्यं गङ्गास्नानफलं
+            लभेत् ॥
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5 pt-1">
             <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200/60">
-              <span className="font-bold text-amber-950 font-serif-vedic block">१. तिथि (Tithi)</span>
+              <span className="font-bold text-amber-950 font-serif-vedic block">
+                १. तिथि (Tithi)
+              </span>
               <span className="text-[11px] text-stone-600 mt-0.5 block">
-                {lang === 'sa' ? 'श्रियमाप्नोति (लक्ष्मी-वैभवप्राप्तिः)' : lang === 'hi' ? 'लक्ष्मी व समृद्धि की प्राप्ति' : 'Confers Wealth & Prosperity (Lakṣmī)'}
+                {lang === "sa"
+                  ? "श्रियमाप्नोति (लक्ष्मी-वैभवप्राप्तिः)"
+                  : lang === "hi"
+                    ? "लक्ष्मी व समृद्धि की प्राप्ति"
+                    : "Confers Wealth & Prosperity (Lakṣmī)"}
               </span>
             </div>
             <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200/60">
               <span className="font-bold text-amber-950 font-serif-vedic block">२. वार (Vāra)</span>
               <span className="text-[11px] text-stone-600 mt-0.5 block">
-                {lang === 'sa' ? 'आयुष्यवर्धनम् (दीर्घायुः)' : lang === 'hi' ? 'आयु एवं तेज में वृद्धि' : 'Augments Longevity & Vital Energy'}
+                {lang === "sa"
+                  ? "आयुष्यवर्धनम् (दीर्घायुः)"
+                  : lang === "hi"
+                    ? "आयु एवं तेज में वृद्धि"
+                    : "Augments Longevity & Vital Energy"}
               </span>
             </div>
             <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200/60">
-              <span className="font-bold text-amber-950 font-serif-vedic block">३. नक्षत्र (Nakṣatra)</span>
+              <span className="font-bold text-amber-950 font-serif-vedic block">
+                ३. नक्षत्र (Nakṣatra)
+              </span>
               <span className="text-[11px] text-stone-600 mt-0.5 block">
-                {lang === 'sa' ? 'हरते पापम् (पापक्षयः)' : lang === 'hi' ? 'पाप व नकारात्मक कर्मों का नाश' : 'Destroys Negative Karma & Sins'}
+                {lang === "sa"
+                  ? "हरते पापम् (पापक्षयः)"
+                  : lang === "hi"
+                    ? "पाप व नकारात्मक कर्मों का नाश"
+                    : "Destroys Negative Karma & Sins"}
               </span>
             </div>
             <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200/60">
               <span className="font-bold text-amber-950 font-serif-vedic block">४. योग (Yoga)</span>
               <span className="text-[11px] text-stone-600 mt-0.5 block">
-                {lang === 'sa' ? 'रोगनिवारणम् (आरोग्यम्)' : lang === 'hi' ? 'रोगों का निवारण एवं स्वास्थ्य' : 'Dispels Disease & Bestows Health'}
+                {lang === "sa"
+                  ? "रोगनिवारणम् (आरोग्यम्)"
+                  : lang === "hi"
+                    ? "रोगों का निवारण एवं स्वास्थ्य"
+                    : "Dispels Disease & Bestows Health"}
               </span>
             </div>
             <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200/60">
-              <span className="font-bold text-amber-950 font-serif-vedic block">५. करण (Karaṇa)</span>
+              <span className="font-bold text-amber-950 font-serif-vedic block">
+                ५. करण (Karaṇa)
+              </span>
               <span className="text-[11px] text-stone-600 mt-0.5 block">
-                {lang === 'sa' ? 'कार्यसिद्धिः (सफलता)' : lang === 'hi' ? 'मनोवांछित कार्यों में सफलता' : 'Ensures Success in Undertakings'}
+                {lang === "sa"
+                  ? "कार्यसिद्धिः (सफलता)"
+                  : lang === "hi"
+                    ? "मनोवांछित कार्यों में सफलता"
+                    : "Ensures Success in Undertakings"}
               </span>
             </div>
           </div>

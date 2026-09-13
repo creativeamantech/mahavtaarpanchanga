@@ -1,7 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, X, Check, BookmarkCheck, RotateCcw, ShieldCheck, MapPin, Sparkles, Sun, Moon } from 'lucide-react';
-import type { CoordinateSelection, MonthSystem, AppTheme } from '../types';
-import { type Language, translations } from '../i18n';
+import React, { useState, useEffect } from "react";
+import {
+  Settings,
+  X,
+  Check,
+  BookmarkCheck,
+  RotateCcw,
+  ShieldCheck,
+  MapPin,
+  Sparkles,
+  Sun,
+  Moon,
+} from "lucide-react";
+import type { CoordinateSelection, MonthSystem, AppTheme } from "../types";
+import { type Language, translations } from "../i18n";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -23,54 +34,60 @@ interface SettingsModalProps {
     ayanamsa: CoordinateSelection,
     monthSystem: MonthSystem,
     saveToDevice?: boolean,
-    theme?: AppTheme
+    theme?: AppTheme,
   ) => void;
   onResetDefaults: () => void;
   lang: Language;
 }
 
-const AYANAMSA_OPTIONS: { key: CoordinateSelection; name: string; desc: string; descHi: string; descSa: string }[] = [
+const AYANAMSA_OPTIONS: {
+  key: CoordinateSelection;
+  name: string;
+  desc: string;
+  descHi: string;
+  descSa: string;
+}[] = [
   {
-    key: 'citra',
-    name: 'Chitra Paksha (Lahiri)',
-    desc: 'Official standard adopted by the Calendar Reform Committee of Government of India.',
-    descHi: 'भारत सरकार की राष्ट्रीय पंचांग सुधार समिति द्वारा स्वीकृत मानक अयनांश (लाहिड़ी)।',
-    descSa: 'भारतसर्वकारस्य पञ्चाङ्गसुधारसमित्या अङ्गीकृतः चित्रपक्ष-लाहिरी-अयनांशः।',
+    key: "citra",
+    name: "Chitra Paksha (Lahiri)",
+    desc: "Official standard adopted by the Calendar Reform Committee of Government of India.",
+    descHi: "भारत सरकार की राष्ट्रीय पंचांग सुधार समिति द्वारा स्वीकृत मानक अयनांश (लाहिड़ी)।",
+    descSa: "भारतसर्वकारस्य पञ्चाङ्गसुधारसमित्या अङ्गीकृतः चित्रपक्ष-लाहिरी-अयनांशः।",
   },
   {
-    key: 'krishnamurti',
-    name: 'Krishnamurti Paddhati (KP)',
-    desc: 'Widely used in KP astrology system; derived by Prof. K.S. Krishnamurti.',
-    descHi: 'कृष्णमूर्ति पद्धति (KP) ज्योतिष में प्रयुक्त मानक अयनांश।',
-    descSa: 'कृष्णमूर्ति-पद्धत्यां बहुप्रयुक्तः अयनांशः।',
+    key: "krishnamurti",
+    name: "Krishnamurti Paddhati (KP)",
+    desc: "Widely used in KP astrology system; derived by Prof. K.S. Krishnamurti.",
+    descHi: "कृष्णमूर्ति पद्धति (KP) ज्योतिष में प्रयुक्त मानक अयनांश।",
+    descSa: "कृष्णमूर्ति-पद्धत्यां बहुप्रयुक्तः अयनांशः।",
   },
   {
-    key: 'raman',
-    name: 'B.V. Raman',
-    desc: 'Formulated by Dr. B.V. Raman, based on traditional Hindu astronomy texts.',
-    descHi: 'डॉ. बी.वी. रामन द्वारा प्राचीन ग्रन्थों के अनुसार प्रतिपादित अयनांश।',
-    descSa: 'डा. बी.वी. रामण-महोदयेन प्रतिपादितः पारम्परिक-अयनांशः।',
+    key: "raman",
+    name: "B.V. Raman",
+    desc: "Formulated by Dr. B.V. Raman, based on traditional Hindu astronomy texts.",
+    descHi: "डॉ. बी.वी. रामन द्वारा प्राचीन ग्रन्थों के अनुसार प्रतिपादित अयनांश।",
+    descSa: "डा. बी.वी. रामण-महोदयेन प्रतिपादितः पारम्परिक-अयनांशः।",
   },
   {
-    key: 'tropical',
-    name: 'Sayana (Tropical / Western)',
-    desc: 'Western tropical zodiac (Ayanāṁśa = 0°); 0° Aries aligns with Vernal Equinox.',
-    descHi: 'सायान पद्धति (पश्चिमी निरयनांश = ०°), वसन्त विषुव पर आधारित।',
-    descSa: 'सायनायन-पद्धतिः (शून्य-अयनांशः), विषुवबिन्दुसंलग्नम्।',
+    key: "tropical",
+    name: "Sayana (Tropical / Western)",
+    desc: "Western tropical zodiac (Ayanāṁśa = 0°); 0° Aries aligns with Vernal Equinox.",
+    descHi: "सायान पद्धति (पश्चिमी निरयनांश = ०°), वसन्त विषुव पर आधारित।",
+    descSa: "सायनायन-पद्धतिः (शून्य-अयनांशः), विषुवबिन्दुसंलग्नम्।",
   },
   {
-    key: 'revati',
-    name: 'Revati (Usha-Shashi)',
-    desc: 'Zero point anchored at the star Zeta Piscium (Revatī).',
-    descHi: 'रेवती तारा (Zeta Piscium) को शून्य बिन्दु मानकर गणना।',
-    descSa: 'रेवती-तारकां शून्यबिन्दुं मत्वा निरयण-गणना।',
+    key: "revati",
+    name: "Revati (Usha-Shashi)",
+    desc: "Zero point anchored at the star Zeta Piscium (Revatī).",
+    descHi: "रेवती तारा (Zeta Piscium) को शून्य बिन्दु मानकर गणना।",
+    descSa: "रेवती-तारकां शून्यबिन्दुं मत्वा निरयण-गणना।",
   },
   {
-    key: 'pushya',
-    name: 'Pushya Paksha',
-    desc: 'Ancient Vedic star system referencing Delta Cancri (Puṣya).',
-    descHi: 'प्राचीन वैदिक गणना जो पुष्य नक्षत्र (Delta Cancri) को आधार बनाती है।',
-    descSa: 'पुष्यनक्षत्र-केन्द्रिता प्राचीनवैदिकी गणना।',
+    key: "pushya",
+    name: "Pushya Paksha",
+    desc: "Ancient Vedic star system referencing Delta Cancri (Puṣya).",
+    descHi: "प्राचीन वैदिक गणना जो पुष्य नक्षत्र (Delta Cancri) को आधार बनाती है।",
+    descSa: "पुष्यनक्षत्र-केन्द्रिता प्राचीनवैदिकी गणना।",
   },
 ];
 
@@ -143,15 +160,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <Settings className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-stone-900 font-serif-vedic">
-                {t.settings}
-              </h3>
+              <h3 className="text-base font-bold text-stone-900 font-serif-vedic">{t.settings}</h3>
               <p className="text-xs text-stone-500 font-sans">
-                {lang === 'hi'
-                  ? 'अयनांश, मास गणना एवं स्थायी डिवाइस सेटिंग्स'
-                  : lang === 'sa'
-                  ? 'अयनांश-मासमान-उपकरणव्यवस्थाश्च'
-                  : 'Ayanāṁśa, Month Reckoning & Saved Device Preferences'}
+                {lang === "hi"
+                  ? "अयनांश, मास गणना एवं स्थायी डिवाइस सेटिंग्स"
+                  : lang === "sa"
+                    ? "अयनांश-मासमान-उपकरणव्यवस्थाश्च"
+                    : "Ayanāṁśa, Month Reckoning & Saved Device Preferences"}
               </p>
             </div>
           </div>
@@ -205,9 +220,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onChange={(e) => setSaveToLocalStorage(e.target.checked)}
                 className="h-4 w-4 rounded text-amber-700 focus:ring-amber-500 border-stone-300"
               />
-              <span className="font-semibold text-stone-800">
-                {t.saveAsDefault}
-              </span>
+              <span className="font-semibold text-stone-800">{t.saveAsDefault}</span>
             </label>
           </div>
 
@@ -221,11 +234,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <button
                 type="button"
                 id="select-theme-parchment"
-                onClick={() => handleSelectTheme('parchment')}
+                onClick={() => handleSelectTheme("parchment")}
                 className={`rounded-xl border p-3 text-left transition-all ${
-                  selectedTheme === 'parchment'
-                    ? 'border-amber-600 bg-amber-50/80 ring-2 ring-amber-600/30'
-                    : 'border-stone-200 hover:bg-stone-50 bg-white'
+                  selectedTheme === "parchment"
+                    ? "border-amber-600 bg-amber-50/80 ring-2 ring-amber-600/30"
+                    : "border-stone-200 hover:bg-stone-50 bg-white"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -235,9 +248,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       {t.parchment}
                     </span>
                   </div>
-                  {selectedTheme === 'parchment' && (
-                    <Check className="h-4 w-4 text-amber-700" />
-                  )}
+                  {selectedTheme === "parchment" && <Check className="h-4 w-4 text-amber-700" />}
                 </div>
                 <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed">
                   {t.parchmentDesc}
@@ -248,11 +259,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <button
                 type="button"
                 id="select-theme-night-sky"
-                onClick={() => handleSelectTheme('nightSky')}
+                onClick={() => handleSelectTheme("nightSky")}
                 className={`rounded-xl border p-3 text-left transition-all ${
-                  selectedTheme === 'nightSky'
-                    ? 'border-indigo-500 bg-indigo-950/40 ring-2 ring-indigo-500/40 text-stone-100'
-                    : 'border-stone-200 hover:bg-stone-50 bg-white'
+                  selectedTheme === "nightSky"
+                    ? "border-indigo-500 bg-indigo-950/40 ring-2 ring-indigo-500/40 text-stone-100"
+                    : "border-stone-200 hover:bg-stone-50 bg-white"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -262,9 +273,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       {t.nightSky}
                     </span>
                   </div>
-                  {selectedTheme === 'nightSky' && (
-                    <Check className="h-4 w-4 text-indigo-400" />
-                  )}
+                  {selectedTheme === "nightSky" && <Check className="h-4 w-4 text-indigo-400" />}
                 </div>
                 <p className="text-[11px] text-stone-500 mt-1.5 leading-relaxed">
                   {t.nightSkyDesc}
@@ -282,54 +291,52 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <button
                 type="button"
                 id="select-amanta"
-                onClick={() => setSelectedMonthSystem('amanta')}
+                onClick={() => setSelectedMonthSystem("amanta")}
                 className={`rounded-xl border p-3 text-left transition-all ${
-                  selectedMonthSystem === 'amanta'
-                    ? 'border-amber-600 bg-amber-50/80 ring-2 ring-amber-600/30'
-                    : 'border-stone-200 hover:bg-stone-50 bg-white'
+                  selectedMonthSystem === "amanta"
+                    ? "border-amber-600 bg-amber-50/80 ring-2 ring-amber-600/30"
+                    : "border-stone-200 hover:bg-stone-50 bg-white"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-stone-900 text-sm font-devanagari">
                     {t.amanta}
                   </span>
-                  {selectedMonthSystem === 'amanta' && (
-                    <Check className="h-4 w-4 text-amber-700" />
-                  )}
+                  {selectedMonthSystem === "amanta" && <Check className="h-4 w-4 text-amber-700" />}
                 </div>
                 <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
-                  {lang === 'sa'
-                    ? 'अमावास्यान्तः मासः। दक्षिणभारते मुख्यतया आचर्यते।'
-                    : lang === 'hi'
-                    ? 'अमावस्या के अंत पर नवीन मास प्रारंभ (दक्षिण भारत, महाराष्ट्र, गुजरात में प्रचलित)।'
-                    : 'Month ends at New Moon (Amāvasyā). Standard in South India, Maharashtra & Gujarat.'}
+                  {lang === "sa"
+                    ? "अमावास्यान्तः मासः। दक्षिणभारते मुख्यतया आचर्यते।"
+                    : lang === "hi"
+                      ? "अमावस्या के अंत पर नवीन मास प्रारंभ (दक्षिण भारत, महाराष्ट्र, गुजरात में प्रचलित)।"
+                      : "Month ends at New Moon (Amāvasyā). Standard in South India, Maharashtra & Gujarat."}
                 </p>
               </button>
 
               <button
                 type="button"
                 id="select-purnimanta"
-                onClick={() => setSelectedMonthSystem('purnimanta')}
+                onClick={() => setSelectedMonthSystem("purnimanta")}
                 className={`rounded-xl border p-3 text-left transition-all ${
-                  selectedMonthSystem === 'purnimanta'
-                    ? 'border-amber-600 bg-amber-50/80 ring-2 ring-amber-600/30'
-                    : 'border-stone-200 hover:bg-stone-50 bg-white'
+                  selectedMonthSystem === "purnimanta"
+                    ? "border-amber-600 bg-amber-50/80 ring-2 ring-amber-600/30"
+                    : "border-stone-200 hover:bg-stone-50 bg-white"
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-stone-900 text-sm font-devanagari">
                     {t.purnimanta}
                   </span>
-                  {selectedMonthSystem === 'purnimanta' && (
+                  {selectedMonthSystem === "purnimanta" && (
                     <Check className="h-4 w-4 text-amber-700" />
                   )}
                 </div>
                 <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
-                  {lang === 'sa'
-                    ? 'पूर्णिमान्तः मासः। उत्तरभारते मुख्यतया आचर्यते।'
-                    : lang === 'hi'
-                    ? 'पूर्णिमा के अंत पर नवीन मास प्रारंभ (उत्तर भारत में सर्वाधिक प्रचलित)।'
-                    : 'Month ends at Full Moon (Pūrṇimā). Standard in North India.'}
+                  {lang === "sa"
+                    ? "पूर्णिमान्तः मासः। उत्तरभारते मुख्यतया आचर्यते।"
+                    : lang === "hi"
+                      ? "पूर्णिमा के अंत पर नवीन मास प्रारंभ (उत्तर भारत में सर्वाधिक प्रचलित)।"
+                      : "Month ends at Full Moon (Pūrṇimā). Standard in North India."}
                 </p>
               </button>
             </div>
@@ -348,14 +355,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClick={() => setSelectedAyanamsa(opt.key)}
                   className={`flex items-start justify-between rounded-xl border p-3 cursor-pointer transition-all ${
                     selectedAyanamsa === opt.key
-                      ? 'border-amber-600 bg-amber-50/80 ring-1 ring-amber-600/30'
-                      : 'border-stone-200 hover:bg-stone-50 bg-white'
+                      ? "border-amber-600 bg-amber-50/80 ring-1 ring-amber-600/30"
+                      : "border-stone-200 hover:bg-stone-50 bg-white"
                   }`}
                 >
                   <div className="pr-3">
                     <div className="font-bold text-stone-900 text-sm">{opt.name}</div>
                     <div className="text-xs text-stone-500 mt-0.5 font-sans">
-                      {lang === 'sa' ? opt.descSa : lang === 'hi' ? opt.descHi : opt.desc}
+                      {lang === "sa" ? opt.descSa : lang === "hi" ? opt.descHi : opt.desc}
                     </div>
                   </div>
                   {selectedAyanamsa === opt.key && (

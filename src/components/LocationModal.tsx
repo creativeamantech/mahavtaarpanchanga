@@ -1,7 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Search, MapPin, X, Navigation, Check, Loader2, Compass, BookmarkCheck, AlertTriangle } from 'lucide-react';
-import type { CityLocation } from '../types';
-import { type Language, translations } from '../i18n';
+import React, { useState, useEffect } from "react";
+import {
+  Search,
+  MapPin,
+  X,
+  Navigation,
+  Check,
+  Loader2,
+  Compass,
+  BookmarkCheck,
+  AlertTriangle,
+} from "lucide-react";
+import type { CityLocation } from "../types";
+import { type Language, translations } from "../i18n";
 
 interface LocationModalProps {
   isOpen: boolean;
@@ -23,7 +33,7 @@ interface LocationModalProps {
     name: string,
     isDeviceLocation?: boolean,
     accuracyMeters?: number,
-    saveAsDefault?: boolean
+    saveAsDefault?: boolean,
   ) => void;
   lang: Language;
 }
@@ -37,8 +47,8 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   onSelectCustom,
   lang,
 }) => {
-  const [activeTab, setActiveTab] = useState<'device' | 'search' | 'custom'>('device');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState<"device" | "search" | "custom">("device");
+  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<CityLocation[]>([]);
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [geoNotice, setGeoNotice] = useState<string | null>(null);
@@ -57,10 +67,10 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   } | null>(null);
 
   // Custom coordinates form state
-  const [customName, setCustomName] = useState('My Location');
-  const [customLat, setCustomLat] = useState(customCoords ? String(customCoords.lat) : '12.97194');
-  const [customLon, setCustomLon] = useState(customCoords ? String(customCoords.lon) : '77.59369');
-  const [customTz, setCustomTz] = useState(customCoords ? customCoords.tz : 'Asia/Kolkata');
+  const [customName, setCustomName] = useState("My Location");
+  const [customLat, setCustomLat] = useState(customCoords ? String(customCoords.lat) : "12.97194");
+  const [customLon, setCustomLon] = useState(customCoords ? String(customCoords.lon) : "77.59369");
+  const [customTz, setCustomTz] = useState(customCoords ? customCoords.tz : "Asia/Kolkata");
 
   const t = translations[lang];
 
@@ -68,7 +78,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
     if (!isOpen) return;
     setGeoNotice(null);
     if (!searchTerm.trim()) {
-      fetch('/api/cities?limit=12')
+      fetch("/api/cities?limit=12")
         .then((res) => res.json())
         .then((data) => setSearchResults(data.cities || []))
         .catch(() => {});
@@ -104,24 +114,24 @@ export const LocationModal: React.FC<LocationModalProps> = ({
     const lat = parseFloat(customLat);
     const lon = parseFloat(customLon);
     if (isNaN(lat) || isNaN(lon)) {
-      setGeoNotice('Invalid coordinates entered. Please verify latitude and longitude values.');
+      setGeoNotice("Invalid coordinates entered. Please verify latitude and longitude values.");
       return;
     }
     onSelectCustom(
       lat,
       lon,
-      customTz.trim() || 'Asia/Kolkata',
-      customName.trim() || 'Custom Location',
+      customTz.trim() || "Asia/Kolkata",
+      customName.trim() || "Custom Location",
       false,
       undefined,
-      saveAsDefault
+      saveAsDefault,
     );
     onClose();
   };
 
   const handleDetectDeviceLocation = () => {
     if (!navigator.geolocation) {
-      setGeoNotice('Geolocation is not supported by your browser.');
+      setGeoNotice("Geolocation is not supported by your browser.");
       return;
     }
 
@@ -133,7 +143,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
         const accuracy = Math.round(pos.coords.accuracy || 0);
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata';
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
 
         let nearestCityName: string | undefined;
         let distanceKm: number | undefined;
@@ -143,7 +153,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           if (res.ok) {
             const data = await res.json();
             if (data?.city?.name) {
-              nearestCityName = data.city.name.split(',')[0].trim();
+              nearestCityName = data.city.name.split(",")[0].trim();
               distanceKm = data.distanceKm;
             }
           }
@@ -175,11 +185,13 @@ export const LocationModal: React.FC<LocationModalProps> = ({
       },
       (err) => {
         setIsDetectingGps(false);
-        let msg = 'Location access was unavailable. You can enter coordinates manually or select a city.';
+        let msg =
+          "Location access was unavailable. You can enter coordinates manually or select a city.";
         if (err.code === err.PERMISSION_DENIED) {
-          msg = 'Location permission was denied. Please allow location access in your browser settings, or select a city manually.';
+          msg =
+            "Location permission was denied. Please allow location access in your browser settings, or select a city manually.";
         } else if (err.code === err.TIMEOUT) {
-          msg = 'Location request timed out. Please try again or enter your coordinates.';
+          msg = "Location request timed out. Please try again or enter your coordinates.";
         }
         setGeoNotice(msg);
       },
@@ -187,7 +199,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         enableHighAccuracy: true,
         timeout: 12000,
         maximumAge: 0,
-      }
+      },
     );
   };
 
@@ -200,7 +212,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
       detectedGps.displayName,
       true,
       detectedGps.accuracy,
-      saveAsDefault
+      saveAsDefault,
     );
     onClose();
   };
@@ -225,11 +237,11 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 {t.changeLocation}
               </h3>
               <p className="text-xs text-stone-500 font-sans">
-                {lang === 'sa'
-                  ? 'प्रत्यक्षदृग्गणितार्थं स्थानचयनम्'
-                  : lang === 'hi'
-                  ? 'सटीक प्रत्यक्ष गणना हेतु अपना नगर या डिवाइस स्थान चुनें'
-                  : `Currently active: ${currentCity}`}
+                {lang === "sa"
+                  ? "प्रत्यक्षदृग्गणितार्थं स्थानचयनम्"
+                  : lang === "hi"
+                    ? "सटीक प्रत्यक्ष गणना हेतु अपना नगर या डिवाइस स्थान चुनें"
+                    : `Currently active: ${currentCity}`}
               </p>
             </div>
           </div>
@@ -247,11 +259,11 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           <button
             type="button"
             id="tab-device-location"
-            onClick={() => setActiveTab('device')}
+            onClick={() => setActiveTab("device")}
             className={`flex-1 rounded-lg py-1.5 text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-              activeTab === 'device'
-                ? 'bg-white text-stone-900 shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
+              activeTab === "device"
+                ? "bg-white text-stone-900 shadow-xs"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             <Navigation className="h-3.5 w-3.5 text-amber-700" />
@@ -260,11 +272,11 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           <button
             type="button"
             id="tab-search-cities"
-            onClick={() => setActiveTab('search')}
+            onClick={() => setActiveTab("search")}
             className={`flex-1 rounded-lg py-1.5 text-xs font-bold transition-all ${
-              activeTab === 'search'
-                ? 'bg-white text-stone-900 shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
+              activeTab === "search"
+                ? "bg-white text-stone-900 shadow-xs"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             {t.searchCity}
@@ -272,11 +284,11 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           <button
             type="button"
             id="tab-custom-coords"
-            onClick={() => setActiveTab('custom')}
+            onClick={() => setActiveTab("custom")}
             className={`flex-1 rounded-lg py-1.5 text-xs font-bold transition-all ${
-              activeTab === 'custom'
-                ? 'bg-white text-stone-900 shadow-xs'
-                : 'text-stone-600 hover:text-stone-900'
+              activeTab === "custom"
+                ? "bg-white text-stone-900 shadow-xs"
+                : "text-stone-600 hover:text-stone-900"
             }`}
           >
             {t.customCoords}
@@ -291,7 +303,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         )}
 
         {/* TAB 1: Device Location (GPS) */}
-        {activeTab === 'device' && (
+        {activeTab === "device" && (
           <div className="mt-4 space-y-4 flex-1 overflow-y-auto">
             <div className="rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50/70 to-orange-50/50 p-5 text-stone-800">
               <div className="flex items-center gap-3">
@@ -300,18 +312,18 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-amber-950 font-serif-vedic">
-                    {lang === 'hi'
-                      ? 'डिवाइस का प्रत्यक्ष जीपीएस स्थान'
-                      : lang === 'sa'
-                      ? 'उपकरणस्य साक्षात् जीपीएस-स्थानम्'
-                      : 'High-Precision Device GPS Location'}
+                    {lang === "hi"
+                      ? "डिवाइस का प्रत्यक्ष जीपीएस स्थान"
+                      : lang === "sa"
+                        ? "उपकरणस्य साक्षात् जीपीएस-स्थानम्"
+                        : "High-Precision Device GPS Location"}
                   </h4>
                   <p className="text-xs text-stone-600 mt-0.5">
-                    {lang === 'hi'
-                      ? 'अपने उपकरण के वास्तविक जीपीएस द्वारा सूर्योदय, नक्षत्र एवं लग्न की शुद्धतम गणना करें।'
-                      : lang === 'sa'
-                      ? 'उपकरणस्य प्रत्यक्षस्थानेन शुद्धसूर्योदयलग्नयोः साधनं भवति।'
-                      : 'Directly reads browser GPS coordinates for exact local astronomical calculations.'}
+                    {lang === "hi"
+                      ? "अपने उपकरण के वास्तविक जीपीएस द्वारा सूर्योदय, नक्षत्र एवं लग्न की शुद्धतम गणना करें।"
+                      : lang === "sa"
+                        ? "उपकरणस्य प्रत्यक्षस्थानेन शुद्धसूर्योदयलग्नयोः साधनं भवति।"
+                        : "Directly reads browser GPS coordinates for exact local astronomical calculations."}
                   </p>
                 </div>
               </div>
@@ -330,19 +342,31 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs pt-1">
                     <div className="bg-white/80 rounded-lg p-2 border border-emerald-100">
-                      <span className="text-[10px] text-stone-500 uppercase block font-bold">Latitude</span>
-                      <span className="font-mono font-bold text-stone-900">{detectedGps.lat.toFixed(5)}° N</span>
+                      <span className="text-[10px] text-stone-500 uppercase block font-bold">
+                        Latitude
+                      </span>
+                      <span className="font-mono font-bold text-stone-900">
+                        {detectedGps.lat.toFixed(5)}° N
+                      </span>
                     </div>
                     <div className="bg-white/80 rounded-lg p-2 border border-emerald-100">
-                      <span className="text-[10px] text-stone-500 uppercase block font-bold">Longitude</span>
-                      <span className="font-mono font-bold text-stone-900">{detectedGps.lon.toFixed(5)}° E</span>
+                      <span className="text-[10px] text-stone-500 uppercase block font-bold">
+                        Longitude
+                      </span>
+                      <span className="font-mono font-bold text-stone-900">
+                        {detectedGps.lon.toFixed(5)}° E
+                      </span>
                     </div>
                   </div>
                   {detectedGps.nearestCityName && (
                     <div className="text-[11px] text-stone-700 bg-white/60 p-2 rounded-lg border border-emerald-100 flex items-center justify-between">
-                      <span>Nearest City: <strong>{detectedGps.nearestCityName}</strong></span>
+                      <span>
+                        Nearest City: <strong>{detectedGps.nearestCityName}</strong>
+                      </span>
                       {detectedGps.distanceKm !== undefined && (
-                        <span className="text-stone-500 font-mono">~{detectedGps.distanceKm} km</span>
+                        <span className="text-stone-500 font-mono">
+                          ~{detectedGps.distanceKm} km
+                        </span>
                       )}
                     </div>
                   )}
@@ -366,7 +390,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   ) : (
                     <>
                       <Navigation className="h-4 w-4" />
-                      <span>{detectedGps ? 'Refresh Device Location' : t.detectGps}</span>
+                      <span>{detectedGps ? "Refresh Device Location" : t.detectGps}</span>
                     </>
                   )}
                 </button>
@@ -390,10 +414,14 @@ export const LocationModal: React.FC<LocationModalProps> = ({
               <div className="rounded-xl border border-stone-200 bg-white p-3 text-xs flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-stone-700">Currently using active device GPS: <strong>{customCoords.name}</strong></span>
+                  <span className="text-stone-700">
+                    Currently using active device GPS: <strong>{customCoords.name}</strong>
+                  </span>
                 </div>
                 {customCoords.accuracyMeters && (
-                  <span className="text-[10px] text-stone-500 font-mono">±{customCoords.accuracyMeters}m</span>
+                  <span className="text-[10px] text-stone-500 font-mono">
+                    ±{customCoords.accuracyMeters}m
+                  </span>
                 )}
               </div>
             )}
@@ -401,7 +429,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         )}
 
         {/* TAB 2: Search Cities */}
-        {activeTab === 'search' && (
+        {activeTab === "search" && (
           <div className="mt-4 flex-1 flex flex-col min-h-0 space-y-3">
             {/* Search Input */}
             <div className="relative">
@@ -454,7 +482,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         )}
 
         {/* TAB 3: Custom Coordinates */}
-        {activeTab === 'custom' && (
+        {activeTab === "custom" && (
           <form onSubmit={handleCustomSubmit} className="mt-4 space-y-3 flex-1 overflow-y-auto">
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">

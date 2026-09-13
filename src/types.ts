@@ -35,7 +35,7 @@ export interface PlanetPosition {
   isRetrograde?: boolean;
 }
 
-export type TransitType = 'rasi' | 'nakshatra' | 'retrograde' | 'direct' | 'combust' | 'rise';
+export type TransitType = "rasi" | "nakshatra" | "retrograde" | "direct" | "combust" | "rise";
 
 export interface PlanetTransitionEvent {
   id: string;
@@ -91,20 +91,20 @@ export interface PlanetTransitionsData {
   todayEvents: PlanetTransitionEvent[];
 }
 
-export type SwaraNadi = 'ida' | 'pingala' | 'sushumna';
+export type SwaraNadi = "ida" | "pingala" | "sushumna";
 
 export interface SwaraDayRule {
   dayNumber: number; // 1 to 30
   tithiName: string;
-  paksha: 'Shukla Paksha' | 'Krishna Paksha' | 'Full moon' | 'No Moon';
+  paksha: "Shukla Paksha" | "Krishna Paksha" | "Full moon" | "No Moon";
   sunriseSwara: SwaraNadi;
   sunsetSwara: SwaraNadi;
-  sunriseNostril: 'Left' | 'Right';
-  sunsetNostril: 'Left' | 'Right';
+  sunriseNostril: "Left" | "Right";
+  sunsetNostril: "Left" | "Right";
   moonriseSwara: SwaraNadi;
   moonsetSwara: SwaraNadi;
-  moonriseNostril: 'Left' | 'Right';
-  moonsetNostril: 'Left' | 'Right';
+  moonriseNostril: "Left" | "Right";
+  moonsetNostril: "Left" | "Right";
 }
 
 export interface SwaraTimingWindow {
@@ -125,24 +125,24 @@ export interface SwaraYogaData {
   paksha: string;
   sunriseSwara: SwaraNadi;
   sunsetSwara: SwaraNadi;
-  sunriseNostril: 'Left' | 'Right';
-  sunsetNostril: 'Left' | 'Right';
+  sunriseNostril: "Left" | "Right";
+  sunsetNostril: "Left" | "Right";
   moonriseSwara: SwaraNadi;
   moonsetSwara: SwaraNadi;
-  moonriseNostril: 'Left' | 'Right';
-  moonsetNostril: 'Left' | 'Right';
+  moonriseNostril: "Left" | "Right";
+  moonsetNostril: "Left" | "Right";
   sunriseWindow?: SwaraTimingWindow;
   sunsetWindow?: SwaraTimingWindow;
   moonriseWindow?: SwaraTimingWindow | null;
   moonsetWindow?: SwaraTimingWindow | null;
-  activeCelestialWindow?: 'sunrise' | 'sunset' | 'moonrise' | 'moonset' | null;
+  activeCelestialWindow?: "sunrise" | "sunset" | "moonrise" | "moonset" | null;
   currentActiveSwara?: SwaraNadi;
-  activeNostril?: 'Left' | 'Right' | 'Both';
+  activeNostril?: "Left" | "Right" | "Both";
   minutesIntoCycle?: number;
   minutesRemainingInCycle?: number;
   cycleNumberToday?: number;
   activeTattva?: {
-    name: 'Prithvi' | 'Jala' | 'Tejas' | 'Vayu' | 'Akasha';
+    name: "Prithvi" | "Jala" | "Tejas" | "Vayu" | "Akasha";
     sanskrit: string;
     element: string;
     color: string;
@@ -157,12 +157,12 @@ export interface PanchangaResponse {
   timezone: string;
   jd: number;
   sunrise_jd: number;
-  coordinate_mode: 'sidereal' | 'tropical';
+  coordinate_mode: "sidereal" | "tropical";
   coordinate_label: string;
   ayanamsa: string | null;
   ayanamsa_key: string | null;
   ayanamsa_degrees: number | null;
-  month_system: 'amanta' | 'purnimanta';
+  month_system: "amanta" | "purnimanta";
   month_system_label: string;
   samvatsara: string;
   samvatsara_north: string;
@@ -190,7 +190,7 @@ export interface PanchangaResponse {
   moonset_status: string;
   day_duration: string;
   night_duration?: string;
-  paksha?: 'Śukla' | 'Kṛṣṇa';
+  paksha?: "Śukla" | "Kṛṣṇa";
   rahu_kala: TimingInterval;
   yamaganda?: TimingInterval;
   gulika_kala?: TimingInterval;
@@ -213,16 +213,9 @@ export interface PanchangaResponse {
 }
 
 export type CoordinateSelection =
-  | 'citra'
-  | 'revati'
-  | 'rohini'
-  | 'pushya'
-  | 'mula'
-  | 'krishnamurti'
-  | 'raman'
-  | 'tropical';
+  "citra" | "revati" | "rohini" | "pushya" | "mula" | "krishnamurti" | "raman" | "tropical";
 
-export type MonthSystem = 'amanta' | 'purnimanta';
+export type MonthSystem = "amanta" | "purnimanta";
 
 export interface MonthlyPanchangaDay {
   day: number;
@@ -235,15 +228,15 @@ export interface MonthlyPanchangaDay {
   sunrise: string;
   sunset: string;
   masa: string;
-  paksha?: 'Śukla' | 'Kṛṣṇa';
+  paksha?: "Śukla" | "Kṛṣṇa";
   rahu_kala?: TimingInterval;
   swara_yoga?: SwaraYogaData;
 }
 
-export type AppTheme = 'parchment' | 'nightSky';
+export type AppTheme = "parchment" | "nightSky";
 
 export interface UserSettings {
-  lang: 'en' | 'hi' | 'sa';
+  lang: "en" | "hi" | "sa";
   ayanamsa: CoordinateSelection;
   monthSystem: MonthSystem;
   currentCity: string;
@@ -258,4 +251,3 @@ export interface UserSettings {
   } | null;
   savedAt?: string;
 }
-

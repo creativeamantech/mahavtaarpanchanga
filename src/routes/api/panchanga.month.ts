@@ -5,9 +5,8 @@ export const Route = createFileRoute("/api/panchanga/month")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const { initPanchangaEngine, computePanchanga } = await import(
-          "@/lib/panchangaEngine.server"
-        );
+        const { initPanchangaEngine, computePanchanga } =
+          await import("@/lib/panchangaEngine.server");
         initPanchangaEngine();
         const url = new URL(request.url);
         const q = url.searchParams;

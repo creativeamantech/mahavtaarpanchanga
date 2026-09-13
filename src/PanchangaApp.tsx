@@ -40,6 +40,7 @@ import {
   Navigation,
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
+import { schedulePanchangaNotifications, getNotificationPreferences } from "./lib/notificationEngine";
 import type { ActiveView } from "./components/Header";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -145,7 +146,28 @@ export default function App() {
   const t = translations[lang];
 
   // Sync theme with HTML root and body class
+  
+  // Notification Scheduler
   useEffect(() => {
+    if (panchangaData) {
+      const prefs = getNotificationPreferences();
+      schedulePanchangaNotifications(panchangaData, prefs);
+    }
+  }, [panchangaData]);
+
+  // Listener for preferences update
+  useEffect(() => {
+    const handlePrefsUpdate = () => {
+      if (panchangaData) {
+        const prefs = getNotificationPreferences();
+        schedulePanchangaNotifications(panchangaData, prefs);
+      }
+    };
+    window.addEventListener("mahavtaar_notif_prefs_updated", handlePrefsUpdate);
+    return () => window.removeEventListener("mahavtaar_notif_prefs_updated", handlePrefsUpdate);
+  }, [panchangaData]);
+
+useEffect(() => {
     if (theme === "nightSky") {
       document.documentElement.classList.add("dark");
       document.body.classList.add("theme-night-sky");

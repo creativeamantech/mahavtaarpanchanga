@@ -155,7 +155,7 @@ export function VedicHorasView({ panchangaData }: { panchangaData: PanchangaResp
             </div>
           </div>
         ) : (
-          <div className="p-8 text-center text-stone-500">Loading live data...</div>
+          <div className="p-8 text-center text-stone-500">Active Hora is only shown for the current day.</div>
         )}
       </div>
 

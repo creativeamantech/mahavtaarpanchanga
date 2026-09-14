@@ -181,7 +181,7 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
               </>
             ) : (
               <div className={`text-xs ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-                Hora data unavailable at this time.
+                Active Hora is only shown for the current day.
               </div>
             )}
           </div>

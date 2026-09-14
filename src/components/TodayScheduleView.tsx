@@ -390,7 +390,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                       : "Pingala (Surya / Right)"}
                   </div>
                   <div className="text-[10px] text-stone-500 mt-0.5">
-                    {liveState.currentNadi?.metadata?.nostril || "Inflow nostril"}
+                    {String(liveState.currentNadi?.metadata?.nostril ?? "Inflow nostril")}
                   </div>
                 </div>
 

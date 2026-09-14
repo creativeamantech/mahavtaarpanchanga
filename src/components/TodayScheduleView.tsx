@@ -629,9 +629,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                     {slot.events.map((ev) => {
                       const isExpanded = expandedEventId === ev.id;
                       const hasHoraTattvas =
-                        ev.type === "hora" &&
-                        ev.metadata?.tattvas &&
-                        Array.isArray(ev.metadata.tattvas);
+                        ev.type === "hora" && Array.isArray(ev.metadata?.tattvas);
 
                       return (
                         <div

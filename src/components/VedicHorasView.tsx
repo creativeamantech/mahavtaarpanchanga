@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { DailyHoras, Hora, TattvaPeriod, computeDailyHoras } from "../horaEngine";
 import { Sun, Moon, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { PanchangaResponse } from "../types";
 
-export function VedicHorasView({ panchangaData }: { panchangaData: any }) {
+export function VedicHorasView({ panchangaData }: { panchangaData: PanchangaResponse }) {
   const [dailyHoras, setDailyHoras] = useState<DailyHoras | null>(null);
   const [now, setNow] = useState(Date.now());
   const [expandedHora, setExpandedHora] = useState<number | null>(null);
@@ -14,9 +15,7 @@ export function VedicHorasView({ panchangaData }: { panchangaData: any }) {
 
   useEffect(() => {
     if (panchangaData) {
-      const parts = panchangaData.date.split("/");
-      const dateObj = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
-      const weekday = dateObj.getDay();
+      const weekday = panchangaData.weekday;
 
       const horas = computeDailyHoras(
         panchangaData.date,
@@ -25,6 +24,7 @@ export function VedicHorasView({ panchangaData }: { panchangaData: any }) {
         panchangaData.next_sunrise_ms!,
         weekday,
         panchangaData.tithi[0]?.number || 1,
+        panchangaData.timezone,
         now,
       );
       setDailyHoras(horas);

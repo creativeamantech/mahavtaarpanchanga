@@ -61,9 +61,7 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
   const activeSwara = SWARA_DETAILS[activeSwaraId];
 
   // Compute Hora
-  const parts = data.date.split("/");
-  const dateObj = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
-  const weekday = dateObj.getDay();
+  const weekday = data.weekday;
 
   // We need to pass the city's current timestamp for the hora calculation.
   // horaEngine compares the timestamp passed with start/endTimeMs.
@@ -78,6 +76,7 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
     data.next_sunrise_ms!,
     weekday,
     primaryTithiNum,
+    data.timezone,
     now.getTime(),
   );
 

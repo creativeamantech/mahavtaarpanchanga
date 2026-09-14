@@ -167,10 +167,7 @@ export function schedulePanchangaNotifications(
 
   // 3. Horas
   if (prefs.horas && data.sunrise_ms && data.sunset_ms && data.next_sunrise_ms) {
-    // We need weekday. We can get it from date.
-    const parts = date.split("/");
-    const base = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
-    const weekday = base.getDay();
+    const weekday = data.weekday;
 
     // Tithi number estimation (rough is okay for swara in horas, but we have data.tithi)
     const primaryTithiNum = data.tithi && data.tithi.length > 0 ? data.tithi[0].number : 1;
@@ -182,7 +179,8 @@ export function schedulePanchangaNotifications(
       data.next_sunrise_ms,
       weekday,
       primaryTithiNum,
-      base.getTime(), // We evaluate from midnight to get all horas
+      data.timezone,
+      Date.now(),
     );
 
     horasData.horas.forEach((hora) => {

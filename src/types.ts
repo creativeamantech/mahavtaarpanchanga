@@ -174,6 +174,7 @@ export interface PanchangaResponse {
   rtu: string;
   drik_rtu: string;
   vaara: string;
+  weekday: number;
   kali_day: number;
   saka_year: number;
   kali_year: number;

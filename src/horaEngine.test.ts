@@ -15,6 +15,7 @@ describe("Hora Engine", () => {
       nextSunrise,
       2 /* Tuesday */,
       1,
+      "UTC",
       sunrise,
     );
 
@@ -36,6 +37,7 @@ describe("Hora Engine", () => {
       nextSunrise,
       3 /* Wednesday */,
       1,
+      "UTC",
       sunrise,
     );
 
@@ -67,7 +69,16 @@ describe("Hora Engine", () => {
     const nextSunrise = new Date("2023-01-02T06:00:00Z").getTime();
 
     for (let w = 0; w < 7; w++) {
-      const result = computeDailyHoras("01/01/2023", sunrise, sunset, nextSunrise, w, 1, sunrise);
+      const result = computeDailyHoras(
+        "01/01/2023",
+        sunrise,
+        sunset,
+        nextSunrise,
+        w,
+        1,
+        "UTC",
+        sunrise,
+      );
       expect(result.horas[0].ruler).toBe(EXPECTED_FIRST[w]);
 
       // Verify sequence (cyclical over the week array)
@@ -83,7 +94,16 @@ describe("Hora Engine", () => {
     const sunset = new Date("2023-01-01T17:00:00Z").getTime();
     const nextSunrise = new Date("2023-01-02T07:15:00Z").getTime();
 
-    const result = computeDailyHoras("01/01/2023", sunrise, sunset, nextSunrise, 0, 1, sunrise);
+    const result = computeDailyHoras(
+      "01/01/2023",
+      sunrise,
+      sunset,
+      nextSunrise,
+      0,
+      1,
+      "UTC",
+      sunrise,
+    );
 
     expect(result.horas[0].startTimeMs).toBe(sunrise);
     expect(result.horas[11].endTimeMs).toBe(sunset);
@@ -102,7 +122,16 @@ describe("Hora Engine", () => {
     const nextSunrise = new Date("2023-01-02T06:00:00Z").getTime();
 
     // Exactly at Hora 1 start
-    let result = computeDailyHoras("01/01/2023", sunrise, sunset, nextSunrise, 0, 1, sunrise);
+    let result = computeDailyHoras(
+      "01/01/2023",
+      sunrise,
+      sunset,
+      nextSunrise,
+      0,
+      1,
+      "UTC",
+      sunrise,
+    );
     expect(result.activeHora?.index).toBe(1);
 
     // Inside Hora 1
@@ -113,6 +142,7 @@ describe("Hora Engine", () => {
       nextSunrise,
       0,
       1,
+      "UTC",
       sunrise + 30 * 60 * 1000,
     );
     expect(result.activeHora?.index).toBe(1);
@@ -125,8 +155,53 @@ describe("Hora Engine", () => {
       nextSunrise,
       0,
       1,
+      "UTC",
       sunrise + 60 * 60 * 1000,
     );
     expect(result.activeHora?.index).toBe(2);
+  });
+
+  test("Test I - Timezone Display Isolation", () => {
+    const sunrise = new Date("2023-01-01T06:00:00Z").getTime();
+    const sunset = new Date("2023-01-01T18:00:00Z").getTime();
+    const nextSunrise = new Date("2023-01-02T06:00:00Z").getTime();
+
+    const timeZones = [
+      { tz: "UTC", expectedStart: "06:00:00 AM" },
+      { tz: "Asia/Kolkata", expectedStart: "11:30:00 AM" },
+      { tz: "America/New_York", expectedStart: "01:00:00 AM" }, // UTC-5
+      { tz: "Europe/London", expectedStart: "06:00:00 AM" }, // UTC+0 in Jan
+    ];
+
+    const results = timeZones.map((tzInfo) => ({
+      ...tzInfo,
+      result: computeDailyHoras(
+        "01/01/2023",
+        sunrise,
+        sunset,
+        nextSunrise,
+        0,
+        1,
+        tzInfo.tz,
+        sunrise,
+      ),
+    }));
+
+    const baseResult = results[0].result;
+
+    for (let i = 1; i < results.length; i++) {
+      const curResult = results[i].result;
+
+      // Core numerical invariants must be strictly identical regardless of timezone
+      expect(baseResult.horas[0].startTimeMs).toBe(curResult.horas[0].startTimeMs);
+      expect(baseResult.horas[0].endTimeMs).toBe(curResult.horas[0].endTimeMs);
+      expect(baseResult.horas[0].durationMs).toBe(curResult.horas[0].durationMs);
+      expect(baseResult.horas[0].ruler).toBe(curResult.horas[0].ruler);
+    }
+
+    // Formatting must correctly reflect the offset
+    for (const res of results) {
+      expect(res.result.horas[0].startTime).toBe(res.expectedStart);
+    }
   });
 });

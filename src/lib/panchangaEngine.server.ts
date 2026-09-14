@@ -2107,6 +2107,7 @@ export function computePanchanga(
     rtu: `${rtuName} Ṛtu`,
     drik_rtu: `${drikRtuName} Ṛtu`,
     vaara: vaaraName,
+    weekday: civilWeekday,
     kali_day: kaliDay,
     saka_year: sakaYear,
     kali_year: kaliYear,

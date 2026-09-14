@@ -66,12 +66,14 @@ const TATTVA_DEFS = [
   },
 ];
 
-function formatHMS(date: Date): string {
-  const m = date.getMinutes().toString().padStart(2, "0");
-  const s = date.getSeconds().toString().padStart(2, "0");
-  const ampm = date.getHours() >= 12 ? "PM" : "AM";
-  const h12 = (date.getHours() % 12 || 12).toString().padStart(2, "0");
-  return `${h12}:${m}:${s} ${ampm}`;
+function formatHMS(date: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(date);
 }
 
 export function computeDailyHoras(
@@ -81,6 +83,7 @@ export function computeDailyHoras(
   nextSunriseMs: number,
   weekday: number, // 0-6 (Sun-Sat)
   tithiNum: number,
+  timeZone: string,
   currentTimeMs?: number, // optional real-time check
 ): DailyHoras {
   const now = currentTimeMs ?? Date.now();
@@ -142,8 +145,8 @@ export function computeDailyHoras(
         durationMs: tEndMs - tattvaStartMs,
         startTimeMs: tattvaStartMs,
         endTimeMs: tEndMs,
-        startTime: formatHMS(new Date(tattvaStartMs)),
-        endTime: formatHMS(new Date(tEndMs)),
+        startTime: formatHMS(new Date(tattvaStartMs), timeZone),
+        endTime: formatHMS(new Date(tEndMs), timeZone),
       };
 
       tattvas.push(tp);
@@ -162,8 +165,8 @@ export function computeDailyHoras(
       startTimeMs,
       endTimeMs,
       durationMs: endTimeMs - startTimeMs,
-      startTime: formatHMS(new Date(startTimeMs)),
-      endTime: formatHMS(new Date(endTimeMs)),
+      startTime: formatHMS(new Date(startTimeMs), timeZone),
+      endTime: formatHMS(new Date(endTimeMs), timeZone),
       ruler,
       nadi,
       tattvas,

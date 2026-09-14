@@ -821,7 +821,7 @@ export function normalizeDailySchedule(
         endTimeMs: cg.endTimeMs,
         durationMs,
         title: `${name} (${isNight ? "Night" : "Day"} Choghaḍiyā)`,
-        subtitle: `${cg.lord ? "Ruler: " + cg.lord + " · " : ""}${Math.round(durationMs / 60000)} min`,
+        subtitle: `${(cg as { lord?: string }).lord ? "Ruler: " + (cg as { lord?: string }).lord + " · " : ""}${Math.round(durationMs / 60000)} min`,
         auspiciousness: ausp,
         priority: EVENT_PRIORITIES.muhurta,
         colorTheme: getEventColorTheme("muhurta", ausp),

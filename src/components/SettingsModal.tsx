@@ -482,7 +482,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           setNotifPrefs({ ...notifPrefs, horaPlanets: newPlanets });
                         }}
                         className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                          notifPrefs.horaPlanets?.[planet] ?? true
+                          (notifPrefs.horaPlanets?.[planet] ?? true)
                             ? "bg-amber-100 text-amber-800 border border-amber-200"
                             : "bg-stone-100 text-stone-500 border border-stone-200"
                         }`}

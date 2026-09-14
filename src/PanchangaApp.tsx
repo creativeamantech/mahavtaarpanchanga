@@ -61,7 +61,7 @@ const NavItem = ({
   onClick,
   theme,
 }: {
-  icon: any;
+  icon: React.ElementType;
   label: string;
   isActive: boolean;
   onClick: () => void;
@@ -324,7 +324,7 @@ export default function App() {
           setPanchangaData(data);
           setIsLoading(false);
         })
-        .catch((err: any) => {
+        .catch((err: Error) => {
           if (retries > 0 && err.message === "Failed to fetch") {
             retries--;
             setTimeout(attemptFetch, 1000);

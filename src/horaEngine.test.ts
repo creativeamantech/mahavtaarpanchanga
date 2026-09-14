@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error - bun test is not in tsconfig types
 import { test, expect, describe } from "bun:test";
 import { computeDailyHoras } from "./horaEngine";
 

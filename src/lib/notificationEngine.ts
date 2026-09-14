@@ -71,7 +71,7 @@ function parseTimeStringToMs(timeStr: string, dateStr: string): number {
   const match = timeStr.match(/(\d+):(\d+)(?::(\d+))?\s*(AM|PM)?/i);
   if (!match) return 0;
 
-  let [, h, m, s, ampm] = match;
+  const [, h, m, s, ampm] = match;
   let hours = parseInt(h, 10);
   if (ampm) {
     if (ampm.toUpperCase() === "PM" && hours < 12) hours += 12;
@@ -98,8 +98,9 @@ function scheduleAlert(title: string, body: string, timeMs: number) {
                   body,
                   icon: "/pwa-192x192.png",
                   badge: "/pwa-192x192.png",
+                  // @ts-expect-error - TS lib DOM doesn't always have vibrate
                   vibrate: [200, 100, 200],
-                } as any)
+                })
                 .catch(() => {
                   new Notification(title, { body, icon: "/pwa-192x192.png" });
                 });

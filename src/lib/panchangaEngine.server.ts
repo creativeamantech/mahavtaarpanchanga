@@ -385,6 +385,19 @@ function findBoundaryCrossing(
 }
 
 // Find segments (current and consecutive) between sunrise and next sunrise
+
+function formatPanchangaTime(dateMs: number, tz: string): string {
+  const d = new Date(dateMs);
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }).format(d);
+}
+
 function findSegments(
   fn: (t: Astronomy.AstroTime) => number,
   namesMap: Record<string, string>,
@@ -392,57 +405,74 @@ function findSegments(
   tNextSunrise: Astronomy.AstroTime,
   localMidnight: Date,
   totalItems: number = 30,
+  tz: string = "UTC"
 ): Segment[] {
   const vSunrise = fn(tSunrise);
   const currentNum = (Math.floor(vSunrise) % totalItems) + 1;
   const segments: Segment[] = [];
-
   const name = namesMap[currentNum.toString()] || `Item ${currentNum}`;
   const target = Math.floor(vSunrise) + 1;
-
+  
+  // Find End
   const crossing = findBoundaryCrossing(fn, target, tSunrise, tNextSunrise);
+  
+  // Find Start (look back up to 36h, forward up to 12h)
+  const tSearchStart = Astronomy.MakeTime(new Date(tSunrise.date.getTime() - 36 * 3600000));
+  const tSearchEnd = Astronomy.MakeTime(new Date(tSunrise.date.getTime() + 12 * 3600000));
+  const startCrossing = findBoundaryCrossing(fn, Math.floor(vSunrise), tSearchStart, tSearchEnd);
+  
+  const startTimeMs = startCrossing ? startCrossing.date.getTime() : undefined;
+  const starts = startTimeMs ? formatPanchangaTime(startTimeMs, tz) : undefined;
 
   if (crossing && crossing.date.getTime() <= tNextSunrise.date.getTime()) {
     const localHours = (crossing.date.getTime() - localMidnight.getTime()) / 3600000;
     const endsStr = formatTimeHMS(localHours);
+    const endTimeMs = crossing.date.getTime();
+    
     segments.push({
       number: currentNum,
       name,
       ends: endsStr,
+      startTimeMs,
+      endTimeMs,
+      starts,
     });
 
-    // Check for a second segment (Vriddhi/consecutive item) before next sunrise
     const nextNum = (currentNum % totalItems) + 1;
     const nextName = namesMap[nextNum.toString()] || `Item ${nextNum}`;
     const target2 = target + 1;
     const crossing2 = findBoundaryCrossing(fn, target2, crossing, tNextSunrise);
-
+    
     if (crossing2 && crossing2.date.getTime() <= tNextSunrise.date.getTime()) {
       const localHours2 = (crossing2.date.getTime() - localMidnight.getTime()) / 3600000;
       segments.push({
         number: nextNum,
         name: nextName,
         ends: formatTimeHMS(localHours2),
+        startTimeMs: endTimeMs,
+        endTimeMs: crossing2.date.getTime(),
+        starts: formatPanchangaTime(endTimeMs, tz),
       });
     } else {
       segments.push({
         number: nextNum,
         name: nextName,
         ends: null,
+        startTimeMs: endTimeMs,
+        starts: formatPanchangaTime(endTimeMs, tz),
       });
     }
   } else {
-    // Current segment lasts all day past next sunrise
     segments.push({
       number: currentNum,
       name,
       ends: null,
+      startTimeMs,
+      starts,
     });
   }
-
   return segments;
 }
-
 const VARJYAM_START_GHATIS = [
   0, 50, 24, 30, 40, 14, 21, 30, 20, 32, 30, 20, 18, 21, 20, 14, 14, 10, 14, 56, 24, 20, 10, 10, 18,
   16, 24, 30,
@@ -1390,6 +1420,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     30,
+    location.timezone
   );
   const nakshatraSegments = findSegments(
     (t) => getNakshatraFraction(t, coordinateSelection),
@@ -1398,6 +1429,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     27,
+    location.timezone
   );
   const yogaSegments = findSegments(
     (t) => getYogaFraction(t, coordinateSelection),
@@ -1406,6 +1438,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     27,
+    location.timezone
   );
   const karanaSegments = findSegments(
     getKaranaFraction,
@@ -1414,6 +1447,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     60,
+    location.timezone
   );
 
   // Astronomical Sun & Moon Longitudes

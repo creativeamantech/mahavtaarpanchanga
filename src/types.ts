@@ -10,7 +10,10 @@ export interface CityLocation {
 export interface Segment {
   number: number;
   name: string;
+  starts?: string | null;
   ends?: string | null;
+  startTimeMs?: number;
+  endTimeMs?: number;
 }
 
 export interface TimingInterval {

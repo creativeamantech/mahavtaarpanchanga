@@ -77,7 +77,12 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
           >
             {primaryLocalized}
           </span>
-          {primary.ends ? (
+          {primary.starts ? (
+            <div className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-200" : "text-amber-900"}`}>
+              <span>Starts: {primary.starts}</span>
+              <span>Ends: {primary.ends || "—"}</span>
+            </div>
+          ) : primary.ends ? (
             <span
               className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold border font-mono ${
                 isNight
@@ -119,8 +124,19 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               >
                 {t.followedBy}:
               </span>
-              {secondary.ends ? (
-                <span className={`font-mono ${isNight ? "text-slate-300" : "text-stone-600"}`}>
+              {secondary.starts ? (
+                <div className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-300/80" : "text-amber-800"}`}>
+                  <span>Starts: {secondary.starts}</span>
+                  <span>Ends: {secondary.ends || "—"}</span>
+                </div>
+              ) : secondary.ends ? (
+                <span
+                  className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold border font-mono ${
+                    isNight
+                      ? "bg-amber-950/40 text-amber-300/80 border-amber-800/40"
+                      : "bg-amber-50/80 text-amber-800 border-amber-200/60"
+                  }`}
+                >
                   {t.endsAt} {secondary.ends}
                 </span>
               ) : (

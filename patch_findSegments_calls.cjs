@@ -1,6 +1,6 @@
-const fs = require('fs');
+const fs = require("fs");
 
-let code = fs.readFileSync('src/lib/panchangaEngine.server.ts', 'utf8');
+let code = fs.readFileSync("src/lib/panchangaEngine.server.ts", "utf8");
 
 code = code.replace(
   /const tithiSegments = findSegments\([\s\S]*?30,\n  \);/g,
@@ -12,7 +12,7 @@ code = code.replace(
     localMidnight,
     30,
     timezone
-  );`
+  );`,
 );
 
 code = code.replace(
@@ -25,7 +25,7 @@ code = code.replace(
     localMidnight,
     27,
     timezone
-  );`
+  );`,
 );
 
 code = code.replace(
@@ -38,7 +38,7 @@ code = code.replace(
     localMidnight,
     27,
     timezone
-  );`
+  );`,
 );
 
 code = code.replace(
@@ -51,7 +51,7 @@ code = code.replace(
     localMidnight,
     60,
     timezone
-  );`
+  );`,
 );
 
-fs.writeFileSync('src/lib/panchangaEngine.server.ts', code);
+fs.writeFileSync("src/lib/panchangaEngine.server.ts", code);

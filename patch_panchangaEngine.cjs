@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/lib/panchangaEngine.server.ts', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/lib/panchangaEngine.server.ts", "utf8");
 
 // Insert previous sunrise and sunset computation
 code = code.replace(
@@ -21,7 +21,7 @@ code = code.replace(
   }
 
   // Sunset
-  let tSunset: Astronomy.AstroTime;`
+  let tSunset: Astronomy.AstroTime;`,
 );
 
 // Populate them in the response
@@ -29,7 +29,7 @@ code = code.replace(
   /sunrise_ms: tSunrise\.date\.getTime\(\),/g,
   `previous_sunrise_ms: tPrevSunrise.date.getTime(),
     previous_sunset_ms: tPrevSunset.date.getTime(),
-    sunrise_ms: tSunrise.date.getTime(),`
+    sunrise_ms: tSunrise.date.getTime(),`,
 );
 
-fs.writeFileSync('src/lib/panchangaEngine.server.ts', code);
+fs.writeFileSync("src/lib/panchangaEngine.server.ts", code);

@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/components/FiveAngasCard.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/components/FiveAngasCard.tsx", "utf8");
 
 const primaryEndsBlock = `          {primary.starts ? (
             <div className={\`flex flex-col text-[10px] sm:text-[11px] font-mono text-right \${isNight ? "text-amber-200" : "text-amber-900"}\`}>
@@ -18,7 +18,10 @@ const primaryEndsBlock = `          {primary.starts ? (
             </span>
           ) : (`;
 
-code = code.replace(/          \{primary\.ends \? \([\s\S]*?\{t\.endsAt\} \{primary\.ends\}\n            <\/span>\n          \) : \(/, primaryEndsBlock);
+code = code.replace(
+  /          \{primary\.ends \? \([\s\S]*?\{t\.endsAt\} \{primary\.ends\}\n            <\/span>\n          \) : \(/,
+  primaryEndsBlock,
+);
 
 const secondaryEndsBlock = `              {secondary.starts ? (
                 <div className={\`flex flex-col text-[10px] sm:text-[11px] font-mono text-right \${isNight ? "text-amber-300/80" : "text-amber-800"}\`}>
@@ -37,6 +40,9 @@ const secondaryEndsBlock = `              {secondary.starts ? (
                 </span>
               ) : (`;
 
-code = code.replace(/              \{secondary\.ends \? \([\s\S]*?\{t\.endsAt\} \{secondary\.ends\}\n                <\/span>\n              \) : \(/, secondaryEndsBlock);
+code = code.replace(
+  /              \{secondary\.ends \? \([\s\S]*?\{t\.endsAt\} \{secondary\.ends\}\n                <\/span>\n              \) : \(/,
+  secondaryEndsBlock,
+);
 
-fs.writeFileSync('src/components/FiveAngasCard.tsx', code);
+fs.writeFileSync("src/components/FiveAngasCard.tsx", code);

@@ -63,24 +63,10 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
   // Compute Hora
   const weekday = data.weekday;
 
-  // We need to pass the city's current timestamp for the hora calculation.
-  // horaEngine compares the timestamp passed with start/endTimeMs.
-  // Wait, computeDailyHoras compares based on `now` timestamp directly if it's the same day.
-  // Actually, computeDailyHoras takes the exact `now` time in milliseconds, but it computes
-  // sunrise/sunset times based on the local device time string parsing.
-  // We'll just pass `now.getTime()` which represents universal time.
-  const horas = computeDailyHoras(
-    data.date,
-    data.sunrise_ms!,
-    data.sunset_ms!,
-    data.next_sunrise_ms!,
-    weekday,
-    primaryTithiNum,
-    data.timezone,
-    now.getTime(),
-  );
-
-  const activeHora = horas.activeHora;
+  // Compute Hora and Tattva using canonical resolveCurrentHora
+  const horaState = resolveCurrentHora(now.getTime(), data);
+  const activeHora = horaState?.hora || null;
+  const activeTattva = horaState?.activeTattva || null;
 
   return (
     <div
@@ -171,6 +157,15 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
                 >
                   {activeHora.ruler} Hora
                 </div>
+                {activeTattva && (
+                  <div className="mt-1 text-xs font-semibold text-purple-700 dark:text-purple-300 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>
+                      Tattva: {activeTattva.sanskrit} ({activeTattva.name}) ·{" "}
+                      {activeTattva.startTime}–{activeTattva.endTime}
+                    </span>
+                  </div>
+                )}
                 <p className={`text-xs mt-1 ${isNight ? "text-slate-400" : "text-stone-600"}`}>
                   {lang === "hi"
                     ? "इस समय " + activeHora.ruler + " का प्रभाव है।"

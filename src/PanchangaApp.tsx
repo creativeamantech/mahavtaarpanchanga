@@ -20,6 +20,7 @@ import { SettingsModal } from "./components/SettingsModal";
 import { PrintablePanchanga } from "./components/PrintablePanchanga";
 import { VedicHorasView } from "./components/VedicHorasView";
 import { LagnaChartView } from "./components/LagnaChartView";
+import { TodayScheduleView } from "./components/TodayScheduleView";
 import type {
   PanchangaResponse,
   CityLocation,
@@ -38,7 +39,6 @@ import {
   LayoutGrid,
   BookmarkCheck,
   Check,
- 
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
 import {
@@ -486,6 +486,19 @@ export default function App() {
             theme={theme}
           />
           <NavItem
+            icon={Calendar}
+            label={
+              lang === "hi"
+                ? "दैनिक समय-सारणी"
+                : lang === "sa"
+                  ? "अद्यतन-समयसारणी"
+                  : "Today Schedule"
+            }
+            isActive={activeView === "today"}
+            onClick={() => setActiveView("today")}
+            theme={theme}
+          />
+          <NavItem
             icon={Clock}
             label={t.muhurtasAndTimings}
             isActive={activeView === "timings"}
@@ -697,7 +710,22 @@ export default function App() {
                   </div>
                 )}
 
-                {/* View: Muhurtas & Timings */}
+                {/* View: Unified Today / Daily Schedule */}
+                {activeView === "today" && (
+                  <div
+                    id="view-today-schedule"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                  >
+                    <TodayScheduleView
+                      data={panchangaData}
+                      lang={lang}
+                      theme={theme}
+                      currentDateStr={currentDate}
+                      onSelectDate={setCurrentDate}
+                      onOpenSettings={() => setIsSettingsOpen(true)}
+                    />
+                  </div>
+                )}
                 {activeView === "timings" && (
                   <div
                     id="view-timings-dedicated"

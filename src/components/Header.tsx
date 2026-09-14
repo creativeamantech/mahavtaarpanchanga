@@ -2,15 +2,10 @@ import React from "react";
 import {
   ChevronLeft,
   ChevronRight,
-  Calendar as
-  MapPin,
+  Calendar as MapPin,
   Settings,
- 
   Sun,
   Moon,
- 
- 
- 
   Navigation,
   Loader2,
 } from "lucide-react";
@@ -19,7 +14,7 @@ import type { AppTheme } from "../types";
 import { PWAInstallButton } from "./PWAInstallButton";
 
 export type ActiveView =
-  "panchanga" | "calendar" | "planets" | "timings" | "swara" | "horas" | "lagna";
+  "panchanga" | "today" | "calendar" | "planets" | "timings" | "swara" | "horas" | "lagna";
 
 interface HeaderProps {
   currentDate: string; // dd/mm/yyyy

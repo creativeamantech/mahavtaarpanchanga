@@ -188,44 +188,52 @@ export function computeDailyHoras(
   };
 }
 
+export interface CurrentHoraState {
+  hora: Hora | null;
+  activeTattva: TattvaPeriod | null;
+  horaStartTimeMs: number | null;
+  horaEndTimeMs: number | null;
+  tattvaStartTimeMs: number | null;
+  tattvaEndTimeMs: number | null;
+  horaRemainingMs: number | null;
+  tattvaRemainingMs: number | null;
+  // Backwards compatibility
+  tattva: TattvaPeriod | null;
+}
 
-export interface CurrentHoraData {
+export interface CurrentHoraData extends CurrentHoraState {
   hora: Hora;
   tattva: TattvaPeriod | null;
 }
 
-export function resolveCurrentHora(
-  nowMs: number,
-  data: PanchangaResponse
-): CurrentHoraData | null {
+export function resolveCurrentHora(nowMs: number, data: PanchangaResponse): CurrentHoraData | null {
   const sunrise = data.sunrise_ms;
   const sunset = data.sunset_ms;
   const nextSunrise = data.next_sunrise_ms;
-  
+
   if (!sunrise || !sunset || !nextSunrise) return null;
+
+  let activeHora: Hora | null = null;
+  let activeTattva: TattvaPeriod | null = null;
 
   // If before today's sunrise, use previous day's data
   if (nowMs < sunrise) {
-    const prevSunrise = data.previous_sunrise_ms;
-    const prevSunset = data.previous_sunset_ms;
-    
-    if (prevSunrise && prevSunset) {
-      const prevWeekday = (data.weekday - 1 + 7) % 7;
-      const prevHoras = computeDailyHoras(
-        data.date,
-        prevSunrise,
-        prevSunset,
-        sunrise,
-        prevWeekday,
-        data.tithi[0]?.number || 1,
-        data.timezone,
-        nowMs
-      );
-      if (prevHoras.activeHora) {
-        return { hora: prevHoras.activeHora, tattva: prevHoras.activeTattva };
-      }
-    }
-  } 
+    const prevSunrise = data.previous_sunrise_ms || sunrise - 24 * 3600000;
+    const prevSunset = data.previous_sunset_ms || sunset - 24 * 3600000;
+    const prevWeekday = (data.weekday - 1 + 7) % 7;
+    const prevHoras = computeDailyHoras(
+      data.date,
+      prevSunrise,
+      prevSunset,
+      sunrise,
+      prevWeekday,
+      data.tithi[0]?.number || 1,
+      data.timezone,
+      nowMs,
+    );
+    activeHora = prevHoras.activeHora;
+    activeTattva = prevHoras.activeTattva;
+  }
   // If between today's sunrise and tomorrow's sunrise
   else if (nowMs >= sunrise && nowMs < nextSunrise) {
     const todayHoras = computeDailyHoras(
@@ -236,12 +244,26 @@ export function resolveCurrentHora(
       data.weekday,
       data.tithi[0]?.number || 1,
       data.timezone,
-      nowMs
+      nowMs,
     );
-    if (todayHoras.activeHora) {
-      return { hora: todayHoras.activeHora, tattva: todayHoras.activeTattva };
-    }
+    activeHora = todayHoras.activeHora;
+    activeTattva = todayHoras.activeTattva;
   }
 
-  return null;
+  if (!activeHora) return null;
+
+  const horaRemainingMs = Math.max(0, activeHora.endTimeMs - nowMs);
+  const tattvaRemainingMs = activeTattva ? Math.max(0, activeTattva.endTimeMs - nowMs) : null;
+
+  return {
+    hora: activeHora,
+    activeTattva,
+    tattva: activeTattva,
+    horaStartTimeMs: activeHora.startTimeMs,
+    horaEndTimeMs: activeHora.endTimeMs,
+    tattvaStartTimeMs: activeTattva?.startTimeMs ?? null,
+    tattvaEndTimeMs: activeTattva?.endTimeMs ?? null,
+    horaRemainingMs,
+    tattvaRemainingMs,
+  };
 }

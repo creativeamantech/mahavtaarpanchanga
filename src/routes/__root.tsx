@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
-import '../styles.css';
+import "../styles.css";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -86,17 +86,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "Panchanga" },
       { title: "Mahavtaar Panchanga" },
-      { name: "description", content: "Mahavtaar Panchanga Application" },
+      {
+        name: "description",
+        content:
+          "Comprehensive Vedic Panchanga almanac with astronomical calculations, five angas, planetary transits, unified Today schedule timeline, Hora-Tattva micro-periods, and live notification system.",
+      },
       { name: "author", content: "Mahavtaar" },
       { property: "og:title", content: "Mahavtaar Panchanga" },
-      { property: "og:description", content: "Mahavtaar Panchanga Application" },
+      {
+        property: "og:description",
+        content:
+          "Comprehensive Vedic Panchanga almanac with astronomical calculations, five angas, planetary transits, unified Today schedule timeline, Hora-Tattva micro-periods, and live notification system.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {
         rel: "stylesheet",
-        href: '',
+        href: "",
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

@@ -143,9 +143,8 @@ export const CurrentMuhurtaWidget: React.FC<CurrentMuhurtaWidgetProps> = ({ data
 
   const isRahuActive = isIntervalActive(data.rahu_kala);
   const isYamaActive = isIntervalActive(data.yamaganda);
-  
+
   const isAbhijitActive = isIntervalActive(data.abhijit_muhurta);
-  
 
   // Active Choghadiya
   const isDayTime =

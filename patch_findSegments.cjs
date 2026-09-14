@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require("fs");
 
 function formatPanchangaTime(dateMs, tz) {
   if (!dateMs) return "";
@@ -13,7 +13,7 @@ function formatPanchangaTime(dateMs, tz) {
   }).format(d);
 }
 
-let code = fs.readFileSync('src/lib/panchangaEngine.server.ts', 'utf8');
+let code = fs.readFileSync("src/lib/panchangaEngine.server.ts", "utf8");
 
 const replacement = `
 function formatPanchangaTime(dateMs: number, tz: string): string {
@@ -105,7 +105,10 @@ function findSegments(
 }
 `;
 
-const originalFunction = code.substring(code.indexOf('function findSegments('), code.indexOf('const VARJYAM_START_GHATIS'));
+const originalFunction = code.substring(
+  code.indexOf("function findSegments("),
+  code.indexOf("const VARJYAM_START_GHATIS"),
+);
 
 code = code.replace(originalFunction, replacement);
-fs.writeFileSync('src/lib/panchangaEngine.server.ts', code);
+fs.writeFileSync("src/lib/panchangaEngine.server.ts", code);

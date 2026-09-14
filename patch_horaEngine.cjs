@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/horaEngine.ts', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/horaEngine.ts", "utf8");
 
 code += `\nimport { PanchangaResponse } from "./types";
 
@@ -61,4 +61,4 @@ export function resolveCurrentHora(
 }
 `;
 
-fs.writeFileSync('src/horaEngine.ts', code);
+fs.writeFileSync("src/horaEngine.ts", code);

@@ -423,3 +423,28 @@ export function getActiveTithiSwaraEvent(
   }
   return null;
 }
+
+/**
+ * Convenience helper for computing Tithi Swara info from tithiNumber, paksha, and timestamps.
+ */
+export function calculateTithiSwaraInfo(
+  tithiNumber: number,
+  paksha: Paksha | string,
+  startTimeMs?: number,
+  endTimeMs?: number,
+  timeZone: string = "Asia/Kolkata",
+  lang: "en" | "hi" | "sa" = "en",
+): TithiSwaraInfo {
+  const isKrishna = String(paksha).toLowerCase().includes("krishna");
+  const cycleNumber = isKrishna ? tithiNumber + 15 : tithiNumber;
+  return computeTithiSwaraEvents(
+    {
+      number: cycleNumber,
+      startTimeMs,
+      endTimeMs,
+    },
+    timeZone,
+    Date.now(),
+    lang,
+  );
+}

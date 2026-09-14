@@ -27,6 +27,12 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
       icon: Sun,
     },
     {
+      id: "today" as ActiveView,
+      label:
+        lang === "hi" ? "दैनिक समय-सारणी" : lang === "sa" ? "अद्यतन-समयसारणी" : "Today Schedule",
+      icon: Calendar,
+    },
+    {
       id: "timings" as ActiveView,
       label: t.muhurtasAndTimings,
       icon: Clock,

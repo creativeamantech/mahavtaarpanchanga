@@ -406,22 +406,22 @@ function findSegments(
   tNextSunrise: Astronomy.AstroTime,
   localMidnight: Date,
   totalItems: number = 30,
-  tz: string = "UTC"
+  tz: string = "UTC",
 ): Segment[] {
   const vSunrise = fn(tSunrise);
   const currentNum = (Math.floor(vSunrise) % totalItems) + 1;
   const segments: Segment[] = [];
   const name = namesMap[currentNum.toString()] || `Item ${currentNum}`;
   const target = Math.floor(vSunrise) + 1;
-  
+
   // Find End
   const crossing = findBoundaryCrossing(fn, target, tSunrise, tNextSunrise);
-  
+
   // Find Start (look back up to 36h, forward up to 12h)
   const tSearchStart = Astronomy.MakeTime(new Date(tSunrise.date.getTime() - 36 * 3600000));
   const tSearchEnd = Astronomy.MakeTime(new Date(tSunrise.date.getTime() + 12 * 3600000));
   const startCrossing = findBoundaryCrossing(fn, Math.floor(vSunrise), tSearchStart, tSearchEnd);
-  
+
   const startTimeMs = startCrossing ? startCrossing.date.getTime() : undefined;
   const starts = startTimeMs ? formatPanchangaTime(startTimeMs, tz) : undefined;
 
@@ -429,7 +429,7 @@ function findSegments(
     const localHours = (crossing.date.getTime() - localMidnight.getTime()) / 3600000;
     const endsStr = formatTimeHMS(localHours);
     const endTimeMs = crossing.date.getTime();
-    
+
     segments.push({
       number: currentNum,
       name,
@@ -443,7 +443,7 @@ function findSegments(
     const nextName = namesMap[nextNum.toString()] || `Item ${nextNum}`;
     const target2 = target + 1;
     const crossing2 = findBoundaryCrossing(fn, target2, crossing, tNextSunrise);
-    
+
     if (crossing2 && crossing2.date.getTime() <= tNextSunrise.date.getTime()) {
       const localHours2 = (crossing2.date.getTime() - localMidnight.getTime()) / 3600000;
       segments.push({
@@ -1341,7 +1341,14 @@ export function computePanchanga(
   // Previous sunrise
   let tPrevSunrise: Astronomy.AstroTime;
   try {
-    tPrevSunrise = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, +1, new Date(localMidnightMs - 24 * 3600000), 1.0, 0.0)!;
+    tPrevSunrise = Astronomy.SearchAltitude(
+      Astronomy.Body.Sun,
+      observer,
+      +1,
+      new Date(localMidnightMs - 24 * 3600000),
+      1.0,
+      0.0,
+    )!;
   } catch {
     tPrevSunrise = Astronomy.MakeTime(new Date(localMidnightMs - 18 * 3600000));
   }
@@ -1349,7 +1356,14 @@ export function computePanchanga(
   // Previous sunset
   let tPrevSunset: Astronomy.AstroTime;
   try {
-    tPrevSunset = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, -1, tPrevSunrise.date, 1.0, 0.0)!;
+    tPrevSunset = Astronomy.SearchAltitude(
+      Astronomy.Body.Sun,
+      observer,
+      -1,
+      tPrevSunrise.date,
+      1.0,
+      0.0,
+    )!;
   } catch {
     tPrevSunset = Astronomy.MakeTime(new Date(tPrevSunrise.date.getTime() + 12 * 3600000));
   }
@@ -1437,7 +1451,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     30,
-    location.timezone
+    location.timezone,
   );
   const tithiSegments: Segment[] = rawTithiSegments.map((seg) => ({
     ...seg,
@@ -1450,7 +1464,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     27,
-    location.timezone
+    location.timezone,
   );
   const yogaSegments = findSegments(
     (t) => getYogaFraction(t, coordinateSelection),
@@ -1459,7 +1473,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     27,
-    location.timezone
+    location.timezone,
   );
   const karanaSegments = findSegments(
     getKaranaFraction,
@@ -1468,7 +1482,7 @@ export function computePanchanga(
     tNextSunrise,
     localMidnight,
     60,
-    location.timezone
+    location.timezone,
   );
 
   // Astronomical Sun & Moon Longitudes
@@ -2185,15 +2199,39 @@ export function computePanchanga(
     day_duration: dayDurationStr,
     night_duration: formatTimeHMS(nightDurationHours),
     paksha: (primaryTithi <= 15 ? "Śukla" : "Kṛṣṇa") as "Śukla" | "Kṛṣṇa",
-    rahu_kala: { start: formatTimeHMS(rahuStart), end: formatTimeHMS(rahuEnd), startTimeMs: localMidnightMs + rahuStart * 3600000, endTimeMs: localMidnightMs + rahuEnd * 3600000, name: "Rāhu Kāla" },
-    yamaganda: { start: formatTimeHMS(yamaStart), end: formatTimeHMS(yamaEnd), startTimeMs: localMidnightMs + yamaStart * 3600000, endTimeMs: localMidnightMs + yamaEnd * 3600000, name: "Yamagaṇḍa" },
-    gulika_kala: { start: formatTimeHMS(gulikaStart), end: formatTimeHMS(gulikaEnd), startTimeMs: localMidnightMs + gulikaStart * 3600000, endTimeMs: localMidnightMs + gulikaEnd * 3600000,
+    rahu_kala: {
+      start: formatTimeHMS(rahuStart),
+      end: formatTimeHMS(rahuEnd),
+      startTimeMs: localMidnightMs + rahuStart * 3600000,
+      endTimeMs: localMidnightMs + rahuEnd * 3600000,
+      name: "Rāhu Kāla",
+    },
+    yamaganda: {
+      start: formatTimeHMS(yamaStart),
+      end: formatTimeHMS(yamaEnd),
+      startTimeMs: localMidnightMs + yamaStart * 3600000,
+      endTimeMs: localMidnightMs + yamaEnd * 3600000,
+      name: "Yamagaṇḍa",
+    },
+    gulika_kala: {
+      start: formatTimeHMS(gulikaStart),
+      end: formatTimeHMS(gulikaEnd),
+      startTimeMs: localMidnightMs + gulikaStart * 3600000,
+      endTimeMs: localMidnightMs + gulikaEnd * 3600000,
       name: "Gulikā Kāla",
     },
-    abhijit_muhurta: { start: formatTimeHMS(abhijitStart), end: formatTimeHMS(abhijitEnd), startTimeMs: localMidnightMs + abhijitStart * 3600000, endTimeMs: localMidnightMs + abhijitEnd * 3600000,
+    abhijit_muhurta: {
+      start: formatTimeHMS(abhijitStart),
+      end: formatTimeHMS(abhijitEnd),
+      startTimeMs: localMidnightMs + abhijitStart * 3600000,
+      endTimeMs: localMidnightMs + abhijitEnd * 3600000,
       name: "Abhijit Muhūrta",
     },
-    brahma_muhurta: { start: formatTimeHMS(brahmaStart), end: formatTimeHMS(brahmaEnd), startTimeMs: localMidnightMs + brahmaStart * 3600000, endTimeMs: localMidnightMs + brahmaEnd * 3600000,
+    brahma_muhurta: {
+      start: formatTimeHMS(brahmaStart),
+      end: formatTimeHMS(brahmaEnd),
+      startTimeMs: localMidnightMs + brahmaStart * 3600000,
+      endTimeMs: localMidnightMs + brahmaEnd * 3600000,
       name: "Brahma Muhūrta",
     },
     amrita_kala: amritaIntervals,

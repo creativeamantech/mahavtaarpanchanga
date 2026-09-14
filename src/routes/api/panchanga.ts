@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import type { CoordinateSelection, MonthSystem } from "@/types";
+import type { CoordinateSelection, MonthSystem } from "../../types";
 
 export const Route = createFileRoute("/api/panchanga")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const { initPanchangaEngine, computePanchanga, computePanchangaCustom } =
-          await import("@/lib/panchangaEngine.server");
+          await import("../../lib/panchangaEngine.server");
         initPanchangaEngine();
         const url = new URL(request.url);
         const q = url.searchParams;

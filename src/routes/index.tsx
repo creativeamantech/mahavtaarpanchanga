@@ -1,7 +1,7 @@
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
-const PanchangaApp = lazy(() => import("@/PanchangaApp"));
+const PanchangaApp = lazy(() => import("../PanchangaApp"));
 
 const description =
   "High-precision observational Hindu lunisolar calendar (Drik Panchanga) with accurate Tithi, Nakshatra, Yoga, Karana, auspicious timings, planetary positions and transits.";

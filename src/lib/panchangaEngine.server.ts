@@ -568,7 +568,7 @@ function formatRelativeTime(targetDate: Date, baseDate: Date): string {
   return isPast ? `${days}d ago` : `in ${days}d ${remHours}h`;
 }
 
-function getBodySiderealLongitude(
+export function getBodySiderealLongitude(
   bodyId: string,
   t: Astronomy.AstroTime,
   ayanamsaKey: CoordinateSelection,

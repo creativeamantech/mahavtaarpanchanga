@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/nearest-city")({
     handlers: {
       GET: async ({ request }) => {
         const { initPanchangaEngine, findNearestCity } =
-          await import("@/lib/panchangaEngine.server");
+          await import("../../lib/panchangaEngine.server");
         initPanchangaEngine();
         const url = new URL(request.url);
         const lat = parseFloat(url.searchParams.get("lat") || "");

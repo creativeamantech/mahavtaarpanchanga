@@ -19,6 +19,7 @@ import { LocationModal } from "./components/LocationModal";
 import { SettingsModal } from "./components/SettingsModal";
 import { PrintablePanchanga } from "./components/PrintablePanchanga";
 import { VedicHorasView } from "./components/VedicHorasView";
+import { LagnaChartView } from "./components/LagnaChartView";
 import type {
   PanchangaResponse,
   CityLocation,
@@ -37,7 +38,7 @@ import {
   LayoutGrid,
   BookmarkCheck,
   Check,
-  Navigation,
+ 
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
 import {
@@ -889,6 +890,23 @@ export default function App() {
                     <section className="space-y-6">
                       <VedicHorasView panchangaData={panchangaData} />
                     </section>
+                  </div>
+                )}
+
+                {/* View: Janma Lagna Chart */}
+                {activeView === "lagna" && (
+                  <div
+                    id="view-janma-lagna"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
+                  >
+                    <div className="flex items-center space-x-3 mb-8">
+                      <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
+                      <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
+                        D1 Rāśi Chart
+                      </h2>
+                      <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
+                    </div>
+                    <LagnaChartView />
                   </div>
                 )}
 

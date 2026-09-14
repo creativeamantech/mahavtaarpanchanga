@@ -47,6 +47,11 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
       icon: Clock,
     },
     {
+      id: "lagna" as ActiveView,
+      label: "Janma Lagna",
+      icon: Sun,
+    },
+    {
       id: "calendar" as ActiveView,
       label: t.monthCalendar,
       icon: Calendar,

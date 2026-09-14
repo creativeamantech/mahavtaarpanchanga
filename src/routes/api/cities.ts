@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/cities")({
     handlers: {
       GET: async ({ request }) => {
         const { initPanchangaEngine, searchCities, getPopularCities } =
-          await import("@/lib/panchangaEngine.server");
+          await import("../../lib/panchangaEngine.server");
         initPanchangaEngine();
         const url = new URL(request.url);
         const query = (url.searchParams.get("q") || "").trim();

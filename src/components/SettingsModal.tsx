@@ -19,7 +19,7 @@ import {
   NotificationPreferences,
   defaultNotificationPreferences,
 } from "../lib/notificationEngine";
-import { Bell, BellOff, BellRing } from "lucide-react";
+import {BellOff, BellRing } from "lucide-react";
 
 interface SettingsModalProps {
   isOpen: boolean;

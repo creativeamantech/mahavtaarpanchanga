@@ -7,6 +7,41 @@ export interface CityLocation {
   population?: number;
 }
 
+export type Nadi = "ida" | "pingala";
+export type Paksha = "shukla" | "krishna";
+
+export interface TithiSwaraRule {
+  paksha: Paksha;
+  tithiNumber: number;
+  startNadi: Nadi;
+  endNadi: Nadi;
+}
+
+export interface TithiSwaraEvent {
+  type: "start" | "end";
+  nadi: Nadi;
+  nadiLabel: string;
+  startTimeMs: number;
+  endTimeMs: number;
+  formattedStart?: string;
+  formattedEnd?: string;
+  formattedRange?: string;
+  durationMinutes: number;
+  hasOverlap: boolean;
+  isActive?: boolean;
+}
+
+export interface TithiSwaraInfo {
+  paksha: Paksha;
+  tithiNumber: number;
+  tithiCycleNumber: number;
+  startNadi: Nadi;
+  endNadi: Nadi;
+  startEvent: TithiSwaraEvent | null;
+  endEvent: TithiSwaraEvent | null;
+  hasOverlap: boolean;
+}
+
 export interface Segment {
   number: number;
   name: string;
@@ -14,6 +49,7 @@ export interface Segment {
   ends?: string | null;
   startTimeMs?: number;
   endTimeMs?: number;
+  tithiSwara?: TithiSwaraInfo;
 }
 
 export interface TimingInterval {

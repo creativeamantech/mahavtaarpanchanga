@@ -1,0 +1,6 @@
+{
+  "name": "Mahavtaar Panchanga",
+  "description": "Comprehensive Vedic Panchanga almanac with astronomical calculations, five angas, planetary transits, and Tithi start/end Swara (Nadi) event integration.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

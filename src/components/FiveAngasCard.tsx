@@ -1,6 +1,7 @@
-import React from "react";
-import { Moon, Star, Compass, Sparkles, Sun } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Moon, Star, Compass, Sparkles, Sun, Wind } from "lucide-react";
 import type { PanchangaResponse, Segment, AppTheme } from "../types";
+import { computeTithiSwaraEvents, isTithiSwaraEventActive } from "../lib/tithiSwaraEngine";
 import {
   type Language,
   translations,
@@ -27,6 +28,12 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
   const isNight = theme === "nightSky";
   const t = translations[lang];
 
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNowMs(Date.now()), 10000);
+    return () => clearInterval(timer);
+  }, []);
+
   const primaryTithiNum = data.tithi[0]?.number || 1;
   const tithiMod = ((primaryTithiNum - 1) % 15) + 1;
   const tithiAttr = TITHI_ATTRIBUTES[primaryTithiNum === 30 ? 30 : tithiMod];
@@ -45,6 +52,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
     segments: Segment[],
     defaultName: string,
     localizeFn?: (num: number, raw: string, lang: Language) => string,
+    isTithi: boolean = false,
   ) => {
     if (!segments || segments.length === 0) {
       return (
@@ -69,6 +77,187 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
         ? localizeFn(secondary.number, secondary.name, lang)
         : secondary?.name;
 
+    const renderTithiSwaraEvents = (seg: Segment) => {
+      const swara =
+        seg.tithiSwara ||
+        computeTithiSwaraEvents(
+          seg,
+          data.timezone,
+          nowMs,
+          lang === "sa" ? "sa" : lang === "hi" ? "hi" : "en",
+        );
+      if (!swara || (!swara.startEvent && !swara.endEvent)) return null;
+
+      const isStartActive = swara.startEvent
+        ? isTithiSwaraEventActive(swara.startEvent, nowMs)
+        : false;
+      const isEndActive = swara.endEvent ? isTithiSwaraEventActive(swara.endEvent, nowMs) : false;
+
+      return (
+        <div className="mt-2 pt-2 border-t border-dashed border-stone-200/90 dark:border-slate-800 space-y-1.5">
+          <div className="flex items-center justify-between text-[11px]">
+            <span
+              className={`flex items-center gap-1 font-bold ${
+                isNight ? "text-amber-300" : "text-amber-900"
+              }`}
+            >
+              <Wind className="w-3.5 h-3.5" />
+              <span>
+                {lang === "hi"
+                  ? "स्वर (नाड़ी) घटनाएं"
+                  : lang === "sa"
+                    ? "स्वर (नाडी) घटनाः"
+                    : "Swara (Nadi) Events"}
+              </span>
+            </span>
+            {swara.hasOverlap && (
+              <span
+                className={`text-[9px] px-1.5 py-0.5 rounded font-medium border ${
+                  isNight
+                    ? "bg-amber-950/60 text-amber-300 border-amber-700/60"
+                    : "bg-amber-100 text-amber-900 border-amber-300"
+                }`}
+              >
+                {lang === "hi" ? "संक्षिप्त तिथि (<२ घं)" : "Short Tithi (<2h Overlap)"}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            {/* Start Event */}
+            {swara.startEvent ? (
+              <div
+                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
+                  isStartActive
+                    ? isNight
+                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
+                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
+                    : isNight
+                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
+                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
+                    {lang === "hi" ? "आरंभ स्वर" : lang === "sa" ? "आरम्भस्वरः" : "Start Event"}
+                  </span>
+                  {isStartActive && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
+                      Active Now
+                    </span>
+                  )}
+                </div>
+                <div
+                  className={`font-mono text-xs font-semibold ${
+                    isNight ? "text-slate-100" : "text-stone-900"
+                  }`}
+                >
+                  {swara.startEvent.formattedRange ||
+                    `${swara.startEvent.formattedStart} → ${swara.startEvent.formattedEnd}`}
+                </div>
+                <div className="flex items-center justify-between text-[10px]">
+                  <span
+                    className={`font-semibold ${
+                      swara.startEvent.nadi === "pingala"
+                        ? isNight
+                          ? "text-amber-300"
+                          : "text-amber-800"
+                        : isNight
+                          ? "text-cyan-300"
+                          : "text-sky-800"
+                    }`}
+                  >
+                    {swara.startEvent.nadiLabel}
+                  </span>
+                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
+                    1 hour
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div
+                className={`rounded-lg p-2 text-[11px] border ${
+                  isNight
+                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
+                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
+                }`}
+              >
+                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
+                  {lang === "hi" ? "आरंभ स्वर" : lang === "sa" ? "आरम्भस्वरः" : "Start Event"}
+                </div>
+                <div className="text-[10px] italic">Before search bracket</div>
+              </div>
+            )}
+
+            {/* End Event */}
+            {swara.endEvent ? (
+              <div
+                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
+                  isEndActive
+                    ? isNight
+                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
+                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
+                    : isNight
+                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
+                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
+                    {lang === "hi" ? "अंतिम स्वर" : lang === "sa" ? "अन्तिमस्वरः" : "End Event"}
+                  </span>
+                  {isEndActive && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
+                      Active Now
+                    </span>
+                  )}
+                </div>
+                <div
+                  className={`font-mono text-xs font-semibold ${
+                    isNight ? "text-slate-100" : "text-stone-900"
+                  }`}
+                >
+                  {swara.endEvent.formattedRange ||
+                    `${swara.endEvent.formattedStart} → ${swara.endEvent.formattedEnd}`}
+                </div>
+                <div className="flex items-center justify-between text-[10px]">
+                  <span
+                    className={`font-semibold ${
+                      swara.endEvent.nadi === "pingala"
+                        ? isNight
+                          ? "text-amber-300"
+                          : "text-amber-800"
+                        : isNight
+                          ? "text-cyan-300"
+                          : "text-sky-800"
+                    }`}
+                  >
+                    {swara.endEvent.nadiLabel}
+                  </span>
+                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
+                    Final 1 hr
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div
+                className={`rounded-lg p-2 text-[11px] border ${
+                  isNight
+                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
+                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
+                }`}
+              >
+                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
+                  {lang === "hi" ? "अंतिम स्वर" : lang === "sa" ? "अन्तिमस्वरः" : "End Event"}
+                </div>
+                <div className="text-[10px] italic">Past next sunrise</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
     return (
       <div className="space-y-1.5">
         <div className="flex flex-wrap items-baseline justify-between gap-1.5">
@@ -78,7 +267,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
             {primaryLocalized}
           </span>
           {primary.starts ? (
-            <div className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-200" : "text-amber-900"}`}>
+            <div
+              className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-200" : "text-amber-900"}`}
+            >
               <span>Starts: {primary.starts}</span>
               <span>Ends: {primary.ends || "—"}</span>
             </div>
@@ -108,6 +299,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
           </div>
         )}
 
+        {/* Primary Tithi Swara Events */}
+        {isTithi && renderTithiSwaraEvents(primary)}
+
         {secondary && (
           <div
             className={`mt-1 rounded-md p-2 text-xs border flex flex-col gap-0.5 ${
@@ -125,7 +319,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                 {t.followedBy}:
               </span>
               {secondary.starts ? (
-                <div className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-300/80" : "text-amber-800"}`}>
+                <div
+                  className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-300/80" : "text-amber-800"}`}
+                >
                   <span>Starts: {secondary.starts}</span>
                   <span>Ends: {secondary.ends || "—"}</span>
                 </div>
@@ -150,6 +346,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
             >
               {secondaryLocalized}
             </div>
+
+            {/* Secondary Tithi Swara Events */}
+            {isTithi && renderTithiSwaraEvents(secondary)}
           </div>
         )}
       </div>
@@ -348,8 +547,11 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                 </span>
               )}
             </div>
-            {renderSegment(data.tithi, "Śukla Pratipat", (num, raw, l) =>
-              getLocalizedTithi(num, l),
+            {renderSegment(
+              data.tithi,
+              "Śukla Pratipat",
+              (num, raw, l) => getLocalizedTithi(num, l),
+              true,
             )}
           </div>
 

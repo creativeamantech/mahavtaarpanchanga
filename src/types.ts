@@ -17,6 +17,8 @@ export interface Segment {
 }
 
 export interface TimingInterval {
+  startTimeMs?: number;
+  endTimeMs?: number;
   start: string;
   end: string;
   name?: string;
@@ -188,6 +190,8 @@ export interface PanchangaResponse {
   sunrise_hours?: number;
   sunset_hours?: number;
   next_sunrise_hours?: number;
+  previous_sunrise_ms?: number;
+  previous_sunset_ms?: number;
   sunrise_ms?: number;
   sunset_ms?: number;
   next_sunrise_ms?: number;

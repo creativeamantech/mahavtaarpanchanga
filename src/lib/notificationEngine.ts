@@ -131,17 +131,17 @@ export function schedulePanchangaNotifications(
 
   // 1. Sunrise & Sunset
   if (prefs.sunriseSunset) {
-    const sunriseMs = parseTimeStringToMs(data.sunrise, date);
+    const sunriseMs = data.sunrise_ms;
     if (sunriseMs) scheduleAlert("Sunrise", `It is sunrise in ${data.city}.`, sunriseMs);
 
-    const sunsetMs = parseTimeStringToMs(data.sunset, date);
+    const sunsetMs = data.sunset_ms;
     if (sunsetMs) scheduleAlert("Sunset", `It is sunset in ${data.city}.`, sunsetMs);
   }
 
   // 2. Muhurtas
   if (prefs.muhurtas) {
     if (data.brahma_muhurta?.start) {
-      const bMs = parseTimeStringToMs(data.brahma_muhurta.start, date);
+      const bMs = data.brahma_muhurta.startTimeMs;
       if (bMs)
         scheduleAlert(
           "Brahma Muhurta Starts",
@@ -150,12 +150,12 @@ export function schedulePanchangaNotifications(
         );
     }
     if (data.abhijit_muhurta?.start) {
-      const aMs = parseTimeStringToMs(data.abhijit_muhurta.start, date);
+      const aMs = data.abhijit_muhurta.startTimeMs;
       if (aMs)
         scheduleAlert("Abhijit Muhurta Starts", `The auspicious Abhijit Muhurta has begun.`, aMs);
     }
     if (data.rahu_kala?.start) {
-      const rMs = parseTimeStringToMs(data.rahu_kala.start, date);
+      const rMs = data.rahu_kala.startTimeMs;
       if (rMs)
         scheduleAlert(
           "Rahu Kala Starts",

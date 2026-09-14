@@ -3,7 +3,7 @@ import { Wind, Clock, Sparkles } from "lucide-react";
 import type { PanchangaResponse, AppTheme } from "../types";
 import type { Language } from "../i18n";
 import { computeSwaraYoga, SWARA_DETAILS } from "../swaraYoga";
-import { computeDailyHoras } from "../horaEngine";
+import { computeDailyHoras, resolveCurrentHora } from "../horaEngine";
 
 interface ActiveCosmicForcesWidgetProps {
   data: PanchangaResponse;

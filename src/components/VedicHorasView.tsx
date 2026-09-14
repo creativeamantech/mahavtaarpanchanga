@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DailyHoras, Hora, TattvaPeriod, computeDailyHoras } from "../horaEngine";
+import { DailyHoras, Hora, TattvaPeriod, computeDailyHoras, resolveCurrentHora, CurrentHoraData } from "../horaEngine";
 import { Sun, Moon, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { PanchangaResponse } from "../types";
 
@@ -33,7 +33,11 @@ export function VedicHorasView({ panchangaData }: { panchangaData: PanchangaResp
 
   if (!dailyHoras) return null;
 
-  const { activeHora, activeTattva } = dailyHoras;
+  // Current Hora resolution
+  const currentLiveHoraData = resolveCurrentHora(now, panchangaData);
+  const activeHora = currentLiveHoraData?.hora || null;
+  const activeTattva = currentLiveHoraData?.tattva || null;
+  
 
   // Auspicious activities map based on Planet & Element
   const adviceMap = {

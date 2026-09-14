@@ -1337,6 +1337,22 @@ export function computePanchanga(
     tSunrise = Astronomy.MakeTime(new Date(localMidnightMs + 6 * 3600000));
   }
 
+  // Previous sunrise
+  let tPrevSunrise: Astronomy.AstroTime;
+  try {
+    tPrevSunrise = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, +1, new Date(localMidnightMs - 24 * 3600000), 1.0, 0.0)!;
+  } catch {
+    tPrevSunrise = Astronomy.MakeTime(new Date(localMidnightMs - 18 * 3600000));
+  }
+
+  // Previous sunset
+  let tPrevSunset: Astronomy.AstroTime;
+  try {
+    tPrevSunset = Astronomy.SearchAltitude(Astronomy.Body.Sun, observer, -1, tPrevSunrise.date, 1.0, 0.0)!;
+  } catch {
+    tPrevSunset = Astronomy.MakeTime(new Date(tPrevSunrise.date.getTime() + 12 * 3600000));
+  }
+
   // Sunset
   let tSunset: Astronomy.AstroTime;
   try {
@@ -2152,6 +2168,8 @@ export function computePanchanga(
     sunrise_hours: sunriseLocalHours,
     sunset_hours: sunsetLocalHours,
     next_sunrise_hours: nextSunriseLocalHours,
+    previous_sunrise_ms: tPrevSunrise.date.getTime(),
+    previous_sunset_ms: tPrevSunset.date.getTime(),
     sunrise_ms: tSunrise.date.getTime(),
     sunset_ms: tSunset.date.getTime(),
     next_sunrise_ms: tNextSunrise.date.getTime(),
@@ -2162,21 +2180,15 @@ export function computePanchanga(
     day_duration: dayDurationStr,
     night_duration: formatTimeHMS(nightDurationHours),
     paksha: (primaryTithi <= 15 ? "Śukla" : "Kṛṣṇa") as "Śukla" | "Kṛṣṇa",
-    rahu_kala: { start: formatTimeHMS(rahuStart), end: formatTimeHMS(rahuEnd), name: "Rāhu Kāla" },
-    yamaganda: { start: formatTimeHMS(yamaStart), end: formatTimeHMS(yamaEnd), name: "Yamagaṇḍa" },
-    gulika_kala: {
-      start: formatTimeHMS(gulikaStart),
-      end: formatTimeHMS(gulikaEnd),
+    rahu_kala: { start: formatTimeHMS(rahuStart), end: formatTimeHMS(rahuEnd), startTimeMs: localMidnightMs + rahuStart * 3600000, endTimeMs: localMidnightMs + rahuEnd * 3600000, name: "Rāhu Kāla" },
+    yamaganda: { start: formatTimeHMS(yamaStart), end: formatTimeHMS(yamaEnd), startTimeMs: localMidnightMs + yamaStart * 3600000, endTimeMs: localMidnightMs + yamaEnd * 3600000, name: "Yamagaṇḍa" },
+    gulika_kala: { start: formatTimeHMS(gulikaStart), end: formatTimeHMS(gulikaEnd), startTimeMs: localMidnightMs + gulikaStart * 3600000, endTimeMs: localMidnightMs + gulikaEnd * 3600000,
       name: "Gulikā Kāla",
     },
-    abhijit_muhurta: {
-      start: formatTimeHMS(abhijitStart),
-      end: formatTimeHMS(abhijitEnd),
+    abhijit_muhurta: { start: formatTimeHMS(abhijitStart), end: formatTimeHMS(abhijitEnd), startTimeMs: localMidnightMs + abhijitStart * 3600000, endTimeMs: localMidnightMs + abhijitEnd * 3600000,
       name: "Abhijit Muhūrta",
     },
-    brahma_muhurta: {
-      start: formatTimeHMS(brahmaStart),
-      end: formatTimeHMS(brahmaEnd),
+    brahma_muhurta: { start: formatTimeHMS(brahmaStart), end: formatTimeHMS(brahmaEnd), startTimeMs: localMidnightMs + brahmaStart * 3600000, endTimeMs: localMidnightMs + brahmaEnd * 3600000,
       name: "Brahma Muhūrta",
     },
     amrita_kala: amritaIntervals,

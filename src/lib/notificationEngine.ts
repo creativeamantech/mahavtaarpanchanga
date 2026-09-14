@@ -6,6 +6,7 @@ export interface NotificationPreferences {
   sunriseSunset: boolean;
   muhurtas: boolean;
   horas: boolean;
+  horaPlanets: Record<string, boolean>;
 }
 
 export const defaultNotificationPreferences: NotificationPreferences = {
@@ -13,6 +14,15 @@ export const defaultNotificationPreferences: NotificationPreferences = {
   sunriseSunset: true,
   muhurtas: true,
   horas: true,
+  horaPlanets: {
+    Sun: true,
+    Moon: true,
+    Mars: true,
+    Mercury: true,
+    Jupiter: true,
+    Venus: true,
+    Saturn: true,
+  },
 };
 
 const NOTIF_PREF_KEY = "mahavtaar_notif_prefs";
@@ -21,7 +31,17 @@ export function getNotificationPreferences(): NotificationPreferences {
   if (typeof window === "undefined") return defaultNotificationPreferences;
   try {
     const val = localStorage.getItem(NOTIF_PREF_KEY);
-    if (val) return JSON.parse(val);
+    if (val) {
+      const parsed = JSON.parse(val);
+      return {
+        ...defaultNotificationPreferences,
+        ...parsed,
+        horaPlanets: {
+          ...defaultNotificationPreferences.horaPlanets,
+          ...(parsed.horaPlanets || {}),
+        },
+      };
+    }
   } catch (e) {
     console.error("Failed to parse notification prefs", e);
   }
@@ -47,42 +67,46 @@ function parseTimeStringToMs(timeStr: string, dateStr: string): number {
   if (parts.length !== 3) return 0;
   const [dd, mm, yyyy] = parts;
   const base = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
-  
+
   const match = timeStr.match(/(\d+):(\d+)(?::(\d+))?\s*(AM|PM)?/i);
   if (!match) return 0;
-  
+
   let [, h, m, s, ampm] = match;
   let hours = parseInt(h, 10);
   if (ampm) {
-    if (ampm.toUpperCase() === 'PM' && hours < 12) hours += 12;
-    if (ampm.toUpperCase() === 'AM' && hours === 12) hours = 0;
+    if (ampm.toUpperCase() === "PM" && hours < 12) hours += 12;
+    if (ampm.toUpperCase() === "AM" && hours === 12) hours = 0;
   }
-  
-  return base.getTime() + (hours * 3600 + parseInt(m, 10) * 60 + parseInt(s || '0', 10)) * 1000;
+
+  return base.getTime() + (hours * 3600 + parseInt(m, 10) * 60 + parseInt(s || "0", 10)) * 1000;
 }
 
 function scheduleAlert(title: string, body: string, timeMs: number) {
   const now = Date.now();
   const delay = timeMs - now;
-  
+
   // Only schedule if it's in the future and within the next 24 hours
   if (delay > 0 && delay < 24 * 60 * 60 * 1000) {
     const timeout = setTimeout(() => {
       if (Notification.permission === "granted") {
         try {
           // Attempt to use service worker if available for better background support
-          navigator.serviceWorker.ready.then((registration) => {
-            registration.showNotification(title, {
-              body,
-              icon: "/pwa-192x192.png",
-              badge: "/pwa-192x192.png",
-              vibrate: [200, 100, 200]
-            }).catch(() => {
+          navigator.serviceWorker.ready
+            .then((registration) => {
+              registration
+                .showNotification(title, {
+                  body,
+                  icon: "/pwa-192x192.png",
+                  badge: "/pwa-192x192.png",
+                  vibrate: [200, 100, 200],
+                } as any)
+                .catch(() => {
+                  new Notification(title, { body, icon: "/pwa-192x192.png" });
+                });
+            })
+            .catch(() => {
               new Notification(title, { body, icon: "/pwa-192x192.png" });
             });
-          }).catch(() => {
-            new Notification(title, { body, icon: "/pwa-192x192.png" });
-          });
         } catch (e) {
           new Notification(title, { body, icon: "/pwa-192x192.png" });
         }
@@ -92,9 +116,12 @@ function scheduleAlert(title: string, body: string, timeMs: number) {
   }
 }
 
-export function schedulePanchangaNotifications(data: PanchangaResponse, prefs: NotificationPreferences) {
+export function schedulePanchangaNotifications(
+  data: PanchangaResponse,
+  prefs: NotificationPreferences,
+) {
   clearScheduledNotifications();
-  
+
   if (!prefs.enabled || Notification.permission !== "granted") {
     return;
   }
@@ -114,44 +141,57 @@ export function schedulePanchangaNotifications(data: PanchangaResponse, prefs: N
   if (prefs.muhurtas) {
     if (data.brahma_muhurta?.start) {
       const bMs = parseTimeStringToMs(data.brahma_muhurta.start, date);
-      if (bMs) scheduleAlert("Brahma Muhurta Starts", `The highly auspicious Brahma Muhurta has begun.`, bMs);
+      if (bMs)
+        scheduleAlert(
+          "Brahma Muhurta Starts",
+          `The highly auspicious Brahma Muhurta has begun.`,
+          bMs,
+        );
     }
     if (data.abhijit_muhurta?.start) {
       const aMs = parseTimeStringToMs(data.abhijit_muhurta.start, date);
-      if (aMs) scheduleAlert("Abhijit Muhurta Starts", `The auspicious Abhijit Muhurta has begun.`, aMs);
+      if (aMs)
+        scheduleAlert("Abhijit Muhurta Starts", `The auspicious Abhijit Muhurta has begun.`, aMs);
     }
     if (data.rahu_kala?.start) {
       const rMs = parseTimeStringToMs(data.rahu_kala.start, date);
-      if (rMs) scheduleAlert("Rahu Kala Starts", `The inauspicious Rahu Kala has begun. Avoid new beginnings.`, rMs);
+      if (rMs)
+        scheduleAlert(
+          "Rahu Kala Starts",
+          `The inauspicious Rahu Kala has begun. Avoid new beginnings.`,
+          rMs,
+        );
     }
   }
 
   // 3. Horas
-  if (prefs.horas && data.sunrise_hours && data.sunset_hours && data.next_sunrise_hours) {
+  if (prefs.horas && data.sunrise_ms && data.sunset_ms && data.next_sunrise_ms) {
     // We need weekday. We can get it from date.
     const parts = date.split("/");
     const base = new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
     const weekday = base.getDay();
-    
+
     // Tithi number estimation (rough is okay for swara in horas, but we have data.tithi)
     const primaryTithiNum = data.tithi && data.tithi.length > 0 ? data.tithi[0].number : 1;
 
     const horasData = computeDailyHoras(
       date,
-      data.sunrise_hours,
-      data.sunset_hours,
-      data.next_sunrise_hours,
+      data.sunrise_ms,
+      data.sunset_ms,
+      data.next_sunrise_ms,
       weekday,
       primaryTithiNum,
-      base.getTime() // We evaluate from midnight to get all horas
+      base.getTime(), // We evaluate from midnight to get all horas
     );
 
-    horasData.horas.forEach(hora => {
-      // Notify at the start of each hora
-      const title = `Hora of ${hora.ruler}`;
-      const element = hora.tattvas.length > 0 ? hora.tattvas[0].name : "Unknown Element";
-      const body = `Started. First element: ${element}. Dominant Nadi: ${hora.nadi}.`;
-      scheduleAlert(title, body, hora.startTimeMs);
+    horasData.horas.forEach((hora) => {
+      // Notify at the start of each hora if enabled for that planet
+      if (prefs.horaPlanets && prefs.horaPlanets[hora.ruler]) {
+        const title = `Hora of ${hora.ruler}`;
+        const element = hora.tattvas.length > 0 ? hora.tattvas[0].name : "Unknown Element";
+        const body = `Started. First element: ${element}. Dominant Nadi: ${hora.nadi}.`;
+        scheduleAlert(title, body, hora.startTimeMs);
+      }
     });
   }
 }

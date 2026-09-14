@@ -1,33 +1,33 @@
-const fs = require('fs');
+const fs = require("fs");
 
-let content = fs.readFileSync('src/components/SettingsModal.tsx', 'utf8');
+let content = fs.readFileSync("src/components/SettingsModal.tsx", "utf8");
 
 // Imports
 content = content.replace(
   'import { type Language, translations } from "../i18n";',
-  'import { type Language, translations } from "../i18n";\nimport { getNotificationPreferences, saveNotificationPreferences, NotificationPreferences, defaultNotificationPreferences } from "../lib/notificationEngine";\nimport { Bell, BellOff, BellRing } from "lucide-react";'
+  'import { type Language, translations } from "../i18n";\nimport { getNotificationPreferences, saveNotificationPreferences, NotificationPreferences, defaultNotificationPreferences } from "../lib/notificationEngine";\nimport { Bell, BellOff, BellRing } from "lucide-react";',
 );
 
 // State
 content = content.replace(
-  'const [selectedTheme, setSelectedTheme] = useState<AppTheme>(theme);',
-  'const [selectedTheme, setSelectedTheme] = useState<AppTheme>(theme);\n  const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(defaultNotificationPreferences);\n\n  useEffect(() => {\n    if (isOpen) {\n      setNotifPrefs(getNotificationPreferences());\n    }\n  }, [isOpen]);'
+  "const [selectedTheme, setSelectedTheme] = useState<AppTheme>(theme);",
+  "const [selectedTheme, setSelectedTheme] = useState<AppTheme>(theme);\n  const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(defaultNotificationPreferences);\n\n  useEffect(() => {\n    if (isOpen) {\n      setNotifPrefs(getNotificationPreferences());\n    }\n  }, [isOpen]);",
 );
 
 // handleSave
 content = content.replace(
-  'onUpdateSettings(selectedAyanamsa, selectedMonthSystem, true, selectedTheme);',
-  'onUpdateSettings(selectedAyanamsa, selectedMonthSystem, true, selectedTheme);\n    saveNotificationPreferences(notifPrefs);\n    // Dispatch a custom event to notify the app to reload notifications\n    window.dispatchEvent(new Event("mahavtaar_notif_prefs_updated"));'
+  "onUpdateSettings(selectedAyanamsa, selectedMonthSystem, true, selectedTheme);",
+  'onUpdateSettings(selectedAyanamsa, selectedMonthSystem, true, selectedTheme);\n    saveNotificationPreferences(notifPrefs);\n    // Dispatch a custom event to notify the app to reload notifications\n    window.dispatchEvent(new Event("mahavtaar_notif_prefs_updated"));',
 );
 
 // handleReset
 content = content.replace(
   'setSelectedTheme("parchment");',
-  'setSelectedTheme("parchment");\n    setNotifPrefs(defaultNotificationPreferences);'
+  'setSelectedTheme("parchment");\n    setNotifPrefs(defaultNotificationPreferences);',
 );
 
 // UI Addition
-const modalActionsIdx = content.indexOf('{/* Modal Actions */}');
+const modalActionsIdx = content.indexOf("{/* Modal Actions */}");
 const newUI = `
           {/* Notification Settings */}
           <div>
@@ -81,4 +81,4 @@ const newUI = `
 
 content = content.substring(0, modalActionsIdx) + newUI + content.substring(modalActionsIdx);
 
-fs.writeFileSync('src/components/SettingsModal.tsx', content);
+fs.writeFileSync("src/components/SettingsModal.tsx", content);

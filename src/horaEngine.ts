@@ -4,8 +4,8 @@ export interface TattvaPeriod {
   name: string;
   sanskrit: string;
   durationMs: number;
-  startTime: string; // HH:mm:ss
-  endTime: string;
+  startTime: string; // hh:mm:ss A (e.g., 06:15:23 AM)
+  endTime: string; // hh:mm:ss A
   startTimeMs: number;
   endTimeMs: number;
 }
@@ -13,8 +13,8 @@ export interface TattvaPeriod {
 export interface Hora {
   index: number;
   isDay: boolean;
-  startTime: string;
-  endTime: string;
+  startTime: string; // hh:mm:ss A
+  endTime: string; // hh:mm:ss A
   startTimeMs: number;
   endTimeMs: number;
   durationMs: number;
@@ -67,7 +67,6 @@ const TATTVA_DEFS = [
 ];
 
 function formatHMS(date: Date): string {
-  const h = date.getHours().toString().padStart(2, "0");
   const m = date.getMinutes().toString().padStart(2, "0");
   const s = date.getSeconds().toString().padStart(2, "0");
   const ampm = date.getHours() >= 12 ? "PM" : "AM";
@@ -77,23 +76,32 @@ function formatHMS(date: Date): string {
 
 export function computeDailyHoras(
   dateStr: string,
-  sunriseHours: number,
-  sunsetHours: number,
-  nextSunriseHours: number,
+  sunriseMs: number,
+  sunsetMs: number,
+  nextSunriseMs: number,
   weekday: number, // 0-6 (Sun-Sat)
   tithiNum: number,
   currentTimeMs?: number, // optional real-time check
 ): DailyHoras {
-  const now = currentTimeMs || Date.now();
+  const now = currentTimeMs ?? Date.now();
 
-  // Create base date for midnight of the provided dateStr (DD/MM/YYYY)
-  const [dd, mm, yyyy] = dateStr.split("/");
-  const baseDate = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
-  const midnightMs = baseDate.getTime();
-
-  const sunriseMs = midnightMs + sunriseHours * 3600000;
-  const sunsetMs = midnightMs + sunsetHours * 3600000;
-  const nextSunriseMs = midnightMs + nextSunriseHours * 3600000;
+  // Validate inputs
+  if (
+    !sunriseMs ||
+    !sunsetMs ||
+    !nextSunriseMs ||
+    isNaN(sunriseMs) ||
+    isNaN(sunsetMs) ||
+    isNaN(nextSunriseMs)
+  ) {
+    throw new Error("Invalid astronomical timestamps provided for Hora calculation.");
+  }
+  if (sunriseMs >= sunsetMs || sunsetMs >= nextSunriseMs) {
+    throw new Error("Invalid chronological ordering of sunrise and sunset.");
+  }
+  if (weekday < 0 || weekday > 6) {
+    throw new Error("Weekday must be between 0 and 6.");
+  }
 
   const dayDurationMs = sunsetMs - sunriseMs;
   const nightDurationMs = nextSunriseMs - sunsetMs;
@@ -111,10 +119,10 @@ export function computeDailyHoras(
   for (let i = 0; i < 24; i++) {
     const isDay = i < 12;
     const duration = isDay ? dayHoraDuration : nightHoraDuration;
-    const startTimeMs = isDay
-      ? sunriseMs + i * dayHoraDuration
-      : sunsetMs + (i - 12) * nightHoraDuration;
-    const endTimeMs = startTimeMs + duration;
+
+    // Guarantee exact endpoints to prevent floating point drift
+    const startTimeMs = i === 0 ? sunriseMs : horas[i - 1].endTimeMs;
+    const endTimeMs = i === 11 ? sunsetMs : i === 23 ? nextSunriseMs : startTimeMs + duration;
 
     const ruler = HORA_LORDS[(startIndex + i) % 7];
     const nadi = i % 2 === 0 ? initialNadi : initialNadi === "ida" ? "pingala" : "ida";
@@ -122,14 +130,16 @@ export function computeDailyHoras(
     const tattvas: TattvaPeriod[] = [];
     let tattvaStartMs = startTimeMs;
 
-    for (const tDef of TATTVA_DEFS) {
+    for (let t = 0; t < TATTVA_DEFS.length; t++) {
+      const tDef = TATTVA_DEFS[t];
       const tDuration = duration * tDef.ratio;
-      const tEndMs = tattvaStartMs + tDuration;
+      // Exact ending for the last tattva to avoid tiny gaps
+      const tEndMs = t === TATTVA_DEFS.length - 1 ? endTimeMs : tattvaStartMs + tDuration;
 
       const tp: TattvaPeriod = {
         name: tDef.name,
         sanskrit: tDef.sanskrit,
-        durationMs: tDuration,
+        durationMs: tEndMs - tattvaStartMs,
         startTimeMs: tattvaStartMs,
         endTimeMs: tEndMs,
         startTime: formatHMS(new Date(tattvaStartMs)),
@@ -138,6 +148,7 @@ export function computeDailyHoras(
 
       tattvas.push(tp);
 
+      // Half-open interval for current time match
       if (now >= tattvaStartMs && now < tEndMs) {
         activeTattva = tp;
       }
@@ -150,7 +161,7 @@ export function computeDailyHoras(
       isDay,
       startTimeMs,
       endTimeMs,
-      durationMs: duration,
+      durationMs: endTimeMs - startTimeMs,
       startTime: formatHMS(new Date(startTimeMs)),
       endTime: formatHMS(new Date(endTimeMs)),
       ruler,

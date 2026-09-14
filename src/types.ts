@@ -184,6 +184,9 @@ export interface PanchangaResponse {
   sunrise_hours?: number;
   sunset_hours?: number;
   next_sunrise_hours?: number;
+  sunrise_ms?: number;
+  sunset_ms?: number;
+  next_sunrise_ms?: number;
   moonrise: string | null;
   moonrise_status: string;
   moonset: string | null;

@@ -16,47 +16,47 @@ export default defineConfig({
   vite: {
     plugins: [
       VitePWA({
-        registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
+        registerType: "autoUpdate",
+        includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon.svg"],
         manifest: {
-          id: '/',
-          name: 'Mahavtaar Panchanga',
-          short_name: 'Panchanga',
-          description: 'A modern installable Vedic Panchanga application.',
-          theme_color: '#0b0f19',
-          background_color: '#0b0f19',
-          display: 'standalone',
-          start_url: '/',
-          scope: '/',
+          id: "/",
+          name: "Mahavtaar Panchanga",
+          short_name: "Panchanga",
+          description: "A modern installable Vedic Panchanga application.",
+          theme_color: "#0b0f19",
+          background_color: "#0b0f19",
+          display: "standalone",
+          start_url: "/",
+          scope: "/",
           icons: [
             {
-              src: '/pwa-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'any',
+              src: "/pwa-192x192.png",
+              sizes: "192x192",
+              type: "image/png",
+              purpose: "any",
             },
             {
-              src: '/pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'any',
+              src: "/pwa-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any",
             },
             {
-              src: '/pwa-maskable-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable',
+              src: "/pwa-maskable-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable",
             },
           ],
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,json}'],
+          globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2,json}"],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-              handler: 'CacheFirst',
+              handler: "CacheFirst",
               options: {
-                cacheName: 'google-fonts-cache',
+                cacheName: "google-fonts-cache",
                 expiration: {
                   maxEntries: 10,
                   maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
@@ -68,9 +68,9 @@ export default defineConfig({
             },
             {
               urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-              handler: 'CacheFirst',
+              handler: "CacheFirst",
               options: {
-                cacheName: 'gstatic-fonts-cache',
+                cacheName: "gstatic-fonts-cache",
                 expiration: {
                   maxEntries: 10,
                   maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
@@ -82,9 +82,9 @@ export default defineConfig({
             },
             {
               urlPattern: /^\/api\/.*/i,
-              handler: 'NetworkFirst',
+              handler: "NetworkFirst",
               options: {
-                cacheName: 'api-cache',
+                cacheName: "api-cache",
                 expiration: {
                   maxEntries: 100,
                   maxAgeSeconds: 60 * 60 * 24, // 1 day fallback
@@ -98,7 +98,7 @@ export default defineConfig({
         },
         devOptions: {
           enabled: true, // Enables service worker in development / AI Studio preview
-          type: 'module',
+          type: "module",
         },
       }),
     ],

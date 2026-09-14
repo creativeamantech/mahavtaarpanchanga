@@ -73,9 +73,9 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
   // We'll just pass `now.getTime()` which represents universal time.
   const horas = computeDailyHoras(
     data.date,
-    data.sunrise_hours ?? 6,
-    data.sunset_hours ?? 18,
-    data.next_sunrise_hours ?? 30,
+    data.sunrise_ms!,
+    data.sunset_ms!,
+    data.next_sunrise_ms!,
     weekday,
     primaryTithiNum,
     now.getTime(),

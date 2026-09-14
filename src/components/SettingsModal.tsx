@@ -13,7 +13,12 @@ import {
 } from "lucide-react";
 import type { CoordinateSelection, MonthSystem, AppTheme } from "../types";
 import { type Language, translations } from "../i18n";
-import { getNotificationPreferences, saveNotificationPreferences, NotificationPreferences, defaultNotificationPreferences } from "../lib/notificationEngine";
+import {
+  getNotificationPreferences,
+  saveNotificationPreferences,
+  NotificationPreferences,
+  defaultNotificationPreferences,
+} from "../lib/notificationEngine";
 import { Bell, BellOff, BellRing } from "lucide-react";
 
 interface SettingsModalProps {
@@ -109,7 +114,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [selectedAyanamsa, setSelectedAyanamsa] = useState<CoordinateSelection>(ayanamsa);
   const [selectedMonthSystem, setSelectedMonthSystem] = useState<MonthSystem>(monthSystem);
   const [selectedTheme, setSelectedTheme] = useState<AppTheme>(theme);
-  const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(defaultNotificationPreferences);
+  const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(
+    defaultNotificationPreferences,
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -139,6 +146,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const handleSave = () => {
     onUpdateSettings(selectedAyanamsa, selectedMonthSystem, saveToLocalStorage, selectedTheme);
+    saveNotificationPreferences(notifPrefs);
+    window.dispatchEvent(new Event("mahavtaar_notif_prefs_updated"));
     setSaveSuccessMsg(true);
     setTimeout(() => {
       onClose();
@@ -383,56 +392,112 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
-        
-          {/* Notification Settings */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">
-              <div className="flex items-center gap-1.5">
-                <BellRing className="w-3.5 h-3.5 text-amber-700" />
-                Push Notifications
-              </div>
-            </label>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl border border-stone-200 bg-white">
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold text-stone-900 font-devanagari">Enable Push Alerts</span>
-                  <span className="text-[11px] text-stone-500">Requires browser permission. Keep app open in background.</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const nextVal = !notifPrefs.enabled;
-                    setNotifPrefs({ ...notifPrefs, enabled: nextVal });
-                    if (nextVal && "Notification" in window && Notification.permission !== "granted") {
-                      Notification.requestPermission();
-                    }
-                  }}
-                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notifPrefs.enabled ? "bg-amber-600" : "bg-stone-300"}`}
-                >
-                  <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${notifPrefs.enabled ? "translate-x-4" : "translate-x-0"}`} />
-                </button>
-              </div>
-
-              {notifPrefs.enabled && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 sm:pl-4 border-l-2 border-amber-100">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={notifPrefs.sunriseSunset} onChange={(e) => setNotifPrefs({...notifPrefs, sunriseSunset: e.target.checked})} className="rounded text-amber-600 focus:ring-amber-600" />
-                    <span className="text-xs font-medium text-stone-700">Sunrise & Sunset</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={notifPrefs.muhurtas} onChange={(e) => setNotifPrefs({...notifPrefs, muhurtas: e.target.checked})} className="rounded text-amber-600 focus:ring-amber-600" />
-                    <span className="text-xs font-medium text-stone-700">Important Muhurtas</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={notifPrefs.horas} onChange={(e) => setNotifPrefs({...notifPrefs, horas: e.target.checked})} className="rounded text-amber-600 focus:ring-amber-600" />
-                    <span className="text-xs font-medium text-stone-700">Horas & Elements</span>
-                  </label>
-                </div>
-              )}
+        {/* Notification Settings */}
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">
+            <div className="flex items-center gap-1.5">
+              <BellRing className="w-3.5 h-3.5 text-amber-700" />
+              Push Notifications
             </div>
+          </label>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 rounded-xl border border-stone-200 bg-white">
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-stone-900 font-devanagari">
+                  Enable Push Alerts
+                </span>
+                <span className="text-[11px] text-stone-500">
+                  Requires browser permission. Keep app open in background.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const nextVal = !notifPrefs.enabled;
+                  setNotifPrefs({ ...notifPrefs, enabled: nextVal });
+                  if (
+                    nextVal &&
+                    "Notification" in window &&
+                    Notification.permission !== "granted"
+                  ) {
+                    Notification.requestPermission();
+                  }
+                }}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notifPrefs.enabled ? "bg-amber-600" : "bg-stone-300"}`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${notifPrefs.enabled ? "translate-x-4" : "translate-x-0"}`}
+                />
+              </button>
+            </div>
+
+            {notifPrefs.enabled && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 sm:pl-4 border-l-2 border-amber-100">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifPrefs.sunriseSunset}
+                    onChange={(e) =>
+                      setNotifPrefs({ ...notifPrefs, sunriseSunset: e.target.checked })
+                    }
+                    className="rounded text-amber-600 focus:ring-amber-600"
+                  />
+                  <span className="text-xs font-medium text-stone-700">Sunrise & Sunset</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifPrefs.muhurtas}
+                    onChange={(e) => setNotifPrefs({ ...notifPrefs, muhurtas: e.target.checked })}
+                    className="rounded text-amber-600 focus:ring-amber-600"
+                  />
+                  <span className="text-xs font-medium text-stone-700">Important Muhurtas</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifPrefs.horas}
+                    onChange={(e) => setNotifPrefs({ ...notifPrefs, horas: e.target.checked })}
+                    className="rounded text-amber-600 focus:ring-amber-600"
+                  />
+                  <span className="text-xs font-medium text-stone-700">Horas & Elements</span>
+                </label>
+              </div>
+            )}
+
+            {notifPrefs.enabled && notifPrefs.horas && (
+              <div className="pl-2 sm:pl-4 border-l-2 border-amber-100">
+                <div className="pt-2">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">
+                    Planetary Horas
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.keys(defaultNotificationPreferences.horaPlanets).map((planet) => (
+                      <button
+                        key={planet}
+                        type="button"
+                        onClick={() => {
+                          const newPlanets = { ...(notifPrefs.horaPlanets || {}) };
+                          newPlanets[planet] = !newPlanets[planet];
+                          setNotifPrefs({ ...notifPrefs, horaPlanets: newPlanets });
+                        }}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                          notifPrefs.horaPlanets?.[planet] ?? true
+                            ? "bg-amber-100 text-amber-800 border border-amber-200"
+                            : "bg-stone-100 text-stone-500 border border-stone-200"
+                        }`}
+                      >
+                        {planet}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          
-{/* Modal Actions */}
+        </div>
+
+        {/* Modal Actions */}
         <div className="mt-6 flex items-center justify-between border-t border-stone-200/80 pt-4">
           <button
             type="button"

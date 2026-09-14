@@ -346,7 +346,7 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Settings className="h-3.5 w-3.5" />
               </button>
-              
+
               <PWAInstallButton />
             </div>
           </div>

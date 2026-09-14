@@ -71,7 +71,6 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
             >
               {t.vedicAlmanac}
             </div>
-
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

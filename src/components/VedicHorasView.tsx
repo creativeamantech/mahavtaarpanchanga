@@ -20,9 +20,9 @@ export function VedicHorasView({ panchangaData }: { panchangaData: any }) {
 
       const horas = computeDailyHoras(
         panchangaData.date,
-        panchangaData.sunrise_hours,
-        panchangaData.sunset_hours,
-        panchangaData.next_sunrise_hours,
+        panchangaData.sunrise_ms!,
+        panchangaData.sunset_ms!,
+        panchangaData.next_sunrise_ms!,
         weekday,
         panchangaData.tithi[0]?.number || 1,
         now,

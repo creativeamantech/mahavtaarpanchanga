@@ -237,11 +237,9 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 {t.changeLocation}
               </h3>
               <p className="text-xs text-stone-500 font-sans">
-                {lang === "sa"
-                  ? "प्रत्यक्षदृग्गणितार्थं स्थानचयनम्"
-                  : lang === "hi"
-                    ? "सटीक प्रत्यक्ष गणना हेतु अपना नगर या डिवाइस स्थान चुनें"
-                    : `Currently active: ${currentCity}`}
+                {lang === "hi"
+                  ? "सटीक प्रत्यक्ष गणना हेतु अपना नगर या डिवाइस स्थान चुनें"
+                  : `Currently active: ${currentCity}`}
               </p>
             </div>
           </div>
@@ -314,16 +312,12 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   <h4 className="text-sm font-bold text-amber-950 font-serif-vedic">
                     {lang === "hi"
                       ? "डिवाइस का प्रत्यक्ष जीपीएस स्थान"
-                      : lang === "sa"
-                        ? "उपकरणस्य साक्षात् जीपीएस-स्थानम्"
-                        : "High-Precision Device GPS Location"}
+                      : "High-Precision Device GPS Location"}
                   </h4>
                   <p className="text-xs text-stone-600 mt-0.5">
                     {lang === "hi"
                       ? "अपने उपकरण के वास्तविक जीपीएस द्वारा सूर्योदय, नक्षत्र एवं लग्न की शुद्धतम गणना करें।"
-                      : lang === "sa"
-                        ? "उपकरणस्य प्रत्यक्षस्थानेन शुद्धसूर्योदयलग्नयोः साधनं भवति।"
-                        : "Directly reads browser GPS coordinates for exact local astronomical calculations."}
+                      : "Directly reads browser GPS coordinates for exact local astronomical calculations."}
                   </p>
                 </div>
               </div>

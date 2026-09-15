@@ -1,6 +1,6 @@
 import React from "react";
 import type { PanchangaResponse } from "../types";
-import type { Language } from "../i18n";
+import { type Language, getLocalizedMasa, getLocalizedPaksha } from "../i18n";
 import { EKADASHI_NAMES } from "../vedicData";
 import { Sparkles, Flame, Moon, Sun, HeartHandshake } from "lucide-react";
 
@@ -274,29 +274,23 @@ export const FestivalCard: React.FC<FestivalCardProps> = ({ data, lang, theme })
           </div>
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-900/60 mb-1">
-              {lang === "sa"
-                ? "दैनिक-सुभाषितम्"
-                : lang === "hi"
-                  ? "दैनिक सुभाषित एवं शान्ति मन्त्र"
-                  : "Daily Vedic Wisdom"}
+              {lang === "hi" ? "दैनिक सुभाषित एवं शान्ति मन्त्र" : "Daily Vedic Wisdom"}
             </div>
             <div className="text-sm font-extrabold text-stone-800 font-serif-vedic">
               ॥ सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः । सर्वे भद्राणि पश्यन्तु मा
               कश्चिद्दुःखभाग्भवेत् ॥
             </div>
             <div className="text-xs text-stone-500 font-sans mt-1">
-              {lang === "sa"
-                ? "सर्वे जनाः सुखिनः आरुग्णाश्च सन्तु, शुभं पश्यन्तु।"
-                : lang === "hi"
-                  ? "सभी सुखी हों, सभी रोगमुक्त हों, सबका कल्याण हो और किसी को भी दुःख न हो।"
-                  : "May all beings be peaceful, healthy, and see auspiciousness everywhere."}
+              {lang === "hi"
+                ? "सभी सुखी हों, सभी रोगमुक्त हों, सबका कल्याण हो और किसी को भी दुःख न हो।"
+                : "May all beings be peaceful, healthy, and see auspiciousness everywhere."}
             </div>
           </div>
         </div>
         <div className="hidden md:flex items-center space-x-2 text-xs text-amber-900 font-semibold bg-amber-50/50 px-3 py-1.5 rounded-full border border-amber-200/80 shadow-sm">
           <Sparkles className="h-3.5 w-3.5 text-amber-600" />
           <span>
-            {data.masa} • {data.paksha} Pakṣa
+            {getLocalizedMasa(data.masa, lang)} • {getLocalizedPaksha(data.paksha || "", lang)} {lang === "hi" ? "पक्ष" : "Pakṣa"}
           </span>
         </div>
       </div>
@@ -334,11 +328,7 @@ export const FestivalCard: React.FC<FestivalCardProps> = ({ data, lang, theme })
           <div>
             <div className="flex items-center space-x-2">
               <span className="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-950 font-sans">
-                {lang === "sa"
-                  ? "विशेष-पर्व / महाव्रतम्"
-                  : lang === "hi"
-                    ? "विशेष पर्व एवं महाव्रत"
-                    : "Special Vrata / Festival"}
+                {lang === "hi" ? "विशेष पर्व एवं महाव्रत" : "Special Vrata / Festival"}
               </span>
               <span className="text-xs text-stone-500 font-sans">• Deity: {observance.deity}</span>
             </div>
@@ -359,11 +349,7 @@ export const FestivalCard: React.FC<FestivalCardProps> = ({ data, lang, theme })
 
         <div className="md:col-span-5 space-y-1.5">
           <span className="text-[11px] font-bold uppercase tracking-wider text-stone-700 block font-sans">
-            {lang === "sa"
-              ? "अनुष्ठेयाः नियमाः :"
-              : lang === "hi"
-                ? "शुभ अनुष्ठान व नियम :"
-                : "Recommended Observances:"}
+            {lang === "hi" ? "शुभ अनुष्ठान व नियम :" : "Recommended Observances:"}
           </span>
           {observance.practices.map((p, idx) => (
             <div

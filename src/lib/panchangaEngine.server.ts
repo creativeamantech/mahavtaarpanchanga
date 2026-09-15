@@ -2,6 +2,7 @@ import * as Astronomy from "astronomy-engine";
 import rawCities from "../data/cities.json";
 import rawSanskritNames from "../data/sanskrit_names.json";
 import { computeTithiSwaraEvents } from "./tithiSwaraEngine";
+import { computeNakshatraSwaraEvents } from "./nakshatraSwaraEngine";
 import type {
   CityLocation,
   CoordinateSelection,
@@ -1457,7 +1458,7 @@ export function computePanchanga(
     ...seg,
     tithiSwara: computeTithiSwaraEvents(seg, location.timezone),
   }));
-  const nakshatraSegments = findSegments(
+  const rawNakshatraSegments = findSegments(
     (t) => getNakshatraFraction(t, coordinateSelection),
     names.nakshatras,
     tSunrise,
@@ -1466,6 +1467,10 @@ export function computePanchanga(
     27,
     location.timezone,
   );
+  const nakshatraSegments: Segment[] = rawNakshatraSegments.map((seg) => ({
+    ...seg,
+    nakshatraSwara: computeNakshatraSwaraEvents(seg, location.timezone),
+  }));
   const yogaSegments = findSegments(
     (t) => getYogaFraction(t, coordinateSelection),
     names.yogas,

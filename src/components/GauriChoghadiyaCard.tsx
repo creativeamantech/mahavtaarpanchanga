@@ -123,35 +123,21 @@ export const GauriChoghadiyaCard: React.FC<GauriChoghadiyaCardProps> = ({ data, 
         <div className="flex flex-wrap items-center gap-3.5">
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>{" "}
-            {lang === "sa"
-              ? "अमृतम् / शुभम् / लाभः (प्रशस्ताः)"
-              : lang === "hi"
-                ? "अमृत / शुभ / लाभ (श्रेष्ठ-शुभ)"
-                : "Amṛta / Śubha / Lābha (Auspicious)"}
+            {lang === "hi"
+              ? "अमृत / शुभ / लाभ (श्रेष्ठ-शुभ)"
+              : "Amṛta / Śubha / Lābha (Auspicious)"}
           </span>
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-stone-400"></span>{" "}
-            {lang === "sa"
-              ? "चलम् (मध्यमः)"
-              : lang === "hi"
-                ? "चर (सामान्य)"
-                : "Chara (Neutral / Motion)"}
+            {lang === "hi" ? "चर (सामान्य)" : "Chara (Neutral / Motion)"}
           </span>
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-rose-500"></span>{" "}
-            {lang === "sa"
-              ? "उद्वेगः / कालः / रोगः (वर्ज्याः)"
-              : lang === "hi"
-                ? "उद्वेग / काल / रोग (अशुभ-त्याज्य)"
-                : "Udvega / Kāla / Roga (Avoid)"}
+            {lang === "hi" ? "उद्वेग / काल / रोग (अशुभ-त्याज्य)" : "Udvega / Kāla / Roga (Avoid)"}
           </span>
         </div>
         <div className="text-[11px] text-stone-400">
-          {lang === "sa"
-            ? "अष्टधा समानभागाः"
-            : lang === "hi"
-              ? "८ समान भागों में विभाजित"
-              : "8 equal diurnal/nocturnal subdivisions"}
+          {lang === "hi" ? "८ समान भागों में विभाजित" : "8 equal diurnal/nocturnal subdivisions"}
         </div>
       </div>
     </div>

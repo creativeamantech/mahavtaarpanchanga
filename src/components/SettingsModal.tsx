@@ -182,9 +182,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <p className="text-xs text-stone-500 font-sans">
                 {lang === "hi"
                   ? "अयनांश, मास गणना एवं स्थायी डिवाइस सेटिंग्स"
-                  : lang === "sa"
-                    ? "अयनांश-मासमान-उपकरणव्यवस्थाश्च"
-                    : "Ayanāṁśa, Month Reckoning & Saved Device Preferences"}
+                  : "Ayanāṁśa, Month Reckoning & Saved Device Preferences"}
               </p>
             </div>
           </div>
@@ -323,11 +321,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   {selectedMonthSystem === "amanta" && <Check className="h-4 w-4 text-amber-700" />}
                 </div>
                 <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
-                  {lang === "sa"
-                    ? "अमावास्यान्तः मासः। दक्षिणभारते मुख्यतया आचर्यते।"
-                    : lang === "hi"
-                      ? "अमावस्या के अंत पर नवीन मास प्रारंभ (दक्षिण भारत, महाराष्ट्र, गुजरात में प्रचलित)।"
-                      : "Month ends at New Moon (Amāvasyā). Standard in South India, Maharashtra & Gujarat."}
+                  {lang === "hi"
+                    ? "अमावस्या के अंत पर नवीन मास प्रारंभ (दक्षिण भारत, महाराष्ट्र, गुजरात में प्रचलित)।"
+                    : "Month ends at New Moon (Amāvasyā). Standard in South India, Maharashtra & Gujarat."}
                 </p>
               </button>
 
@@ -350,11 +346,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   )}
                 </div>
                 <p className="text-[11px] text-stone-500 mt-1 leading-relaxed">
-                  {lang === "sa"
-                    ? "पूर्णिमान्तः मासः। उत्तरभारते मुख्यतया आचर्यते।"
-                    : lang === "hi"
-                      ? "पूर्णिमा के अंत पर नवीन मास प्रारंभ (उत्तर भारत में सर्वाधिक प्रचलित)।"
-                      : "Month ends at Full Moon (Pūrṇimā). Standard in North India."}
+                  {lang === "hi"
+                    ? "पूर्णिमा के अंत पर नवीन मास प्रारंभ (उत्तर भारत में सर्वाधिक प्रचलित)।"
+                    : "Month ends at Full Moon (Pūrṇimā). Standard in North India."}
                 </p>
               </button>
             </div>
@@ -380,7 +374,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="pr-3">
                     <div className="font-bold text-stone-900 text-sm">{opt.name}</div>
                     <div className="text-xs text-stone-500 mt-0.5 font-sans">
-                      {lang === "sa" ? opt.descSa : lang === "hi" ? opt.descHi : opt.desc}
+                      {lang === "hi" ? opt.descHi : opt.desc}
                     </div>
                   </div>
                   {selectedAyanamsa === opt.key && (

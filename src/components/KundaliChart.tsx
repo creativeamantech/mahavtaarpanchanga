@@ -133,18 +133,14 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                 isNight ? "text-amber-200" : "text-stone-900"
               }`}
             >
-              {lang === "sa"
-                ? "राशौ ग्रहस्थितिः (कुण्डली / चक्रम्)"
-                : lang === "hi"
-                  ? "राशि चक्र एवं ग्रह स्थिति (कुण्डली)"
-                  : "Rāśi Chakra & Graha Kundali Chart"}
+              {lang === "hi"
+                ? "राशि चक्र एवं ग्रह स्थिति (कुण्डली)"
+                : "Rāśi Chakra & Graha Kundali Chart"}
             </h3>
             <p className={`text-xs font-sans ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-              {lang === "sa"
-                ? "द्वादशराशिषु नवग्रहाणाम् अवस्थितिः"
-                : lang === "hi"
-                  ? "द्वादश राशियों में नवग्रहों की वास्तविक स्थिति"
-                  : "Visual zodiac chart depicting current planetary house placements"}
+              {lang === "hi"
+                ? "द्वादश राशियों में नवग्रहों की वास्तविक स्थिति"
+                : "Visual zodiac chart depicting current planetary house placements"}
             </p>
           </div>
         </div>
@@ -169,11 +165,7 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                   : "text-stone-600 hover:text-stone-900"
             }`}
           >
-            {lang === "sa"
-              ? "दाक्षिणात्यचक्रम्"
-              : lang === "hi"
-                ? "दक्षिण भारतीय शैली"
-                : "South Indian Grid"}
+            {lang === "hi" ? "दक्षिण भारतीय शैली" : "South Indian Grid"}
           </button>
           <button
             type="button"
@@ -189,11 +181,7 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                   : "text-stone-600 hover:text-stone-900"
             }`}
           >
-            {lang === "sa"
-              ? "उत्तरभारतीयचक्रम्"
-              : lang === "hi"
-                ? "उत्तर भारतीय शैली"
-                : "North Indian Diamond"}
+            {lang === "hi" ? "उत्तर भारतीय शैली" : "North Indian Diamond"}
           </button>
         </div>
       </div>
@@ -224,7 +212,7 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                 <span
                   className={`text-xs font-bold font-serif-vedic mt-1 ${isNight ? "text-amber-100" : "text-stone-200"}`}
                 >
-                  {lang === "sa" ? "राशि चक्रम्" : lang === "hi" ? "राशि चक्र" : "Rāśi Cakra"}
+                  {lang === "hi" ? "राशि चक्र" : "Rāśi Cakra"}
                 </span>
                 <span
                   className={`text-[10px] font-mono mt-0.5 ${isNight ? "text-slate-400" : "text-stone-400"}`}
@@ -512,11 +500,7 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                     isNight ? "text-amber-500" : "text-amber-800"
                   }`}
                 >
-                  {lang === "sa"
-                    ? "निर्वाचित-राशिः"
-                    : lang === "hi"
-                      ? "चयनित राशि"
-                      : "Selected Sign"}
+                  {lang === "hi" ? "चयनित राशि" : "Selected Sign"}
                 </span>
                 <h4
                   className={`text-lg font-black font-serif-vedic ${isNight ? "text-slate-100" : "text-stone-900"}`}
@@ -539,11 +523,7 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                   isNight ? "text-slate-400" : "text-stone-600"
                 }`}
               >
-                {lang === "sa"
-                  ? "अस्यां राशौ स्थिताः ग्रहाः :"
-                  : lang === "hi"
-                    ? "इस राशि में स्थित ग्रह :"
-                    : "Grahas residing in this sign:"}
+                {lang === "hi" ? "इस राशि में स्थित ग्रह :" : "Grahas residing in this sign:"}
               </span>
 
               {selectedPlanets.length === 0 ? (
@@ -554,11 +534,7 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                       : "bg-white text-stone-400 border-stone-300"
                   }`}
                 >
-                  {lang === "sa"
-                    ? "कोऽपि ग्रहो नास्ति (रिक्तम्)"
-                    : lang === "hi"
-                      ? "कोई ग्रह नहीं (खाली)"
-                      : "No planets in this sign currently"}
+                  {lang === "hi" ? "कोई ग्रह नहीं (खाली)" : "No planets in this sign currently"}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -588,7 +564,7 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
                                     : "bg-amber-100 text-amber-800"
                                 }`}
                               >
-                                {lang === "sa" ? "वक्री" : lang === "hi" ? "वक्री" : "Retrograde"}
+                                {lang === "hi" ? "वक्री" : "Retrograde"}
                               </span>
                             )}
                             <span
@@ -626,23 +602,11 @@ export const KundaliChart: React.FC<KundaliChartProps> = ({ planets, lang, theme
           >
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span>
-                {lang === "sa"
-                  ? "शुभग्रहाः"
-                  : lang === "hi"
-                    ? "सौम्य ग्रह"
-                    : "Benefic (Guru, Śukra, etc.)"}
-              </span>
+              <span>{lang === "hi" ? "सौम्य ग्रह" : "Benefic (Guru, Śukra, etc.)"}</span>
             </span>
             <span className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full bg-rose-500" />
-              <span>
-                {lang === "sa"
-                  ? "क्रूरग्रहाः"
-                  : lang === "hi"
-                    ? "क्रूर ग्रह"
-                    : "Malefic (Śani, Maṅgala, etc.)"}
-              </span>
+              <span>{lang === "hi" ? "क्रूर ग्रह" : "Malefic (Śani, Maṅgala, etc.)"}</span>
             </span>
             <span
               className={`flex items-center gap-1 font-bold ${isNight ? "text-amber-500" : "text-amber-800"}`}

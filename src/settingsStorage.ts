@@ -26,7 +26,7 @@ export function loadUserSettings(): UserSettings {
     }
     const parsed = JSON.parse(raw);
     return {
-      lang: (["en", "hi", "sa"].includes(parsed.lang)
+      lang: (["en", "hi"].includes(parsed.lang)
         ? parsed.lang
         : DEFAULT_USER_SETTINGS.lang) as Language,
       ayanamsa: (parsed.ayanamsa || DEFAULT_USER_SETTINGS.ayanamsa) as CoordinateSelection,

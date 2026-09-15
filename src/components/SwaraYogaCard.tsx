@@ -6,7 +6,10 @@ import {
   SWARA_DETAILS,
   computeSwaraYoga,
   getSwaraForTithiNumber,
+  evaluateNakshatraSwaraAlignment,
 } from "../swaraYoga";
+import { NakshatraSwaraAlignmentCard } from "./NakshatraSwaraAlignmentCard";
+import { resolveCurrentHora } from "../horaEngine";
 import {
   Wind,
   Sun,
@@ -24,6 +27,7 @@ import {
   Flame,
   Droplets,
   Layers,
+  ArrowRight,
 } from "lucide-react";
 
 import type { AppTheme } from "../types";
@@ -38,7 +42,9 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
   const isNight = theme === "nightSky";
   const [showTable, setShowTable] = useState(false);
   const [tableFilter, setTableFilter] = useState<"all" | "shukla" | "krishna">("all");
-  const [activeTab, setActiveTab] = useState<"current" | "activities" | "tattva">("current");
+  const [activeTab, setActiveTab] = useState<
+    "current" | "activities" | "tattva" | "nakshatraAlignment"
+  >("current");
   const [currentTime, setCurrentTime] = useState<{
     hours: number;
     minutes: number;
@@ -75,9 +81,23 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
   const sunsetDetails = SWARA_DETAILS[swaraData.sunsetSwara];
   const moonriseDetails = SWARA_DETAILS[swaraData.moonriseSwara];
   const moonsetDetails = SWARA_DETAILS[swaraData.moonsetSwara];
-  const activeDetails = swaraData.currentActiveSwara
-    ? SWARA_DETAILS[swaraData.currentActiveSwara]
-    : sunriseDetails;
+
+  const horaState = resolveCurrentHora(Date.now(), data);
+  const activeHora = horaState?.hora || null;
+  const activeHoraTattva = horaState?.activeTattva || null;
+  const activeNadi = activeHora?.nadi || swaraData.currentActiveSwara || swaraData.sunriseSwara;
+  const activeDetails = SWARA_DETAILS[activeNadi] || sunriseDetails;
+
+  const primaryNakNum = data.nakshatra?.[0]?.number || 1;
+  const moonPlanet = data.planets?.find((p) => p.id === "moon");
+  const moonPada = moonPlanet?.pada || 1;
+  const moonRashiNum = moonPlanet?.rasiNumber || 1;
+  const liveAlignment = evaluateNakshatraSwaraAlignment(
+    primaryTithiNum,
+    primaryNakNum,
+    moonPada,
+    moonRashiNum,
+  );
 
   // Filtered 30-day table
   const filteredDays = SWARA_CYCLE_RULES.filter((rule) => {
@@ -101,26 +121,18 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
             <div>
               <div className="flex items-center space-x-2">
                 <h3 className="font-serif-vedic text-xl font-bold text-stone-900 tracking-wide">
-                  {lang === "sa"
-                    ? "शिवस्वरोदयः (स्वरयोगः)"
-                    : lang === "hi"
-                      ? "शिव स्वरोदय (स्वर योग एवं नाड़ी ज्ञान)"
-                      : "Shiva Swarodaya (Swara Yoga)"}
+                  {lang === "hi"
+                    ? "शिव स्वरोदय (स्वर योग एवं नाड़ी ज्ञान)"
+                    : "Shiva Swarodaya (Swara Yoga)"}
                 </h3>
                 <span className="rounded-full border border-amber-400/80 bg-amber-200/60 px-2 py-0.5 text-[11px] font-bold text-amber-900 uppercase">
-                  {lang === "sa"
-                    ? "प्राणविज्ञानम्"
-                    : lang === "hi"
-                      ? "प्राण विज्ञान"
-                      : "Pranic Breath Science"}
+                  {lang === "hi" ? "प्राण विज्ञान" : "Pranic Breath Science"}
                 </span>
               </div>
               <p className="text-xs text-stone-600 mt-0.5">
-                {lang === "sa"
-                  ? "तिथ्यनुसारं सूर्योदय-सूर्यास्त-स्वरप्रवाह-साधनम्"
-                  : lang === "hi"
-                    ? "तिथि एवं पक्ष अनुसार सूर्योदय व सूर्यास्त के स्वर का सटीक निर्धारण"
-                    : "Daily solar rising breath, nostril dominance & lunar day alignment"}
+                {lang === "hi"
+                  ? "तिथि एवं पक्ष अनुसार सूर्योदय व सूर्यास्त के स्वर का सटीक निर्धारण"
+                  : "Daily solar rising breath, nostril dominance & lunar day alignment"}
               </p>
             </div>
           </div>
@@ -135,14 +147,10 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                 {showTable
                   ? lang === "hi"
                     ? "तालिका छिपाएँ"
-                    : lang === "sa"
-                      ? "सारणीं गोपय"
-                      : "Hide 30-Day Table"
+                    : "Hide 30-Day Table"
                   : lang === "hi"
                     ? "30-दिवसीय चक्र तालिका"
-                    : lang === "sa"
-                      ? "त्रिंशद्-दिवस-सारणी"
-                      : "View 30-Day Table"}
+                    : "View 30-Day Table"}
               </span>
               {showTable ? (
                 <ChevronUp className="h-3.5 w-3.5" />
@@ -165,9 +173,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
             <p className="text-xs text-stone-600 mt-1 italic">
               {lang === "hi"
                 ? "बाएं नथुने (इड़ा) में चन्द्रमा, दाएं नथुने (पिङ्गला) में सूर्य, तथा दोनों समान चलने पर (सुषुम्णा) में ब्रह्म स्थित होते हैं।"
-                : lang === "sa"
-                  ? "इडानाड्यां चन्द्रस्वरः, पिङ्गलायां सूर्यस्वरः, सुषुम्णायां ब्रह्मभावश्च स्थितः भवति।"
-                  : "Ida (left nostril) embodies lunar nectar; Pingala (right nostril) is the solar fire; Sushumna (balanced flow) is the cosmic soul."}
+                : "Ida (left nostril) embodies lunar nectar; Pingala (right nostril) is the solar fire; Sushumna (balanced flow) is the cosmic soul."}
             </p>
           </div>
 
@@ -179,9 +185,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                 <span>
                   {lang === "hi"
                     ? "स्वर काल एवं नाड़ी नियम (1 घंटा काल)"
-                    : lang === "sa"
-                      ? "स्वरकाल-नाडीनियमः (१ होरा)"
-                      : "1-Hour Celestial Swara Windows"}
+                    : "1-Hour Celestial Swara Windows"}
                 </span>
               </span>
             </div>
@@ -189,18 +193,10 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px] text-stone-700 font-sans mt-2">
               <div className="rounded-xl border border-amber-200/70 bg-white/70 p-2 text-center">
                 <span className="font-bold text-amber-950 block">
-                  {lang === "hi"
-                    ? "१. सूर्योदय स्वर"
-                    : lang === "sa"
-                      ? "१. सूर्योदयस्वरः"
-                      : "1. Sunrise Swara"}
+                  {lang === "hi" ? "१. सूर्योदय स्वर" : "1. Sunrise Swara"}
                 </span>
                 <span className="text-stone-600 block mt-0.5">
-                  {lang === "hi"
-                    ? "सूर्योदय starting से 1 घंटे तक"
-                    : lang === "sa"
-                      ? "सूर्योदयात् १ होरापर्यन्तम्"
-                      : "1 hr from sunrise starting"}
+                  {lang === "hi" ? "सूर्योदय starting से 1 घंटे तक" : "1 hr from sunrise starting"}
                 </span>
                 {swaraData.sunriseWindow && (
                   <span className="font-mono font-bold text-amber-900 block mt-0.5 text-[10px] bg-amber-100/60 rounded py-0.5">
@@ -211,18 +207,10 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
 
               <div className="rounded-xl border border-amber-200/70 bg-white/70 p-2 text-center">
                 <span className="font-bold text-amber-950 block">
-                  {lang === "hi"
-                    ? "२. सूर्यास्त स्वर"
-                    : lang === "sa"
-                      ? "२. सूर्यास्तस्वरः"
-                      : "2. Sunset Swara"}
+                  {lang === "hi" ? "२. सूर्यास्त स्वर" : "2. Sunset Swara"}
                 </span>
                 <span className="text-stone-600 block mt-0.5">
-                  {lang === "hi"
-                    ? "सूर्यास्त से 1 घंटा पहले प्रारंभ"
-                    : lang === "sa"
-                      ? "सूर्यास्तात् १ होरा पूर्वम्"
-                      : "Starts 1 hr before sunset"}
+                  {lang === "hi" ? "सूर्यास्त से 1 घंटा पहले प्रारंभ" : "Starts 1 hr before sunset"}
                 </span>
                 {swaraData.sunsetWindow && (
                   <span className="font-mono font-bold text-amber-900 block mt-0.5 text-[10px] bg-amber-100/60 rounded py-0.5">
@@ -233,18 +221,12 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
 
               <div className="rounded-xl border border-amber-200/70 bg-white/70 p-2 text-center">
                 <span className="font-bold text-amber-950 block">
-                  {lang === "hi"
-                    ? "३. चन्द्रोदय स्वर"
-                    : lang === "sa"
-                      ? "३. चन्द्रोदयस्वरः"
-                      : "3. Moonrise Swara"}
+                  {lang === "hi" ? "३. चन्द्रोदय स्वर" : "3. Moonrise Swara"}
                 </span>
                 <span className="text-stone-600 block mt-0.5">
                   {lang === "hi"
                     ? "चन्द्रोदय starting से 1 घंटे तक (सूर्योदय का विपरीत)"
-                    : lang === "sa"
-                      ? "चन्द्रोदयात् १ होरापर्यन्तम् (सूर्योदयविपरीतम्)"
-                      : "1 hr from moonrise (opp. of sunrise)"}
+                    : "1 hr from moonrise (opp. of sunrise)"}
                 </span>
                 <span className="font-mono font-bold text-amber-900 block mt-0.5 text-[10px] bg-amber-100/60 rounded py-0.5">
                   {swaraData.moonriseWindow?.windowFormatted || "—"}
@@ -253,18 +235,12 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
 
               <div className="rounded-xl border border-amber-200/70 bg-white/70 p-2 text-center">
                 <span className="font-bold text-amber-950 block">
-                  {lang === "hi"
-                    ? "४. चन्द्रास्त स्वर"
-                    : lang === "sa"
-                      ? "४. चन्द्रास्तस्वरः"
-                      : "4. Moonset Swara"}
+                  {lang === "hi" ? "४. चन्द्रास्त स्वर" : "4. Moonset Swara"}
                 </span>
                 <span className="text-stone-600 block mt-0.5">
                   {lang === "hi"
                     ? "चन्द्रास्त से 1 घंटा पहले प्रारंभ (सूर्यास्त का विपरीत)"
-                    : lang === "sa"
-                      ? "चन्द्रास्तात् १ होरा पूर्वम् (सूर्यास्तविपरीतम्)"
-                      : "Starts 1 hr before moonset (opp. of sunset)"}
+                    : "Starts 1 hr before moonset (opp. of sunset)"}
                 </span>
                 <span className="font-mono font-bold text-amber-900 block mt-0.5 text-[10px] bg-amber-100/60 rounded py-0.5">
                   {swaraData.moonsetWindow?.windowFormatted || "—"}
@@ -293,11 +269,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     className={`h-4 w-4 ${swaraData.sunriseSwara === "ida" ? "text-sky-600" : "text-orange-600"}`}
                   />
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                    {lang === "hi"
-                      ? "सूर्योदय स्वर"
-                      : lang === "sa"
-                        ? "सूर्योदयस्वरः"
-                        : "Sunrise Swara"}
+                    {lang === "hi" ? "सूर्योदय स्वर" : "Sunrise Swara"}
                   </span>
                 </div>
                 {swaraData.sunriseWindow?.isActive ? (
@@ -327,14 +299,10 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     {swaraData.sunriseSwara === "ida"
                       ? lang === "hi"
                         ? "इड़ा (वाम)"
-                        : lang === "sa"
-                          ? "इड़ा (वामनासा)"
-                          : "Ida (Left)"
+                        : "Ida (Left)"
                       : lang === "hi"
                         ? "पिङ्गला (दक्षिण)"
-                        : lang === "sa"
-                          ? "पिङ्गला (दक्षिणनासा)"
-                          : "Pingala (Right)"}
+                        : "Pingala (Right)"}
                   </h4>
                   <div className="text-[11px] text-stone-600 mt-0.5">
                     {sunriseDetails.energy[lang]}
@@ -345,11 +313,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
               {/* Exact 1-Hour Time Window Badge */}
               <div className="mt-2.5 rounded-lg bg-white/70 border border-stone-200/60 p-1.5 text-center">
                 <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-                  {lang === "hi"
-                    ? "काल (सूर्योदय से 1 घंटा)"
-                    : lang === "sa"
-                      ? "कालः (सूर्योदयात् १ होरा)"
-                      : "Window (1 hr from sunrise)"}
+                  {lang === "hi" ? "काल (सूर्योदय से 1 घंटा)" : "Window (1 hr from sunrise)"}
                 </div>
                 <div className="font-mono text-xs font-bold text-stone-900 mt-0.5">
                   {swaraData.sunriseWindow?.windowFormatted}
@@ -358,9 +322,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
             </div>
 
             <div className="mt-3 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-xs">
-              <span className="text-stone-500">
-                {lang === "hi" ? "तत्त्व" : lang === "sa" ? "तत्त्वम्" : "Element"}:
-              </span>
+              <span className="text-stone-500">{lang === "hi" ? "तत्त्व" : "Element"}:</span>
               <span className="font-bold text-stone-800">{sunriseDetails.element[lang]}</span>
             </div>
           </div>
@@ -382,11 +344,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     className={`h-4 w-4 ${swaraData.sunsetSwara === "ida" ? "text-sky-600" : "text-orange-600"}`}
                   />
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                    {lang === "hi"
-                      ? "सूर्यास्त स्वर"
-                      : lang === "sa"
-                        ? "सूर्यास्तस्वरः"
-                        : "Sunset Swara"}
+                    {lang === "hi" ? "सूर्यास्त स्वर" : "Sunset Swara"}
                   </span>
                 </div>
                 {swaraData.sunsetWindow?.isActive ? (
@@ -416,14 +374,10 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     {swaraData.sunsetSwara === "ida"
                       ? lang === "hi"
                         ? "इड़ा (वाम)"
-                        : lang === "sa"
-                          ? "इड़ा (वामनासा)"
-                          : "Ida (Left)"
+                        : "Ida (Left)"
                       : lang === "hi"
                         ? "पिङ्गला (दक्षिण)"
-                        : lang === "sa"
-                          ? "पिङ्गला (दक्षिणनासा)"
-                          : "Pingala (Right)"}
+                        : "Pingala (Right)"}
                   </h4>
                   <div className="text-[11px] text-stone-600 mt-0.5">
                     {sunsetDetails.energy[lang]}
@@ -434,11 +388,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
               {/* Exact 1-Hour Time Window Badge */}
               <div className="mt-2.5 rounded-lg bg-white/70 border border-stone-200/60 p-1.5 text-center">
                 <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-                  {lang === "hi"
-                    ? "काल (सूर्यास्त से 1 घंटा पहले)"
-                    : lang === "sa"
-                      ? "कालः (सूर्यास्तात् १ होरा पूर्वम्)"
-                      : "Window (1 hr before sunset)"}
+                  {lang === "hi" ? "काल (सूर्यास्त से 1 घंटा पहले)" : "Window (1 hr before sunset)"}
                 </div>
                 <div className="font-mono text-xs font-bold text-stone-900 mt-0.5">
                   {swaraData.sunsetWindow?.windowFormatted}
@@ -447,9 +397,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
             </div>
 
             <div className="mt-3 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-xs">
-              <span className="text-stone-500">
-                {lang === "hi" ? "तत्त्व" : lang === "sa" ? "तत्त्वम्" : "Element"}:
-              </span>
+              <span className="text-stone-500">{lang === "hi" ? "तत्त्व" : "Element"}:</span>
               <span className="font-bold text-stone-800">{sunsetDetails.element[lang]}</span>
             </div>
           </div>
@@ -471,11 +419,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     className={`h-4 w-4 ${swaraData.moonriseSwara === "ida" ? "text-sky-600" : "text-orange-600"}`}
                   />
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                    {lang === "hi"
-                      ? "चन्द्रोदय स्वर"
-                      : lang === "sa"
-                        ? "चन्द्रोदयस्वरः"
-                        : "Moonrise Swara"}
+                    {lang === "hi" ? "चन्द्रोदय स्वर" : "Moonrise Swara"}
                   </span>
                 </div>
                 {swaraData.moonriseWindow?.isActive ? (
@@ -507,22 +451,14 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     {swaraData.moonriseSwara === "ida"
                       ? lang === "hi"
                         ? "इड़ा (वाम)"
-                        : lang === "sa"
-                          ? "इड़ा (वामनासा)"
-                          : "Ida (Left)"
+                        : "Ida (Left)"
                       : lang === "hi"
                         ? "पिङ्गला (दक्षिण)"
-                        : lang === "sa"
-                          ? "पिङ्गला (दक्षिणनासा)"
-                          : "Pingala (Right)"}
+                        : "Pingala (Right)"}
                   </h4>
                   <div className="text-[11px] text-stone-600 mt-0.5">
                     <span className="inline-block rounded bg-stone-200/60 px-1 py-0.2 text-[10px] font-bold text-stone-700 mr-1">
-                      {lang === "hi"
-                        ? "सूर्योदय विपरीत"
-                        : lang === "sa"
-                          ? "सूर्योदयविपरीतम्"
-                          : "Opposite of Sunrise"}
+                      {lang === "hi" ? "सूर्योदय विपरीत" : "Opposite of Sunrise"}
                     </span>
                     {moonriseDetails.energy[lang]}
                   </div>
@@ -532,11 +468,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
               {/* Exact 1-Hour Time Window Badge */}
               <div className="mt-2.5 rounded-lg bg-white/70 border border-stone-200/60 p-1.5 text-center">
                 <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-                  {lang === "hi"
-                    ? "काल (चन्द्रोदय से 1 घंटा)"
-                    : lang === "sa"
-                      ? "कालः (चन्द्रोदयात् १ होरा)"
-                      : "Window (1 hr from moonrise)"}
+                  {lang === "hi" ? "काल (चन्द्रोदय से 1 घंटा)" : "Window (1 hr from moonrise)"}
                 </div>
                 <div className="font-mono text-xs font-bold text-stone-900 mt-0.5">
                   {swaraData.moonriseWindow?.windowFormatted || "—"}
@@ -545,9 +477,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
             </div>
 
             <div className="mt-3 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-xs">
-              <span className="text-stone-500">
-                {lang === "hi" ? "तत्त्व" : lang === "sa" ? "तत्त्वम्" : "Element"}:
-              </span>
+              <span className="text-stone-500">{lang === "hi" ? "तत्त्व" : "Element"}:</span>
               <span className="font-bold text-stone-800">{moonriseDetails.element[lang]}</span>
             </div>
           </div>
@@ -569,11 +499,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     className={`h-4 w-4 ${swaraData.moonsetSwara === "ida" ? "text-sky-600" : "text-orange-600"}`}
                   />
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                    {lang === "hi"
-                      ? "चन्द्रास्त स्वर"
-                      : lang === "sa"
-                        ? "चन्द्रास्तस्वरः"
-                        : "Moonset Swara"}
+                    {lang === "hi" ? "चन्द्रास्त स्वर" : "Moonset Swara"}
                   </span>
                 </div>
                 {swaraData.moonsetWindow?.isActive ? (
@@ -605,22 +531,14 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     {swaraData.moonsetSwara === "ida"
                       ? lang === "hi"
                         ? "इड़ा (वाम)"
-                        : lang === "sa"
-                          ? "इड़ा (वामनासा)"
-                          : "Ida (Left)"
+                        : "Ida (Left)"
                       : lang === "hi"
                         ? "पिङ्गला (दक्षिण)"
-                        : lang === "sa"
-                          ? "पिङ्गला (दक्षिणनासा)"
-                          : "Pingala (Right)"}
+                        : "Pingala (Right)"}
                   </h4>
                   <div className="text-[11px] text-stone-600 mt-0.5">
                     <span className="inline-block rounded bg-stone-200/60 px-1 py-0.2 text-[10px] font-bold text-stone-700 mr-1">
-                      {lang === "hi"
-                        ? "सूर्यास्त विपरीत"
-                        : lang === "sa"
-                          ? "सूर्यास्तविपरीतम्"
-                          : "Opposite of Sunset"}
+                      {lang === "hi" ? "सूर्यास्त विपरीत" : "Opposite of Sunset"}
                     </span>
                     {moonsetDetails.energy[lang]}
                   </div>
@@ -632,9 +550,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                 <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
                   {lang === "hi"
                     ? "काल (चन्द्रास्त से 1 घंटा पहले)"
-                    : lang === "sa"
-                      ? "कालः (चन्द्रास्तात् १ होरा पूर्वम्)"
-                      : "Window (1 hr before moonset)"}
+                    : "Window (1 hr before moonset)"}
                 </div>
                 <div className="font-mono text-xs font-bold text-stone-900 mt-0.5">
                   {swaraData.moonsetWindow?.windowFormatted || "—"}
@@ -643,9 +559,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
             </div>
 
             <div className="mt-3 pt-2.5 border-t border-stone-200/60 flex items-center justify-between text-xs">
-              <span className="text-stone-500">
-                {lang === "hi" ? "तत्त्व" : lang === "sa" ? "तत्त्वम्" : "Element"}:
-              </span>
+              <span className="text-stone-500">{lang === "hi" ? "तत्त्व" : "Element"}:</span>
               <span className="font-bold text-stone-800">{moonsetDetails.element[lang]}</span>
             </div>
           </div>
@@ -662,27 +576,19 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                   {swaraData.activeCelestialWindow === "sunrise" &&
                     (lang === "hi"
                       ? "वर्तमान में सूर्योदय स्वर काल सक्रिय है (सूर्योदय से 1 घंटे तक)"
-                      : lang === "sa"
-                        ? "साम्प्रतं सूर्योदयस्वरकालः प्रचलति (सूर्योदयात् १ होरा)"
-                        : "Active Now: Sunrise Swara Window (1 hr from sunrise)")}
+                      : "Active Now: Sunrise Swara Window (1 hr from sunrise)")}
                   {swaraData.activeCelestialWindow === "sunset" &&
                     (lang === "hi"
                       ? "वर्तमान में सूर्यास्त स्वर काल सक्रिय है (सूर्यास्त से 1 घंटा पहले)"
-                      : lang === "sa"
-                        ? "साम्प्रतं सूर्यास्तस्वरकालः प्रचलति (सूर्यास्तात् १ होरा पूर्वम्)"
-                        : "Active Now: Sunset Swara Window (1 hr before sunset)")}
+                      : "Active Now: Sunset Swara Window (1 hr before sunset)")}
                   {swaraData.activeCelestialWindow === "moonrise" &&
                     (lang === "hi"
                       ? "वर्तमान में चन्द्रोदय स्वर काल सक्रिय है (चन्द्रोदय से 1 घंटे तक)"
-                      : lang === "sa"
-                        ? "साम्प्रतं चन्द्रोदयस्वरकालः प्रचलति (चन्द्रोदयात् १ होरा)"
-                        : "Active Now: Moonrise Swara Window (1 hr from moonrise)")}
+                      : "Active Now: Moonrise Swara Window (1 hr from moonrise)")}
                   {swaraData.activeCelestialWindow === "moonset" &&
                     (lang === "hi"
                       ? "वर्तमान में चन्द्रास्त स्वर काल सक्रिय है (चन्द्रास्त से 1 घंटा पहले)"
-                      : lang === "sa"
-                        ? "साम्प्रतं चन्द्रास्तस्वरकालः प्रचलति (चन्द्रास्तात् १ होरा पूर्वम्)"
-                        : "Active Now: Moonset Swara Window (1 hr before moonset)")}
+                      : "Active Now: Moonset Swara Window (1 hr before moonset)")}
                 </span>
               </div>
               <span className="font-mono font-bold text-emerald-950 bg-white/90 px-2.5 py-0.5 rounded-lg border border-emerald-300 text-center">
@@ -704,36 +610,28 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
               <span className="text-xs font-bold uppercase tracking-wider text-amber-950">
                 {lang === "hi"
                   ? "वर्तमान प्रवहमान स्वर एवं नाड़ी स्थिति"
-                  : lang === "sa"
-                    ? "वर्तमानस्वरप्रवाहः नाडीस्थितिः च"
-                    : "Current Active Swara & Flow Status"}
+                  : "Current Active Swara & Flow Status"}
               </span>
             </div>
-            <div className="flex items-center space-x-3 text-xs">
-              <span className="font-mono font-bold text-amber-900 bg-amber-200/70 px-2 py-0.5 rounded-md">
-                Cycle #{swaraData.cycleNumberToday || 1}
-              </span>
-              <span className="text-stone-600">
-                {lang === "hi"
-                  ? "अगला परिवर्तन"
-                  : lang === "sa"
-                    ? "अग्रिमपरिवर्तनम्"
-                    : "Next switch in"}
-                :{" "}
-                <strong className="text-amber-950 font-mono font-bold">
-                  ~{swaraData.minutesRemainingInCycle} mins
-                </strong>
-              </span>
-            </div>
+            {activeHora && (
+              <div className="flex items-center space-x-2 text-xs">
+                <span className="font-mono font-bold text-amber-900 bg-amber-200/70 px-2 py-0.5 rounded-md">
+                  {activeHora.ruler} Hora (#{activeHora.index})
+                </span>
+                <span className="font-mono font-bold text-stone-700 bg-stone-100 px-2 py-0.5 rounded-md">
+                  {activeHora.startTime} – {activeHora.endTime}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="mt-3.5 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
             <div className="flex items-center space-x-3.5">
               <div
                 className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-2xs ${
-                  swaraData.currentActiveSwara === "ida"
+                  activeNadi === "ida"
                     ? "bg-sky-600"
-                    : swaraData.currentActiveSwara === "pingala"
+                    : activeNadi === "pingala"
                       ? "bg-orange-600"
                       : "bg-purple-600"
                 }`}
@@ -752,35 +650,40 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                 <p className="text-xs text-stone-600 mt-0.5">
                   {activeDetails.energy[lang]} — {activeDetails.element[lang]}
                 </p>
+                <div className="flex items-center gap-1.5 text-[11px] text-amber-950 font-medium mt-1">
+                  <span className="font-bold text-amber-800">
+                    {lang === "hi" ? "शासक ग्रह:" : "Governing Planets:"}
+                  </span>
+                  <span className="text-stone-800">
+                    {activeHora
+                      ? `${activeHora.ruler} (${activeDetails.rulingDeities[lang]})`
+                      : activeDetails.rulingDeities[lang]}
+                  </span>
+                </div>
               </div>
             </div>
 
-            {swaraData.activeTattva && (
+            {activeHoraTattva && (
               <div className="rounded-xl border border-amber-200/80 bg-white/80 p-3 flex items-center justify-between">
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
-                    {lang === "hi"
-                      ? "वर्तमान सक्रिय तत्त्व"
-                      : lang === "sa"
-                        ? "वर्तमानसक्रियतत्त्वम्"
-                        : "Active Tattva"}
+                    {lang === "hi" ? "वर्तमान होरा तत्त्व" : "Active Hora Tattva"}
                   </div>
                   <div className="font-serif-vedic text-sm font-bold text-stone-900 flex items-center space-x-1.5 mt-0.5">
                     <span
                       className="inline-block h-2.5 w-2.5 rounded-full"
-                      style={{ backgroundColor: swaraData.activeTattva.color }}
+                      style={{ backgroundColor: activeHoraTattva.color }}
                     ></span>
-                    <span>{swaraData.activeTattva.sanskrit}</span>
+                    <span>{activeHoraTattva.sanskrit}</span>
                     <span className="text-xs font-normal text-stone-500 font-sans">
-                      ({swaraData.activeTattva.name})
+                      ({activeHoraTattva.name})
                     </span>
                   </div>
                 </div>
-                <div className="text-right text-[11px] max-w-[180px] text-stone-600">
-                  <span className="font-semibold text-amber-900">
-                    {lang === "hi" ? "शुभ कार्य" : lang === "sa" ? "शुभकार्यम्" : "Best for"}:
-                  </span>{" "}
-                  {swaraData.activeTattva.karya}
+                <div className="text-right text-[11px] text-stone-600">
+                  <span className="font-mono font-bold text-amber-900 bg-amber-100/80 px-2 py-0.5 rounded">
+                    {activeHoraTattva.startTime} – {activeHoraTattva.endTime}
+                  </span>
                 </div>
               </div>
             )}
@@ -798,9 +701,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                 <h4 className="font-serif-vedic text-lg font-bold text-stone-900">
                   {lang === "hi"
                     ? "30-दिवसीय शिवस्वरोदय सारणी (तिथि व पक्ष अनुसार)"
-                    : lang === "sa"
-                      ? "त्रिंशद्-दिवसीया शिवस्वरोदय-चक्रसारणी"
-                      : "Classical 30-Day Shiva Swarodaya Table"}
+                    : "Classical 30-Day Shiva Swarodaya Table"}
                 </h4>
                 <p className="text-xs text-stone-500 mt-0.5">
                   Exact Vedic rhythm alternating every 3 lunar days between Chandra (Ida) & Surya
@@ -818,7 +719,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       : "text-stone-600 hover:text-stone-900"
                   }`}
                 >
-                  {lang === "hi" ? "सभी 30 दिन" : lang === "sa" ? "सर्वे" : "All 30 Days"}
+                  {lang === "hi" ? "सभी 30 दिन" : "All 30 Days"}
                 </button>
                 <button
                   onClick={() => setTableFilter("shukla")}
@@ -828,11 +729,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       : "text-stone-600 hover:text-stone-900"
                   }`}
                 >
-                  {lang === "hi"
-                    ? "शुक्ल पक्ष (1–15)"
-                    : lang === "sa"
-                      ? "शुक्लपक्षः"
-                      : "Shukla Paksha (1–15)"}
+                  {lang === "hi" ? "शुक्ल पक्ष (1–15)" : "Shukla Paksha (1–15)"}
                 </button>
                 <button
                   onClick={() => setTableFilter("krishna")}
@@ -842,11 +739,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       : "text-stone-600 hover:text-stone-900"
                   }`}
                 >
-                  {lang === "hi"
-                    ? "कृष्ण पक्ष (16–30)"
-                    : lang === "sa"
-                      ? "कृष्णपक्षः"
-                      : "Krishna Paksha (16–30)"}
+                  {lang === "hi" ? "कृष्ण पक्ष (16–30)" : "Krishna Paksha (16–30)"}
                 </button>
               </div>
             </div>
@@ -1011,14 +904,12 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
               <h4 className="font-serif-vedic text-base font-bold text-stone-900">
                 {lang === "hi"
                   ? "स्वर विज्ञान एवं दैनिक कार्यों में उपयोग"
-                  : lang === "sa"
-                    ? "स्वरविज्ञानम् कर्मसु विनियोगश्च"
-                    : "Svara Shastra: Auspicious Deeds for Each Breath"}
+                  : "Svara Shastra: Auspicious Deeds for Each Breath"}
               </h4>
             </div>
 
             {/* Tabs */}
-            <div className="flex rounded-xl bg-stone-100 p-1 border border-stone-200/60 text-xs">
+            <div className="flex flex-wrap rounded-xl bg-stone-100 p-1 border border-stone-200/60 text-xs gap-1">
               <button
                 onClick={() => setActiveTab("current")}
                 className={`rounded-lg px-3 py-1 font-bold transition-colors ${
@@ -1027,11 +918,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     : "text-stone-600 hover:text-stone-900"
                 }`}
               >
-                {lang === "hi"
-                  ? "सक्रिय स्वर मार्गदर्शिका"
-                  : lang === "sa"
-                    ? "सक्रियस्वरमार्गः"
-                    : "Active Swara Guide"}
+                {lang === "hi" ? "सक्रिय स्वर मार्गदर्शिका" : "Active Swara Guide"}
               </button>
               <button
                 onClick={() => setActiveTab("activities")}
@@ -1041,11 +928,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     : "text-stone-600 hover:text-stone-900"
                 }`}
               >
-                {lang === "hi"
-                  ? "इड़ा बनाम पिङ्गला कार्य"
-                  : lang === "sa"
-                    ? "इड़ा-पिङ्गला-कार्याणि"
-                    : "Ida vs Pingala Tasks"}
+                {lang === "hi" ? "इड़ा बनाम पिङ्गला कार्य" : "Ida vs Pingala Tasks"}
               </button>
               <button
                 onClick={() => setActiveTab("tattva")}
@@ -1055,11 +938,20 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     : "text-stone-600 hover:text-stone-900"
                 }`}
               >
-                {lang === "hi"
-                  ? "पंचमहाभूत तत्त्व चक्र"
-                  : lang === "sa"
-                    ? "पञ्चतत्त्वचक्रम्"
-                    : "5 Mahabhuta Tattvas"}
+                {lang === "hi" ? "पंचमहाभूत तत्त्व चक्र" : "5 Mahabhuta Tattvas"}
+              </button>
+              <button
+                onClick={() => setActiveTab("nakshatraAlignment")}
+                className={`rounded-lg px-3 py-1 font-bold transition-colors flex items-center space-x-1 ${
+                  activeTab === "nakshatraAlignment"
+                    ? "bg-white text-amber-950 shadow-2xs"
+                    : "text-amber-800 hover:text-amber-950"
+                }`}
+              >
+                <Sparkles className="h-3 w-3 text-amber-600" />
+                <span>
+                  {lang === "hi" ? "नक्षत्र-स्वर संरेखण (श्लोक ७३-७४)" : "Nakshatra-Nadi Alignment"}
+                </span>
               </button>
             </div>
           </div>
@@ -1082,9 +974,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       <span>
                         {lang === "hi"
                           ? "वर्तमान स्वर में प्रशस्त व शुभ कार्य"
-                          : lang === "sa"
-                            ? "अस्मिन् स्वरे प्रशस्तानि कार्याणि"
-                            : "Auspicious Works in Current Flow"}
+                          : "Auspicious Works in Current Flow"}
                       </span>
                     </div>
                     <ul className="space-y-1.5 text-xs text-emerald-950 font-sans">
@@ -1103,9 +993,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       <span>
                         {lang === "hi"
                           ? "वर्तमान स्वर में वर्जित या अनुचित कार्य"
-                          : lang === "sa"
-                            ? "अस्मिन् स्वरे त्याज्यानि कार्याणि"
-                            : "Inadvisable Works in Current Flow"}
+                          : "Inadvisable Works in Current Flow"}
                       </span>
                     </div>
                     <ul className="space-y-1.5 text-xs text-rose-950 font-sans">
@@ -1117,6 +1005,38 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       ))}
                     </ul>
                   </div>
+                </div>
+
+                {/* Today's Nakshatra-Nadi Alignment Quick Glance Banner */}
+                <div className="rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50/80 via-white to-orange-50/70 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-base">{liveAlignment.alignmentIcon}</span>
+                      <span className="font-bold text-stone-900">
+                        {lang === "hi"
+                          ? "दैनिक नक्षत्र-स्वर संगति:"
+                          : "Today's Star-Breath Alignment:"}{" "}
+                        {liveAlignment.alignmentStatus[lang]}
+                      </span>
+                      <span className="rounded-full bg-amber-200/80 text-amber-950 font-bold px-2 py-0.5 text-[10px]">
+                        {liveAlignment.tattvaDetails.symbol}{" "}
+                        {liveAlignment.tattvaDetails.name[lang]}
+                      </span>
+                    </div>
+                    <p className="text-stone-600 text-[11px] leading-snug">
+                      {liveAlignment.advice[lang]}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => setActiveTab("nakshatraAlignment")}
+                    className="shrink-0 inline-flex items-center space-x-1 rounded-lg border border-amber-300 bg-white px-3 py-1.5 font-bold text-amber-900 hover:bg-amber-100/80 transition-colors shadow-2xs"
+                  >
+                    <span>
+                      {lang === "hi" ? "विस्तृत संरेखण व सिम्युलेटर" : "Explore Alignment & Tables"}
+                    </span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
                 </div>
               </div>
             )}
@@ -1135,6 +1055,12 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     </span>
                   </div>
                   <div className="space-y-2 text-xs text-stone-800">
+                    <div className="rounded-lg bg-white/80 p-2 border border-sky-200 text-[11px] text-sky-950 font-medium">
+                      <span className="font-bold text-sky-900 block">
+                        {lang === "hi" ? "शासक ग्रह:" : "Governing Planets:"}
+                      </span>
+                      <span>{SWARA_DETAILS.ida.rulingDeities[lang]}</span>
+                    </div>
                     <p className="text-[11px] text-sky-900 font-medium">
                       Best for peaceful, permanent, generative, gentle (Saumya) deeds:
                     </p>
@@ -1160,6 +1086,12 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     </span>
                   </div>
                   <div className="space-y-2 text-xs text-stone-800">
+                    <div className="rounded-lg bg-white/80 p-2 border border-orange-200 text-[11px] text-orange-950 font-medium">
+                      <span className="font-bold text-orange-900 block">
+                        {lang === "hi" ? "शासक ग्रह:" : "Governing Planets:"}
+                      </span>
+                      <span>{SWARA_DETAILS.pingala.rulingDeities[lang]}</span>
+                    </div>
                     <p className="text-[11px] text-orange-900 font-medium">
                       Best for active, metabolic, vigorous, bold (Agni/Raudra) deeds:
                     </p>
@@ -1249,6 +1181,11 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Tab 4: Nakshatra-Nadi Alignment & 28-Star Tattva Derivation */}
+            {activeTab === "nakshatraAlignment" && (
+              <NakshatraSwaraAlignmentCard data={data} lang={lang} theme={theme} />
             )}
           </div>
         </div>

@@ -98,7 +98,7 @@ export const CurrentMuhurtaWidget: React.FC<CurrentMuhurtaWidgetProps> = ({ data
     const totalGhatis = diffMins / 24;
     const ghati = Math.floor(totalGhatis);
     const vighati = Math.floor((totalGhatis - ghati) * 60);
-    ghatiDisplay = `${ghati} ${lang === "sa" ? "घटिका" : lang === "hi" ? "घटी" : "Ghati"} ${vighati} ${lang === "sa" ? "विघटिका" : lang === "hi" ? "पल (विघटी)" : "Pala"}`;
+    ghatiDisplay = `${ghati} ${lang === "hi" ? "घटी" : "Ghati"} ${vighati} ${lang === "hi" ? "पल (विघटी)" : "Pala"}`;
   }
 
   // Check if an interval is currently active
@@ -193,13 +193,11 @@ export const CurrentMuhurtaWidget: React.FC<CurrentMuhurtaWidgetProps> = ({ data
               <span className="text-stone-400">
                 {isDayTime ? (
                   <span className="inline-flex items-center text-amber-700">
-                    <Sun className="h-3 w-3 mr-1" />{" "}
-                    {lang === "sa" ? "दिनमानम्" : lang === "hi" ? "दिनमान" : "Daytime"}
+                    <Sun className="h-3 w-3 mr-1" /> {lang === "hi" ? "दिनमान" : "Daytime"}
                   </span>
                 ) : (
                   <span className="inline-flex items-center text-indigo-700">
-                    <Moon className="h-3 w-3 mr-1" />{" "}
-                    {lang === "sa" ? "रात्रिमानम्" : lang === "hi" ? "रात्रिमान" : "Nighttime"}
+                    <Moon className="h-3 w-3 mr-1" /> {lang === "hi" ? "रात्रिमान" : "Nighttime"}
                   </span>
                 )}
               </span>
@@ -214,20 +212,10 @@ export const CurrentMuhurtaWidget: React.FC<CurrentMuhurtaWidgetProps> = ({ data
               <ShieldAlert className="h-4 w-4 text-rose-600 shrink-0" />
               <div>
                 <span className="font-bold font-devanagari">
-                  {lang === "sa"
-                    ? "राहुकालः प्रवृत्तः"
-                    : lang === "hi"
-                      ? "राहु काल चल रहा है"
-                      : "Rāhu Kāla Active"}
+                  {lang === "hi" ? "राहु काल चल रहा है" : "Rāhu Kāla Active"}
                 </span>
                 <span className="ml-1 text-rose-800">
-                  ({isRahuActive.remainingMins}{" "}
-                  {lang === "sa"
-                    ? "निमेषाः अवशिष्टाः"
-                    : lang === "hi"
-                      ? "मिनट शेष"
-                      : "mins remaining"}
-                  )
+                  ({isRahuActive.remainingMins} {lang === "hi" ? "मिनट शेष" : "mins remaining"})
                 </span>
               </div>
             </div>
@@ -236,11 +224,9 @@ export const CurrentMuhurtaWidget: React.FC<CurrentMuhurtaWidgetProps> = ({ data
               <ShieldCheck className="h-4 w-4 text-emerald-700 shrink-0" />
               <div>
                 <span className="font-bold font-devanagari">
-                  {lang === "sa"
-                    ? "अभिजित्मुहूर्तः प्रवृत्तः (परमशुभः)"
-                    : lang === "hi"
-                      ? "अभिजित् मुहूर्त सक्रिय (अति शुभ)"
-                      : "Abhijit Muhūrta Active (Highly Auspicious)"}
+                  {lang === "hi"
+                    ? "अभिजित् मुहूर्त सक्रिय (अति शुभ)"
+                    : "Abhijit Muhūrta Active (Highly Auspicious)"}
                 </span>
                 <span className="ml-1 text-emerald-800">
                   ({isAbhijitActive.remainingMins} mins left)
@@ -261,11 +247,7 @@ export const CurrentMuhurtaWidget: React.FC<CurrentMuhurtaWidgetProps> = ({ data
               <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
               <div className="truncate">
                 <span className="font-semibold font-devanagari">
-                  {lang === "sa"
-                    ? "सामान्य-शुभवेला"
-                    : lang === "hi"
-                      ? "सामान्य शुभ काल"
-                      : "Regular Auspicious Window"}
+                  {lang === "hi" ? "सामान्य शुभ काल" : "Regular Auspicious Window"}
                 </span>
                 <span className="ml-1 text-stone-500">
                   • {t.sunrise}: {data.sunrise} • {t.sunset}: {data.sunset}

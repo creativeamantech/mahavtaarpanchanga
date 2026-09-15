@@ -8,6 +8,8 @@ import {
   getLocalizedMasa,
   getLocalizedRasi,
   getLocalizedVaara,
+  getLocalizedAyana,
+  getLocalizedRtu,
 } from "../i18n";
 
 interface PanchangaSummaryCardProps {
@@ -28,6 +30,10 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
   const localizedVaara = getLocalizedVaara(data.vaara, lang);
   const localizedSunRasi = getLocalizedRasi(data.sun_rasi || "", lang);
   const localizedMoonRasi = getLocalizedRasi(data.moon_rasi || "", lang);
+  const localizedAyana = getLocalizedAyana(data.ayana || "", lang);
+  const localizedDrikAyana = getLocalizedAyana(data.drik_ayana || "", lang);
+  const localizedRtu = getLocalizedRtu(data.rtu || "", lang);
+  const localizedDrikRtu = getLocalizedRtu(data.drik_rtu || "", lang);
 
   const localizedPaksha =
     (data.paksha || "").toLowerCase().includes("k") ||
@@ -114,12 +120,12 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
             <span
               className={`text-sm font-bold font-devanagari mt-0.5 block ${isNight ? "text-slate-100" : "text-stone-900"}`}
             >
-              {data.ayana}
+              {localizedAyana}
             </span>
             <span
               className={`text-[11px] block mt-0.5 ${isNight ? "text-slate-400" : "text-stone-400"}`}
             >
-              {t.drikAyana}: {data.drik_ayana}
+              {t.drikAyana}: {localizedDrikAyana}
             </span>
           </div>
 
@@ -137,12 +143,12 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
             <span
               className={`text-sm font-bold font-devanagari mt-0.5 block ${isNight ? "text-slate-100" : "text-stone-900"}`}
             >
-              {data.rtu}
+              {localizedRtu}
             </span>
             <span
               className={`text-[11px] block mt-0.5 ${isNight ? "text-slate-400" : "text-stone-400"}`}
             >
-              {t.drikRtu}: {data.drik_rtu}
+              {t.drikRtu}: {localizedDrikRtu}
             </span>
           </div>
 
@@ -522,7 +528,7 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
                 isNight ? "text-indigo-300" : "text-stone-700"
               }`}
             >
-              {lang === "sa" ? "मुख्यकालाः" : lang === "hi" ? "प्रमुख मुहूर्त" : "Key Muhūrtas"}
+              {lang === "hi" ? "प्रमुख मुहूर्त" : "Key Muhūrtas"}
             </span>
             <div
               className={`flex h-6 w-6 items-center justify-center rounded-md ${

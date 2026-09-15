@@ -3,6 +3,10 @@ import { Moon, Star, Compass, Sparkles, Sun, Wind } from "lucide-react";
 import type { PanchangaResponse, Segment, AppTheme } from "../types";
 import { computeTithiSwaraEvents, isTithiSwaraEventActive } from "../lib/tithiSwaraEngine";
 import {
+  computeNakshatraSwaraEvents,
+  isNakshatraSwaraEventActive,
+} from "../lib/nakshatraSwaraEngine";
+import {
   type Language,
   translations,
   getLocalizedTithi,
@@ -53,6 +57,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
     defaultName: string,
     localizeFn?: (num: number, raw: string, lang: Language) => string,
     isTithi: boolean = false,
+    isNakshatra: boolean = false,
   ) => {
     if (!segments || segments.length === 0) {
       return (
@@ -77,21 +82,18 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
         ? localizeFn(secondary.number, secondary.name, lang)
         : secondary?.name;
 
-    const renderTithiSwaraEvents = (seg: Segment) => {
+    const renderNakshatraSwaraEvents = (seg: Segment) => {
       const swara =
-        seg.tithiSwara ||
-        computeTithiSwaraEvents(
-          seg,
-          data.timezone,
-          nowMs,
-          lang === "sa" ? "sa" : lang === "hi" ? "hi" : "en",
-        );
+        seg.nakshatraSwara ||
+        computeNakshatraSwaraEvents(seg, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
       if (!swara || (!swara.startEvent && !swara.endEvent)) return null;
 
       const isStartActive = swara.startEvent
-        ? isTithiSwaraEventActive(swara.startEvent, nowMs)
+        ? isNakshatraSwaraEventActive(swara.startEvent, nowMs)
         : false;
-      const isEndActive = swara.endEvent ? isTithiSwaraEventActive(swara.endEvent, nowMs) : false;
+      const isEndActive = swara.endEvent
+        ? isNakshatraSwaraEventActive(swara.endEvent, nowMs)
+        : false;
 
       return (
         <div className="mt-2 pt-2 border-t border-dashed border-stone-200/90 dark:border-slate-800 space-y-1.5">
@@ -103,11 +105,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
             >
               <Wind className="w-3.5 h-3.5" />
               <span>
-                {lang === "hi"
-                  ? "स्वर (नाड़ी) घटनाएं"
-                  : lang === "sa"
-                    ? "स्वर (नाडी) घटनाः"
-                    : "Swara (Nadi) Events"}
+                {lang === "hi" ? "नक्षत्र स्वर (नाड़ी) कालखंड" : "Nakshatra Swara (Nadi) Windows"}
               </span>
             </span>
             {swara.hasOverlap && (
@@ -118,7 +116,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                     : "bg-amber-100 text-amber-900 border-amber-300"
                 }`}
               >
-                {lang === "hi" ? "संक्षिप्त तिथि (<२ घं)" : "Short Tithi (<2h Overlap)"}
+                {lang === "hi" ? "संक्षिप्त नक्षत्र (<२ घं)" : "Short Nakshatra (<2h Overlap)"}
               </span>
             )}
           </div>
@@ -139,7 +137,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
-                    {lang === "hi" ? "आरंभ स्वर" : lang === "sa" ? "आरम्भस्वरः" : "Start Event"}
+                    {lang === "hi" ? "आरंभ नाड़ी (१ घंटा)" : "Starting Nadi (1h)"}
                   </span>
                   {isStartActive && (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
@@ -183,7 +181,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                 }`}
               >
                 <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
-                  {lang === "hi" ? "आरंभ स्वर" : lang === "sa" ? "आरम्भस्वरः" : "Start Event"}
+                  {lang === "hi" ? "आरंभ नाड़ी" : "Starting Nadi"}
                 </div>
                 <div className="text-[10px] italic">Before search bracket</div>
               </div>
@@ -204,7 +202,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
-                    {lang === "hi" ? "अंतिम स्वर" : lang === "sa" ? "अन्तिमस्वरः" : "End Event"}
+                    {lang === "hi" ? "समापन नाड़ी (विपरीत)" : "Ending Nadi (Opposite)"}
                   </span>
                   {isEndActive && (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
@@ -248,7 +246,177 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                 }`}
               >
                 <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
-                  {lang === "hi" ? "अंतिम स्वर" : lang === "sa" ? "अन्तिमस्वरः" : "End Event"}
+                  {lang === "hi" ? "समापन नाड़ी" : "Ending Nadi"}
+                </div>
+                <div className="text-[10px] italic">Past next sunrise</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    const renderTithiSwaraEvents = (seg: Segment) => {
+      const swara =
+        seg.tithiSwara ||
+        computeTithiSwaraEvents(seg, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
+      if (!swara || (!swara.startEvent && !swara.endEvent)) return null;
+
+      const isStartActive = swara.startEvent
+        ? isTithiSwaraEventActive(swara.startEvent, nowMs)
+        : false;
+      const isEndActive = swara.endEvent ? isTithiSwaraEventActive(swara.endEvent, nowMs) : false;
+
+      return (
+        <div className="mt-2 pt-2 border-t border-dashed border-stone-200/90 dark:border-slate-800 space-y-1.5">
+          <div className="flex items-center justify-between text-[11px]">
+            <span
+              className={`flex items-center gap-1 font-bold ${
+                isNight ? "text-amber-300" : "text-amber-900"
+              }`}
+            >
+              <Wind className="w-3.5 h-3.5" />
+              <span>{lang === "hi" ? "स्वर (नाड़ी) घटनाएं" : "Swara (Nadi) Events"}</span>
+            </span>
+            {swara.hasOverlap && (
+              <span
+                className={`text-[9px] px-1.5 py-0.5 rounded font-medium border ${
+                  isNight
+                    ? "bg-amber-950/60 text-amber-300 border-amber-700/60"
+                    : "bg-amber-100 text-amber-900 border-amber-300"
+                }`}
+              >
+                {lang === "hi" ? "संक्षिप्त तिथि (<२ घं)" : "Short Tithi (<2h Overlap)"}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+            {/* Start Event */}
+            {swara.startEvent ? (
+              <div
+                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
+                  isStartActive
+                    ? isNight
+                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
+                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
+                    : isNight
+                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
+                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
+                    {lang === "hi" ? "आरंभ स्वर" : "Start Event"}
+                  </span>
+                  {isStartActive && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
+                      Active Now
+                    </span>
+                  )}
+                </div>
+                <div
+                  className={`font-mono text-xs font-semibold ${
+                    isNight ? "text-slate-100" : "text-stone-900"
+                  }`}
+                >
+                  {swara.startEvent.formattedRange ||
+                    `${swara.startEvent.formattedStart} → ${swara.startEvent.formattedEnd}`}
+                </div>
+                <div className="flex items-center justify-between text-[10px]">
+                  <span
+                    className={`font-semibold ${
+                      swara.startEvent.nadi === "pingala"
+                        ? isNight
+                          ? "text-amber-300"
+                          : "text-amber-800"
+                        : isNight
+                          ? "text-cyan-300"
+                          : "text-sky-800"
+                    }`}
+                  >
+                    {swara.startEvent.nadiLabel}
+                  </span>
+                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
+                    1 hour
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div
+                className={`rounded-lg p-2 text-[11px] border ${
+                  isNight
+                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
+                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
+                }`}
+              >
+                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
+                  {lang === "hi" ? "आरंभ स्वर" : "Start Event"}
+                </div>
+                <div className="text-[10px] italic">Before search bracket</div>
+              </div>
+            )}
+
+            {/* End Event */}
+            {swara.endEvent ? (
+              <div
+                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
+                  isEndActive
+                    ? isNight
+                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
+                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
+                    : isNight
+                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
+                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
+                    {lang === "hi" ? "अंतिम स्वर" : "End Event"}
+                  </span>
+                  {isEndActive && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
+                      Active Now
+                    </span>
+                  )}
+                </div>
+                <div
+                  className={`font-mono text-xs font-semibold ${
+                    isNight ? "text-slate-100" : "text-stone-900"
+                  }`}
+                >
+                  {swara.endEvent.formattedRange ||
+                    `${swara.endEvent.formattedStart} → ${swara.endEvent.formattedEnd}`}
+                </div>
+                <div className="flex items-center justify-between text-[10px]">
+                  <span
+                    className={`font-semibold ${
+                      swara.endEvent.nadi === "pingala"
+                        ? isNight
+                          ? "text-amber-300"
+                          : "text-amber-800"
+                        : isNight
+                          ? "text-cyan-300"
+                          : "text-sky-800"
+                    }`}
+                  >
+                    {swara.endEvent.nadiLabel}
+                  </span>
+                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
+                    Final 1 hr
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div
+                className={`rounded-lg p-2 text-[11px] border ${
+                  isNight
+                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
+                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
+                }`}
+              >
+                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
+                  {lang === "hi" ? "अंतिम स्वर" : "End Event"}
                 </div>
                 <div className="text-[10px] italic">Past next sunrise</div>
               </div>
@@ -302,6 +470,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
         {/* Primary Tithi Swara Events */}
         {isTithi && renderTithiSwaraEvents(primary)}
 
+        {/* Primary Nakshatra Swara Events */}
+        {isNakshatra && renderNakshatraSwaraEvents(primary)}
+
         {secondary && (
           <div
             className={`mt-1 rounded-md p-2 text-xs border flex flex-col gap-0.5 ${
@@ -349,6 +520,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
 
             {/* Secondary Tithi Swara Events */}
             {isTithi && renderTithiSwaraEvents(secondary)}
+
+            {/* Secondary Nakshatra Swara Events */}
+            {isNakshatra && renderNakshatraSwaraEvents(secondary)}
           </div>
         )}
       </div>
@@ -359,104 +533,38 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
     switch (vaara) {
       case "Ravivāra":
         return {
-          deity:
-            lang === "sa"
-              ? "सूर्यः अधिपतिः"
-              : lang === "hi"
-                ? "स्वामी: सूर्य देव"
-                : "Ruled by Sūrya (Sun)",
-          metal:
-            lang === "sa"
-              ? "ताम्रम् • माणिक्यम्"
-              : lang === "hi"
-                ? "तांबा • माणिक"
-                : "Copper • Ruby",
+          deity: lang === "hi" ? "स्वामी: सूर्य देव" : "Ruled by Sūrya (Sun)",
+          metal: lang === "hi" ? "तांबा • माणिक" : "Copper • Ruby",
         };
       case "Somavāra":
         return {
-          deity:
-            lang === "sa"
-              ? "चन्द्रः अधिपतिः"
-              : lang === "hi"
-                ? "स्वामी: चन्द्र देव"
-                : "Ruled by Candra (Moon)",
-          metal:
-            lang === "sa"
-              ? "रजतम् • मुक्ताफलम्"
-              : lang === "hi"
-                ? "चांदी • मोती"
-                : "Silver • Pearl",
+          deity: lang === "hi" ? "स्वामी: चन्द्र देव" : "Ruled by Candra (Moon)",
+          metal: lang === "hi" ? "चांदी • मोती" : "Silver • Pearl",
         };
       case "Maṅgalavāra":
         return {
-          deity:
-            lang === "sa"
-              ? "मङ्गलः अधिपतिः"
-              : lang === "hi"
-                ? "स्वामी: मङ्गल देव"
-                : "Ruled by Maṅgala (Mars)",
-          metal:
-            lang === "sa"
-              ? "ताम्रम् • प्रवालम्"
-              : lang === "hi"
-                ? "तांबा • मूंगा"
-                : "Copper • Red Coral",
+          deity: lang === "hi" ? "स्वामी: मङ्गल देव" : "Ruled by Maṅgala (Mars)",
+          metal: lang === "hi" ? "तांबा • मूंगा" : "Copper • Red Coral",
         };
       case "Budhavāra":
         return {
-          deity:
-            lang === "sa"
-              ? "बुधः अधिपतिः"
-              : lang === "hi"
-                ? "स्वामी: बुध देव"
-                : "Ruled by Budha (Mercury)",
-          metal:
-            lang === "sa"
-              ? "कांस्यम् • मरकतम्"
-              : lang === "hi"
-                ? "कांसा • पन्ना"
-                : "Bronze • Emerald",
+          deity: lang === "hi" ? "स्वामी: बुध देव" : "Ruled by Budha (Mercury)",
+          metal: lang === "hi" ? "कांसा • पन्ना" : "Bronze • Emerald",
         };
       case "Guruvāra":
         return {
-          deity:
-            lang === "sa"
-              ? "बृहस्पतिः अधिपतिः"
-              : lang === "hi"
-                ? "स्वामी: बृहस्पति (गुरु)"
-                : "Ruled by Bṛhaspati (Jupiter)",
-          metal:
-            lang === "sa"
-              ? "सुवर्णम् • पुखराजम्"
-              : lang === "hi"
-                ? "स्वर्ण • पुखराज"
-                : "Gold • Yellow Sapphire",
+          deity: lang === "hi" ? "स्वामी: बृहस्पति (गुरु)" : "Ruled by Bṛhaspati (Jupiter)",
+          metal: lang === "hi" ? "स्वर्ण • पुखराज" : "Gold • Yellow Sapphire",
         };
       case "Śukravāra":
         return {
-          deity:
-            lang === "sa"
-              ? "शुक्रः अधिपतिः"
-              : lang === "hi"
-                ? "स्वामी: शुक्र देव"
-                : "Ruled by Śukra (Venus)",
-          metal:
-            lang === "sa" ? "रजतम् • वज्रम्" : lang === "hi" ? "चांदी • हीरा" : "Silver • Diamond",
+          deity: lang === "hi" ? "स्वामी: शुक्र देव" : "Ruled by Śukra (Venus)",
+          metal: lang === "hi" ? "चांदी • हीरा" : "Silver • Diamond",
         };
       case "Śanivāra":
         return {
-          deity:
-            lang === "sa"
-              ? "शनैश्चरः अधिपतिः"
-              : lang === "hi"
-                ? "स्वामी: शनि देव"
-                : "Ruled by Śani (Saturn)",
-          metal:
-            lang === "sa"
-              ? "अयः • नीलमणिः"
-              : lang === "hi"
-                ? "लोहा • नीलम"
-                : "Iron • Blue Sapphire",
+          deity: lang === "hi" ? "स्वामी: शनि देव" : "Ruled by Śani (Saturn)",
+          metal: lang === "hi" ? "लोहा • नीलम" : "Iron • Blue Sapphire",
         };
       default:
         return { deity: "Solar Weekday", metal: "—" };
@@ -569,11 +677,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               </div>
             )}
             <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "sa"
-                ? "सूर्य-चन्द्रयोः १२° अन्तरम्"
-                : lang === "hi"
-                  ? "सूर्य व चन्द्रमा के बीच १२° अंतर"
-                  : "12° lunar-solar elongation span"}
+              {lang === "hi"
+                ? "सूर्य व चन्द्रमा के बीच १२° अंतर"
+                : "12° lunar-solar elongation span"}
             </div>
           </div>
         </div>
@@ -614,8 +720,12 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                 </span>
               )}
             </div>
-            {renderSegment(data.nakshatra, "Aśvinī", (num, raw, l) =>
-              getLocalizedNakshatra(num, raw, l),
+            {renderSegment(
+              data.nakshatra,
+              "Aśvinī",
+              (num, raw, l) => getLocalizedNakshatra(num, raw, l),
+              false,
+              true,
             )}
           </div>
 
@@ -633,11 +743,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               </div>
             )}
             <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "sa"
-                ? "क्रान्तिवृत्ते १३°२०' नक्षत्रभागः"
-                : lang === "hi"
-                  ? "चन्द्रमा का १३°२०' नक्षत्र भोग"
-                  : "13°20' sidereal lunar asterism"}
+              {lang === "hi" ? "चन्द्रमा का १३°२०' नक्षत्र भोग" : "13°20' sidereal lunar asterism"}
             </div>
           </div>
         </div>
@@ -683,16 +789,12 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                   }`}
                 >
                   {yogaAttr.nature === "auspicious"
-                    ? lang === "sa"
-                      ? "शुभः"
-                      : lang === "hi"
-                        ? "शुभ"
-                        : "Auspicious"
-                    : lang === "sa"
-                      ? "अशुभः"
-                      : lang === "hi"
-                        ? "अशुभ"
-                        : "Inauspicious"}
+                    ? lang === "hi"
+                      ? "शुभ"
+                      : "Auspicious"
+                    : lang === "hi"
+                      ? "अशुभ"
+                      : "Inauspicious"}
                 </span>
               )}
             </div>
@@ -712,11 +814,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               </div>
             )}
             <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "sa"
-                ? "सूर्य-चन्द्रयोः योगमानम्"
-                : lang === "hi"
-                  ? "सूर्य व चन्द्र भोगांशों का योग"
-                  : "Sum of Sun & Moon longitudes"}
+              {lang === "hi" ? "सूर्य व चन्द्र भोगांशों का योग" : "Sum of Sun & Moon longitudes"}
             </div>
           </div>
         </div>
@@ -756,16 +854,12 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
                   }`}
                 >
                   {karAttr.type === "chara"
-                    ? lang === "sa"
+                    ? lang === "hi"
                       ? "चर"
-                      : lang === "hi"
-                        ? "चर"
-                        : "Movable"
-                    : lang === "sa"
+                      : "Movable"
+                    : lang === "hi"
                       ? "स्थिर"
-                      : lang === "hi"
-                        ? "स्थिर"
-                        : "Fixed"}
+                      : "Fixed"}
                 </span>
               )}
             </div>
@@ -786,11 +880,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               </div>
             )}
             <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "sa"
-                ? "तिथेः अर्धभागः (६° विस्तारः)"
-                : lang === "hi"
-                  ? "तिथि का आधा भाग (६° अंतर)"
-                  : "Half of a Tithi (6° elongation)"}
+              {lang === "hi" ? "तिथि का आधा भाग (६° अंतर)" : "Half of a Tithi (6° elongation)"}
             </div>
           </div>
         </div>
@@ -849,11 +939,7 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
               {vaaraInfo.metal}
             </div>
             <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "sa"
-                ? "सूर्योदयात् सूर्योदयपर्यन्तम्"
-                : lang === "hi"
-                  ? "सूर्योदय से अगले सूर्योदय तक"
-                  : "From local sunrise to sunrise"}
+              {lang === "hi" ? "सूर्योदय से अगले सूर्योदय तक" : "From local sunrise to sunrise"}
             </div>
           </div>
         </div>

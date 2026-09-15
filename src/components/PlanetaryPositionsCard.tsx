@@ -97,7 +97,7 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
               }`}
             >
               <LayoutGrid className="h-3.5 w-3.5" />
-              <span>{lang === "sa" ? "तालिका" : lang === "hi" ? "तालिका" : "Table"}</span>
+              <span>{lang === "hi" ? "तालिका" : "Table"}</span>
             </button>
             <button
               type="button"
@@ -114,7 +114,7 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
               }`}
             >
               <Grid3X3 className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`} />
-              <span>{lang === "sa" ? "कुण्डली" : lang === "hi" ? "कुण्डली" : "Kundali"}</span>
+              <span>{lang === "hi" ? "कुण्डली" : "Kundali"}</span>
             </button>
             <button
               type="button"
@@ -133,7 +133,7 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
               <ArrowRightLeft
                 className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`}
               />
-              <span>{lang === "sa" ? "गोचरः" : lang === "hi" ? "गोचर" : "Transits"}</span>
+              <span>{lang === "hi" ? "गोचर" : "Transits"}</span>
             </button>
           </div>
 
@@ -286,11 +286,7 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
                       <div
                         className={`text-xs font-medium ${isNight ? "text-amber-400" : "text-amber-900"}`}
                       >
-                        {lang === "sa"
-                          ? `${planet.pada} पादः`
-                          : lang === "hi"
-                            ? `चरण ${planet.pada}`
-                            : `Pāda ${planet.pada}`}{" "}
+                        {lang === "hi" ? `चरण ${planet.pada}` : `Pāda ${planet.pada}`}{" "}
                         <span
                           className={`font-mono ${isNight ? "text-slate-500" : "text-stone-400"}`}
                         >
@@ -382,11 +378,9 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
         }`}
       >
         <div>
-          {lang === "sa"
-            ? "* राहु-केतु छायाग्रहाः सदा वक्रिणः १८:०० समसप्तके तिष्ठतः।"
-            : lang === "hi"
-              ? "* राहु व केतु छायाग्रह हैं और परस्पर १८०° पर सदैव वक्री गति में रहते हैं।"
-              : "* Rāhu and Ketu are true Mean Lunar Nodes in opposite 180° sidereal alignment."}
+          {lang === "hi"
+            ? "* राहु व केतु छायाग्रह हैं और परस्पर १८०° पर सदैव वक्री गति में रहते हैं।"
+            : "* Rāhu and Ketu are true Mean Lunar Nodes in opposite 180° sidereal alignment."}
         </div>
         <div className={`font-mono text-[11px] ${isNight ? "text-slate-500" : "text-stone-400"}`}>
           VSOP87 / ELP2000 Ephemeris • NASA JPL Algorithms

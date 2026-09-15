@@ -114,10 +114,8 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   // Sync year/month when currentDateStr changes
   useEffect(() => {
     const p = parseDateString(currentDateStr);
-    if (p.year !== year || p.month !== month) {
-      setYear(p.year);
-      setMonth(p.month);
-    }
+    setYear((prevYear) => (prevYear !== p.year ? p.year : prevYear));
+    setMonth((prevMonth) => (prevMonth !== p.month ? p.month : prevMonth));
   }, [currentDateStr]);
 
   useEffect(() => {
@@ -140,8 +138,9 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             const match = json.days.find((d: MonthlyPanchangaDay) => d.date === currentDateStr);
             setInspectedDay(match || json.days[0] || null);
           }
-        } catch (err: any) {
-          if (retries > 0 && err.message === "Failed to fetch" && !isCancelled) {
+        } catch (err: unknown) {
+          const errMsg = err instanceof Error ? err.message : String(err);
+          if (retries > 0 && errMsg === "Failed to fetch" && !isCancelled) {
             retries--;
             setTimeout(attemptFetch, 1000);
             return;
@@ -190,8 +189,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
     setMonth(now.getMonth() + 1);
   };
 
-  const monthNames =
-    lang === "sa" ? MONTH_NAMES_SA : lang === "hi" ? MONTH_NAMES_HI : MONTH_NAMES_EN;
+  const monthNames = lang === "hi" ? MONTH_NAMES_HI : MONTH_NAMES_EN;
   const firstDayWeekday = new Date(year, month - 1, 1).getDay();
 
   return (
@@ -230,7 +228,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   : "text-stone-500 hover:text-stone-900"
               }`}
             >
-              {lang === "sa" ? "सर्वे" : lang === "hi" ? "सभी दिन" : "All"}
+              {lang === "hi" ? "सभी दिन" : "All"}
             </button>
             <button
               type="button"
@@ -242,11 +240,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   : "text-stone-500 hover:text-stone-900"
               }`}
             >
-              {lang === "sa"
-                ? "पर्व/एकादशी"
-                : lang === "hi"
-                  ? "पर्व व एकादशी"
-                  : "Vratas & Festivals"}
+              {lang === "hi" ? "पर्व व एकादशी" : "Vratas & Festivals"}
             </button>
             <button
               type="button"
@@ -608,11 +602,9 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             className="inline-flex items-center justify-center space-x-2 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 transition-colors shrink-0"
           >
             <span>
-              {lang === "sa"
-                ? "अस्य दिनस्य सम्पूर्णपञ्चाङ्गम्"
-                : lang === "hi"
-                  ? "इस दिन का सम्पूर्ण पञ्चाङ्ग देखें"
-                  : "Open Daily Panchanga for This Date"}
+              {lang === "hi"
+                ? "इस दिन का सम्पूर्ण पञ्चाङ्ग देखें"
+                : "Open Daily Panchanga for This Date"}
             </span>
             <ArrowRight className="h-4 w-4" />
           </button>

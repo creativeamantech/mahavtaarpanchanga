@@ -243,13 +243,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
               }`}
             >
               <Compass className="h-3.5 w-3.5" />
-              <span>
-                {lang === "sa"
-                  ? "नवग्रहगोचरः"
-                  : lang === "hi"
-                    ? "ग्रह स्थिति व आगामी"
-                    : "Graha Overview"}
-              </span>
+              <span>{lang === "hi" ? "ग्रह स्थिति व आगामी" : "Graha Overview"}</span>
             </button>
             <button
               type="button"
@@ -267,7 +261,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
             >
               <Clock className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`} />
               <span>
-                {lang === "sa" ? "कालक्रमः" : lang === "hi" ? "गोचर कालक्रम" : "Transit Timeline"}
+                {lang === "hi" ? "गोचर कालक्रम" : "Transit Timeline"}
                 {upcomingEvents.length > 0 && (
                   <span
                     className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
@@ -325,7 +319,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                           {ev.symbol}
                         </span>
                         <span className="font-bold text-amber-950">
-                          {lang === "hi" || lang === "sa" ? ev.sanskritName : ev.planetName}
+                          {lang === "hi" ? ev.sanskritName : ev.planetName}
                         </span>
                         <span className="text-stone-400">→</span>
                         <span className="font-semibold text-stone-900">
@@ -461,12 +455,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                       <span
                         className={`font-sans ${isNight ? "text-slate-400" : "text-stone-500"}`}
                       >
-                        {lang === "hi"
-                          ? "वर्तमान राशि"
-                          : lang === "sa"
-                            ? "वर्तमानराशिः"
-                            : "Current Sign"}
-                        :
+                        {lang === "hi" ? "वर्तमान राशि" : "Current Sign"}:
                       </span>
                       <span
                         className={`font-bold font-devanagari ${isNight ? "text-slate-200" : "text-stone-900"}`}
@@ -502,12 +491,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                       <span
                         className={`font-sans ${isNight ? "text-slate-400" : "text-stone-500"}`}
                       >
-                        {lang === "hi"
-                          ? "नक्षत्र व चरण"
-                          : lang === "sa"
-                            ? "नक्षत्रम्"
-                            : "Nakshatra"}
-                        :
+                        {lang === "hi" ? "नक्षत्र व चरण" : "Nakshatra"}:
                       </span>
                       <span
                         className={`font-semibold font-devanagari ${isNight ? "text-slate-200" : "text-stone-800"}`}
@@ -551,11 +535,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                           <ArrowRightLeft
                             className={`h-3 w-3 ${isNight ? "text-amber-500" : "text-amber-700"}`}
                           />
-                          {lang === "hi"
-                            ? "आगामी राशि गोचर"
-                            : lang === "sa"
-                              ? "आगामीराशिप्रवेशः"
-                              : "Next Sign Ingress"}
+                          {lang === "hi" ? "आगामी राशि गोचर" : "Next Sign Ingress"}
                         </span>
                         <span
                           className={`rounded-full px-2 py-0.2 text-[10px] font-bold font-sans ${
@@ -676,8 +656,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                {lang === "hi" ? "सभी गोचर" : lang === "sa" ? "सर्वाणि संक्रमणानि" : "All Transits"}{" "}
-                ({upcomingEvents.length})
+                {lang === "hi" ? "सभी गोचर" : "All Transits"} ({upcomingEvents.length})
               </button>
               <button
                 type="button"
@@ -692,11 +671,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                {lang === "hi"
-                  ? "राशि प्रवेश (संक्रांति)"
-                  : lang === "sa"
-                    ? "राशिप्रवेशः"
-                    : "Sign (Rāśi) Ingress"}
+                {lang === "hi" ? "राशि प्रवेश (संक्रांति)" : "Sign (Rāśi) Ingress"}
               </button>
               <button
                 type="button"
@@ -711,11 +686,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                {lang === "hi"
-                  ? "नक्षत्र प्रवेश"
-                  : lang === "sa"
-                    ? "नक्षत्रप्रवेशः"
-                    : "Nakṣatra Ingress"}
+                {lang === "hi" ? "नक्षत्र प्रवेश" : "Nakṣatra Ingress"}
               </button>
               {todayEvents.length > 0 && (
                 <button
@@ -731,8 +702,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                         : "bg-amber-100 text-amber-900 hover:bg-amber-200"
                   }`}
                 >
-                  {lang === "hi" ? "आज के गोचर" : lang === "sa" ? "अद्यतनानि" : "Today"} (
-                  {todayEvents.length})
+                  {lang === "hi" ? "आज के गोचर" : "Today"} ({todayEvents.length})
                 </button>
               )}
             </div>
@@ -784,7 +754,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                               isNight ? "text-slate-100" : "text-stone-900"
                             }`}
                           >
-                            {lang === "hi" || lang === "sa" ? ev.sanskritName : ev.planetName}
+                            {lang === "hi" ? ev.sanskritName : ev.planetName}
                           </span>
                           <span
                             className={`text-xs ${isNight ? "text-slate-500" : "text-stone-400"}`}
@@ -936,11 +906,9 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
         }`}
       >
         <div>
-          {lang === "sa"
-            ? "* ग्रहसंक्रमणानां गणना दृक्सिद्ध-निरयण-अयनांशेन क्रियते।"
-            : lang === "hi"
-              ? "* सभी ग्रह गोचर व संक्रांति समय नासा जेपीएल प्रत्यक्ष दृश्य निरयण अयनांश आधारित हैं।"
-              : "* Planetary ingress and Saṅkrānti computed with high-precision NASA JPL sidereal ephemeris."}
+          {lang === "hi"
+            ? "* सभी ग्रह गोचर व संक्रांति समय नासा जेपीएल प्रत्यक्ष दृश्य निरयण अयनांश आधारित हैं।"
+            : "* Planetary ingress and Saṅkrānti computed with high-precision NASA JPL sidereal ephemeris."}
         </div>
         <div className="font-mono text-[11px] text-stone-400">
           Root-bracketed Bisection Precision ±30s

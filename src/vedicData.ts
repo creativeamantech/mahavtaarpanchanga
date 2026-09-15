@@ -507,3 +507,12 @@ export const EKADASHI_NAMES: Record<string, { shukla: string; krishna: string }>
   Māgha: { shukla: "Jayā (Bhaimī) Ekādaśī", krishna: "Ṣaṭ-tilā Ekādaśī" },
   Phālguna: { shukla: "Āmalakī Ekādaśī", krishna: "Vijayā Ekādaśī" },
 };
+
+// Re-export Nakshatra-Tattva & Nakshatra-Nadi systems from swaraYoga
+export {
+  TATTVA_MASTER_TABLE,
+  ZODIAC_NADI_MASTER_TABLE,
+  NAKSHATRA_NADI_DEFINITIONS,
+  getNakshatraDefinition,
+  evaluateNakshatraSwaraAlignment,
+} from "./swaraYoga";

@@ -42,6 +42,44 @@ export interface TithiSwaraInfo {
   hasOverlap: boolean;
 }
 
+export interface NakshatraSwaraRule {
+  nakshatraNumber: number;
+  nakshatraName: string;
+  sanskritName: string;
+  startNadi: Nadi;
+  endNadi: Nadi;
+  startNostril: "Left" | "Right";
+  endNostril: "Left" | "Right";
+  rashiName: string;
+  rashiNumber: number;
+}
+
+export interface NakshatraSwaraEvent {
+  type: "start" | "end";
+  nadi: Nadi;
+  nadiLabel: string;
+  startTimeMs: number;
+  endTimeMs: number;
+  durationMinutes: number;
+  formattedStart?: string;
+  formattedEnd?: string;
+  formattedRange?: string;
+  hasOverlap: boolean;
+  isActive?: boolean;
+}
+
+export interface NakshatraSwaraInfo {
+  nakshatraNumber: number;
+  nakshatraName: string;
+  startNadi: Nadi;
+  endNadi: Nadi;
+  startNostril: "Left" | "Right";
+  endNostril: "Left" | "Right";
+  startEvent: NakshatraSwaraEvent | null;
+  endEvent: NakshatraSwaraEvent | null;
+  hasOverlap: boolean;
+}
+
 export interface Segment {
   number: number;
   name: string;
@@ -50,6 +88,7 @@ export interface Segment {
   startTimeMs?: number;
   endTimeMs?: number;
   tithiSwara?: TithiSwaraInfo;
+  nakshatraSwara?: NakshatraSwaraInfo;
 }
 
 export interface TimingInterval {
@@ -134,6 +173,65 @@ export interface PlanetTransitionsData {
 
 export type SwaraNadi = "ida" | "pingala" | "sushumna";
 
+export type TattvaElement = "prithvi" | "jala" | "tejas" | "vayu" | "akash";
+
+export interface NakshatraTattvaDetails {
+  element: TattvaElement;
+  name: { en: string; hi: string; sa: string };
+  symbol: string;
+  quality: { en: string; hi: string; sa: string };
+  application: { en: string; hi: string; sa: string };
+  warning?: { en: string; hi: string; sa: string };
+  color: string;
+  badgeBg: string;
+  badgeBorder: string;
+  badgeText: string;
+}
+
+export interface NakshatraNadiSpan {
+  rashiNumber: number;
+  rashiName: string;
+  sanskritName: string;
+  nadi: "ida" | "pingala";
+  nostril: "Left" | "Right";
+  padas: number[];
+  padaDescription: string;
+}
+
+export interface NakshatraNadiDefinition {
+  nakshatraNumber: number;
+  nakshatraName: string;
+  sanskritName: string;
+  tattva: TattvaElement;
+  defaultNadi: "ida" | "pingala" | "mixed";
+  primaryNostril: "Left" | "Right" | "Mixed";
+  spans: NakshatraNadiSpan[];
+}
+
+export interface NakshatraSwaraAlignmentResult {
+  tithiNumber: number;
+  tithiName: string;
+  paksha: string;
+  requiredNadi: "ida" | "pingala";
+  requiredNostril: "Left" | "Right";
+  nakshatraNumber: number;
+  nakshatraName: string;
+  sanskritName: string;
+  selectedPada?: number;
+  activeRashiNumber?: number;
+  activeRashiName?: string;
+  activeRashiSanskrit?: string;
+  starNadi: "ida" | "pingala" | "mixed";
+  starNostril: "Left" | "Right" | "Mixed";
+  alignmentRating: "Perfect" | "Neutral" | "Incompatible";
+  alignmentIcon: "✅" | "⚠️" | "❌";
+  alignmentStatus: { en: string; hi: string; sa: string };
+  tattva: TattvaElement;
+  tattvaDetails: NakshatraTattvaDetails;
+  elementWarning: { en: string; hi: string; sa: string };
+  advice: { en: string; hi: string; sa: string };
+}
+
 export interface SwaraDayRule {
   dayNumber: number; // 1 to 30
   tithiName: string;
@@ -179,17 +277,6 @@ export interface SwaraYogaData {
   activeCelestialWindow?: "sunrise" | "sunset" | "moonrise" | "moonset" | null;
   currentActiveSwara?: SwaraNadi;
   activeNostril?: "Left" | "Right" | "Both";
-  minutesIntoCycle?: number;
-  minutesRemainingInCycle?: number;
-  cycleNumberToday?: number;
-  activeTattva?: {
-    name: "Prithvi" | "Jala" | "Tejas" | "Vayu" | "Akasha";
-    sanskrit: string;
-    element: string;
-    color: string;
-    durationMins: number;
-    karya: string;
-  };
 }
 
 export interface PanchangaResponse {

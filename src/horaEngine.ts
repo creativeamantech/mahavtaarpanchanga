@@ -34,6 +34,25 @@ export interface DailyHoras {
 const HORA_LORDS = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"];
 const WEEKDAY_START_INDEX = [0, 3, 6, 2, 5, 1, 4]; // Sun to Sat
 
+/**
+ * Classical Shiva Swarodaya (शिवस्वरोदय) Graha-Nadi Correspondence:
+ * - Saumya (Gentle / Lunar) Grahas: Moon, Mercury, Jupiter, Venus -> Ida Nadi (Chandra Swara / Left Nostril)
+ * - Krura/Agni (Fiery / Solar) Grahas: Sun, Mars, Saturn -> Pingala Nadi (Surya Swara / Right Nostril)
+ */
+export const PLANET_TO_SWARA_NADI: Record<string, "ida" | "pingala"> = {
+  Sun: "pingala",
+  Moon: "ida",
+  Mars: "pingala",
+  Mercury: "ida",
+  Jupiter: "ida",
+  Venus: "ida",
+  Saturn: "pingala",
+};
+
+export function getPlanetSwaraNadi(ruler: string): "ida" | "pingala" {
+  return PLANET_TO_SWARA_NADI[ruler] ?? "ida";
+}
+
 const TATTVA_DEFS = [
   {
     name: "Space",
@@ -129,6 +148,7 @@ export function computeDailyHoras(
     const endTimeMs = i === 11 ? sunsetMs : i === 23 ? nextSunriseMs : startTimeMs + duration;
 
     const ruler = HORA_LORDS[(startIndex + i) % 7];
+    // Swarodaya Rule: Nadi alternates every Hora, starting from the Sunrise Swara (which depends on Tithi)
     const nadi = i % 2 === 0 ? initialNadi : initialNadi === "ida" ? "pingala" : "ida";
 
     const tattvas: TattvaPeriod[] = [];

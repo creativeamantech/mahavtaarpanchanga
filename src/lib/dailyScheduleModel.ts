@@ -28,6 +28,8 @@ export type DailyScheduleEventType =
   | "nadi"
   | "tithi-swara-start"
   | "tithi-swara-end"
+  | "nakshatra-swara-start"
+  | "nakshatra-swara-end"
   | "muhurta"
   | "planetary-transit"
   | "planetary-retrograde"

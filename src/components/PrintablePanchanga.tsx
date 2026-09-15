@@ -11,6 +11,9 @@ import {
   getLocalizedVaara,
   getLocalizedMasa,
   getLocalizedRasi,
+  getLocalizedAyana,
+  getLocalizedRtu,
+  getLocalizedPaksha,
 } from "../i18n";
 
 interface PrintablePanchangaProps {
@@ -28,6 +31,11 @@ export const PrintablePanchanga: React.FC<PrintablePanchangaProps> = ({ data, on
 
   const localizedVaara = getLocalizedVaara(data.vaara, lang);
   const localizedMasa = getLocalizedMasa(data.masa, lang);
+  const localizedAyana = getLocalizedAyana(data.ayana || "", lang);
+  const localizedDrikAyana = getLocalizedAyana(data.drik_ayana || "", lang);
+  const localizedRtu = getLocalizedRtu(data.rtu || "", lang);
+  const localizedDrikRtu = getLocalizedRtu(data.drik_rtu || "", lang);
+  const localizedPaksha = getLocalizedPaksha(data.paksha || "", lang);
 
   return (
     <div
@@ -88,19 +96,19 @@ export const PrintablePanchanga: React.FC<PrintablePanchangaProps> = ({ data, on
             <div>
               <span className="text-stone-500">{t.masa}:</span>{" "}
               <span className="font-bold">
-                {localizedMasa} ({data.paksha} Pakṣa)
+                {localizedMasa} ({localizedPaksha} {lang === "hi" ? "पक्ष" : "Pakṣa"})
               </span>
             </div>
             <div>
               <span className="text-stone-500">{t.ayana}:</span>{" "}
               <span className="font-bold">
-                {data.ayana} ({data.drik_ayana})
+                {localizedAyana} ({localizedDrikAyana})
               </span>
             </div>
             <div>
               <span className="text-stone-500">{t.rtu}:</span>{" "}
               <span className="font-bold">
-                {data.rtu} ({data.drik_rtu})
+                {localizedRtu} ({localizedDrikRtu})
               </span>
             </div>
             <div>

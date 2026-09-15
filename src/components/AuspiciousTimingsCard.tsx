@@ -1,5 +1,5 @@
-import React from "react";
-import { ShieldAlert, ShieldCheck } from "lucide-react";
+import React, { useState } from "react";
+import { ShieldAlert, ShieldCheck, LayoutGrid, List } from "lucide-react";
 import type { PanchangaResponse, AppTheme } from "../types";
 import { type Language, translations } from "../i18n";
 
@@ -16,403 +16,378 @@ export const AuspiciousTimingsCard: React.FC<AuspiciousTimingsCardProps> = ({
 }) => {
   const isNight = theme === "nightSky";
   const t = translations[lang];
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   return (
     <div id="auspicious-timings-section" className="space-y-6">
-      {/* Inauspicious Periods (Aśubha Muhūrtas) */}
-      <div
-        id="inauspicious-card"
-        className={`rounded-[1.5rem] p-6 sm:p-8 transition-colors ${
-          isNight
-            ? "border border-rose-950/50 bg-[#0e1424]/90 text-slate-100 shadow-xl"
-            : "glass-card border border-stone-200/80 bg-white/70"
-        }`}
-      >
-        <div
-          className={`flex items-center space-x-3 border-b pb-3.5 ${
-            isNight ? "border-rose-900/40" : "border-rose-100"
-          }`}
-        >
-          <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl shadow-2xs ${
-              isNight ? "bg-rose-950/80 text-rose-300" : "bg-rose-100 text-rose-800"
-            }`}
-          >
-            <ShieldAlert className="h-5 w-5" />
-          </div>
-          <div>
-            <h3
-              className={`text-base sm:text-lg font-bold font-serif-vedic ${
-                isNight ? "text-rose-200" : "text-stone-900"
-              }`}
-            >
-              {t.inauspiciousTimings}
-            </h3>
-            <p className={`text-xs ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-              {t.inauspiciousSub}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {/* Rahu Kala */}
-          <div
-            id="period-rahu-kala"
-            className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-              isNight ? "bg-rose-950/40 border-rose-900/60" : "bg-rose-50/80 border-rose-200"
-            }`}
-          >
-            <div className="mb-2">
-              <div
-                className={`text-sm font-bold font-devanagari ${
-                  isNight ? "text-rose-300" : "text-rose-950"
-                }`}
-              >
-                {t.rahuKala}
-              </div>
-              <div className={`text-xs mt-0.5 ${isNight ? "text-rose-400" : "text-rose-700/90"}`}>
-                {t.rahuKalaDesc}
-              </div>
-            </div>
-            <div
-              className={`mt-auto font-mono text-sm font-extrabold px-2.5 py-1.5 rounded-lg border shadow-2xs w-fit ${
-                isNight
-                  ? "bg-rose-950/90 text-rose-200 border-rose-800"
-                  : "bg-white text-rose-950 border-rose-300"
-              }`}
-            >
-              {data.rahu_kala ? `${data.rahu_kala.start} – ${data.rahu_kala.end}` : "—"}
-            </div>
-          </div>
-
-          {/* Yamaganda */}
-          {data.yamaganda && (
-            <div
-              id="period-yamaganda"
-              className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-                isNight
-                  ? "bg-[#12182b] border-indigo-900/40 text-slate-200"
-                  : "bg-stone-50/90 border-stone-200"
-              }`}
-            >
-              <div className="mb-2">
-                <div
-                  className={`text-sm font-bold font-devanagari ${
-                    isNight ? "text-slate-200" : "text-stone-900"
-                  }`}
-                >
-                  {t.yamaganda}
-                </div>
-                <div className={`text-xs mt-0.5 ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-                  {t.yamagandaDesc}
-                </div>
-              </div>
-              <div
-                className={`mt-auto font-mono text-sm font-bold px-2.5 py-1.5 rounded-lg border shadow-2xs w-fit ${
-                  isNight
-                    ? "bg-slate-900 text-slate-200 border-indigo-900/60"
-                    : "bg-white text-stone-800 border-stone-200"
-                }`}
-              >
-                {data.yamaganda.start} – {data.yamaganda.end}
-              </div>
-            </div>
-          )}
-
-          {/* Gulika Kala */}
-          {data.gulika_kala && (
-            <div
-              id="period-gulika"
-              className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-                isNight
-                  ? "bg-[#12182b] border-indigo-900/40 text-slate-200"
-                  : "bg-stone-50/90 border-stone-200"
-              }`}
-            >
-              <div className="mb-2">
-                <div
-                  className={`text-sm font-bold font-devanagari ${
-                    isNight ? "text-slate-200" : "text-stone-900"
-                  }`}
-                >
-                  {t.gulikaKala}
-                </div>
-                <div className={`text-xs mt-0.5 ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-                  {t.gulikaKalaDesc}
-                </div>
-              </div>
-              <div
-                className={`mt-auto font-mono text-sm font-bold px-2.5 py-1.5 rounded-lg border shadow-2xs w-fit ${
-                  isNight
-                    ? "bg-slate-900 text-slate-200 border-indigo-900/60"
-                    : "bg-white text-stone-800 border-stone-200"
-                }`}
-              >
-                {data.gulika_kala.start} – {data.gulika_kala.end}
-              </div>
-            </div>
-          )}
-
-          {/* Durmuhurta */}
-          {data.durmuhurta && data.durmuhurta.length > 0 && (
-            <div
-              id="period-durmuhurta"
-              className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-                isNight
-                  ? "bg-[#12182b] border-indigo-900/40 text-slate-200"
-                  : "bg-stone-50/90 border-stone-200"
-              }`}
-            >
-              <div className="mb-2">
-                <div
-                  className={`text-sm font-bold font-devanagari ${
-                    isNight ? "text-slate-200" : "text-stone-900"
-                  }`}
-                >
-                  {t.durmuhurta}
-                </div>
-                <div className={`text-xs mt-0.5 ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-                  {t.durmuhurtaDesc}
-                </div>
-              </div>
-              <div className="mt-auto flex flex-wrap gap-2 pt-1">
-                {data.durmuhurta.map((dm, idx) => (
-                  <span
-                    key={idx}
-                    className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-mono font-bold shadow-2xs border ${
-                      isNight
-                        ? "bg-slate-900 text-slate-200 border-slate-700"
-                        : "bg-stone-200/90 text-stone-900 border-stone-300"
-                    }`}
-                  >
-                    {dm.start} – {dm.end}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Varjyam */}
-          {data.varjyam && data.varjyam.length > 0 && (
-            <div
-              id="period-varjyam"
-              className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-                isNight
-                  ? "bg-[#12182b] border-indigo-900/40 text-slate-200"
-                  : "bg-stone-50/90 border-stone-200"
-              }`}
-            >
-              <div className="mb-2">
-                <div
-                  className={`text-sm font-bold font-devanagari ${
-                    isNight ? "text-slate-200" : "text-stone-900"
-                  }`}
-                >
-                  {t.varjyam}
-                </div>
-                <div className={`text-xs mt-0.5 ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-                  {t.varjyamDesc}
-                </div>
-              </div>
-              <div className="mt-auto flex flex-wrap gap-2 pt-1">
-                {data.varjyam.map((v, idx) => (
-                  <span
-                    key={idx}
-                    className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-mono font-bold border shadow-2xs ${
-                      isNight
-                        ? "bg-rose-950/80 text-rose-300 border-rose-800/80"
-                        : "bg-rose-100/90 text-rose-900 border-rose-200"
-                    }`}
-                  >
-                    {v.start} – {v.end}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Auspicious Periods (Śubha Muhūrtas) */}
-      <div
-        id="auspicious-card"
-        className={`rounded-[1.5rem] p-6 sm:p-8 transition-colors ${
-          isNight
-            ? "border border-emerald-950/50 bg-[#0e1424]/90 text-slate-100 shadow-xl"
-            : "glass-card border border-stone-200/80 bg-white/70"
-        }`}
-      >
-        <div
-          className={`flex items-center space-x-3 border-b pb-3.5 ${
-            isNight ? "border-emerald-900/40" : "border-emerald-100"
-          }`}
-        >
-          <div
-            className={`flex h-9 w-9 items-center justify-center rounded-xl shadow-2xs ${
-              isNight ? "bg-emerald-950/80 text-emerald-300" : "bg-emerald-100 text-emerald-800"
-            }`}
-          >
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <div>
-            <h3
-              className={`text-base sm:text-lg font-bold font-serif-vedic ${
-                isNight ? "text-emerald-300" : "text-stone-900"
-              }`}
-            >
-              {t.auspiciousTimings}
-            </h3>
-            <p className={`text-xs ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-              {t.auspiciousSub}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-          {/* Abhijit Muhurta */}
-          {data.abhijit_muhurta ? (
-            <div
-              id="period-abhijit"
-              className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-                isNight
-                  ? "bg-emerald-950/40 border-emerald-900/60 text-slate-200"
-                  : "bg-emerald-50/80 border-emerald-200"
-              }`}
-            >
-              <div className="mb-2">
-                <div
-                  className={`text-sm font-bold font-devanagari ${
-                    isNight ? "text-emerald-300" : "text-emerald-950"
-                  }`}
-                >
-                  {t.abhijit}
-                </div>
-                <div
-                  className={`text-xs mt-0.5 ${isNight ? "text-emerald-400" : "text-emerald-700"}`}
-                >
-                  {t.abhijitDesc}
-                </div>
-              </div>
-              <div
-                className={`mt-auto font-mono text-sm font-extrabold px-2.5 py-1.5 rounded-lg border shadow-2xs w-fit ${
-                  isNight
-                    ? "bg-emerald-950/90 text-emerald-200 border-emerald-800"
-                    : "bg-white text-emerald-950 border-emerald-300"
-                }`}
-              >
-                {data.abhijit_muhurta.start} – {data.abhijit_muhurta.end}
-              </div>
-            </div>
-          ) : (
-            <div
-              className={`flex flex-col justify-center p-4 text-xs rounded-xl border ${
-                isNight
-                  ? "bg-[#12182b] text-slate-400 border-indigo-900/40"
-                  : "bg-stone-50 text-stone-500 border-stone-200"
-              }`}
-            >
-              {lang === "sa"
-                ? "बुधवासरे अभिजित्मुहूर्तः वर्ज्यते।"
-                : lang === "hi"
-                  ? "बुधवार के दिन अभिजित् मुहूर्त का परिहार माना जाता है।"
-                  : "Abhijit Muhurta is avoided on Wednesdays (Budhavara)."}
-            </div>
-          )}
-
-          {/* Brahma Muhurta */}
-          {data.brahma_muhurta && (
-            <div
-              id="period-brahma"
-              className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-                isNight
-                  ? "bg-amber-950/40 border-amber-900/60 text-slate-200"
-                  : "bg-amber-50/80 border-amber-200"
-              }`}
-            >
-              <div className="mb-2">
-                <div
-                  className={`text-sm font-bold font-devanagari ${
-                    isNight ? "text-amber-300" : "text-amber-950"
-                  }`}
-                >
-                  {t.brahmaMuhurta}
-                </div>
-                <div className={`text-xs mt-0.5 ${isNight ? "text-amber-400" : "text-amber-800"}`}>
-                  {t.brahmaMuhurtaDesc}
-                </div>
-              </div>
-              <div
-                className={`mt-auto font-mono text-sm font-extrabold px-2.5 py-1.5 rounded-lg border shadow-2xs w-fit ${
-                  isNight
-                    ? "bg-amber-950/90 text-amber-200 border-amber-800"
-                    : "bg-white text-amber-950 border-amber-300"
-                }`}
-              >
-                {data.brahma_muhurta.start} – {data.brahma_muhurta.end}
-              </div>
-            </div>
-          )}
-
-          {/* Amrita Kala */}
-          {data.amrita_kala && data.amrita_kala.length > 0 && (
-            <div
-              id="period-amrita"
-              className={`flex flex-col rounded-xl p-4 border transition-all hover:shadow-sm ${
-                isNight
-                  ? "bg-emerald-950/30 border-emerald-900/50"
-                  : "bg-emerald-50/60 border-emerald-200"
-              }`}
-            >
-              <div className="mb-2">
-                <div
-                  className={`text-sm font-bold font-devanagari ${
-                    isNight ? "text-emerald-300" : "text-emerald-950"
-                  }`}
-                >
-                  {t.amritaKala}
-                </div>
-                <div
-                  className={`text-xs mt-0.5 ${isNight ? "text-emerald-400" : "text-emerald-700"}`}
-                >
-                  {t.amritaKalaDesc}
-                </div>
-              </div>
-              <div className="mt-auto flex flex-wrap gap-2 pt-1">
-                {data.amrita_kala.map((a, idx) => (
-                  <span
-                    key={idx}
-                    className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-mono font-bold border shadow-2xs ${
-                      isNight
-                        ? "bg-emerald-950 text-emerald-300 border-emerald-800"
-                        : "bg-emerald-100 text-emerald-900 border-emerald-300"
-                    }`}
-                  >
-                    {a.start} – {a.end}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Vedic Guidance Note */}
-        <div
-          className={`mt-5 rounded-xl p-4 text-xs border ${
-            isNight
-              ? "bg-indigo-950/40 border-indigo-900/50 text-slate-300"
-              : "bg-amber-50/40 border-amber-200/60 text-stone-600"
-          }`}
-        >
-          <p className="leading-relaxed">
-            <strong>{lang === "sa" ? "सूचना:" : lang === "hi" ? "विशेष:" : "Note:"}</strong>{" "}
-            {lang === "sa"
-              ? "सर्वे मुहूर्ताः स्थानीयसूर्योदयानुसारं प्रत्यक्षदृग्गणितेन साधिताः।"
-              : lang === "hi"
-                ? "समस्त मुहूर्त काल स्थानीय सूर्योदय, सूर्यास्त व दिनमान के प्रत्यक्ष दृग्गणित पर आधारित हैं।"
-                : `All Muhūrta spans are astronomically calculated based on exact civil sunrise and day/night length in ${data.city}.`}
+      {/* View Mode Switcher Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-serif-vedic font-bold text-lg sm:text-xl text-stone-900 dark:text-amber-100">
+            {lang === "hi"
+              ? "दैनिक मुहूर्त एवं काल विभाजन"
+              : "Daily Muhurtas & Cosmic Timing Spans"}
+          </h3>
+          <p className="text-xs text-stone-500 dark:text-slate-400 mt-0.5">
+            {lang === "hi"
+              ? "स्थानीय सूर्योदय-सूर्यास्त आधारित शुभ एवं अशुभ काल"
+              : "Calculated from exact local sunrise and sunset divisions"}
           </p>
         </div>
+
+        <div className="flex items-center rounded-lg p-0.5 bg-stone-100 dark:bg-slate-800 border border-stone-200 dark:border-slate-700">
+          <button
+            type="button"
+            onClick={() => setViewMode("list")}
+            className={`p-1.5 rounded-md text-xs font-medium transition-colors ${
+              viewMode === "list"
+                ? "bg-white dark:bg-slate-700 text-stone-900 dark:text-white shadow-xs"
+                : "text-stone-500 dark:text-slate-400 hover:text-stone-900"
+            }`}
+            title="List View"
+          >
+            <List className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("grid")}
+            className={`p-1.5 rounded-md text-xs font-medium transition-colors ${
+              viewMode === "grid"
+                ? "bg-white dark:bg-slate-700 text-stone-900 dark:text-white shadow-xs"
+                : "text-stone-500 dark:text-slate-400 hover:text-stone-900"
+            }`}
+            title="Grid View"
+          >
+            <LayoutGrid className="w-4 h-4" />
+          </button>
+        </div>
       </div>
+
+      {viewMode === "list" ? (
+        /* ─── MASTER REFERENCE LIST DESIGN ─────────────────────── */
+        <div className="space-y-6">
+          {/* Inauspicious Periods Block */}
+          <div>
+            <div className="flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
+              <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0"></span>
+              <span>
+                {t.inauspiciousTimings} ({lang === "hi" ? "अशुभ काल" : "Aśubha Kāla"})
+              </span>
+            </div>
+
+            <div
+              className={`vedic-card divide-y ${
+                isNight
+                  ? "bg-[#12182B] divide-indigo-950/80 border-indigo-900/40"
+                  : "bg-white divide-stone-100 border-[#E4E2DD]"
+              }`}
+            >
+              {/* Rahu Kala */}
+              <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-rose-50/30 dark:hover:bg-rose-950/20 transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0"></span>
+                  <div>
+                    <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                      {t.rahuKala}
+                    </div>
+                    <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                      {t.rahuKalaDesc}
+                    </div>
+                  </div>
+                </div>
+                <div className="font-serif-vedic font-bold text-xs sm:text-sm text-rose-700 dark:text-rose-300">
+                  {data.rahu_kala ? `${data.rahu_kala.start} – ${data.rahu_kala.end}` : "—"}
+                </div>
+              </div>
+
+              {/* Yamaganda */}
+              {data.yamaganda && (
+                <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-amber-50/30 dark:hover:bg-amber-950/20 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0"></span>
+                    <div>
+                      <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                        {t.yamaganda}
+                      </div>
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                        {t.yamagandaDesc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-serif-vedic font-bold text-xs sm:text-sm text-amber-700 dark:text-amber-300">
+                    {data.yamaganda.start} – {data.yamaganda.end}
+                  </div>
+                </div>
+              )}
+
+              {/* Gulika Kala */}
+              {data.gulika_kala && (
+                <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-amber-50/30 dark:hover:bg-amber-950/20 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0"></span>
+                    <div>
+                      <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                        {t.gulikaKala}
+                      </div>
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                        {t.gulikaKalaDesc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-serif-vedic font-bold text-xs sm:text-sm text-stone-800 dark:text-slate-200">
+                    {data.gulika_kala.start} – {data.gulika_kala.end}
+                  </div>
+                </div>
+              )}
+
+              {/* Durmuhurta */}
+              {data.durmuhurta && data.durmuhurta.length > 0 && (
+                <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-rose-50/30 dark:hover:bg-rose-950/20 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0"></span>
+                    <div>
+                      <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                        {t.durmuhurta}
+                      </div>
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                        {t.durmuhurtaDesc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-serif-vedic font-bold text-xs sm:text-sm text-rose-700 dark:text-rose-300 text-right">
+                    {data.durmuhurta.map((dm) => `${dm.start} – ${dm.end}`).join(", ")}
+                  </div>
+                </div>
+              )}
+
+              {/* Varjyam */}
+              {data.varjyam && data.varjyam.length > 0 && (
+                <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-rose-50/30 dark:hover:bg-rose-950/20 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0"></span>
+                    <div>
+                      <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                        {t.varjyam}
+                      </div>
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                        {t.varjyamDesc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-serif-vedic font-bold text-xs sm:text-sm text-rose-700 dark:text-rose-300 text-right">
+                    {data.varjyam.map((v) => `${v.start} – ${v.end}`).join(", ")}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Auspicious Periods Block */}
+          <div>
+            <div className="flex items-center gap-2 mb-2 text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
+              <span>
+                {t.auspiciousTimings} ({lang === "hi" ? "शुभ काल" : "Śubha Kāla"})
+              </span>
+            </div>
+
+            <div
+              className={`vedic-card divide-y ${
+                isNight
+                  ? "bg-[#12182B] divide-indigo-950/80 border-indigo-900/40"
+                  : "bg-white divide-stone-100 border-[#E4E2DD]"
+              }`}
+            >
+              {/* Brahma Muhurta */}
+              {data.brahma_muhurta && (
+                <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
+                    <div>
+                      <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                        {t.brahmaMuhurta}
+                      </div>
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                        {t.brahmaMuhurtaDesc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-serif-vedic font-bold text-xs sm:text-sm text-emerald-700 dark:text-emerald-300">
+                    {data.brahma_muhurta.start} – {data.brahma_muhurta.end}
+                  </div>
+                </div>
+              )}
+
+              {/* Abhijit Muhurta */}
+              {data.abhijit_muhurta && (
+                <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
+                    <div>
+                      <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                        {t.abhijit}
+                      </div>
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                        {t.abhijitDesc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-serif-vedic font-bold text-xs sm:text-sm text-emerald-700 dark:text-emerald-300">
+                    {data.abhijit_muhurta.start} – {data.abhijit_muhurta.end}
+                  </div>
+                </div>
+              )}
+
+              {/* Amrita Kala */}
+              {data.amrita_kala && data.amrita_kala.length > 0 && (
+                <div className="flex items-center justify-between p-3.5 sm:px-4 hover:bg-emerald-50/30 dark:hover:bg-emerald-950/20 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
+                    <div>
+                      <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
+                        {t.amritaKala}
+                      </div>
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400">
+                        {t.amritaKalaDesc}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="font-serif-vedic font-bold text-xs sm:text-sm text-emerald-700 dark:text-emerald-300 text-right">
+                    {data.amrita_kala.map((a) => `${a.start} – ${a.end}`).join(", ")}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* ─── GRID CARD DESIGN ───────────────────────────────── */
+        <div className="space-y-6">
+          {/* Inauspicious Cards */}
+          <div
+            className={`rounded-2xl p-5 sm:p-6 transition-colors border ${
+              isNight
+                ? "bg-[#12182B] border-rose-950/60 text-slate-100"
+                : "bg-white border-rose-200"
+            }`}
+          >
+            <div className="flex items-center space-x-2.5 border-b pb-3 border-rose-100 dark:border-rose-900/40 mb-4">
+              <ShieldAlert className="h-5 w-5 text-rose-600" />
+              <h4 className="font-serif-vedic font-bold text-base text-rose-900 dark:text-rose-200">
+                {t.inauspiciousTimings}
+              </h4>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {/* Rahu Kala */}
+              <div className="p-3.5 rounded-xl border bg-rose-50/60 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/50">
+                <div className="font-bold text-xs text-rose-900 dark:text-rose-300">
+                  {t.rahuKala}
+                </div>
+                <div className="text-[11px] text-rose-700 dark:text-rose-400 mt-0.5">
+                  {t.rahuKalaDesc}
+                </div>
+                <div className="font-mono font-bold text-xs mt-2 text-rose-900 dark:text-rose-200">
+                  {data.rahu_kala ? `${data.rahu_kala.start} – ${data.rahu_kala.end}` : "—"}
+                </div>
+              </div>
+
+              {/* Yamaganda */}
+              {data.yamaganda && (
+                <div className="p-3.5 rounded-xl border bg-amber-50/60 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/50">
+                  <div className="font-bold text-xs text-amber-900 dark:text-amber-300">
+                    {t.yamaganda}
+                  </div>
+                  <div className="text-[11px] text-amber-700 dark:text-amber-400 mt-0.5">
+                    {t.yamagandaDesc}
+                  </div>
+                  <div className="font-mono font-bold text-xs mt-2 text-amber-900 dark:text-amber-200">
+                    {data.yamaganda.start} – {data.yamaganda.end}
+                  </div>
+                </div>
+              )}
+
+              {/* Gulika Kala */}
+              {data.gulika_kala && (
+                <div className="p-3.5 rounded-xl border bg-stone-50 dark:bg-slate-900/60 border-stone-200 dark:border-slate-800">
+                  <div className="font-bold text-xs text-stone-900 dark:text-slate-200">
+                    {t.gulikaKala}
+                  </div>
+                  <div className="text-[11px] text-stone-500 dark:text-slate-400 mt-0.5">
+                    {t.gulikaKalaDesc}
+                  </div>
+                  <div className="font-mono font-bold text-xs mt-2 text-stone-900 dark:text-slate-100">
+                    {data.gulika_kala.start} – {data.gulika_kala.end}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Auspicious Cards */}
+          <div
+            className={`rounded-2xl p-5 sm:p-6 transition-colors border ${
+              isNight
+                ? "bg-[#12182B] border-emerald-950/60 text-slate-100"
+                : "bg-white border-emerald-200"
+            }`}
+          >
+            <div className="flex items-center space-x-2.5 border-b pb-3 border-emerald-100 dark:border-emerald-900/40 mb-4">
+              <ShieldCheck className="h-5 w-5 text-emerald-600" />
+              <h4 className="font-serif-vedic font-bold text-base text-emerald-900 dark:text-emerald-200">
+                {t.auspiciousTimings}
+              </h4>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {/* Brahma Muhurta */}
+              {data.brahma_muhurta && (
+                <div className="p-3.5 rounded-xl border bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/50">
+                  <div className="font-bold text-xs text-emerald-900 dark:text-emerald-300">
+                    {t.brahmaMuhurta}
+                  </div>
+                  <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+                    {t.brahmaMuhurtaDesc}
+                  </div>
+                  <div className="font-mono font-bold text-xs mt-2 text-emerald-900 dark:text-emerald-200">
+                    {data.brahma_muhurta.start} – {data.brahma_muhurta.end}
+                  </div>
+                </div>
+              )}
+
+              {/* Abhijit Muhurta */}
+              {data.abhijit_muhurta && (
+                <div className="p-3.5 rounded-xl border bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900/50">
+                  <div className="font-bold text-xs text-emerald-900 dark:text-emerald-300">
+                    {t.abhijit}
+                  </div>
+                  <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+                    {t.abhijitDesc}
+                  </div>
+                  <div className="font-mono font-bold text-xs mt-2 text-emerald-900 dark:text-emerald-200">
+                    {data.abhijit_muhurta.start} – {data.abhijit_muhurta.end}
+                  </div>
+                </div>
+              )}
+
+              {/* Amrita Kala */}
+              {data.amrita_kala && data.amrita_kala.length > 0 && (
+                <div className="p-3.5 rounded-xl border bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40">
+                  <div className="font-bold text-xs text-emerald-900 dark:text-emerald-300">
+                    {t.amritaKala}
+                  </div>
+                  <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+                    {t.amritaKalaDesc}
+                  </div>
+                  <div className="font-mono font-bold text-xs mt-2 text-emerald-900 dark:text-emerald-200">
+                    {data.amrita_kala.map((a) => `${a.start} – ${a.end}`).join(", ")}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

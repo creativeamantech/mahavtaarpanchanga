@@ -1,4 +1,4 @@
-export type Language = "en" | "hi" | "sa";
+export type Language = "en" | "hi";
 
 export interface TranslationDictionary {
   [key: string]: any;
@@ -392,135 +392,6 @@ export const translations: Record<Language, TranslationDictionary> = {
     apply: "लागू करें",
     cancel: "रद्द करें",
   },
-  sa: {
-    appName: "दृग्गणितपञ्चाङ्गम्",
-    appSubtitle: "प्रत्यक्षदृक्सिद्धं वैदिकपञ्चाङ्गम् (नासा जेपीएल / दृग्गणितप्रणाली)",
-    invocation: "॥ श्री गणेशाय नमः ॥ श्री सूर्यदेवाय नमः ॥",
-    today: "अद्य",
-    yesterday: "ह्यः",
-    tomorrow: "श्वः",
-    selectDate: "दिनाङ्कचयनम्",
-    changeLocation: "स्थानपरिवर्तनम्",
-    settings: "अयनांशव्यवस्था",
-    print: "मुद्रणम् / पत्रकम्",
-    views: {
-      panchanga: "दैनिकपञ्चाङ्गम्",
-      timings: "शुभमुहूर्ताः",
-      choghadiya: "गौरीपञ्चाङ्गम्",
-      planets: "ग्रहस्थितिः",
-      calendar: "मासिकपञ्चाङ्गम्",
-      swara: "शिवस्वरोदयः (स्वरयोगः)",
-    },
-    vedicAlmanac: "वैदिककालक्रमः",
-    samvatsara: "संवत्सरः",
-    masa: "मासः",
-    paksha: "पक्षः",
-    sukla: "शुक्लपक्षः",
-    krishna: "कृष्णपक्षः",
-    vaara: "वासरः",
-    ayana: "अयनम्",
-    drikAyana: "दृगयनम्",
-    rtu: "ऋतुः",
-    drikRtu: "दृगृतुः",
-    sunSign: "सूर्यराशिः",
-    moonSign: "चन्द्रराशिः",
-    solarDay: "सौरदिनचक्रम्",
-    lunarNight: "चान्द्ररात्रिचक्रम्",
-    sunrise: "सूर्योदयः",
-    sunset: "सूर्यास्तः",
-    moonrise: "चन्द्रोदयः",
-    moonset: "चन्द्रास्तः",
-    dayLength: "दिनमानम्",
-    nightLength: "रात्रिमानम्",
-    limbsTitle: "पञ्चाङ्गानि — पञ्च मुख्य-अङ्गानि",
-    limbsSubtitle: "प्रत्यक्षदृक्सिद्धानि खगोलीय-अङ्गानि",
-    tithi: "तिथिः",
-    nakshatra: "नक्षत्रम्",
-    yoga: "योगः",
-    karana: "करणम्",
-    endsAt: "समाप्तिः",
-    followedBy: "तदनन्तरम्",
-    throughoutDay: "अहोरात्रम्",
-    auspiciousTimings: "शुभमुहूर्ताः (प्रशस्ताः)",
-    inauspiciousTimings: "अशुभकालाः (वर्ज्याः)",
-    auspiciousSub: "कर्मारम्भाय प्रशस्तकालाः",
-    inauspiciousSub: "सर्वकर्मसु त्याज्याः कालाः",
-    rahuKala: "राहुकालः",
-    rahuKalaDesc: "राहुणा अधिपतितः भागः; सर्वकर्मसु वर्ज्यः",
-    yamaganda: "यमगण्डः",
-    yamagandaDesc: "यमस्य कालः; यात्रासु त्याज्यः",
-    gulikaKala: "गुलिककालः",
-    gulikaKalaDesc: "शनिपुत्रस्य गुलिकस्य भागः",
-    durmuhurta: "दुर्मुहूर्तः",
-    durmuhurtaDesc: "दिने वर्ज्याः मुहूर्ताः",
-    varjyam: "वर्ज्यम्",
-    varjyamDesc: "नक्षत्रदोषयुक्तः भागः",
-    abhijit: "अभिजित्मुहूर्तः",
-    abhijitDesc: "मध्याह्ने अष्टमो मुहूर्तः; सर्वदोषप्रशमनः",
-    brahmaMuhurta: "ब्रह्ममुहूर्तः",
-    brahmaMuhurtaDesc: "सूर्योदयात् पूर्वं ज्ञान-ध्यान-साधनाय उत्तमः",
-    amritaKala: "अमृतकालः",
-    amritaKalaDesc: "अमृतयुक्तः प्रशस्तसमयः",
-    choghadiyaTitle: "गौरीपञ्चाङ्गम् (चौघड़िया)",
-    choghadiyaSub: "अष्टधा विभक्ताः दिन-रात्र्योः कालविभागाः",
-    dayChoghadiya: "दिनभागः (दिवा)",
-    nightChoghadiya: "रात्रिभागः (नक्तम्)",
-    currentChoghadiya: "वर्तमानप्रवृत्तः भागः",
-    planetsTitle: "ग्रहस्थितिः (नवग्रहाः)",
-    planetsSub: "सूर्योदयकालिकी निरयणग्रहस्थितिः",
-    graha: "ग्रहः",
-    rasi: "राशिः",
-    degrees: "अंशाः",
-    pada: "नक्षत्रं पादश्च",
-    motion: "गतिः",
-    direct: "मार्गी",
-    retrograde: "वक्री",
-    planetTransitionsTitle: "ग्रहगोचरः — राशिनक्षत्रसंक्रमणम्",
-    planetTransitionsSub: "प्रत्यक्षग्रहसंक्रमणकालाः संक्रान्तिपुण्यकालसहिताः",
-    transitRasi: "राशिपरिवर्तनम् (संक्रान्तिः / गोचरः)",
-    transitNakshatra: "नक्षत्रप्रवेशः",
-    nextTransit: "आगामी गोचरः",
-    timeline: "आगामिसंक्रमणकालक्रमः",
-    todayTransits: "अद्यतनानि ग्रहसंक्रमणानि",
-    punyaKala: "पुण्यकालः",
-    mahaPunyaKala: "महापुण्यकालः",
-    combust: "अस्तङ्गतः",
-    monthlyTitle: "मासिकपञ्चाङ्गम्",
-    monthlySub: "सम्पूर्णमासस्य तिथिनक्षत्रादिविवरणम्",
-    printTitle: "दृग्गणितपञ्चाङ्गपत्रम्",
-    printSubtitle: "प्रत्यक्षवैदिकपञ्चाङ्गविवरणम्",
-    printAction: "मुद्रणं कुर्वन्तु",
-    close: "पिदधातु",
-    searchCity: "नगरान्वेषणम्",
-    customCoords: "स्वाभीष्ट-अक्षांशाः",
-    ayanamsaSystem: "अयनांशपद्धतिः",
-    monthScheme: "मासपद्धतिः",
-    eraDetails: "संवत्सराब्दविवरणम्",
-    sakaEra: "शकसंवत्सरः",
-    vikramaEra: "विक्रमसंवत्सरः",
-    kaliYear: "कलियुगाब्दः",
-    ahargana: "कल्यहर्गणः",
-    popularCities: "प्रमुखाणि नगराणि",
-    detectGps: "उपकरणस्य प्रत्यक्षस्थानं गृह्णातु (GPS)",
-    useDeviceLocation: "उपकरणस्थानं प्रयुज्यताम्",
-    detectingLocation: "उपकरणस्य जीपीएस-अन्वेषणं क्रियते...",
-    locationDetected: "उपकरणस्थानं सफलतया प्राप्तम्",
-    saveAsDefault: "अस्मिन् उपकरणे नित्यस्थानरूपेण संरक्षतु",
-    savedSettingsTitle: "स्थिरोपकरणव्यवस्था",
-    savedSettingsDesc: "प्राथमिकताः अक्षांशाश्च अस्मिन् उपकरणे सुरक्षिताः",
-    resetDefaults: "मूलव्यवस्थां प्रतिगच्छतु",
-    settingsSavedToast: "व्यवस्थाः अस्मिन् उपकरणे संरक्षिताः",
-    deviceGps: "उपकरणस्थानम् (GPS)",
-    theme: "स्वरूपम् (Theme)",
-    parchment: "पत्रपाण्डु (Parchment)",
-    nightSky: "निशीथाकाशः (Night Sky)",
-    parchmentDesc: "दिवसपठनार्थं सौम्यपत्रपृष्ठम्",
-    nightSkyDesc: "रात्रौ नेत्रसौख्यार्थं गहननील-अङ्गारवर्णम्",
-    switchToNightSky: "निशीथाकाश-स्वरूपं स्वीकुरु",
-    switchToParchment: "पत्रपाण्डु-स्वरूपं स्वीकुरु",
-    apply: "स्वीकुरु",
-    cancel: "त्यजतु",
-  },
 };
 
 // Devanagari mappings for Tithi names
@@ -750,6 +621,25 @@ export const MASA_TRANSLATIONS: Record<string, { sa: string; hi: string; en: str
   Phālguṇa: { sa: "फाल्गुनः", hi: "फाल्गुन", en: "Phālguṇa" },
 };
 
+export const RTU_TRANSLATIONS: Record<string, { sa: string; hi: string; en: string }> = {
+  "Vasanta Ṛtu": { sa: "वसन्तर्तुः", hi: "वसन्त ऋतु", en: "Vasanta Ṛtu" },
+  "Grīṣma Ṛtu": { sa: "ग्रीष्मर्तुः", hi: "ग्रीष्म ऋतु", en: "Grīṣma Ṛtu" },
+  "Varṣā Ṛtu": { sa: "वर्षा ऋतुः", hi: "वर्षा ऋतु", en: "Varṣā Ṛtu" },
+  "Śarad Ṛtu": { sa: "शरदृतुः", hi: "शरद ऋतु", en: "Śarad Ṛtu" },
+  "Hemanta Ṛtu": { sa: "हेमन्तर्तुः", hi: "हेमन्त ऋतु", en: "Hemanta Ṛtu" },
+  "Śiśira Ṛtu": { sa: "शिशिरर्तुः", hi: "शिशिर ऋतु", en: "Śiśira Ṛtu" },
+};
+
+export const AYANA_TRANSLATIONS: Record<string, { sa: string; hi: string; en: string }> = {
+  "Uttarāyaṇa": { sa: "उत्तरायणम्", hi: "उत्तरायण", en: "Uttarāyaṇa" },
+  "Dakṣiṇāyana": { sa: "दक्षिणायनम्", hi: "दक्षिणायन", en: "Dakṣiṇāyana" },
+};
+
+export const PAKSHA_TRANSLATIONS: Record<string, { sa: string; hi: string; en: string }> = {
+  "Śukla": { sa: "शुक्ल", hi: "शुक्ल", en: "Śukla" },
+  "Kṛṣṇa": { sa: "कृष्ण", hi: "कृष्ण", en: "Kṛṣṇa" },
+};
+
 // Translation helper functions
 export function getLocalizedTithi(tithiNum: number, lang: Language): string {
   const item = TITHI_DEVANAGARI[tithiNum];
@@ -809,4 +699,22 @@ export function getLocalizedChoghadiya(
     nature: item.nature,
     natureType: item.natureType,
   };
+}
+
+export function getLocalizedRtu(rtuName: string, lang: Language): string {
+  const item = RTU_TRANSLATIONS[rtuName];
+  if (!item) return rtuName;
+  return item[lang] || rtuName;
+}
+
+export function getLocalizedAyana(ayanaName: string, lang: Language): string {
+  const item = AYANA_TRANSLATIONS[ayanaName];
+  if (!item) return ayanaName;
+  return item[lang] || ayanaName;
+}
+
+export function getLocalizedPaksha(pakshaName: string, lang: Language): string {
+  const item = PAKSHA_TRANSLATIONS[pakshaName];
+  if (!item) return pakshaName;
+  return item[lang] || pakshaName;
 }

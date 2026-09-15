@@ -80,24 +80,16 @@ export const MoonPhaseVisualizer: React.FC<MoonPhaseVisualizerProps> = ({ data, 
           </div>
           <div>
             <h4 className="text-sm font-bold text-amber-300 font-serif-vedic">
-              {lang === "sa"
-                ? "चन्द्रकला एवं दृश्यमानम्"
-                : lang === "hi"
-                  ? "चन्द्र कला एवं प्रदीप्ति"
-                  : "Lunar Phase & Illumination"}
+              {lang === "hi" ? "चन्द्र कला एवं प्रदीप्ति" : "Lunar Phase & Illumination"}
             </h4>
             <span className="text-[11px] text-stone-400 font-sans">
               {isSukla
-                ? lang === "sa"
-                  ? "शुक्लपक्षः (आप्यायमानः)"
-                  : lang === "hi"
-                    ? "शुक्ल पक्ष (बढ़ती कलाएं)"
-                    : "Śukla Pakṣa (Waxing)"
-                : lang === "sa"
-                  ? "कृष्णपक्षः (क्षीयमाणः)"
-                  : lang === "hi"
-                    ? "कृष्ण पक्ष (घटती कलाएं)"
-                    : "Kṛṣṇa Pakṣa (Waning)"}
+                ? lang === "hi"
+                  ? "शुक्ल पक्ष (बढ़ती कलाएं)"
+                  : "Śukla Pakṣa (Waxing)"
+                : lang === "hi"
+                  ? "कृष्ण पक्ष (घटती कलाएं)"
+                  : "Kṛṣṇa Pakṣa (Waning)"}
             </span>
           </div>
         </div>

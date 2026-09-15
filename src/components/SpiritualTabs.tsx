@@ -1,9 +1,7 @@
 import React from "react";
-import { motion } from "motion/react";
 import { type ActiveView } from "./Header";
 import { type Language, translations } from "../i18n";
 import type { AppTheme } from "../types";
-import { Sun, Clock, Moon, Wind, Calendar } from "lucide-react";
 
 interface SpiritualTabsProps {
   activeView: ActiveView;
@@ -19,105 +17,106 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
   theme = "parchment",
 }) => {
   const t = translations[lang];
+  const isNight = theme === "nightSky";
 
-  const tabs = [
+  const tabs: {
+    id: ActiveView;
+    label: string;
+    icon: string;
+    subLabel?: string;
+  }[] = [
     {
-      id: "panchanga" as ActiveView,
-      label: t.dailyPanchanga,
-      icon: Sun,
+      id: "panchanga",
+      label: t.views.panchanga || (lang === "hi" ? "दैनिक पंचांग" : "Panchanga"),
+      icon: "☀️",
+      subLabel: "पञ्चाङ्ग",
     },
     {
-      id: "today" as ActiveView,
-      label:
-        lang === "hi" ? "दैनिक समय-सारणी" : lang === "sa" ? "अद्यतन-समयसारणी" : "Today Schedule",
-      icon: Calendar,
+      id: "today",
+      label: lang === "hi" ? "दैनिक समय-सारणी" : "Schedule",
+      icon: "📋",
+      subLabel: "समय-सारणी",
     },
     {
-      id: "timings" as ActiveView,
-      label: t.muhurtasAndTimings,
-      icon: Clock,
+      id: "timings",
+      label: t.views.timings || (lang === "hi" ? "मुहूर्त" : "Timings"),
+      icon: "⏰",
+      subLabel: "मुहूर्ताः",
     },
     {
-      id: "planets" as ActiveView,
-      label: t.grahaSthiti,
-      icon: Moon,
+      id: "planets",
+      label: t.views.planets || (lang === "hi" ? "ग्रह स्थिति" : "Planets"),
+      icon: "🪐",
+      subLabel: "ग्रहस्थिति",
     },
     {
-      id: "swara" as ActiveView,
-      label: t.views.swara,
-      icon: Wind,
+      id: "swara",
+      label: t.views.swara || (lang === "hi" ? "स्वर विज्ञान" : "Swara Yoga"),
+      icon: "🌬️",
+      subLabel: "स्वरोदय",
     },
     {
-      id: "horas" as ActiveView,
-      label: lang === "hi" ? "वैदिक होरा" : lang === "sa" ? "वैदिकहोरा" : "Vedic Horas",
-      icon: Clock,
+      id: "horas",
+      label: lang === "hi" ? "वैदिक होरा" : "Horas",
+      icon: "🕐",
+      subLabel: "होरा",
     },
     {
-      id: "lagna" as ActiveView,
-      label: "Janma Lagna",
-      icon: Sun,
+      id: "calendar",
+      label: t.views.calendar || (lang === "hi" ? "मासिक पंचांग" : "Calendar"),
+      icon: "📅",
+      subLabel: "मास-पत्रकम्",
     },
     {
-      id: "calendar" as ActiveView,
-      label: t.monthCalendar,
-      icon: Calendar,
+      id: "lagna",
+      label: lang === "hi" ? "लग्न कुण्डली" : "Lagna",
+      icon: "🔯",
+      subLabel: "लग्नम्",
+    },
+    {
+      id: "festivals",
+      label: lang === "hi" ? "पर्व व व्रत" : "Festivals",
+      icon: "🪔",
+      subLabel: "उत्सव",
     },
   ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div
-        className={`glass-card rounded-2xl p-1.5 flex items-center justify-start lg:justify-center space-x-1 sm:space-x-2 overflow-x-auto hide-scrollbar ${
-          theme === "nightSky" ? "bg-[#0e1424]/90 border-indigo-950/70" : "border-amber-200/60"
-        }`}
-      >
-        {tabs.map((tab) => {
-          const isActive = activeView === tab.id;
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => onViewChange(tab.id)}
-              className={`relative flex items-center space-x-2 px-5 py-2.5 rounded-xl font-devanagari whitespace-nowrap shrink-0 transition-colors ${
-                isActive
-                  ? theme === "nightSky"
-                    ? "text-amber-300 font-bold"
-                    : "text-amber-950 font-bold"
-                  : theme === "nightSky"
-                    ? "text-slate-300 hover:text-white font-semibold hover:bg-slate-800/50"
-                    : "text-stone-600 hover:text-stone-900 font-semibold hover:bg-stone-100/50"
-              }`}
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="activeTab"
-                  className={`absolute inset-0 rounded-xl shadow-xs border ${
-                    theme === "nightSky"
-                      ? "bg-indigo-900/80 border-indigo-500/50 shadow-indigo-950/50"
-                      : "bg-white shadow-xs border-amber-200/80"
-                  }`}
-                  initial={false}
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-              <div className="relative flex items-center space-x-2 z-10">
-                <Icon
-                  className={`w-4 h-4 transition-transform ${
-                    isActive
-                      ? theme === "nightSky"
-                        ? "text-amber-300 scale-105"
-                        : "text-amber-700 scale-105"
-                      : theme === "nightSky"
-                        ? "text-slate-400"
-                        : "text-stone-500"
-                  }`}
-                />
-                <span className="text-sm tracking-wide">{tab.label}</span>
-              </div>
-            </button>
-          );
-        })}
+    <nav
+      id="category-navigation"
+      className={`sticky top-[96px] sm:top-[104px] z-40 border-b transition-colors shadow-2xs ${
+        isNight
+          ? "bg-[#0E1322]/95 border-indigo-950/70 text-slate-300 backdrop-blur-md"
+          : "bg-white/95 border-[#E4E2DD] text-stone-700 backdrop-blur-md"
+      }`}
+    >
+      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto cat-nav-scroll py-1">
+          {tabs.map((tab) => {
+            const isActive = activeView === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                id={`cat-tab-${tab.id}`}
+                onClick={() => onViewChange(tab.id)}
+                className={`relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-[13px] font-semibold tracking-wide whitespace-nowrap shrink-0 transition-all border-b-[2.5px] -mb-1 ${
+                  isActive
+                    ? isNight
+                      ? "text-[#F0C96A] border-[#F0C96A] font-bold"
+                      : "text-[#D4680A] border-[#D4680A] font-bold"
+                    : isNight
+                      ? "text-slate-400 hover:text-slate-100 border-transparent hover:border-slate-700"
+                      : "text-[#7C7F8E] hover:text-[#1C1B1A] border-transparent hover:border-stone-300"
+                }`}
+              >
+                <span className="text-sm sm:text-base shrink-0 leading-none">{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </nav>
   );
 };

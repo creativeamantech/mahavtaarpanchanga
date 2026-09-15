@@ -114,18 +114,12 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
           </div>
           <div>
             <h3 className="text-base font-bold text-stone-900 font-serif-vedic">
-              {lang === "sa"
-                ? "२४-होरात्मक मुहूर्तावलोकनम्"
-                : lang === "hi"
-                  ? "२४ घंटे का दृश्य मुहूर्त चक्र"
-                  : "24-Hour Muhūrta Visual Timeline"}
+              {lang === "hi" ? "२४ घंटे का दृश्य मुहूर्त चक्र" : "24-Hour Muhūrta Visual Timeline"}
             </h3>
             <p className="text-xs text-stone-500 font-sans">
-              {lang === "sa"
-                ? "सूर्योदयानुसारं शुभाशुभमुहूर्तानां कालमानम्"
-                : lang === "hi"
-                  ? "शुभ व अशुभ मुहूर्तों का स्पष्ट कालमान"
-                  : "Interactive diurnal timeline with exact solar transition and periods"}
+              {lang === "hi"
+                ? "शुभ व अशुभ मुहूर्तों का स्पष्ट कालमान"
+                : "Interactive diurnal timeline with exact solar transition and periods"}
             </p>
           </div>
         </div>
@@ -141,11 +135,9 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
           ) : (
             <span className="text-stone-400 font-sans text-[11px] flex items-center gap-1">
               <Info className="h-3.5 w-3.5" />
-              {lang === "sa"
-                ? "विवरणं द्रष्टुं रेखाखण्डे स्पर्शं कुर्वन्तु"
-                : lang === "hi"
-                  ? "विवरण देखने हेतु टाइमलाइन पर माउस ले जाएं"
-                  : "Hover or tap segments on timeline to inspect"}
+              {lang === "hi"
+                ? "विवरण देखने हेतु टाइमलाइन पर माउस ले जाएं"
+                : "Hover or tap segments on timeline to inspect"}
             </span>
           )}
         </div>
@@ -234,13 +226,11 @@ export const MuhurtaTimelineBar: React.FC<MuhurtaTimelineBarProps> = ({ data, la
         <div className="flex flex-wrap items-center gap-3">
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-            <span>
-              Abhijit / Amṛta ({lang === "sa" ? "शुभम्" : lang === "hi" ? "शुभ" : "Auspicious"})
-            </span>
+            <span>Abhijit / Amṛta ({lang === "hi" ? "शुभ" : "Auspicious"})</span>
           </span>
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-rose-500"></span>
-            <span>Rāhu Kāla ({lang === "sa" ? "वर्ज्यम्" : lang === "hi" ? "अशुभ" : "Avoid"})</span>
+            <span>Rāhu Kāla ({lang === "hi" ? "अशुभ" : "Avoid"})</span>
           </span>
           <span className="flex items-center gap-1.5 font-medium">
             <span className="h-2.5 w-2.5 rounded-full bg-orange-500"></span>

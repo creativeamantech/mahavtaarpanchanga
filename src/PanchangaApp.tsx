@@ -21,6 +21,8 @@ import { PrintablePanchanga } from "./components/PrintablePanchanga";
 import { VedicHorasView } from "./components/VedicHorasView";
 import { LagnaChartView } from "./components/LagnaChartView";
 import { TodayScheduleView } from "./components/TodayScheduleView";
+import { FestivalsView } from "./components/FestivalsView";
+import { InvocationBanner } from "./components/InvocationBanner";
 import type {
   PanchangaResponse,
   CityLocation,
@@ -39,6 +41,8 @@ import {
   LayoutGrid,
   BookmarkCheck,
   Check,
+  Sparkles,
+  Compass,
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
 import {
@@ -487,13 +491,7 @@ export default function App() {
           />
           <NavItem
             icon={Calendar}
-            label={
-              lang === "hi"
-                ? "दैनिक समय-सारणी"
-                : lang === "sa"
-                  ? "अद्यतन-समयसारणी"
-                  : "Today Schedule"
-            }
+            label={lang === "hi" ? "दैनिक समय-सारणी" : "Today Schedule"}
             isActive={activeView === "today"}
             onClick={() => setActiveView("today")}
             theme={theme}
@@ -521,7 +519,7 @@ export default function App() {
           />
           <NavItem
             icon={Clock}
-            label={lang === "hi" ? "वैदिक होरा" : lang === "sa" ? "वैदिकहोरा" : "Vedic Horas"}
+            label={lang === "hi" ? "वैदिक होरा" : "Vedic Horas"}
             isActive={activeView === "horas"}
             onClick={() => setActiveView("horas")}
             theme={theme}
@@ -531,6 +529,20 @@ export default function App() {
             label={t.monthCalendar}
             isActive={activeView === "calendar"}
             onClick={() => setActiveView("calendar")}
+            theme={theme}
+          />
+          <NavItem
+            icon={Compass}
+            label={lang === "hi" ? "लग्न कुण्डली" : "Janma Lagna"}
+            isActive={activeView === "lagna"}
+            onClick={() => setActiveView("lagna")}
+            theme={theme}
+          />
+          <NavItem
+            icon={Sparkles}
+            label={lang === "hi" ? "पर्व व व्रत" : "Festivals & Vratas"}
+            isActive={activeView === "festivals"}
+            onClick={() => setActiveView("festivals")}
             theme={theme}
           />
         </div>
@@ -556,6 +568,7 @@ export default function App() {
           isDeviceLocation={Boolean(customCoords?.isDeviceLocation)}
           isDetectingLocation={isDetectingGps}
           activeView={activeView}
+          panchangaData={panchangaData}
           onDateChange={setCurrentDate}
           onViewChange={setActiveView}
           onOpenLocation={() => setIsLocationOpen(true)}
@@ -568,15 +581,13 @@ export default function App() {
           onToggleTheme={handleToggleTheme}
         />
 
-        {/* Mobile Tabs Bar - Hidden on Desktop */}
-        <div className="lg:hidden sticky top-[64px] sm:top-[68px] z-30 pt-3 pb-3 glass-header border-b border-amber-200/40 w-full shadow-xs">
-          <SpiritualTabs
-            activeView={activeView}
-            onViewChange={setActiveView}
-            lang={lang}
-            theme={theme}
-          />
-        </div>
+        {/* Primary Vedic Horizontal Category Navigation */}
+        <SpiritualTabs
+          activeView={activeView}
+          onViewChange={setActiveView}
+          lang={lang}
+          theme={theme}
+        />
 
         {/* Scrollable Content */}
         <main
@@ -586,8 +597,8 @@ export default function App() {
           <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             {/* Spiritual Context Banner */}
             {activeView !== "calendar" && !error && !isLoading && panchangaData && (
-              <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
-                <VedicInvocationBanner lang={lang} theme={theme} />
+              <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-500">
+                <InvocationBanner lang={lang} theme={theme} data={panchangaData} />
               </div>
             )}
 
@@ -619,11 +630,9 @@ export default function App() {
               >
                 <div className="flex h-14 w-14 animate-spin items-center justify-center rounded-full border-4 border-amber-200 border-t-amber-700 shadow-sm"></div>
                 <div className="mt-5 text-lg font-bold font-serif-vedic text-stone-900">
-                  {lang === "sa"
-                    ? "दृग्गणित-ग्रहस्थितीनां साधनं क्रियते..."
-                    : lang === "hi"
-                      ? "दृग्गणित अनुसार ग्रह स्थितियों एवं पंचांग की गणना जारी है..."
-                      : "Calculating Observational Planetary Positions & Panchanga..."}
+                  {lang === "hi"
+                    ? "दृग्गणित अनुसार ग्रह स्थितियों एवं पंचांग की गणना जारी है..."
+                    : "Calculating Observational Planetary Positions & Panchanga..."}
                 </div>
                 <p className="text-xs text-stone-500 mt-2 max-w-sm font-sans mx-auto">
                   Computing High-Precision Drik-Ganita Ephemeris for {currentCity}
@@ -641,11 +650,7 @@ export default function App() {
                       <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
                       <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
                         <Sun className="w-4 h-4 text-amber-600" />
-                        {lang === "hi"
-                          ? "दैनिक पंचांग सारांश"
-                          : lang === "sa"
-                            ? "दैनिक-पञ्चाङ्ग-सारांशः"
-                            : "Daily Panchanga Overview"}
+                        {lang === "hi" ? "दैनिक पंचांग सारांश" : "Daily Panchanga Overview"}
                       </h2>
                       <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
                     </div>
@@ -659,11 +664,7 @@ export default function App() {
                           <div className="flex items-center gap-2.5 mb-4 px-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]"></span>
                             <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                              {lang === "hi"
-                                ? "पंचांग के पांच अंग"
-                                : lang === "sa"
-                                  ? "पञ्चाङ्गस्य पञ्च अङ्गानि"
-                                  : "The Five Angas"}
+                              {lang === "hi" ? "पंचांग के पांच अंग" : "The Five Angas"}
                             </h3>
                           </div>
                           <FiveAngasCard data={panchangaData} lang={lang} theme={theme} />
@@ -682,11 +683,7 @@ export default function App() {
                           <div className="flex items-center gap-2.5 mb-4 px-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></span>
                             <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                              {lang === "hi"
-                                ? "चंद्र कला एवं स्थिति"
-                                : lang === "sa"
-                                  ? "चन्द्र-कला एवं स्थितिः"
-                                  : "Lunar Phase & State"}
+                              {lang === "hi" ? "चंद्र कला एवं स्थिति" : "Lunar Phase & State"}
                             </h3>
                           </div>
                           <MoonPhaseVisualizer data={panchangaData} lang={lang} theme={theme} />
@@ -696,11 +693,7 @@ export default function App() {
                           <div className="flex items-center gap-2.5 mb-4 px-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></span>
                             <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                              {lang === "hi"
-                                ? "आज के व्रत एवं त्यौहार"
-                                : lang === "sa"
-                                  ? "अद्यतनानि व्रतानि उत्सवाः च"
-                                  : "Festivals & Vratas"}
+                              {lang === "hi" ? "आज के व्रत एवं त्यौहार" : "Festivals & Vratas"}
                             </h3>
                           </div>
                           <FestivalCard data={panchangaData} lang={lang} theme={theme} />
@@ -735,11 +728,7 @@ export default function App() {
                       <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
                       <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
                         <Clock className="w-4 h-4 text-amber-600" />
-                        {lang === "hi"
-                          ? "मुहूर्त एवं समय"
-                          : lang === "sa"
-                            ? "मुहूर्ताः समयाः च"
-                            : "Muhurtas & Timings"}
+                        {lang === "hi" ? "मुहूर्त एवं समय" : "Muhurtas & Timings"}
                       </h2>
                       <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
                     </div>
@@ -754,11 +743,7 @@ export default function App() {
                             <div className="flex items-center gap-2.5 mb-4 px-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
                               <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                                {lang === "hi"
-                                  ? "वर्तमान मुहूर्त"
-                                  : lang === "sa"
-                                    ? "वर्तमान-मुहूर्तः"
-                                    : "Active Muhurta"}
+                                {lang === "hi" ? "वर्तमान मुहूर्त" : "Active Muhurta"}
                               </h3>
                             </div>
                             <CurrentMuhurtaWidget data={panchangaData} lang={lang} theme={theme} />
@@ -769,11 +754,7 @@ export default function App() {
                             <div className="flex items-center gap-2.5 mb-4 px-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]"></span>
                               <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                                {lang === "hi"
-                                  ? "शुभ एवं अशुभ समय"
-                                  : lang === "sa"
-                                    ? "शुभ-अशुभ-समयाः"
-                                    : "Auspicious & Inauspicious"}
+                                {lang === "hi" ? "शुभ एवं अशुभ समय" : "Auspicious & Inauspicious"}
                               </h3>
                             </div>
                             <AuspiciousTimingsCard data={panchangaData} lang={lang} theme={theme} />
@@ -782,11 +763,7 @@ export default function App() {
                             <div className="flex items-center gap-2.5 mb-4 px-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.6)]"></span>
                               <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                                {lang === "hi"
-                                  ? "गौरी एवं चौघड़िया"
-                                  : lang === "sa"
-                                    ? "गौरी-चौघड़िया"
-                                    : "Gauri & Choghadiya"}
+                                {lang === "hi" ? "गौरी एवं चौघड़िया" : "Gauri & Choghadiya"}
                               </h3>
                             </div>
                             <GauriChoghadiyaCard data={panchangaData} lang={lang} theme={theme} />
@@ -807,11 +784,7 @@ export default function App() {
                       <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
                       <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
                         <Moon className="w-4 h-4 text-amber-600" />
-                        {lang === "hi"
-                          ? "ग्रह स्थिति (गोचर)"
-                          : lang === "sa"
-                            ? "ग्रहस्थितिः"
-                            : "Planetary Ephemeris"}
+                        {lang === "hi" ? "ग्रह स्थिति (गोचर)" : "Planetary Ephemeris"}
                       </h2>
                       <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
                     </div>
@@ -823,11 +796,7 @@ export default function App() {
                             <div className="flex items-center gap-2.5 mb-4 px-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></span>
                               <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                                {lang === "hi"
-                                  ? "चंद्र कला"
-                                  : lang === "sa"
-                                    ? "चन्द्र-कला"
-                                    : "Lunar Phase"}
+                                {lang === "hi" ? "चंद्र कला" : "Lunar Phase"}
                               </h3>
                             </div>
                             <MoonPhaseVisualizer data={panchangaData} lang={lang} theme={theme} />
@@ -838,11 +807,7 @@ export default function App() {
                             <div className="flex items-center gap-2.5 mb-4 px-1">
                               <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]"></span>
                               <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
-                                {lang === "hi"
-                                  ? "नवग्रह स्पष्ट"
-                                  : lang === "sa"
-                                    ? "नवग्रह-स्पष्टम्"
-                                    : "Navagraha Positions"}
+                                {lang === "hi" ? "नवग्रह स्पष्ट" : "Navagraha Positions"}
                               </h3>
                             </div>
                             <PlanetaryPositionsCard
@@ -860,9 +825,7 @@ export default function App() {
                           <h3 className="text-[11px] font-bold uppercase tracking-widest text-stone-500">
                             {lang === "hi"
                               ? "ग्रह गोचर एवं राशि संक्रमण"
-                              : lang === "sa"
-                                ? "ग्रहगोचरः राशिसंक्रमणं च"
-                                : "Planet Transitions & Ingress (Graha Gochara)"}
+                              : "Planet Transitions & Ingress (Graha Gochara)"}
                           </h3>
                         </div>
                         <PlanetTransitionsCard data={panchangaData} lang={lang} theme={theme} />
@@ -881,11 +844,7 @@ export default function App() {
                       <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
                       <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
                         <Wind className="w-4 h-4 text-amber-600" />
-                        {lang === "hi"
-                          ? "शिव स्वरोदय"
-                          : lang === "sa"
-                            ? "शिव-स्वरोदयः"
-                            : "Shiva Swarodaya"}
+                        {lang === "hi" ? "शिव स्वरोदय" : "Shiva Swarodaya"}
                       </h2>
                       <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
                     </div>
@@ -906,17 +865,13 @@ export default function App() {
                       <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
                       <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
                         <Clock className="w-4 h-4 text-amber-600" />
-                        {lang === "hi"
-                          ? "वैदिक होरा चक्र"
-                          : lang === "sa"
-                            ? "वैदिक-होरा-चक्रम्"
-                            : "Vedic Hora Chart"}
+                        {lang === "hi" ? "वैदिक होरा चक्र" : "Vedic Hora Chart"}
                       </h2>
                       <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
                     </div>
 
                     <section className="space-y-6">
-                      <VedicHorasView panchangaData={panchangaData} />
+                      <VedicHorasView panchangaData={panchangaData} lang={lang} />
                     </section>
                   </div>
                 )}
@@ -934,7 +889,7 @@ export default function App() {
                       </h2>
                       <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
                     </div>
-                    <LagnaChartView />
+                    <LagnaChartView lang={lang} />
                   </div>
                 )}
 
@@ -948,11 +903,7 @@ export default function App() {
                       <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
                       <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
                         <Calendar className="w-4 h-4 text-amber-600" />
-                        {lang === "hi"
-                          ? "मासिक पंचांग"
-                          : lang === "sa"
-                            ? "मासिक-पञ्चाङ्गम्"
-                            : "Monthly Calendar"}
+                        {lang === "hi" ? "मासिक पंचांग" : "Monthly Calendar"}
                       </h2>
                       <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
                     </div>
@@ -972,6 +923,16 @@ export default function App() {
                     </section>
                   </div>
                 )}
+
+                {/* View: Festivals & Vratas */}
+                {activeView === "festivals" && (
+                  <div
+                    id="view-festivals"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
+                  >
+                    <FestivalsView data={panchangaData} lang={lang} theme={theme} />
+                  </div>
+                )}
               </div>
             ) : null}
 
@@ -987,11 +948,9 @@ export default function App() {
                   </span>
                   <span className="text-stone-300">•</span>
                   <span className="font-devanagari font-semibold">
-                    {lang === "sa"
-                      ? "दृग्गणित-पद्धत्या विशुद्ध-खगोलीयपञ्चाङ्गम्"
-                      : lang === "hi"
-                        ? "दृग्गणित पद्धति पर आधारित शुद्ध भारतीय पंचांग"
-                        : "Drig-ganita Observational Almanac System"}
+                    {lang === "hi"
+                      ? "दृग्गणित पद्धति पर आधारित शुद्ध भारतीय पंचांग"
+                      : "Drig-ganita Observational Almanac System"}
                   </span>
                 </div>
               </div>

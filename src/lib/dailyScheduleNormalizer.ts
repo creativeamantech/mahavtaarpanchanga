@@ -18,6 +18,7 @@ import type { Language } from "../i18n";
 import { computeDailyHoras } from "./horaEngine";
 import { computeSwaraYoga } from "../swaraYoga";
 import { calculateTithiSwaraInfo } from "./tithiSwaraEngine";
+import { computeNakshatraSwaraEvents } from "./nakshatraSwaraEngine";
 import { EKADASHI_NAMES } from "../vedicData";
 import type {
   DailyScheduleEvent,
@@ -44,6 +45,8 @@ const EVENT_PRIORITIES: Record<DailyScheduleEventType, number> = {
   "swara-tattva": 45,
   "tithi-swara-start": 50,
   "tithi-swara-end": 51,
+  "nakshatra-swara-start": 52,
+  "nakshatra-swara-end": 53,
   "planetary-transit": 60,
   "planetary-retrograde": 61,
   "planetary-direct": 62,
@@ -191,6 +194,8 @@ function getEventColorTheme(type: DailyScheduleEventType, auspiciousness?: strin
       };
     case "tithi-swara-start":
     case "tithi-swara-end":
+    case "nakshatra-swara-start":
+    case "nakshatra-swara-end":
       return {
         badgeBg: "bg-sky-100",
         badgeText: "text-sky-900",
@@ -263,6 +268,8 @@ function mapTypeToCategory(type: DailyScheduleEventType): EventCategory {
     case "swara-tattva":
     case "tithi-swara-start":
     case "tithi-swara-end":
+    case "nakshatra-swara-start":
+    case "nakshatra-swara-end":
       return "swara";
     case "muhurta":
       return "muhurta";
@@ -331,8 +338,11 @@ export function normalizeDailySchedule(
     category: "astronomical",
     startTimeMs: sunriseMs,
     endTimeMs: null,
-    title: lang === "hi" ? "सूर्योदय" : lang === "sa" ? "सूर्योदयः" : "Sunrise",
-    subtitle: `${formatTimeInZone(sunriseMs, timeZone)} · Beginning of Vedic Day`,
+    title: lang === "hi" ? "सूर्योदय" : "Sunrise",
+    subtitle:
+      lang === "hi"
+        ? `${formatTimeInZone(sunriseMs, timeZone)} · वैदिक दिवस का आरम्भ`
+        : `${formatTimeInZone(sunriseMs, timeZone)} · Beginning of Vedic Day`,
     localizedTitle: { en: "Sunrise", hi: "सूर्योदय", sa: "सूर्योदयः" },
     priority: EVENT_PRIORITIES.sunrise,
     colorTheme: getEventColorTheme("sunrise"),
@@ -346,8 +356,11 @@ export function normalizeDailySchedule(
     category: "astronomical",
     startTimeMs: sunsetMs,
     endTimeMs: null,
-    title: lang === "hi" ? "सूर्यास्त" : lang === "sa" ? "सूर्यास्तः" : "Sunset",
-    subtitle: `${formatTimeInZone(sunsetMs, timeZone)} · Beginning of Vedic Night`,
+    title: lang === "hi" ? "सूर्यास्त" : "Sunset",
+    subtitle:
+      lang === "hi"
+        ? `${formatTimeInZone(sunsetMs, timeZone)} · वैदिक रात्रि का आरम्भ`
+        : `${formatTimeInZone(sunsetMs, timeZone)} · Beginning of Vedic Night`,
     localizedTitle: { en: "Sunset", hi: "सूर्यास्त", sa: "सूर्यास्तः" },
     priority: EVENT_PRIORITIES.sunset,
     colorTheme: getEventColorTheme("sunset"),
@@ -363,8 +376,11 @@ export function normalizeDailySchedule(
       category: "astronomical",
       startTimeMs: moonriseMs,
       endTimeMs: null,
-      title: lang === "hi" ? "चन्द्रोदय" : lang === "sa" ? "चन्द्रोदयः" : "Moonrise",
-      subtitle: `${formatTimeInZone(moonriseMs, timeZone)} · Chandra Udaya`,
+      title: lang === "hi" ? "चन्द्रोदय" : "Moonrise",
+      subtitle:
+        lang === "hi"
+          ? `${formatTimeInZone(moonriseMs, timeZone)} · चंद्र उदय`
+          : `${formatTimeInZone(moonriseMs, timeZone)} · Chandra Udaya`,
       localizedTitle: { en: "Moonrise", hi: "चन्द्रोदय", sa: "चन्द्रोदयः" },
       priority: EVENT_PRIORITIES.moonrise,
       colorTheme: getEventColorTheme("moonrise"),
@@ -381,8 +397,11 @@ export function normalizeDailySchedule(
       category: "astronomical",
       startTimeMs: moonsetMs,
       endTimeMs: null,
-      title: lang === "hi" ? "चन्द्रास्त" : lang === "sa" ? "चन्द्रास्तः" : "Moonset",
-      subtitle: `${formatTimeInZone(moonsetMs, timeZone)} · Chandra Asta`,
+      title: lang === "hi" ? "चन्द्रास्त" : "Moonset",
+      subtitle:
+        lang === "hi"
+          ? `${formatTimeInZone(moonsetMs, timeZone)} · चंद्र अस्त`
+          : `${formatTimeInZone(moonsetMs, timeZone)} · Chandra Asta`,
       localizedTitle: { en: "Moonset", hi: "चन्द्रास्त", sa: "चन्द्रास्तः" },
       priority: EVENT_PRIORITIES.moonset,
       colorTheme: getEventColorTheme("moonset"),
@@ -411,8 +430,11 @@ export function normalizeDailySchedule(
         startTimeMs: seg.startTimeMs,
         endTimeMs: seg.endTimeMs,
         durationMs,
-        title: `${seg.name} (${lang === "hi" ? labelHi : lang === "sa" ? labelSa : labelEn})`,
-        subtitle: `${labelEn} #${seg.number || idx + 1} · ${Math.round(durationMs / 3600000)}h duration`,
+        title: `${seg.name} (${lang === "hi" ? labelHi : labelEn})`,
+        subtitle:
+          lang === "hi"
+            ? `${labelHi} #${seg.number || idx + 1} · ${Math.round(durationMs / 3600000)}घंटे की अवधि`
+            : `${labelEn} #${seg.number || idx + 1} · ${Math.round(durationMs / 3600000)}h duration`,
         metadata: { ...seg },
         priority: EVENT_PRIORITIES[type],
         colorTheme: getEventColorTheme(type),
@@ -450,12 +472,20 @@ export function normalizeDailySchedule(
         startTimeMs: h.startTimeMs,
         endTimeMs: h.endTimeMs,
         durationMs: h.durationMs,
-        title: `${h.ruler} Hora`,
-        subtitle: `${h.isDay ? "Day" : "Night"} Hora #${h.index} · Nadi: ${h.nadi.toUpperCase()}`,
+        title: lang === "hi" ? `${h.ruler} होरा` : `${h.ruler} Hora`,
+        subtitle:
+          lang === "hi"
+            ? `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${h.nadi === "ida" ? "चन्द्र नाड़ी (इड़ा)" : "सूर्य नाड़ी (पिंगला)"}`
+            : `${h.isDay ? "Day" : "Night"} Hora #${h.index} · ${h.nadi === "ida" ? "Lunar Nadi (IDA)" : "Solar Nadi (PINGALA)"}`,
         localizedTitle: {
           en: `${h.ruler} Hora`,
           hi: `${h.ruler} होरा`,
           sa: `${h.ruler} होरा`,
+        },
+        localizedSubtitle: {
+          en: `${h.isDay ? "Day" : "Night"} Hora #${h.index} · ${h.nadi === "ida" ? "Lunar (Ida)" : "Solar (Pingala)"}`,
+          hi: `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${h.nadi === "ida" ? "चन्द्र (इड़ा)" : "सूर्य (पिङ्गला)"}`,
+          sa: `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${h.nadi === "ida" ? "चन्द्र (इड़ा)" : "सूर्य (पिङ्गला)"}`,
         },
         metadata: {
           horaIndex: h.index,
@@ -478,8 +508,14 @@ export function normalizeDailySchedule(
           startTimeMs: tp.startTimeMs,
           endTimeMs: tp.endTimeMs,
           durationMs: tp.durationMs,
-          title: `${tp.sanskrit} Tattva (${tp.name})`,
-          subtitle: `${h.ruler} Hora · Micro-period ${tIdx + 1}/5`,
+          title:
+            lang === "hi"
+              ? `${tp.sanskrit} तत्त्व (${tp.name})`
+              : `${tp.sanskrit} Tattva (${tp.name})`,
+          subtitle:
+            lang === "hi"
+              ? `${h.ruler} होरा · सूक्ष्म काल ${tIdx + 1}/5`
+              : `${h.ruler} Hora · Micro-period ${tIdx + 1}/5`,
           localizedTitle: {
             en: `${tp.sanskrit} Tattva (${tp.name})`,
             hi: `${tp.sanskrit} तत्त्व (${tp.name})`,
@@ -521,8 +557,14 @@ export function normalizeDailySchedule(
       startTimeMs: sunriseMs,
       endTimeMs: sunriseSwaraEndMs,
       durationMs: 3600000,
-      title: `Sunrise Swara · ${swaraYoga.sunriseSwara === "ida" ? "Ida (Lunar / Left)" : "Pingala (Solar / Right)"}`,
-      subtitle: `${swaraYoga.sunriseNostril} Nostril · 1st Hour Classical Swara Window`,
+      title:
+        lang === "hi"
+          ? `सूर्योदय स्वर · ${swaraYoga.sunriseSwara === "ida" ? "इड़ा (बायाँ)" : "पिंगला (दायाँ)"}`
+          : `Sunrise Swara · ${swaraYoga.sunriseSwara === "ida" ? "Ida (Lunar / Left)" : "Pingala (Solar / Right)"}`,
+      subtitle:
+        lang === "hi"
+          ? `${swaraYoga.sunriseNostril === "Left" ? "बायाँ" : "दायाँ"} स्वर · प्रथम घंटा शास्त्रीय स्वर`
+          : `${swaraYoga.sunriseNostril} Nostril · 1st Hour Classical Swara Window`,
       priority: EVENT_PRIORITIES.swara,
       colorTheme: getEventColorTheme("swara"),
       metadata: {
@@ -542,8 +584,14 @@ export function normalizeDailySchedule(
       startTimeMs: sunsetSwaraStartMs,
       endTimeMs: sunsetMs,
       durationMs: 3600000,
-      title: `Sunset Swara · ${swaraYoga.sunsetSwara === "ida" ? "Ida (Lunar / Left)" : "Pingala (Solar / Right)"}`,
-      subtitle: `${swaraYoga.sunsetNostril} Nostril · Sandhya Transition Swara Window`,
+      title:
+        lang === "hi"
+          ? `सूर्यास्त स्वर · ${swaraYoga.sunsetSwara === "ida" ? "इड़ा (बायाँ)" : "पिंगला (दायाँ)"}`
+          : `Sunset Swara · ${swaraYoga.sunsetSwara === "ida" ? "Ida (Lunar / Left)" : "Pingala (Solar / Right)"}`,
+      subtitle:
+        lang === "hi"
+          ? `${swaraYoga.sunsetNostril === "Left" ? "बायाँ" : "दायाँ"} स्वर · संध्या काल संधिकाल`
+          : `${swaraYoga.sunsetNostril} Nostril · Sandhya Transition Swara Window`,
       priority: EVENT_PRIORITIES.swara,
       colorTheme: getEventColorTheme("swara"),
       metadata: {
@@ -552,80 +600,6 @@ export function normalizeDailySchedule(
         nostril: swaraYoga.sunsetNostril,
       },
     });
-
-    // 4.3 24 Hourly Alternating Nadi Cycles
-    const totalCycles = 24;
-    const cycleDurationMs = (nextSunriseMs - sunriseMs) / 24;
-
-    for (let c = 0; c < totalCycles; c++) {
-      const cycleStartMs = Math.round(sunriseMs + c * cycleDurationMs);
-      const cycleEndMs = Math.round(
-        c === totalCycles - 1 ? nextSunriseMs : cycleStartMs + cycleDurationMs,
-      );
-      const cycleNadi =
-        c % 2 === 0 ? swaraYoga.sunriseSwara : swaraYoga.sunriseSwara === "ida" ? "pingala" : "ida";
-      const cycleNostril = cycleNadi === "ida" ? "Left Nostril" : "Right Nostril";
-
-      // Nadi alternating cycle
-      events.push({
-        id: `swara-nadi-cycle-${c + 1}-${cycleStartMs}`,
-        type: "nadi",
-        source: "Swara Engine",
-        category: "swara",
-        startTimeMs: cycleStartMs,
-        endTimeMs: cycleEndMs,
-        durationMs: cycleEndMs - cycleStartMs,
-        title: `${cycleNadi === "ida" ? "Ida Nadi" : "Pingala Nadi"} Cycle #${c + 1}`,
-        subtitle: `${cycleNostril} · Active Breathing Current (${Math.round((cycleEndMs - cycleStartMs) / 60000)} min)`,
-        priority: EVENT_PRIORITIES.nadi,
-        colorTheme: getEventColorTheme("nadi"),
-        metadata: {
-          cycleNumber: c + 1,
-          nadi: cycleNadi,
-          nostril: cycleNostril,
-        },
-      });
-
-      // Swara Tattva sub-periods (Classical Swarodaya 5 Tattvas in order: Prithvi 20m, Jala 16m, Tejas 12m, Vayu 8m, Akasha 4m)
-      const swaraTattvaRatios = [
-        { name: "Earth", sanskrit: "Prithvi", minutes: 20 },
-        { name: "Water", sanskrit: "Jala", minutes: 16 },
-        { name: "Fire", sanskrit: "Tejas", minutes: 12 },
-        { name: "Air", sanskrit: "Vayu", minutes: 8 },
-        { name: "Space", sanskrit: "Akasha", minutes: 4 },
-      ];
-
-      let stStart = cycleStartMs;
-      const actualDuration = cycleEndMs - cycleStartMs;
-      const totalRatioMinutes = 60;
-
-      swaraTattvaRatios.forEach((st, stIdx) => {
-        const stDuration = Math.round(actualDuration * (st.minutes / totalRatioMinutes));
-        const stEnd = stIdx === swaraTattvaRatios.length - 1 ? cycleEndMs : stStart + stDuration;
-
-        events.push({
-          id: `swara-tattva-${c + 1}-${st.sanskrit}-${stStart}`,
-          type: "swara-tattva",
-          source: "Swara Engine",
-          category: "swara",
-          startTimeMs: stStart,
-          endTimeMs: stEnd,
-          durationMs: stEnd - stStart,
-          title: `Swara ${st.sanskrit} (${st.name})`,
-          subtitle: `${cycleNadi === "ida" ? "Ida" : "Pingala"} · Swarodaya Sub-period ${stIdx + 1}/5`,
-          priority: EVENT_PRIORITIES["swara-tattva"],
-          colorTheme: getEventColorTheme("swara-tattva"),
-          metadata: {
-            cycle: c + 1,
-            nadi: cycleNadi,
-            sanskrit: st.sanskrit,
-            name: st.name,
-          },
-        });
-
-        stStart = stEnd;
-      });
-    }
   } catch (err) {
     console.warn("Swara normalization error:", err);
   }
@@ -660,8 +634,14 @@ export function normalizeDailySchedule(
             startTimeMs: se.startTimeMs,
             endTimeMs: se.endTimeMs,
             durationMs: se.durationMs,
-            title: `Tithi Start Swara · ${se.nadi === "ida" ? "Ida Nadi" : "Pingala Nadi"}`,
-            subtitle: `${tithiSeg.name} Beginning · ${se.nadi === "ida" ? "Left Nostril" : "Right Nostril"} (60 min)`,
+            title:
+              lang === "hi"
+                ? `तिथि आरंभ स्वर · ${se.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`
+                : `Tithi Start Swara · ${se.nadi === "ida" ? "Ida Nadi" : "Pingala Nadi"}`,
+            subtitle:
+              lang === "hi"
+                ? `${tithiSeg.name} आरंभ · ${se.nadi === "ida" ? "बायाँ स्वर" : "दायाँ स्वर"} (60 मिनट)`
+                : `${tithiSeg.name} Beginning · ${se.nadi === "ida" ? "Left Nostril" : "Right Nostril"} (60 min)`,
             hasOverlap: se.hasOverlap,
             priority: EVENT_PRIORITIES["tithi-swara-start"],
             colorTheme: getEventColorTheme("tithi-swara-start"),
@@ -687,8 +667,14 @@ export function normalizeDailySchedule(
             startTimeMs: ee.startTimeMs,
             endTimeMs: ee.endTimeMs,
             durationMs: ee.durationMs,
-            title: `Tithi End Swara · ${ee.nadi === "ida" ? "Ida Nadi" : "Pingala Nadi"}`,
-            subtitle: `${tithiSeg.name} Completion · ${ee.nadi === "ida" ? "Left Nostril" : "Right Nostril"} (60 min)`,
+            title:
+              lang === "hi"
+                ? `तिथि समापन स्वर · ${ee.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`
+                : `Tithi End Swara · ${ee.nadi === "ida" ? "Ida Nadi" : "Pingala Nadi"}`,
+            subtitle:
+              lang === "hi"
+                ? `${tithiSeg.name} समापन · ${ee.nadi === "ida" ? "बायाँ स्वर" : "दायाँ स्वर"} (60 मिनट)`
+                : `${tithiSeg.name} Completion · ${ee.nadi === "ida" ? "Left Nostril" : "Right Nostril"} (60 min)`,
             hasOverlap: ee.hasOverlap,
             priority: EVENT_PRIORITIES["tithi-swara-end"],
             colorTheme: getEventColorTheme("tithi-swara-end"),
@@ -706,6 +692,85 @@ export function normalizeDailySchedule(
     }
   } catch (err) {
     console.warn("Tithi-Swara normalization error:", err);
+  }
+
+  // ---------------------------------------------------------------------------
+  // 5b. NAKSHATRA-SWARA EVENTS (1-hour Start & 1-hour Opposite End)
+  // ---------------------------------------------------------------------------
+  try {
+    if (data.nakshatra && Array.isArray(data.nakshatra)) {
+      data.nakshatra.forEach((nakSeg, nIdx) => {
+        if (!nakSeg.startTimeMs || !nakSeg.endTimeMs) return;
+        const nakNum = nakSeg.number || nIdx + 1;
+        const info =
+          nakSeg.nakshatraSwara ||
+          computeNakshatraSwaraEvents(nakSeg, data.timezone, undefined, lang);
+
+        if (info?.startEvent) {
+          const se = info.startEvent;
+          events.push({
+            id: `nakshatra-swara-start-${nakNum}-${se.startTimeMs}`,
+            type: "nakshatra-swara-start",
+            source: "Nakshatra-Swara Engine",
+            category: "swara",
+            startTimeMs: se.startTimeMs,
+            endTimeMs: se.endTimeMs,
+            durationMs: se.durationMs,
+            title:
+              lang === "hi"
+                ? `नक्षत्र आरंभ स्वर · ${se.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`
+                : `Nakshatra Start Swara · ${se.nadi === "ida" ? "Ida Nadi" : "Pingala Nadi"}`,
+            subtitle:
+              lang === "hi"
+                ? `${nakSeg.name} आरंभ · ${se.nadi === "ida" ? "बायाँ स्वर" : "दायाँ स्वर"} (60 मिनट)`
+                : `${nakSeg.name} Beginning · ${se.nadi === "ida" ? "Left Nostril" : "Right Nostril"} (60 min)`,
+            hasOverlap: se.hasOverlap,
+            priority: EVENT_PRIORITIES["nakshatra-swara-start"],
+            colorTheme: getEventColorTheme("nakshatra-swara-start"),
+            metadata: {
+              nakshatraName: nakSeg.name,
+              nakshatraNumber: nakNum,
+              nadi: se.nadi,
+              nadiLabel: se.nadiLabel,
+              hasOverlap: se.hasOverlap,
+            },
+          });
+        }
+
+        if (info?.endEvent) {
+          const ee = info.endEvent;
+          events.push({
+            id: `nakshatra-swara-end-${nakNum}-${ee.startTimeMs}`,
+            type: "nakshatra-swara-end",
+            source: "Nakshatra-Swara Engine",
+            category: "swara",
+            startTimeMs: ee.startTimeMs,
+            endTimeMs: ee.endTimeMs,
+            durationMs: ee.durationMs,
+            title:
+              lang === "hi"
+                ? `नक्षत्र समापन स्वर (विपरीत) · ${ee.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`
+                : `Nakshatra End Swara (Opposite) · ${ee.nadi === "ida" ? "Ida Nadi" : "Pingala Nadi"}`,
+            subtitle:
+              lang === "hi"
+                ? `${nakSeg.name} समापन · ${ee.nadi === "ida" ? "बायाँ स्वर" : "दायाँ स्वर"} (60 मिनट)`
+                : `${nakSeg.name} Completion · ${ee.nadi === "ida" ? "Left Nostril" : "Right Nostril"} (60 min)`,
+            hasOverlap: ee.hasOverlap,
+            priority: EVENT_PRIORITIES["nakshatra-swara-end"],
+            colorTheme: getEventColorTheme("nakshatra-swara-end"),
+            metadata: {
+              nakshatraName: nakSeg.name,
+              nakshatraNumber: nakNum,
+              nadi: ee.nadi,
+              nadiLabel: ee.nadiLabel,
+              hasOverlap: ee.hasOverlap,
+            },
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.warn("Nakshatra-Swara normalization error:", err);
   }
 
   // ---------------------------------------------------------------------------
@@ -729,8 +794,11 @@ export function normalizeDailySchedule(
       startTimeMs: interval.startTimeMs,
       endTimeMs: interval.endTimeMs,
       durationMs,
-      title: lang === "hi" ? titleHi : lang === "sa" ? titleSa : titleEn,
-      subtitle: `${auspiciousness === "auspicious" ? "Auspicious Timing" : "Inauspicious Period"} · ${Math.round(durationMs / 60000)} min`,
+      title: lang === "hi" ? titleHi : titleEn,
+      subtitle:
+        lang === "hi"
+          ? `${auspiciousness === "auspicious" ? "शुभ काल" : "अशुभ काल"} · ${Math.round(durationMs / 60000)} मिनट`
+          : `${auspiciousness === "auspicious" ? "Auspicious Timing" : "Inauspicious Period"} · ${Math.round(durationMs / 60000)} min`,
       localizedTitle: { en: titleEn, hi: titleHi, sa: titleSa },
       auspiciousness,
       priority: EVENT_PRIORITIES.muhurta,
@@ -820,8 +888,14 @@ export function normalizeDailySchedule(
         startTimeMs: cg.startTimeMs,
         endTimeMs: cg.endTimeMs,
         durationMs,
-        title: `${name} (${isNight ? "Night" : "Day"} Choghaḍiyā)`,
-        subtitle: `${(cg as { lord?: string }).lord ? "Ruler: " + (cg as { lord?: string }).lord + " · " : ""}${Math.round(durationMs / 60000)} min`,
+        title:
+          lang === "hi"
+            ? `${name} (${isNight ? "रात्रि" : "दिन"} चौघड़िया)`
+            : `${name} (${isNight ? "Night" : "Day"} Choghaḍiyā)`,
+        subtitle:
+          lang === "hi"
+            ? `${cg.lord ? "स्वामी: " + cg.lord + " · " : ""}${Math.round(durationMs / 60000)} मिनट`
+            : `${cg.lord ? "Ruler: " + cg.lord + " · " : ""}${Math.round(durationMs / 60000)} min`,
         auspiciousness: ausp,
         priority: EVENT_PRIORITIES.muhurta,
         colorTheme: getEventColorTheme("muhurta", ausp),

@@ -2,6 +2,7 @@ import { PanchangaResponse } from "./types";
 import { computeSwaraYoga } from "./swaraYoga";
 
 export interface TattvaPeriod {
+  color?: string;
   name: string;
   sanskrit: string;
   durationMs: number;

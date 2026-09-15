@@ -92,6 +92,7 @@ export interface Segment {
 }
 
 export interface TimingInterval {
+  lord?: string;
   startTimeMs?: number;
   endTimeMs?: number;
   start: string;
@@ -370,7 +371,7 @@ export interface MonthlyPanchangaDay {
 export type AppTheme = "parchment" | "nightSky";
 
 export interface UserSettings {
-  lang: "en" | "hi" | "sa";
+  lang: "en" | "hi";
   ayanamsa: CoordinateSelection;
   monthSystem: MonthSystem;
   currentCity: string;

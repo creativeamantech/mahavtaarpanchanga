@@ -1917,7 +1917,7 @@ export function evaluateNakshatraSwaraAlignment(
     tithiNumber: normalizedTithi,
     tithiName: tithiRule.tithiName,
     paksha: tithiRule.paksha,
-    requiredNadi,
+    requiredNadi: requiredNadi as "ida" | "pingala",
     requiredNostril,
     nakshatraNumber: nakDef.nakshatraNumber,
     nakshatraName: nakDef.nakshatraName,

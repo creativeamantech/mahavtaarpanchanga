@@ -66,7 +66,7 @@ const MONTH_NAMES_SA = [
   "दिसम्बर (मासः)",
 ];
 
-const WEEKDAYS: Record<Language, string[]> = {
+const WEEKDAYS: Record<string, string[]> = {
   en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   hi: ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"],
   sa: ["रविवासरः", "सोमवासरः", "मङ्गलवासरः", "बुधवासरः", "गुरुवासरः", "शुक्रवासरः", "शनिवासरः"],

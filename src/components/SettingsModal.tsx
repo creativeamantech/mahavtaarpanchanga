@@ -18,6 +18,11 @@ import {
   saveNotificationPreferences,
   NotificationPreferences,
   defaultNotificationPreferences,
+  requestNotificationPermission,
+  getNotificationPermissionStatus,
+  sendTestNotification,
+  playNotificationTune,
+  type NotificationPermissionStatus,
 } from "../lib/notificationEngine";
 import { BellOff, BellRing } from "lucide-react";
 
@@ -117,12 +122,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(
     defaultNotificationPreferences,
   );
+  const [permStatus, setPermStatus] = useState<NotificationPermissionStatus>("default");
 
   useEffect(() => {
     if (isOpen) {
       setNotifPrefs(getNotificationPreferences());
+      setPermStatus(getNotificationPermissionStatus());
     }
   }, [isOpen]);
+
+  const handleToggleNotifications = async () => {
+    const nextVal = !notifPrefs.enabled;
+    if (!nextVal) {
+      setNotifPrefs({ ...notifPrefs, enabled: false });
+      return;
+    }
+    const status = await requestNotificationPermission();
+    setPermStatus(status);
+    setNotifPrefs({ ...notifPrefs, enabled: status === "granted" });
+  };
   const [saveToLocalStorage, setSaveToLocalStorage] = useState<boolean>(true);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<boolean>(false);
 
@@ -407,15 +425,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  const nextVal = !notifPrefs.enabled;
-                  setNotifPrefs({ ...notifPrefs, enabled: nextVal });
-                  if (
-                    nextVal &&
-                    "Notification" in window &&
-                    Notification.permission !== "granted"
-                  ) {
-                    Notification.requestPermission();
-                  }
+                  void handleToggleNotifications();
                 }}
                 className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${notifPrefs.enabled ? "bg-amber-600" : "bg-stone-300"}`}
               >
@@ -424,6 +434,34 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
               </button>
             </div>
+
+            {permStatus === "open-in-new-tab" && (
+              <p className="text-[11px] rounded-lg bg-amber-50 border border-amber-200 text-amber-900 p-2.5">
+                Your browser won't show the permission prompt inside this embedded preview. Open the
+                app in its own browser tab, then turn alerts on again.
+              </p>
+            )}
+            {permStatus === "denied" && (
+              <p className="text-[11px] rounded-lg bg-red-50 border border-red-200 text-red-800 p-2.5">
+                Notifications are blocked for this site. Allow them in your browser's site settings,
+                then turn alerts on again.
+              </p>
+            )}
+            {permStatus === "unsupported" && (
+              <p className="text-[11px] rounded-lg bg-stone-100 border border-stone-200 text-stone-600 p-2.5">
+                This browser does not support notifications.
+              </p>
+            )}
+
+            {notifPrefs.enabled && permStatus === "granted" && (
+              <button
+                type="button"
+                onClick={() => void sendTestNotification(notifPrefs.customTune)}
+                className="w-full px-3 py-2 rounded-xl border border-amber-300 bg-amber-50 text-xs font-bold text-amber-900 hover:bg-amber-100 transition-colors"
+              >
+                Send a test alert
+              </button>
+            )}
 
             {notifPrefs.enabled && (
               <div className="space-y-4 pl-2 sm:pl-4 border-l-2 border-amber-100">
@@ -444,13 +482,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         type="button"
                         onClick={() => {
                           setNotifPrefs({ ...notifPrefs, customTune: tune.id as any });
-                          // Preview the sound if not default
-                          if (tune.id !== "default") {
-                            try {
-                              const audio = new Audio(`/${tune.id}.mp3`);
-                              audio.play().catch(e => console.log("Preview blocked", e));
-                            } catch (e) {}
-                          }
+                          // Preview the selected tone
+                          playNotificationTune(tune.id);
                         }}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                           (notifPrefs.customTune || "default") === tune.id

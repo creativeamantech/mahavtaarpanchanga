@@ -14,6 +14,8 @@ import { type Language, translations } from "../i18n";
 import type { AppTheme, PanchangaResponse } from "../types";
 import { PWAInstallButton } from "./PWAInstallButton";
 import { getLocalizedMasa, getLocalizedPaksha, getLocalizedVaara } from "../i18n";
+import logoAsset from "../assets/mahavtaar-logo.png.asset.json";
+
 
 export type ActiveView =
   | "panchanga"

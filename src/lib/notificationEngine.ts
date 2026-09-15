@@ -20,6 +20,8 @@ export interface NotificationPreferences {
 
   /** Advance alert notice in minutes: 0 (at event), 5, 10, or 30 */
   advanceMinutes: number;
+  /** Custom alert tone */
+  customTune?: "default" | "bell" | "shankha" | "om";
 
   /** Event category toggles */
   horaStarts: boolean;
@@ -48,6 +50,7 @@ export interface NotificationPreferences {
 export const defaultNotificationPreferences: NotificationPreferences = {
   enabled: false,
   advanceMinutes: 0,
+  customTune: "default",
   horaStarts: true,
   horaEnds: false,
   horaTattvaStarts: true,
@@ -116,7 +119,7 @@ export function clearScheduledNotifications() {
 /**
  * Dispatches browser / PWA notification.
  */
-function scheduleAlert(id: string, title: string, body: string, triggerTimeMs: number) {
+function scheduleAlert(id: string, title: string, body: string, triggerTimeMs: number, customTune?: string) {
   if (scheduledIds.has(id)) return; // Prevent duplicates
   scheduledIds.add(id);
 
@@ -126,6 +129,19 @@ function scheduleAlert(id: string, title: string, body: string, triggerTimeMs: n
   // Only schedule if it's in the future and within the next 24 hours
   if (delay > 0 && delay < 24 * 60 * 60 * 1000) {
     const timeout = setTimeout(() => {
+      // Play custom tune if selected and not default
+      if (customTune && customTune !== "default" && typeof window !== "undefined") {
+        try {
+          const audio = new Audio(`/${customTune}.mp3`);
+          audio.play().catch(() => {
+            // Audio play may fail if user hasn't interacted with page
+            console.log("Audio play blocked by browser policy");
+          });
+        } catch (e) {
+          console.error("Failed to play custom notification sound", e);
+        }
+      }
+
       if (typeof Notification !== "undefined" && Notification.permission === "granted") {
         try {
           if (navigator?.serviceWorker?.ready) {
@@ -192,7 +208,7 @@ export function schedulePanchangaNotifications(
           `${event.id}_start_${triggerTimeMs}`,
           `${advancePrefix}🌅 Sunrise (सूर्योदय)`,
           `Sunrise begins in ${data.city}. Auspicious start of the Vedic day.`,
-          triggerTimeMs,
+          triggerTimeMs, prefs.customTune,
         );
       } else if (event.type === "sunset") {
         const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -200,7 +216,7 @@ export function schedulePanchangaNotifications(
           `${event.id}_start_${triggerTimeMs}`,
           `${advancePrefix}🌇 Sunset (सूर्यास्त)`,
           `Sunset in ${data.city}. Sandhya transition begins.`,
-          triggerTimeMs,
+          triggerTimeMs, prefs.customTune,
         );
       } else if (event.type === "moonrise") {
         const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -208,7 +224,7 @@ export function schedulePanchangaNotifications(
           `${event.id}_start_${triggerTimeMs}`,
           `${advancePrefix}🌙 Moonrise (चन्द्रोदय)`,
           `Moonrise in ${data.city}.`,
-          triggerTimeMs,
+          triggerTimeMs, prefs.customTune,
         );
       } else if (event.type === "moonset") {
         const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -216,7 +232,7 @@ export function schedulePanchangaNotifications(
           `${event.id}_start_${triggerTimeMs}`,
           `${advancePrefix}🌘 Moonset (चन्द्रास्त)`,
           `Moonset in ${data.city}.`,
-          triggerTimeMs,
+          triggerTimeMs, prefs.customTune,
         );
       }
     }
@@ -232,7 +248,7 @@ export function schedulePanchangaNotifications(
           `${event.id}_start_${triggerTimeMs}`,
           `${advancePrefix}🪐 ${ruler} Hora Started`,
           `Planetary Hora of ${ruler} is active until ${event.formattedEnd || "next Hora"}. Dominant Nadi: ${String(event.metadata?.nadi || "").toUpperCase()}.`,
-          triggerTimeMs,
+          triggerTimeMs, prefs.customTune,
         );
       }
 
@@ -242,7 +258,7 @@ export function schedulePanchangaNotifications(
           `${event.id}_end_${triggerTimeMs}`,
           `${advancePrefix}⌛ ${ruler} Hora Ending`,
           `Hora of ${ruler} is completing. Next planetary period begins.`,
-          triggerTimeMs,
+          triggerTimeMs, prefs.customTune,
         );
       }
     }
@@ -261,7 +277,7 @@ export function schedulePanchangaNotifications(
           `${event.id}_start_${triggerTimeMs}`,
           `${advancePrefix}✨ ${sanskrit} Tattva (${name}) in ${parentRuler} Hora`,
           `Micro-period active until ${event.formattedEnd}. Element: ${name}.`,
-          triggerTimeMs,
+          triggerTimeMs, prefs.customTune,
         );
       }
     }
@@ -273,7 +289,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}🌬️ ${event.title}`,
         `${event.subtitle || "Classical Swarodaya window active."}`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     } else if (event.type === "nadi" && prefs.nadiChanges) {
       const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -281,7 +297,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}💨 ${event.title}`,
         `${event.subtitle || "Breathing current shift."}`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     } else if (event.type === "swara-tattva" && prefs.swaraTattvaChanges) {
       const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -289,7 +305,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}🧘 ${event.title}`,
         `${event.subtitle || "Swarodaya elemental sub-period."}`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     }
 
@@ -304,7 +320,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}🌀 ${event.title}${overlapNote}`,
         `${event.subtitle || "60-minute classical Tithi-Swara transition."}`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     }
 
@@ -315,7 +331,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}🌕 Tithi Begun: ${event.title}`,
         `Duration until ${event.formattedEnd || "completion"}.`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     } else if (event.type === "nakshatra" && prefs.nakshatraChanges) {
       const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -323,7 +339,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}⭐ Nakshatra: ${event.title}`,
         `Active until ${event.formattedEnd || "transition"}.`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     } else if (event.type === "yoga" && prefs.yogaChanges) {
       const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -331,7 +347,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}🔯 Yoga: ${event.title}`,
         `Active until ${event.formattedEnd}.`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     } else if (event.type === "karana" && prefs.karanaChanges) {
       const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
@@ -339,7 +355,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}⚡ Karana: ${event.title}`,
         `Active until ${event.formattedEnd}.`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     }
 
@@ -352,7 +368,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}${icon} ${event.title}`,
         `${event.subtitle || (isGood ? "Auspicious timing begins." : "Inauspicious period active. Avoid new initiatives.")}`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     }
 
@@ -369,7 +385,7 @@ export function schedulePanchangaNotifications(
         `${event.id}_start_${triggerTimeMs}`,
         `${advancePrefix}🪐 Planetary Transit: ${event.title}`,
         `${event.subtitle || "Astronomical planetary transition event."}`,
-        triggerTimeMs,
+        triggerTimeMs, prefs.customTune,
       );
     }
   });

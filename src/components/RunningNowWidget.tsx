@@ -10,6 +10,8 @@ import {
 } from "../i18n";
 import { computeSwaraYoga, SWARA_DETAILS } from "../swaraYoga";
 import { resolveCurrentHora } from "../horaEngine";
+import { computeTithiSwaraEvents } from "../lib/tithiSwaraEngine";
+import { computeNakshatraSwaraEvents } from "../lib/nakshatraSwaraEngine";
 
 const horaNamesHi: Record<string, string> = {
   Sun: "सूर्य",
@@ -134,6 +136,8 @@ export const RunningNowWidget: React.FC<RunningNowWidgetProps> = ({
     citySeconds = s || 0;
   } catch (e) {}
 
+  const timeZone = data.timezone || "Asia/Kolkata";
+
   const primaryTithiNum = data.tithi?.[0]?.number || 1;
   const swaraData = computeSwaraYoga(
     primaryTithiNum,
@@ -143,6 +147,32 @@ export const RunningNowWidget: React.FC<RunningNowWidgetProps> = ({
     data.moonrise,
     data.moonset,
   );
+
+  let activeTithiSwaraEvent = null;
+  for (const t of data.tithi) {
+    const info = computeTithiSwaraEvents(t, timeZone, nowMs, lang);
+    if (info.startEvent?.isActive) {
+      activeTithiSwaraEvent = info.startEvent;
+      break;
+    }
+    if (info.endEvent?.isActive) {
+      activeTithiSwaraEvent = info.endEvent;
+      break;
+    }
+  }
+
+  let activeNakshatraSwaraEvent = null;
+  for (const n of data.nakshatra) {
+    const info = computeNakshatraSwaraEvents(n, timeZone, nowMs, lang);
+    if (info.startEvent?.isActive) {
+      activeNakshatraSwaraEvent = info.startEvent;
+      break;
+    }
+    if (info.endEvent?.isActive) {
+      activeNakshatraSwaraEvent = info.endEvent;
+      break;
+    }
+  }
 
   const horaState = resolveCurrentHora(now.getTime(), data);
   const activeHora = horaState?.hora || null;
@@ -276,6 +306,36 @@ export const RunningNowWidget: React.FC<RunningNowWidgetProps> = ({
                   {swaraData.activeCelestialWindow === "sunset" ? swaraData.sunsetWindow?.windowFormatted : ""}
                   {swaraData.activeCelestialWindow === "moonrise" ? swaraData.moonriseWindow?.windowFormatted : ""}
                   {swaraData.activeCelestialWindow === "moonset" ? swaraData.moonsetWindow?.windowFormatted : ""}
+                </div>
+              </div>
+            )}
+            
+            {activeTithiSwaraEvent && (
+              <div className={`mt-2 rounded-lg p-2.5 text-xs flex flex-col gap-1.5 ${
+                isNight ? "bg-purple-900/30 text-purple-200 border border-purple-800/50" : "bg-purple-50 text-purple-800 border border-purple-200/60"
+              }`}>
+                <div className="font-bold flex items-center gap-1.5 text-sm">
+                  <Wind className="w-3.5 h-3.5" />
+                  {lang === "hi" ? `तिथि ${activeTithiSwaraEvent.type === "start" ? "आरंभ" : "समापन"} स्वर काल` : `Tithi ${activeTithiSwaraEvent.type === "start" ? "Start" : "End"} Swara`}
+                  {` (${activeTithiSwaraEvent.nadi === "ida" ? (lang === "hi" ? "इड़ा" : "Ida") : (lang === "hi" ? "पिङ्गला" : "Pingala")})`}
+                </div>
+                <div className="font-mono font-medium opacity-90 text-sm pl-5">
+                  {activeTithiSwaraEvent.formattedRange}
+                </div>
+              </div>
+            )}
+            
+            {activeNakshatraSwaraEvent && (
+              <div className={`mt-2 rounded-lg p-2.5 text-xs flex flex-col gap-1.5 ${
+                isNight ? "bg-fuchsia-900/30 text-fuchsia-200 border border-fuchsia-800/50" : "bg-fuchsia-50 text-fuchsia-800 border border-fuchsia-200/60"
+              }`}>
+                <div className="font-bold flex items-center gap-1.5 text-sm">
+                  <Wind className="w-3.5 h-3.5" />
+                  {lang === "hi" ? `नक्षत्र ${activeNakshatraSwaraEvent.type === "start" ? "आरंभ" : "समापन"} स्वर काल` : `Nakshatra ${activeNakshatraSwaraEvent.type === "start" ? "Start" : "End"} Swara`}
+                  {` (${activeNakshatraSwaraEvent.nadi === "ida" ? (lang === "hi" ? "इड़ा" : "Ida") : (lang === "hi" ? "पिङ्गला" : "Pingala")})`}
+                </div>
+                <div className="font-mono font-medium opacity-90 text-sm pl-5">
+                  {activeNakshatraSwaraEvent.formattedRange}
                 </div>
               </div>
             )}

@@ -426,40 +426,110 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
 
             {notifPrefs.enabled && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-2 sm:pl-4 border-l-2 border-amber-100">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={notifPrefs.sunriseSunset}
-                    onChange={(e) =>
-                      setNotifPrefs({ ...notifPrefs, sunriseSunset: e.target.checked })
-                    }
-                    className="rounded text-amber-600 focus:ring-amber-600"
-                  />
-                  <span className="text-xs font-medium text-stone-700">Sunrise & Sunset</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={notifPrefs.muhurtas}
-                    onChange={(e) => setNotifPrefs({ ...notifPrefs, muhurtas: e.target.checked })}
-                    className="rounded text-amber-600 focus:ring-amber-600"
-                  />
-                  <span className="text-xs font-medium text-stone-700">Important Muhurtas</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={notifPrefs.horas}
-                    onChange={(e) => setNotifPrefs({ ...notifPrefs, horas: e.target.checked })}
-                    className="rounded text-amber-600 focus:ring-amber-600"
-                  />
-                  <span className="text-xs font-medium text-stone-700">Horas & Elements</span>
-                </label>
+              <div className="space-y-4 pl-2 sm:pl-4 border-l-2 border-amber-100">
+                {/* Custom Tune Selection */}
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">
+                    {lang === "hi" ? "कस्टम ट्यून (Custom Tune)" : "Custom Notification Tune"}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: "default", label: "Default" },
+                      { id: "bell", label: "Temple Bell" },
+                      { id: "shankha", label: "Shankha" },
+                      { id: "om", label: "Om Chant" },
+                    ].map((tune) => (
+                      <button
+                        key={tune.id}
+                        type="button"
+                        onClick={() => {
+                          setNotifPrefs({ ...notifPrefs, customTune: tune.id as any });
+                          // Preview the sound if not default
+                          if (tune.id !== "default") {
+                            try {
+                              const audio = new Audio(`/${tune.id}.mp3`);
+                              audio.play().catch(e => console.log("Preview blocked", e));
+                            } catch (e) {}
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                          (notifPrefs.customTune || "default") === tune.id
+                            ? "bg-amber-600 text-white shadow-sm"
+                            : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                        }`}
+                      >
+                        {tune.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Categories */}
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">
+                    {lang === "hi" ? "अलर्ट की श्रेणियां (Alert Categories)" : "Alert Categories"}
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.sunriseSunset ?? notifPrefs.astronomical}
+                        onChange={(e) => setNotifPrefs({ ...notifPrefs, sunriseSunset: e.target.checked, astronomical: e.target.checked })}
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                      <span className="text-xs font-medium text-stone-700">Sunrise & Sunset</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.swaraChanges}
+                        onChange={(e) => setNotifPrefs({ ...notifPrefs, swaraChanges: e.target.checked })}
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                      <span className="text-xs font-medium text-stone-700">Swara (Ida/Pingala)</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.horas}
+                        onChange={(e) => setNotifPrefs({ ...notifPrefs, horas: e.target.checked, horaStarts: e.target.checked })}
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                      <span className="text-xs font-medium text-stone-700">Planetary Horas</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.horaTattvaStarts}
+                        onChange={(e) => setNotifPrefs({ ...notifPrefs, horaTattvaStarts: e.target.checked })}
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                      <span className="text-xs font-medium text-stone-700">Tattva (Elements)</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.muhurtas}
+                        onChange={(e) => setNotifPrefs({ ...notifPrefs, muhurtas: e.target.checked })}
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                      <span className="text-xs font-medium text-stone-700">Important Muhurtas</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.tithiSwara}
+                        onChange={(e) => setNotifPrefs({ ...notifPrefs, tithiSwara: e.target.checked })}
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                      <span className="text-xs font-medium text-stone-700">Tithi/Nakshatra Swara</span>
+                    </label>
+                  </div>
+                </div>
               </div>
             )}
 
-            {notifPrefs.enabled && notifPrefs.horas && (
+            {notifPrefs.enabled && (notifPrefs.horas || notifPrefs.horaStarts) && (
               <div className="pl-2 sm:pl-4 border-l-2 border-amber-100">
                 <div className="pt-2">
                   <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">

@@ -106,8 +106,100 @@ export function saveNotificationPreferences(prefs: NotificationPreferences) {
   localStorage.setItem(NOTIF_PREF_KEY, JSON.stringify(prefs));
 }
 
+// ---------------------------------------------------------------------------
+// Permission handling
+// ---------------------------------------------------------------------------
+
+export type NotificationPermissionStatus =
+  | "granted"
+  | "denied"
+  | "default"
+  | "unsupported"
+  | "open-in-new-tab";
+
+export function getNotificationPermissionStatus(): NotificationPermissionStatus {
+  if (typeof window === "undefined") return "unsupported";
+  if (!("Notification" in window)) return "unsupported";
+  if (Notification.permission === "granted") return "granted";
+  if (Notification.permission === "denied") return "denied";
+  if (window.top !== window.self) return "open-in-new-tab";
+  return "default";
+}
+
+/**
+ * Asks the browser for permission. Must be called from a user gesture.
+ */
+export async function requestNotificationPermission(): Promise<NotificationPermissionStatus> {
+  const status = getNotificationPermissionStatus();
+  if (status !== "default") return status;
+  try {
+    const result = await Notification.requestPermission();
+    if (result === "granted") {
+      // A service worker gives us reliable delivery while the tab is backgrounded.
+      void ensureServiceWorker();
+      return "granted";
+    }
+    return result === "denied" ? "denied" : "default";
+  } catch {
+    return "open-in-new-tab";
+  }
+}
+
+/** Returns an existing service worker registration, if any (never hangs). */
+async function ensureServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return null;
+  try {
+    const existing = await navigator.serviceWorker.getRegistration();
+    if (existing) return existing;
+    return await navigator.serviceWorker.register("/notification-sw.js");
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Alert sound (synthesised — no audio files required)
+// ---------------------------------------------------------------------------
+
+type TuneId = "default" | "bell" | "shankha" | "om";
+
+const TUNE_SPECS: Record<TuneId, { freqs: number[]; duration: number; type: OscillatorType }> = {
+  default: { freqs: [880], duration: 0.25, type: "sine" },
+  bell: { freqs: [1318, 1760], duration: 1.4, type: "sine" },
+  shankha: { freqs: [392, 466], duration: 1.8, type: "sawtooth" },
+  om: { freqs: [136.1, 272.2], duration: 2.4, type: "sine" },
+};
+
+export function playNotificationTune(tune: string | undefined) {
+  if (typeof window === "undefined") return;
+  const spec = TUNE_SPECS[(tune as TuneId) || "default"] || TUNE_SPECS.default;
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    void ctx.resume();
+    const now = ctx.currentTime;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.25, now + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + spec.duration);
+    gain.connect(ctx.destination);
+    spec.freqs.forEach((freq) => {
+      const osc = ctx.createOscillator();
+      osc.type = spec.type;
+      osc.frequency.setValueAtTime(freq, now);
+      osc.connect(gain);
+      osc.start(now);
+      osc.stop(now + spec.duration);
+    });
+    window.setTimeout(() => void ctx.close().catch(() => {}), (spec.duration + 0.3) * 1000);
+  } catch {
+    // Audio unavailable — silent notification is still delivered
+  }
+}
+
 // Keep track of active timeouts so we can clear them when data or settings change
-let activeTimeouts: NodeJS.Timeout[] = [];
+let activeTimeouts: ReturnType<typeof setTimeout>[] = [];
 const scheduledIds = new Set<string>();
 
 export function clearScheduledNotifications() {
@@ -116,10 +208,58 @@ export function clearScheduledNotifications() {
   scheduledIds.clear();
 }
 
+/** Shows a notification right now, preferring the service worker channel. */
+export async function showNotificationNow(title: string, body: string, tag?: string) {
+  if (typeof window === "undefined") return;
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+  const options: NotificationOptions = {
+    body,
+    icon: "/pwa-192x192.png",
+    badge: "/pwa-192x192.png",
+    ...(tag ? { tag } : {}),
+  };
+
+  const registration = await ensureServiceWorker();
+  if (registration) {
+    try {
+      await registration.showNotification(title, {
+        ...options,
+        // @ts-expect-error vibrate is present on mobile browsers
+        vibrate: [200, 100, 200],
+      });
+      return;
+    } catch {
+      // fall through to the constructor path
+    }
+  }
+  try {
+    new Notification(title, options);
+  } catch {
+    // Notifications not supported in this environment
+  }
+}
+
+/** Fires a one-off test alert so the user can confirm the setup works. */
+export async function sendTestNotification(tune?: string) {
+  playNotificationTune(tune);
+  await showNotificationNow(
+    "🔔 Mahavtaar Panchanga",
+    "Test alert — your reminders are working.",
+    "mahavtaar-test",
+  );
+}
+
 /**
  * Dispatches browser / PWA notification.
  */
-function scheduleAlert(id: string, title: string, body: string, triggerTimeMs: number, customTune?: string) {
+function scheduleAlert(
+  id: string,
+  title: string,
+  body: string,
+  triggerTimeMs: number,
+  customTune?: string,
+) {
   if (scheduledIds.has(id)) return; // Prevent duplicates
   scheduledIds.add(id);
 
@@ -129,51 +269,8 @@ function scheduleAlert(id: string, title: string, body: string, triggerTimeMs: n
   // Only schedule if it's in the future and within the next 24 hours
   if (delay > 0 && delay < 24 * 60 * 60 * 1000) {
     const timeout = setTimeout(() => {
-      // Play custom tune if selected and not default
-      if (customTune && customTune !== "default" && typeof window !== "undefined") {
-        try {
-          const audio = new Audio(`/${customTune}.mp3`);
-          audio.play().catch(() => {
-            // Audio play may fail if user hasn't interacted with page
-            console.log("Audio play blocked by browser policy");
-          });
-        } catch (e) {
-          console.error("Failed to play custom notification sound", e);
-        }
-      }
-
-      if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-        try {
-          if (navigator?.serviceWorker?.ready) {
-            navigator.serviceWorker.ready
-              .then((registration) => {
-                registration
-                  .showNotification(title, {
-                    body,
-                    icon: "/pwa-192x192.png",
-                    badge: "/pwa-192x192.png",
-                    // @ts-expect-error vibrate is present on mobile browsers
-                    vibrate: [200, 100, 200],
-                    tag: id,
-                  })
-                  .catch(() => {
-                    new Notification(title, { body, icon: "/pwa-192x192.png" });
-                  });
-              })
-              .catch(() => {
-                new Notification(title, { body, icon: "/pwa-192x192.png" });
-              });
-          } else {
-            new Notification(title, { body, icon: "/pwa-192x192.png" });
-          }
-        } catch {
-          try {
-            new Notification(title, { body, icon: "/pwa-192x192.png" });
-          } catch {
-            // Notifications not supported in this environment
-          }
-        }
-      }
+      playNotificationTune(customTune);
+      void showNotificationNow(title, body, id);
     }, delay);
     activeTimeouts.push(timeout);
   }

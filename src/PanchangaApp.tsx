@@ -163,7 +163,7 @@ export default function App() {
     }
   }, [panchangaData]);
 
-  // Listener for preferences update
+  // Listener for preferences update + re-arm timers when the tab wakes up
   useEffect(() => {
     const handlePrefsUpdate = () => {
       if (panchangaData) {
@@ -171,8 +171,15 @@ export default function App() {
         schedulePanchangaNotifications(panchangaData, prefs);
       }
     };
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") handlePrefsUpdate();
+    };
     window.addEventListener("mahavtaar_notif_prefs_updated", handlePrefsUpdate);
-    return () => window.removeEventListener("mahavtaar_notif_prefs_updated", handlePrefsUpdate);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("mahavtaar_notif_prefs_updated", handlePrefsUpdate);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [panchangaData]);
 
   useEffect(() => {

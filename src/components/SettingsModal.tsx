@@ -122,12 +122,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(
     defaultNotificationPreferences,
   );
+  const [permStatus, setPermStatus] = useState<NotificationPermissionStatus>("default");
 
   useEffect(() => {
     if (isOpen) {
       setNotifPrefs(getNotificationPreferences());
+      setPermStatus(getNotificationPermissionStatus());
     }
   }, [isOpen]);
+
+  const handleToggleNotifications = async () => {
+    const nextVal = !notifPrefs.enabled;
+    if (!nextVal) {
+      setNotifPrefs({ ...notifPrefs, enabled: false });
+      return;
+    }
+    const status = await requestNotificationPermission();
+    setPermStatus(status);
+    setNotifPrefs({ ...notifPrefs, enabled: status === "granted" });
+  };
   const [saveToLocalStorage, setSaveToLocalStorage] = useState<boolean>(true);
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<boolean>(false);
 

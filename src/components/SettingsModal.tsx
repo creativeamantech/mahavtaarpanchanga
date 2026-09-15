@@ -18,6 +18,11 @@ import {
   saveNotificationPreferences,
   NotificationPreferences,
   defaultNotificationPreferences,
+  requestNotificationPermission,
+  getNotificationPermissionStatus,
+  sendTestNotification,
+  playNotificationTune,
+  type NotificationPermissionStatus,
 } from "../lib/notificationEngine";
 import { BellOff, BellRing } from "lucide-react";
 

@@ -177,14 +177,19 @@ export const Header: React.FC<HeaderProps> = ({
           {/* App Name & Sacred Vedic Branding */}
           <div className="flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
             <div
-              className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl shadow-inner border ${
+              className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl shadow-inner border overflow-hidden ${
                 isNight
-                  ? "bg-indigo-950/80 border-indigo-700/60 text-[#F0C96A]"
-                  : "bg-white/10 border-white/15 text-[#F0C96A]"
+                  ? "bg-black border-[#F0C96A]/40"
+                  : "bg-black border-[#F0C96A]/40"
               }`}
             >
-              <span className="font-serif-vedic font-bold text-xl sm:text-2xl leading-none">ॐ</span>
+              <img
+                src={logoAsset.url}
+                alt="Mahavtaar Panchanga"
+                className="h-full w-full object-contain"
+              />
             </div>
+
 
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5 sm:gap-2">

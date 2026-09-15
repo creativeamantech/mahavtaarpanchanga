@@ -40,21 +40,27 @@ import {
   Wind,
   Calendar,
   LayoutGrid,
-  BookmarkCheck,
-  Check,
+  MapPin,
+  Flame,
+  ArrowRight,
+  Activity,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
   Sparkles,
   Compass,
   Star,
+  ListTodo,
+  CalendarDays,
+  Hourglass
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
-import {
-  schedulePanchangaNotifications,
+import { schedulePanchangaNotifications,
   getNotificationPreferences,
 } from "./lib/notificationEngine";
 import type { ActiveView } from "./components/Header";
 import { motion, AnimatePresence } from "motion/react";
-import {
-  loadUserSettings,
+import { loadUserSettings,
   saveUserSettings,
   clearUserSettings,
   DEFAULT_USER_SETTINGS,
@@ -492,15 +498,15 @@ export default function App() {
             Spiritual Navigation
           </div>
           <NavItem
-            icon={LayoutGrid}
+            icon={Sun}
             label={t.dailyPanchanga}
             isActive={activeView === "panchanga"}
             onClick={() => setActiveView("panchanga")}
             theme={theme}
           />
           <NavItem
-            icon={Calendar}
-            label={lang === "hi" ? "दैनिक समय-सारणी" : "Today Schedule"}
+            icon={ListTodo}
+            label={lang === "hi" ? "दैनिक समय-सारणी" : "Schedule"}
             isActive={activeView === "today"}
             onClick={() => setActiveView("today")}
             theme={theme}
@@ -526,23 +532,22 @@ export default function App() {
             onClick={() => setActiveView("swara")}
             theme={theme}
           />
-          
           <NavItem
             icon={Star}
-            label={lang === "hi" ? "नव तारा चक्र" : "Navtara Chakra"}
+            label={lang === "hi" ? "नव तारा" : "Navtara"}
             isActive={activeView === "navtara"}
             onClick={() => setActiveView("navtara")}
             theme={theme}
           />
           <NavItem
-            icon={Clock}
-            label={lang === "hi" ? "वैदिक होरा" : "Vedic Horas"}
+            icon={Hourglass}
+            label={lang === "hi" ? "वैदिक होरा" : "Horas"}
             isActive={activeView === "horas"}
             onClick={() => setActiveView("horas")}
             theme={theme}
           />
           <NavItem
-            icon={Calendar}
+            icon={CalendarDays}
             label={t.monthCalendar}
             isActive={activeView === "calendar"}
             onClick={() => setActiveView("calendar")}
@@ -550,20 +555,19 @@ export default function App() {
           />
           <NavItem
             icon={Compass}
-            label={lang === "hi" ? "लग्न कुण्डली" : "Janma Lagna"}
+            label={lang === "hi" ? "लग्न कुण्डली" : "Lagna"}
             isActive={activeView === "lagna"}
             onClick={() => setActiveView("lagna")}
             theme={theme}
           />
           <NavItem
-            icon={Sparkles}
-            label={lang === "hi" ? "पर्व व व्रत" : "Festivals & Vratas"}
+            icon={Flame}
+            label={lang === "hi" ? "पर्व व व्रत" : "Festivals"}
             isActive={activeView === "festivals"}
             onClick={() => setActiveView("festivals")}
             theme={theme}
           />
         </div>
-
         <div
           className={`p-5 border-t ${theme === "nightSky" ? "border-indigo-950/60" : "border-amber-200/50"}`}
         >

@@ -80,7 +80,7 @@ export const NakshatraSwaraAlignmentCard: React.FC<NakshatraSwaraAlignmentCardPr
   }, [primaryNakSeg, data.timezone, nowMs, lang]);
 
   const simRule = useMemo(() => {
-    return getNakshatraSwaraRule(customNak, customPada);
+    return getNakshatraSwaraRule(customNak);
   }, [customNak, customPada]);
 
   // Handler to load the prompt's reference test case (Day 1 Shukla Pratipada + Pushya)

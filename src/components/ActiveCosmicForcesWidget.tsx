@@ -106,7 +106,7 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
                   : "bg-amber-100/80 border-amber-300/80 text-amber-900"
               }`}
             >
-              {formatCountdown(horaState.horaRemainingMs)}{" "}
+              {formatCountdown(horaState.horaRemainingMs ?? 0)}{" "}
               <span className="text-[9px] font-sans font-normal opacity-80">
                 {lang === "hi" ? "शेष" : "left"}
               </span>

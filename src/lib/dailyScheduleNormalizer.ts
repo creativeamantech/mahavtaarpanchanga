@@ -633,7 +633,7 @@ export function normalizeDailySchedule(
             category: "swara",
             startTimeMs: se.startTimeMs,
             endTimeMs: se.endTimeMs,
-            durationMs: se.durationMs,
+            durationMs: se.endTimeMs - se.startTimeMs,
             title:
               lang === "hi"
                 ? `तिथि आरंभ स्वर · ${se.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`
@@ -666,7 +666,7 @@ export function normalizeDailySchedule(
             category: "swara",
             startTimeMs: ee.startTimeMs,
             endTimeMs: ee.endTimeMs,
-            durationMs: ee.durationMs,
+            durationMs: ee.endTimeMs - ee.startTimeMs,
             title:
               lang === "hi"
                 ? `तिथि समापन स्वर · ${ee.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`
@@ -715,7 +715,7 @@ export function normalizeDailySchedule(
             category: "swara",
             startTimeMs: se.startTimeMs,
             endTimeMs: se.endTimeMs,
-            durationMs: se.durationMs,
+            durationMs: se.endTimeMs - se.startTimeMs,
             title:
               lang === "hi"
                 ? `नक्षत्र आरंभ स्वर · ${se.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`
@@ -746,7 +746,7 @@ export function normalizeDailySchedule(
             category: "swara",
             startTimeMs: ee.startTimeMs,
             endTimeMs: ee.endTimeMs,
-            durationMs: ee.durationMs,
+            durationMs: ee.endTimeMs - ee.startTimeMs,
             title:
               lang === "hi"
                 ? `नक्षत्र समापन स्वर (विपरीत) · ${ee.nadi === "ida" ? "इड़ा नाड़ी" : "पिंगला नाड़ी"}`

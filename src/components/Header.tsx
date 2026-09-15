@@ -140,10 +140,10 @@ export const Header: React.FC<HeaderProps> = ({
       } else {
         rawMasa = getLocalizedMasa(rawMasa, lang);
       }
-      
+
       const rawPaksha = panchangaData.paksha ? getLocalizedPaksha(panchangaData.paksha, lang) : "";
       const rawVaara = panchangaData.vaara ? getLocalizedVaara(panchangaData.vaara, lang) : "";
-      
+
       if (lang === "hi") {
         return `${rawMasa} ${rawPaksha} पक्ष · ${rawVaara}`;
       } else {
@@ -270,7 +270,9 @@ export const Header: React.FC<HeaderProps> = ({
               ) : (
                 <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-200 fill-amber-200/20" />
               )}
-              <span className="text-[10px] sm:text-xs font-semibold">{lang === "hi" ? "थीम" : "Theme"}</span>
+              <span className="text-[10px] sm:text-xs font-semibold">
+                {lang === "hi" ? "थीम" : "Theme"}
+              </span>
             </button>
 
             {/* Print Button */}
@@ -294,7 +296,9 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label={t.settings}
             >
               <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="text-[10px] sm:text-xs font-semibold">{lang === "hi" ? "सेटिंग्स" : "Settings"}</span>
+              <span className="text-[10px] sm:text-xs font-semibold">
+                {lang === "hi" ? "सेटिंग्स" : "Settings"}
+              </span>
             </button>
 
             <PWAInstallButton />

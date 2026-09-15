@@ -370,7 +370,8 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                   </div>
                   <div className="text-xs text-stone-600 dark:text-slate-300 mt-1.5 truncate">
                     <strong className="text-stone-900 dark:text-white">
-                      {liveState.currentTithi?.title?.split("(")[0]?.trim() || data.tithi?.[0]?.name}
+                      {liveState.currentTithi?.title?.split("(")[0]?.trim() ||
+                        data.tithi?.[0]?.name}
                     </strong>
                     {" · "}
                     <span>
@@ -389,17 +390,26 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                   <Wind className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   <span className="font-bold text-blue-900 dark:text-blue-200">
                     {lang === "hi" ? "सक्रिय नाड़ी: " : "Active Nadi: "}
-                    {liveState.horaState.hora.nadi === "ida" ? (lang === "hi" ? "चन्द्र (इड़ा)" : "Lunar (Ida)") :
-                     liveState.horaState.hora.nadi === "pingala" ? (lang === "hi" ? "सूर्य (पिंगला)" : "Solar (Pingala)") :
-                     (lang === "hi" ? "सुषुम्ना" : "Sushumna")}
+                    {liveState.horaState.hora.nadi === "ida"
+                      ? lang === "hi"
+                        ? "चन्द्र (इड़ा)"
+                        : "Lunar (Ida)"
+                      : liveState.horaState.hora.nadi === "pingala"
+                        ? lang === "hi"
+                          ? "सूर्य (पिंगला)"
+                          : "Solar (Pingala)"
+                        : lang === "hi"
+                          ? "सुषुम्ना"
+                          : "Sushumna"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between flex-1">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                     <span className="font-bold text-purple-900 dark:text-purple-200">
-                      {lang === "hi" ? "सक्रिय तत्त्व: " : "Active Tattva: "} 
-                      {liveState.horaState.activeTattva.sanskrit} ({liveState.horaState.activeTattva.name})
+                      {lang === "hi" ? "सक्रिय तत्त्व: " : "Active Tattva: "}
+                      {liveState.horaState.activeTattva.sanskrit} (
+                      {liveState.horaState.activeTattva.name})
                     </span>
                   </div>
                   {liveState.horaState.tattvaRemainingMs != null && (
@@ -486,7 +496,9 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
             {liveState.nextUpcomingEvent && liveState.nextEventRemainingMs != null && (
               <div className="mt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm pt-3 border-t border-stone-200/60 dark:border-slate-800">
                 <div className="flex items-center gap-2">
-                  <span className="text-stone-500 dark:text-slate-400 font-medium">{lang === "hi" ? "आने वाला समय (Next):" : "Upcoming (Next):"}</span>
+                  <span className="text-stone-500 dark:text-slate-400 font-medium">
+                    {lang === "hi" ? "आने वाला समय (Next):" : "Upcoming (Next):"}
+                  </span>
                   <span className="font-bold text-stone-800 dark:text-slate-200">
                     {liveState.nextUpcomingEvent.title}
                   </span>
@@ -576,10 +588,16 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
         {filteredEvents.map((ev, eIdx) => {
           const isExpanded = expandedEventId === ev.id;
           const styles = getCategoryStyles(ev.category, ev.auspiciousness);
-          const hasHoraTattvas = ev.type === "hora" && Array.isArray(ev.metadata?.tattvas);
-          
-          const startTimeStr = new Date(ev.startTimeMs).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-          const endTimeStr = ev.endTimeMs ? new Date(ev.endTimeMs).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : "";
+          const hasHoraTattvas =
+            ev.type === "hora" && ev.metadata?.tattvas && Array.isArray(ev.metadata.tattvas);
+
+          const startTimeStr = new Date(ev.startTimeMs).toLocaleTimeString([], {
+            hour: "numeric",
+            minute: "2-digit",
+          });
+          const endTimeStr = ev.endTimeMs
+            ? new Date(ev.endTimeMs).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+            : "";
 
           // Show the exact current time marker if we are scrolling past the current active moment
           const isFirstActive = ev.isCurrent && (eIdx === 0 || !filteredEvents[eIdx - 1].isCurrent);
@@ -587,7 +605,11 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
           return (
             <React.Fragment key={`${ev.id}-${ev.startTimeMs}`}>
               {isFirstActive && schedule.isToday && (
-                <div ref={nowMarkerRef} id="agenda-now-marker" className="flex items-center gap-3 py-2 my-2 select-none">
+                <div
+                  ref={nowMarkerRef}
+                  id="agenda-now-marker"
+                  className="flex items-center gap-3 py-2 my-2 select-none"
+                >
                   <div className="h-0.5 flex-1 bg-emerald-500/50 rounded-full" />
                   <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500 text-white shadow-sm animate-pulse flex items-center gap-2">
                     <Activity className="w-4 h-4" />
@@ -597,7 +619,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                 </div>
               )}
 
-              <div 
+              <div
                 className={`vedic-card rounded-xl border p-4 transition-all shadow-sm ${styles.borderAccent} ${
                   ev.isCurrent
                     ? "ring-2 ring-emerald-500 border-emerald-400 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-md"
@@ -609,10 +631,12 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                 {/* Top Row: Category Badge & Timing */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3 border-b border-stone-100 dark:border-slate-800 pb-3">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${styles.badge}`}>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${styles.badge}`}
+                    >
                       {styles.label}
                     </span>
-                    
+
                     {ev.isCurrent && (
                       <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-white animate-pulse">
                         {lang === "hi" ? "अभी चल रहा है" : "ACTIVE NOW"}
@@ -665,8 +689,20 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                       className="p-1.5 rounded-md text-stone-500 bg-stone-100 dark:bg-slate-800 hover:bg-stone-200 dark:hover:bg-slate-700 hover:text-stone-900 dark:hover:text-white transition-colors shrink-0 flex items-center gap-1 text-[11px] font-bold uppercase"
                       title={isExpanded ? "Less Details" : "More Details"}
                     >
-                      <span>{isExpanded ? (lang === "hi" ? "कम" : "LESS") : (lang === "hi" ? "विवरण" : "DETAILS")}</span>
-                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      <span>
+                        {isExpanded
+                          ? lang === "hi"
+                            ? "कम"
+                            : "LESS"
+                          : lang === "hi"
+                            ? "विवरण"
+                            : "DETAILS"}
+                      </span>
+                      {isExpanded ? (
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      )}
                     </button>
                   )}
                 </div>
@@ -678,11 +714,14 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                       <div className="space-y-2 bg-purple-50/50 dark:bg-purple-900/10 p-3 rounded-lg border border-purple-100 dark:border-purple-800/30">
                         <div className="text-[11px] font-bold uppercase tracking-wider text-purple-800 dark:text-purple-300 flex items-center gap-1.5">
                           <Layers className="w-4 h-4 text-purple-600" />
-                          {lang === "hi" ? "पंच-तत्त्व सूक्ष्म अनुक्रम (Pancha-Tattva Sequence)" : "Pancha-Tattva Micro-Sequence"}
+                          {lang === "hi"
+                            ? "पंच-तत्त्व सूक्ष्म अनुक्रम (Pancha-Tattva Sequence)"
+                            : "Pancha-Tattva Micro-Sequence"}
                         </div>
                         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2">
                           {(ev.metadata?.tattvas as TattvaPeriod[]).map((tp, idx) => {
-                            const isTattvaActive = schedule.isToday && nowMs >= tp.startTimeMs && nowMs < tp.endTimeMs;
+                            const isTattvaActive =
+                              schedule.isToday && nowMs >= tp.startTimeMs && nowMs < tp.endTimeMs;
                             return (
                               <div
                                 key={tp.sanskrit + idx}
@@ -692,7 +731,9 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                                     : "border-stone-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 text-stone-700 dark:text-slate-300 hover:border-purple-300"
                                 }`}
                               >
-                                <div className="text-xs font-bold truncate mb-0.5">{tp.sanskrit}</div>
+                                <div className="text-xs font-bold truncate mb-0.5">
+                                  {tp.sanskrit}
+                                </div>
                                 <div className="text-[10px] text-stone-500 dark:text-slate-400 truncate font-mono">
                                   {tp.startTime}–{tp.endTime}
                                 </div>
@@ -707,13 +748,19 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                       <div className="p-2.5 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800/30 text-xs text-stone-700 dark:text-slate-300 flex items-center flex-wrap gap-2">
                         <span className="flex items-center gap-1.5">
                           <Moon className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-                          <span className="uppercase text-[10px] font-bold text-sky-700 dark:text-sky-300">{lang === "hi" ? "तिथि:" : "Tithi:"}</span>
-                          <strong className="text-sky-900 dark:text-sky-100">{String(ev.metadata?.tithiName)}</strong>
+                          <span className="uppercase text-[10px] font-bold text-sky-700 dark:text-sky-300">
+                            {lang === "hi" ? "तिथि:" : "Tithi:"}
+                          </span>
+                          <strong className="text-sky-900 dark:text-sky-100">
+                            {String(ev.metadata?.tithiName)}
+                          </strong>
                         </span>
                         <span className="text-stone-300 dark:text-slate-600">|</span>
                         <span className="flex items-center gap-1.5">
                           <Wind className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                          <span className="uppercase text-[10px] font-bold text-emerald-700 dark:text-emerald-300">{lang === "hi" ? "नाड़ी:" : "Nadi:"}</span>
+                          <span className="uppercase text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                            {lang === "hi" ? "नाड़ी:" : "Nadi:"}
+                          </span>
                           <strong className="text-emerald-900 dark:text-emerald-100">
                             {String(ev.metadata?.nadiLabel || ev.metadata?.nadi)}
                           </strong>

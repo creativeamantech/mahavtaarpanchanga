@@ -37,6 +37,7 @@ export interface TranslationDictionary {
   solarDay: string;
   lunarNight: string;
   sunrise: string;
+  midday: string;
   sunset: string;
   moonrise: string;
   moonset: string;
@@ -168,6 +169,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     solarDay: "Sūrya (Solar Cycle)",
     lunarNight: "Candra (Lunar Cycle)",
     sunrise: "Sunrise (Sūryodaya)",
+    midday: "Midday (Madhyāhna)",
     sunset: "Sunset (Sūryāsta)",
     moonrise: "Moonrise (Candrodaya)",
     moonset: "Moonset (Candrāsta)",
@@ -298,6 +300,7 @@ export const translations: Record<Language, TranslationDictionary> = {
     solarDay: "सौर दिवस चक्र",
     lunarNight: "चन्द्र रात्रि चक्र",
     sunrise: "सूर्योदय",
+    midday: "मध्याह्न (Midday)",
     sunset: "सूर्यास्त",
     moonrise: "चन्द्रोदय",
     moonset: "चन्द्रास्त",
@@ -631,13 +634,13 @@ export const RTU_TRANSLATIONS: Record<string, { sa: string; hi: string; en: stri
 };
 
 export const AYANA_TRANSLATIONS: Record<string, { sa: string; hi: string; en: string }> = {
-  "Uttarāyaṇa": { sa: "उत्तरायणम्", hi: "उत्तरायण", en: "Uttarāyaṇa" },
-  "Dakṣiṇāyana": { sa: "दक्षिणायनम्", hi: "दक्षिणायन", en: "Dakṣiṇāyana" },
+  Uttarāyaṇa: { sa: "उत्तरायणम्", hi: "उत्तरायण", en: "Uttarāyaṇa" },
+  Dakṣiṇāyana: { sa: "दक्षिणायनम्", hi: "दक्षिणायन", en: "Dakṣiṇāyana" },
 };
 
 export const PAKSHA_TRANSLATIONS: Record<string, { sa: string; hi: string; en: string }> = {
-  "Śukla": { sa: "शुक्ल", hi: "शुक्ल", en: "Śukla" },
-  "Kṛṣṇa": { sa: "कृष्ण", hi: "कृष्ण", en: "Kṛṣṇa" },
+  Śukla: { sa: "शुक्ल", hi: "शुक्ल", en: "Śukla" },
+  Kṛṣṇa: { sa: "कृष्ण", hi: "कृष्ण", en: "Kṛṣṇa" },
 };
 
 // Translation helper functions

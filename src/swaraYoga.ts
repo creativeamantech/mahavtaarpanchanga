@@ -707,6 +707,30 @@ export function computeSwaraYoga(
     isActive: isSunriseActive,
   };
 
+
+  // 1.5. Midday Swara Window: Starts at Midday, runs for 1 hour (Same as Sunrise)
+  let daytimeMins = sunsetMins - sunriseMins;
+  if (daytimeMins < 0) daytimeMins += 1440;
+  const middayMins = (sunriseMins + daytimeMins / 2) % 1440;
+
+  const middayWindowStart = middayMins;
+  const middayWindowEnd = middayMins + 60;
+  const isMiddayActive =
+    currentMins !== null
+      ? isTimeInsideWindow(currentMins, middayWindowStart, middayWindowEnd)
+      : false;
+  const middayWindow = {
+    start: formatMinutesToTime(middayWindowStart),
+    end: formatMinutesToTime(middayWindowEnd),
+    windowFormatted: `${formatMinutesToTime(middayWindowStart)} – ${formatMinutesToTime(middayWindowEnd)}`,
+    ruleDescription: {
+      en: "Starts at Midday, runs for 1 hour (Same as Sunrise)",
+      hi: "मध्याह्न (दोपहर) से 1 घंटे तक प्रवहमान रहता है (सूर्योदय के समान)",
+      sa: "मध्याह्नात् आरभ्य १ होरापर्यन्तं प्रवहति (सूर्योदयसमानम्)",
+    },
+    isActive: isMiddayActive,
+  };
+
   // 2. Sunset Swara Window: Starts 1 hour before Sunset, runs until Sunset
   const sunsetWindowStart = sunsetMins - 60;
   const sunsetWindowEnd = sunsetMins;
@@ -772,6 +796,8 @@ export function computeSwaraYoga(
   let activeCelestialWindow: SwaraYogaData["activeCelestialWindow"] = null;
   if (isSunriseActive) {
     activeCelestialWindow = "sunrise";
+  } else if (isMiddayActive) {
+    activeCelestialWindow = "midday";
   } else if (isSunsetActive) {
     activeCelestialWindow = "sunset";
   } else if (isMoonriseActive) {
@@ -785,6 +811,9 @@ export function computeSwaraYoga(
 
   // Active celestial sandhya window takes precedence, otherwise Tithi's sunrise swara
   if (isSunriseActive) {
+    currentActiveSwara = rule.sunriseSwara;
+    activeNostril = rule.sunriseNostril;
+  } else if (isMiddayActive) {
     currentActiveSwara = rule.sunriseSwara;
     activeNostril = rule.sunriseNostril;
   } else if (isSunsetActive) {
@@ -811,6 +840,7 @@ export function computeSwaraYoga(
     moonriseNostril: rule.moonriseNostril,
     moonsetNostril: rule.moonsetNostril,
     sunriseWindow,
+    middayWindow,
     sunsetWindow,
     moonriseWindow,
     moonsetWindow,

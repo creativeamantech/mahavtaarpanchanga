@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Moon, Star, Compass, Sparkles, Sun, Wind } from "lucide-react";
+import { Moon, Star, Sun, Activity, PieChart, Clock, CircleDashed } from "lucide-react";
 import type { PanchangaResponse, Segment, AppTheme } from "../types";
-import { computeTithiSwaraEvents, isTithiSwaraEventActive } from "../lib/tithiSwaraEngine";
-import {
-  computeNakshatraSwaraEvents,
-  isNakshatraSwaraEventActive,
-} from "../lib/nakshatraSwaraEngine";
+import { computeTithiSwaraEvents } from "../lib/tithiSwaraEngine";
+import { computeNakshatraSwaraEvents } from "../lib/nakshatraSwaraEngine";
 import {
   type Language,
   translations,
@@ -15,12 +12,6 @@ import {
   getLocalizedKarana,
   getLocalizedVaara,
 } from "../i18n";
-import {
-  TITHI_ATTRIBUTES,
-  NAKSHATRA_ATTRIBUTES,
-  YOGA_ATTRIBUTES,
-  KARANA_ATTRIBUTES,
-} from "../vedicData";
 
 interface FiveAngasCardProps {
   data: PanchangaResponse;
@@ -28,506 +19,33 @@ interface FiveAngasCardProps {
   theme?: AppTheme;
 }
 
+const getActiveAndNext = (segments: Segment[], nowMs: number) => {
+  if (!segments || segments.length === 0) return { active: null, next: null };
+  let active = segments[0];
+  let next = segments.length > 1 ? segments[1] : null;
+
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i];
+    if (seg.endTimeMs && nowMs > seg.endTimeMs) {
+      continue;
+    }
+    active = seg;
+    next = segments.length > i + 1 ? segments[i + 1] : null;
+    break;
+  }
+  return { active, next };
+};
+
 export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme }) => {
   const isNight = theme === "nightSky";
   const t = translations[lang];
 
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
+
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 10000);
     return () => clearInterval(timer);
   }, []);
-
-  const primaryTithiNum = data.tithi[0]?.number || 1;
-  const tithiMod = ((primaryTithiNum - 1) % 15) + 1;
-  const tithiAttr = TITHI_ATTRIBUTES[primaryTithiNum === 30 ? 30 : tithiMod];
-
-  const primaryNakNum = data.nakshatra[0]?.number || 1;
-  const nakAttr = NAKSHATRA_ATTRIBUTES[primaryNakNum];
-
-  const primaryYogaNum = data.yoga[0]?.number || 1;
-  const yogaAttr = YOGA_ATTRIBUTES[primaryYogaNum];
-
-  const primaryKarNum = data.karana[0]?.number || 1;
-  const karMod = ((primaryKarNum - 1) % 11) + 1;
-  const karAttr = KARANA_ATTRIBUTES[karMod];
-
-  const renderSegment = (
-    segments: Segment[],
-    defaultName: string,
-    localizeFn?: (num: number, raw: string, lang: Language) => string,
-    isTithi: boolean = false,
-    isNakshatra: boolean = false,
-  ) => {
-    if (!segments || segments.length === 0) {
-      return (
-        <div
-          className={`text-base font-bold font-devanagari ${isNight ? "text-slate-100" : "text-stone-900"}`}
-        >
-          {defaultName}
-        </div>
-      );
-    }
-
-    const primary = segments[0];
-    const secondary = segments.length > 1 ? segments[1] : null;
-
-    const primaryLocalized =
-      localizeFn && primary.number != null
-        ? localizeFn(primary.number, primary.name, lang)
-        : primary.name;
-
-    const secondaryLocalized =
-      secondary && localizeFn && secondary.number != null
-        ? localizeFn(secondary.number, secondary.name, lang)
-        : secondary?.name;
-
-    const renderNakshatraSwaraEvents = (seg: Segment) => {
-      const swara =
-        seg.nakshatraSwara ||
-        computeNakshatraSwaraEvents(seg, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
-      if (!swara || (!swara.startEvent && !swara.endEvent)) return null;
-
-      const isStartActive = swara.startEvent
-        ? isNakshatraSwaraEventActive(swara.startEvent, nowMs)
-        : false;
-      const isEndActive = swara.endEvent
-        ? isNakshatraSwaraEventActive(swara.endEvent, nowMs)
-        : false;
-
-      return (
-        <div className="mt-2 pt-2 border-t border-dashed border-stone-200/90 dark:border-slate-800 space-y-1.5">
-          <div className="flex items-center justify-between text-[11px]">
-            <span
-              className={`flex items-center gap-1 font-bold ${
-                isNight ? "text-amber-300" : "text-amber-900"
-              }`}
-            >
-              <Wind className="w-3.5 h-3.5" />
-              <span>
-                {lang === "hi" ? "नक्षत्र स्वर (नाड़ी) कालखंड" : "Nakshatra Swara (Nadi) Windows"}
-              </span>
-            </span>
-            {swara.hasOverlap && (
-              <span
-                className={`text-[9px] px-1.5 py-0.5 rounded font-medium border ${
-                  isNight
-                    ? "bg-amber-950/60 text-amber-300 border-amber-700/60"
-                    : "bg-amber-100 text-amber-900 border-amber-300"
-                }`}
-              >
-                {lang === "hi" ? "संक्षिप्त नक्षत्र (<२ घं)" : "Short Nakshatra (<2h Overlap)"}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-            {/* Start Event */}
-            {swara.startEvent ? (
-              <div
-                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
-                  isStartActive
-                    ? isNight
-                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
-                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
-                    : isNight
-                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
-                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
-                    {lang === "hi" ? "आरंभ नाड़ी (१ घंटा)" : "Starting Nadi (1h)"}
-                  </span>
-                  {isStartActive && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
-                      Active Now
-                    </span>
-                  )}
-                </div>
-                <div
-                  className={`font-mono text-xs font-semibold ${
-                    isNight ? "text-slate-100" : "text-stone-900"
-                  }`}
-                >
-                  {swara.startEvent.formattedRange ||
-                    `${swara.startEvent.formattedStart} → ${swara.startEvent.formattedEnd}`}
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span
-                    className={`font-semibold ${
-                      swara.startEvent.nadi === "pingala"
-                        ? isNight
-                          ? "text-amber-300"
-                          : "text-amber-800"
-                        : isNight
-                          ? "text-cyan-300"
-                          : "text-sky-800"
-                    }`}
-                  >
-                    {swara.startEvent.nadiLabel}
-                  </span>
-                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-                    1 hour
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`rounded-lg p-2 text-[11px] border ${
-                  isNight
-                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
-                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
-                }`}
-              >
-                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
-                  {lang === "hi" ? "आरंभ नाड़ी" : "Starting Nadi"}
-                </div>
-                <div className="text-[10px] italic">Before search bracket</div>
-              </div>
-            )}
-
-            {/* End Event */}
-            {swara.endEvent ? (
-              <div
-                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
-                  isEndActive
-                    ? isNight
-                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
-                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
-                    : isNight
-                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
-                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
-                    {lang === "hi" ? "समापन नाड़ी (विपरीत)" : "Ending Nadi (Opposite)"}
-                  </span>
-                  {isEndActive && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
-                      Active Now
-                    </span>
-                  )}
-                </div>
-                <div
-                  className={`font-mono text-xs font-semibold ${
-                    isNight ? "text-slate-100" : "text-stone-900"
-                  }`}
-                >
-                  {swara.endEvent.formattedRange ||
-                    `${swara.endEvent.formattedStart} → ${swara.endEvent.formattedEnd}`}
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span
-                    className={`font-semibold ${
-                      swara.endEvent.nadi === "pingala"
-                        ? isNight
-                          ? "text-amber-300"
-                          : "text-amber-800"
-                        : isNight
-                          ? "text-cyan-300"
-                          : "text-sky-800"
-                    }`}
-                  >
-                    {swara.endEvent.nadiLabel}
-                  </span>
-                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-                    Final 1 hr
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`rounded-lg p-2 text-[11px] border ${
-                  isNight
-                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
-                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
-                }`}
-              >
-                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
-                  {lang === "hi" ? "समापन नाड़ी" : "Ending Nadi"}
-                </div>
-                <div className="text-[10px] italic">Past next sunrise</div>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    };
-
-    const renderTithiSwaraEvents = (seg: Segment) => {
-      const swara =
-        seg.tithiSwara ||
-        computeTithiSwaraEvents(seg, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
-      if (!swara || (!swara.startEvent && !swara.endEvent)) return null;
-
-      const isStartActive = swara.startEvent
-        ? isTithiSwaraEventActive(swara.startEvent, nowMs)
-        : false;
-      const isEndActive = swara.endEvent ? isTithiSwaraEventActive(swara.endEvent, nowMs) : false;
-
-      return (
-        <div className="mt-2 pt-2 border-t border-dashed border-stone-200/90 dark:border-slate-800 space-y-1.5">
-          <div className="flex items-center justify-between text-[11px]">
-            <span
-              className={`flex items-center gap-1 font-bold ${
-                isNight ? "text-amber-300" : "text-amber-900"
-              }`}
-            >
-              <Wind className="w-3.5 h-3.5" />
-              <span>{lang === "hi" ? "स्वर (नाड़ी) घटनाएं" : "Swara (Nadi) Events"}</span>
-            </span>
-            {swara.hasOverlap && (
-              <span
-                className={`text-[9px] px-1.5 py-0.5 rounded font-medium border ${
-                  isNight
-                    ? "bg-amber-950/60 text-amber-300 border-amber-700/60"
-                    : "bg-amber-100 text-amber-900 border-amber-300"
-                }`}
-              >
-                {lang === "hi" ? "संक्षिप्त तिथि (<२ घं)" : "Short Tithi (<2h Overlap)"}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-            {/* Start Event */}
-            {swara.startEvent ? (
-              <div
-                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
-                  isStartActive
-                    ? isNight
-                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
-                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
-                    : isNight
-                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
-                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
-                    {lang === "hi" ? "आरंभ स्वर" : "Start Event"}
-                  </span>
-                  {isStartActive && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
-                      Active Now
-                    </span>
-                  )}
-                </div>
-                <div
-                  className={`font-mono text-xs font-semibold ${
-                    isNight ? "text-slate-100" : "text-stone-900"
-                  }`}
-                >
-                  {swara.startEvent.formattedRange ||
-                    `${swara.startEvent.formattedStart} → ${swara.startEvent.formattedEnd}`}
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span
-                    className={`font-semibold ${
-                      swara.startEvent.nadi === "pingala"
-                        ? isNight
-                          ? "text-amber-300"
-                          : "text-amber-800"
-                        : isNight
-                          ? "text-cyan-300"
-                          : "text-sky-800"
-                    }`}
-                  >
-                    {swara.startEvent.nadiLabel}
-                  </span>
-                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-                    1 hour
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`rounded-lg p-2 text-[11px] border ${
-                  isNight
-                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
-                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
-                }`}
-              >
-                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
-                  {lang === "hi" ? "आरंभ स्वर" : "Start Event"}
-                </div>
-                <div className="text-[10px] italic">Before search bracket</div>
-              </div>
-            )}
-
-            {/* End Event */}
-            {swara.endEvent ? (
-              <div
-                className={`rounded-lg p-2 text-[11px] border flex flex-col justify-between gap-1 transition-all ${
-                  isEndActive
-                    ? isNight
-                      ? "bg-amber-950/70 border-amber-500 shadow-xs ring-1 ring-amber-400/50"
-                      : "bg-amber-50 border-amber-400 shadow-xs ring-1 ring-amber-400/50"
-                    : isNight
-                      ? "bg-slate-900/50 border-slate-800 text-slate-300"
-                      : "bg-stone-50/80 border-stone-200/70 text-stone-700"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[9px] uppercase tracking-wider text-stone-500 dark:text-slate-400">
-                    {lang === "hi" ? "अंतिम स्वर" : "End Event"}
-                  </span>
-                  {isEndActive && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[8px] font-extrabold uppercase rounded bg-amber-600 text-white animate-pulse">
-                      Active Now
-                    </span>
-                  )}
-                </div>
-                <div
-                  className={`font-mono text-xs font-semibold ${
-                    isNight ? "text-slate-100" : "text-stone-900"
-                  }`}
-                >
-                  {swara.endEvent.formattedRange ||
-                    `${swara.endEvent.formattedStart} → ${swara.endEvent.formattedEnd}`}
-                </div>
-                <div className="flex items-center justify-between text-[10px]">
-                  <span
-                    className={`font-semibold ${
-                      swara.endEvent.nadi === "pingala"
-                        ? isNight
-                          ? "text-amber-300"
-                          : "text-amber-800"
-                        : isNight
-                          ? "text-cyan-300"
-                          : "text-sky-800"
-                    }`}
-                  >
-                    {swara.endEvent.nadiLabel}
-                  </span>
-                  <span className={`text-[9px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-                    Final 1 hr
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`rounded-lg p-2 text-[11px] border ${
-                  isNight
-                    ? "bg-slate-900/40 border-slate-800 text-slate-500"
-                    : "bg-stone-50/60 border-stone-200/50 text-stone-400"
-                }`}
-              >
-                <div className="font-bold text-[9px] uppercase tracking-wider text-stone-400 dark:text-slate-500">
-                  {lang === "hi" ? "अंतिम स्वर" : "End Event"}
-                </div>
-                <div className="text-[10px] italic">Past next sunrise</div>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    };
-
-    return (
-      <div className="space-y-1.5">
-        <div className="flex flex-wrap items-baseline justify-between gap-1.5">
-          <span
-            className={`text-base sm:text-lg font-bold font-devanagari ${isNight ? "text-slate-100" : "text-stone-950"}`}
-          >
-            {primaryLocalized}
-          </span>
-          {primary.starts ? (
-            <div
-              className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-200" : "text-amber-900"}`}
-            >
-              <span>Starts: {primary.starts}</span>
-              <span>Ends: {primary.ends || "—"}</span>
-            </div>
-          ) : primary.ends ? (
-            <span
-              className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold border font-mono ${
-                isNight
-                  ? "bg-amber-950/70 text-amber-200 border-amber-700/60"
-                  : "bg-amber-100/90 text-amber-900 border-amber-300/80"
-              }`}
-            >
-              {t.endsAt} {primary.ends}
-            </span>
-          ) : (
-            <span className={`text-[11px] italic ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {t.throughoutDay}
-            </span>
-          )}
-        </div>
-
-        {/* Transliterated / Secondary English name if in Devanagari */}
-        {lang !== "en" && primary.name !== primaryLocalized && (
-          <div
-            className={`text-xs font-sans tracking-wide ${isNight ? "text-slate-400" : "text-stone-500"}`}
-          >
-            {primary.name}
-          </div>
-        )}
-
-        {/* Primary Tithi Swara Events */}
-        {isTithi && renderTithiSwaraEvents(primary)}
-
-        {/* Primary Nakshatra Swara Events */}
-        {isNakshatra && renderNakshatraSwaraEvents(primary)}
-
-        {secondary && (
-          <div
-            className={`mt-1 rounded-md p-2 text-xs border flex flex-col gap-0.5 ${
-              isNight
-                ? "bg-slate-900/60 text-slate-200 border-slate-700/60"
-                : "bg-amber-50/70 text-stone-700 border-amber-200/60"
-            }`}
-          >
-            <div
-              className={`flex items-center justify-between text-[11px] ${isNight ? "text-slate-400" : "text-stone-500"}`}
-            >
-              <span
-                className={`font-medium uppercase tracking-wider ${isNight ? "text-amber-300" : "text-amber-900"}`}
-              >
-                {t.followedBy}:
-              </span>
-              {secondary.starts ? (
-                <div
-                  className={`flex flex-col text-[10px] sm:text-[11px] font-mono text-right ${isNight ? "text-amber-300/80" : "text-amber-800"}`}
-                >
-                  <span>Starts: {secondary.starts}</span>
-                  <span>Ends: {secondary.ends || "—"}</span>
-                </div>
-              ) : secondary.ends ? (
-                <span
-                  className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-semibold border font-mono ${
-                    isNight
-                      ? "bg-amber-950/40 text-amber-300/80 border-amber-800/40"
-                      : "bg-amber-50/80 text-amber-800 border-amber-200/60"
-                  }`}
-                >
-                  {t.endsAt} {secondary.ends}
-                </span>
-              ) : (
-                <span className={`italic ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-                  ({t.throughoutDay})
-                </span>
-              )}
-            </div>
-            <div
-              className={`font-semibold font-devanagari ${isNight ? "text-slate-100" : "text-stone-900"}`}
-            >
-              {secondaryLocalized}
-            </div>
-
-            {/* Secondary Tithi Swara Events */}
-            {isTithi && renderTithiSwaraEvents(secondary)}
-
-            {/* Secondary Nakshatra Swara Events */}
-            {isNakshatra && renderNakshatraSwaraEvents(secondary)}
-          </div>
-        )}
-      </div>
-    );
-  };
 
   const getVaaraDetails = (vaara: string) => {
     switch (vaara) {
@@ -567,382 +85,422 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
           metal: lang === "hi" ? "लोहा • नीलम" : "Iron • Blue Sapphire",
         };
       default:
-        return { deity: "Solar Weekday", metal: "—" };
+        return null;
     }
   };
 
-  const localizedVaara = getLocalizedVaara(data.vaara, lang);
-  const vaaraInfo = getVaaraDetails(data.vaara);
+  const VaaraRow = () => {
+    const localizedVaara = getLocalizedVaara(data.vaara, lang);
+    const details = getVaaraDetails(data.vaara);
+
+    return (
+      <div
+        className={`p-3 sm:p-4 rounded-xl border transition-all ${isNight ? "bg-slate-900/40 border-slate-700/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]" : "bg-white border-stone-200/80 shadow-xs"} flex flex-col gap-2`}
+      >
+        <div className="flex items-center gap-2 mb-1 border-b pb-2 border-stone-200/60 dark:border-slate-800">
+          <div
+            className={`p-1.5 rounded-lg ${isNight ? "bg-amber-900/30 text-amber-400" : "bg-amber-100/60 text-amber-600"}`}
+          >
+            <Sun className="w-4 h-4" />
+          </div>
+          <h3
+            className={`font-bold uppercase tracking-wider text-xs ${isNight ? "text-slate-300" : "text-stone-500"}`}
+          >
+            {lang === "hi" ? "१. वार (दिन)" : "1. Vaara (Day)"}
+          </h3>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="flex h-1.5 w-1.5 relative shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              <span
+                className={`text-[10px] uppercase font-bold tracking-wider ${isNight ? "text-emerald-400" : "text-emerald-700"}`}
+              >
+                {lang === "hi" ? "आज का वार" : "Today"}
+              </span>
+            </div>
+            <span
+              className={`text-lg sm:text-xl font-bold font-devanagari mt-0.5 ${isNight ? "text-white" : "text-stone-900"}`}
+            >
+              {localizedVaara}
+            </span>
+          </div>
+
+          {details && (
+            <div
+              className={`text-xs flex flex-col sm:items-end ${isNight ? "text-slate-300" : "text-stone-600"}`}
+            >
+              <div className={`font-bold ${isNight ? "text-amber-200" : "text-amber-700"}`}>
+                {details.deity}
+              </div>
+              <div className="opacity-80 mt-0.5">{details.metal}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderNadiCycle = (swaraInfo: any, labelPrefix: string = "") => {
+    if (!swaraInfo || (!swaraInfo.startEvent && !swaraInfo.endEvent)) return null;
+    return (
+      <div
+        className={`mt-2 p-2.5 rounded-lg border flex flex-col gap-2 ${isNight ? "bg-slate-900/50 border-slate-700/60" : "bg-stone-50 border-stone-200/60"}`}
+      >
+        <div className="flex items-center justify-between text-[10px] uppercase font-bold text-stone-500 dark:text-slate-400">
+          <span>
+            {labelPrefix ? `${labelPrefix} ` : ""}
+            {lang === "hi" ? "नाड़ी चक्र (Nadi Cycle)" : "Nadi Cycle"}
+          </span>
+          {swaraInfo.hasOverlap && (
+            <span className="text-amber-600 dark:text-amber-400">
+              {lang === "hi" ? "संक्षिप्त (<2h)" : "Short (<2h)"}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-col sm:flex-row gap-2">
+          {/* Start Nadi */}
+          {swaraInfo.startEvent &&
+            (() => {
+              const isNadiActive =
+                nowMs >= swaraInfo.startEvent.startTimeMs &&
+                nowMs <= swaraInfo.startEvent.endTimeMs;
+              return (
+                <div
+                  className={`flex-1 p-2 rounded-md border flex items-center justify-between transition-colors ${
+                    isNadiActive
+                      ? "ring-1 ring-amber-400 bg-amber-50 border-amber-300 dark:bg-amber-950/30 dark:border-amber-700/50 shadow-sm"
+                      : isNight
+                        ? "bg-slate-800/50 border-slate-700/50"
+                        : "bg-white border-stone-200"
+                  }`}
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-bold text-stone-500 dark:text-slate-400 uppercase">
+                        {lang === "hi" ? "आरंभ नाड़ी" : "Start Nadi"}
+                      </span>
+                      {isNadiActive && (
+                        <span className="inline-block w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                      )}
+                    </div>
+                    <span
+                      className={`text-[11px] font-bold ${
+                        swaraInfo.startEvent.nadi === "pingala"
+                          ? "text-amber-600 dark:text-amber-400"
+                          : swaraInfo.startEvent.nadi === "ida"
+                            ? "text-sky-600 dark:text-cyan-400"
+                            : "text-purple-600 dark:text-purple-400"
+                      }`}
+                    >
+                      {swaraInfo.startEvent.nadiLabel}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-[10px] font-mono font-medium text-stone-600 dark:text-slate-300">
+                      {swaraInfo.startEvent.formattedStart}
+                    </span>
+                    <span className="text-[9px] text-stone-400 dark:text-slate-500">1 hr</span>
+                  </div>
+                </div>
+              );
+            })()}
+
+          {/* End Nadi */}
+          {swaraInfo.endEvent &&
+            (() => {
+              const isNadiActive =
+                nowMs >= swaraInfo.endEvent.startTimeMs && nowMs <= swaraInfo.endEvent.endTimeMs;
+              return (
+                <div
+                  className={`flex-1 p-2 rounded-md border flex items-center justify-between transition-colors ${
+                    isNadiActive
+                      ? "ring-1 ring-amber-400 bg-amber-50 border-amber-300 dark:bg-amber-950/30 dark:border-amber-700/50 shadow-sm"
+                      : isNight
+                        ? "bg-slate-800/50 border-slate-700/50"
+                        : "bg-white border-stone-200"
+                  }`}
+                >
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] font-bold text-stone-500 dark:text-slate-400 uppercase">
+                        {lang === "hi" ? "समापन नाड़ी" : "End Nadi"}
+                      </span>
+                      {isNadiActive && (
+                        <span className="inline-block w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                      )}
+                    </div>
+                    <span
+                      className={`text-[11px] font-bold ${
+                        swaraInfo.endEvent.nadi === "pingala"
+                          ? "text-amber-600 dark:text-amber-400"
+                          : swaraInfo.endEvent.nadi === "ida"
+                            ? "text-sky-600 dark:text-cyan-400"
+                            : "text-purple-600 dark:text-purple-400"
+                      }`}
+                    >
+                      {swaraInfo.endEvent.nadiLabel}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-[10px] font-mono font-medium text-stone-600 dark:text-slate-300">
+                      {swaraInfo.endEvent.formattedStart}
+                    </span>
+                    <span className="text-[9px] text-stone-400 dark:text-slate-500">Final 1h</span>
+                  </div>
+                </div>
+              );
+            })()}
+        </div>
+      </div>
+    );
+  };
+  const AngaRow = ({
+    index,
+    title,
+    icon: Icon,
+    segments,
+    localizeFn,
+    color,
+    angaType,
+  }: {
+    index: number;
+    title: string;
+    icon: React.ElementType;
+    segments?: Segment[];
+    localizeFn?: (num: number, raw: string, l: Language) => string;
+    color: "indigo" | "rose" | "purple" | "cyan";
+    angaType?: "tithi" | "nakshatra";
+  }) => {
+    if (!segments || segments.length === 0) return null;
+
+    const { active, next } = getActiveAndNext(segments, nowMs);
+    if (!active) return null;
+
+    const activeName =
+      localizeFn && active.number != null
+        ? localizeFn(active.number, active.name, lang)
+        : active.name;
+
+    const nextName =
+      next && localizeFn && next.number != null
+        ? localizeFn(next.number, next.name, lang)
+        : next?.name;
+
+    const colorVariants = {
+      indigo: {
+        bg: isNight ? "bg-indigo-900/30" : "bg-indigo-100/60",
+        text: isNight ? "text-indigo-400" : "text-indigo-600",
+        accent: isNight ? "text-indigo-200" : "text-indigo-700",
+      },
+      rose: {
+        bg: isNight ? "bg-rose-900/30" : "bg-rose-100/60",
+        text: isNight ? "text-rose-400" : "text-rose-600",
+        accent: isNight ? "text-rose-200" : "text-rose-700",
+      },
+      purple: {
+        bg: isNight ? "bg-purple-900/30" : "bg-purple-100/60",
+        text: isNight ? "text-purple-400" : "text-purple-600",
+        accent: isNight ? "text-purple-200" : "text-purple-700",
+      },
+      cyan: {
+        bg: isNight ? "bg-cyan-900/30" : "bg-cyan-100/60",
+        text: isNight ? "text-cyan-400" : "text-cyan-600",
+        accent: isNight ? "text-cyan-200" : "text-cyan-700",
+      },
+    };
+
+    const colors = colorVariants[color];
+
+    let swara = null;
+    let nextSwara = null;
+    if (angaType === "tithi") {
+      swara =
+        active.tithiSwara ||
+        computeTithiSwaraEvents(active, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
+      if (next) {
+        nextSwara =
+          next.tithiSwara ||
+          computeTithiSwaraEvents(next, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
+      }
+    } else if (angaType === "nakshatra") {
+      swara =
+        active.nakshatraSwara ||
+        computeNakshatraSwaraEvents(active, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
+      if (next) {
+        nextSwara =
+          next.nakshatraSwara ||
+          computeNakshatraSwaraEvents(next, data.timezone, nowMs, lang === "hi" ? "hi" : "en");
+      }
+    }
+
+    return (
+      <div
+        className={`p-3 sm:p-4 rounded-xl border transition-all ${isNight ? "bg-slate-900/40 border-slate-700/50 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]" : "bg-white border-stone-200/80 shadow-xs"} flex flex-col gap-2`}
+      >
+        <div className="flex items-center gap-2 mb-1 border-b pb-2 border-stone-200/60 dark:border-slate-800">
+          <div className={`p-1.5 rounded-lg ${colors.bg} ${colors.text}`}>
+            <Icon className="w-4 h-4" />
+          </div>
+          <h3
+            className={`font-bold uppercase tracking-wider text-xs ${isNight ? "text-slate-300" : "text-stone-500"}`}
+          >
+            {index}. {title}
+          </h3>
+        </div>
+
+        {/* Active Segment */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="flex h-1.5 w-1.5 relative shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              <span
+                className={`text-[10px] uppercase font-bold tracking-wider ${isNight ? "text-emerald-400" : "text-emerald-700"}`}
+              >
+                {lang === "hi" ? "अभी चल रहा है" : "Active Now"}
+              </span>
+            </div>
+            <span
+              className={`text-lg sm:text-xl font-bold font-devanagari mt-0.5 ${isNight ? "text-white" : "text-stone-900"}`}
+            >
+              {activeName}
+            </span>
+            {lang !== "en" && active.name !== activeName && (
+              <span className={`text-[11px] ${isNight ? "text-slate-400" : "text-stone-500"}`}>
+                {active.name}
+              </span>
+            )}
+          </div>
+
+          {/* Timing */}
+          <div
+            className={`text-xs font-mono font-medium flex flex-col sm:items-end ${isNight ? "text-slate-300" : "text-stone-600"}`}
+          >
+            {active.starts && (
+              <div>
+                {lang === "hi" ? "प्रारंभ:" : "Starts:"} {active.starts}
+              </div>
+            )}
+            {active.ends && (
+              <div>
+                {lang === "hi" ? "समापन:" : "Ends:"} {active.ends}
+              </div>
+            )}
+            {!active.starts && !active.ends && <div className="italic">{t.throughoutDay}</div>}
+          </div>
+        </div>
+
+        {/* Nadi Info */}
+        {renderNadiCycle(swara)}
+        {/* Next Segment */}
+        {next && (
+          <div
+            className={`mt-1.5 pt-2 border-t border-dashed ${isNight ? "border-slate-800" : "border-stone-200"} flex flex-col gap-2`}
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-start sm:items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-stone-400 shrink-0 mt-0.5 sm:mt-0" />
+                <div className="flex flex-col">
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-wider ${isNight ? "text-slate-400" : "text-stone-500"}`}
+                  >
+                    {lang === "hi" ? "आने वाला (Next)" : "Upcoming (Next)"}
+                  </span>
+                  <span className={`text-sm font-bold font-devanagari ${colors.accent}`}>
+                    {nextName}
+                  </span>
+                </div>
+              </div>
+
+              <div
+                className={`text-[11px] font-mono font-medium flex flex-col sm:items-end ${isNight ? "text-slate-400" : "text-stone-500"}`}
+              >
+                {next.starts && (
+                  <div>
+                    {lang === "hi" ? "प्रारंभ:" : "Starts:"} {next.starts}
+                  </div>
+                )}
+                {next.ends && (
+                  <div>
+                    {lang === "hi" ? "समापन:" : "Ends:"} {next.ends}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {nextSwara && renderNadiCycle(nextSwara, lang === "hi" ? "आगामी" : "Upcoming")}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div
-      id="five-angas-card"
-      className={`glass-card rounded-[1.5rem] p-6 sm:p-8 transition-colors ${
-        isNight
-          ? "border-indigo-800/50 bg-[#0e1424]/90 text-slate-100"
-          : "border border-amber-300/50 bg-gradient-to-b from-amber-50/40 via-white/50 to-orange-50/30"
-      }`}
+      className={`rounded-2xl border shadow-sm overflow-hidden ${isNight ? "bg-[#1A1F36] border-indigo-900/40" : "bg-stone-50/50 border-stone-200"}`}
     >
-      {/* Header */}
       <div
-        className={`flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-3.5 gap-2 ${
-          isNight ? "border-indigo-800/40" : "border-amber-200/70"
-        }`}
+        className={`p-4 border-b ${isNight ? "border-indigo-900/40 bg-[#121629]" : "border-stone-200 bg-white"}`}
       >
-        <div className="flex items-center space-x-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-600 text-white shadow-xs font-serif-vedic text-base font-bold">
-            ॐ
-          </div>
-          <div>
-            <h2
-              className={`text-lg font-bold font-serif-vedic tracking-tight ${
-                isNight ? "text-amber-200" : "text-stone-900"
-              }`}
-            >
-              {t.limbsTitle}
-            </h2>
-            <p className={`text-xs font-sans ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-              {t.limbsSubtitle}
-            </p>
-          </div>
-        </div>
-        <div
-          className={`text-xs font-mono px-3 py-1 rounded-full border self-start sm:self-auto ${
-            isNight
-              ? "bg-indigo-950/80 text-indigo-300 border-indigo-700/50"
-              : "text-amber-900/80 bg-amber-100/60 border-amber-300/60"
-          }`}
+        <h2
+          className={`text-lg font-black uppercase tracking-wider ${isNight ? "text-amber-200" : "text-amber-900"} flex items-center gap-2`}
         >
-          JD: {data.sunrise_jd?.toFixed(4)}
-        </div>
+          <div className={`p-1.5 rounded-lg ${isNight ? "bg-amber-900/40" : "bg-amber-100"}`}>
+            <Star className="w-4 h-4" />
+          </div>
+          {lang === "hi" ? "पंचांग के ५ अंग" : "The 5 Angas (Limbs)"}
+        </h2>
+        <p className={`text-xs mt-1 font-medium ${isNight ? "text-slate-400" : "text-stone-500"}`}>
+          {lang === "hi"
+            ? "वार, तिथि, नक्षत्र, योग और करण का वर्तमान एवं आगामी विवरण।"
+            : "Current and upcoming states for Vaara, Tithi, Nakshatra, Yoga, and Karana."}
+        </p>
       </div>
 
-      {/* Five Limbs Grid */}
-      <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 sm:gap-5">
-        {/* 1. Tithi */}
-        <div
-          id="anga-tithi"
-          className={`rounded-xl border p-4 shadow-xs transition-all flex flex-col justify-between ${
-            isNight
-              ? "border-indigo-800/40 bg-[#12182b] text-slate-100 hover:border-indigo-600"
-              : "border-stone-200/90 bg-white hover:border-amber-400 hover:shadow-sm"
-          }`}
-        >
-          <div>
-            <div
-              className={`flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2 ${
-                isNight ? "text-amber-300" : "text-amber-800"
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                    isNight ? "bg-amber-950/80 text-amber-300" : "bg-amber-100 text-amber-900"
-                  }`}
-                >
-                  १
-                </span>
-                <Moon className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`} />
-                <span>{t.tithi}</span>
-              </span>
-              {tithiAttr && (
-                <span
-                  className={`rounded px-1.5 py-0.5 text-[10px] font-bold font-serif-vedic ${
-                    isNight ? "bg-slate-800 text-amber-300" : "bg-stone-100 text-amber-950"
-                  }`}
-                >
-                  {tithiAttr.category[lang]}
-                </span>
-              )}
-            </div>
-            {renderSegment(
-              data.tithi,
-              "Śukla Pratipat",
-              (num, raw, l) => getLocalizedTithi(num, l),
-              true,
-            )}
-          </div>
-
-          <div
-            className={`mt-3 border-t pt-2 text-[11px] space-y-1 ${
-              isNight ? "border-slate-800 text-slate-400" : "border-stone-100 text-stone-500"
-            }`}
-          >
-            {tithiAttr && (
-              <div
-                className={`font-medium truncate ${isNight ? "text-amber-300" : "text-amber-900"}`}
-              >
-                <span className={isNight ? "text-slate-500" : "text-stone-400"}>Deity:</span>{" "}
-                {tithiAttr.deity[lang]}
-              </div>
-            )}
-            <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "hi"
-                ? "सूर्य व चन्द्रमा के बीच १२° अंतर"
-                : "12° lunar-solar elongation span"}
-            </div>
-          </div>
-        </div>
-
-        {/* 2. Nakshatra */}
-        <div
-          id="anga-nakshatra"
-          className={`rounded-xl border p-4 shadow-xs transition-all flex flex-col justify-between ${
-            isNight
-              ? "border-indigo-800/40 bg-[#12182b] text-slate-100 hover:border-indigo-600"
-              : "border-stone-200/90 bg-white hover:border-amber-400 hover:shadow-sm"
-          }`}
-        >
-          <div>
-            <div
-              className={`flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2 ${
-                isNight ? "text-amber-300" : "text-amber-800"
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                    isNight ? "bg-amber-950/80 text-amber-300" : "bg-amber-100 text-amber-900"
-                  }`}
-                >
-                  २
-                </span>
-                <Star className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`} />
-                <span>{t.nakshatra}</span>
-              </span>
-              {nakAttr && (
-                <span
-                  className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                    isNight ? "bg-slate-800 text-slate-300" : "bg-stone-100 text-stone-700"
-                  }`}
-                >
-                  {nakAttr.gana[lang]}
-                </span>
-              )}
-            </div>
-            {renderSegment(
-              data.nakshatra,
-              "Aśvinī",
-              (num, raw, l) => getLocalizedNakshatra(num, raw, l),
-              false,
-              true,
-            )}
-          </div>
-
-          <div
-            className={`mt-3 border-t pt-2 text-[11px] space-y-1 ${
-              isNight ? "border-slate-800 text-slate-400" : "border-stone-100 text-stone-500"
-            }`}
-          >
-            {nakAttr && (
-              <div
-                className={`font-medium truncate ${isNight ? "text-amber-300" : "text-amber-900"}`}
-              >
-                <span className={isNight ? "text-slate-500" : "text-stone-400"}>Lord:</span>{" "}
-                {nakAttr.lord[lang]} • {nakAttr.symbol}
-              </div>
-            )}
-            <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "hi" ? "चन्द्रमा का १३°२०' नक्षत्र भोग" : "13°20' sidereal lunar asterism"}
-            </div>
-          </div>
-        </div>
-
-        {/* 3. Yoga */}
-        <div
-          id="anga-yoga"
-          className={`rounded-xl border p-4 shadow-xs transition-all flex flex-col justify-between ${
-            isNight
-              ? "border-indigo-800/40 bg-[#12182b] text-slate-100 hover:border-indigo-600"
-              : "border-stone-200/90 bg-white hover:border-amber-400 hover:shadow-sm"
-          }`}
-        >
-          <div>
-            <div
-              className={`flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2 ${
-                isNight ? "text-amber-300" : "text-amber-800"
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                    isNight ? "bg-amber-950/80 text-amber-300" : "bg-amber-100 text-amber-900"
-                  }`}
-                >
-                  ३
-                </span>
-                <Compass
-                  className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`}
-                />
-                <span>{t.yoga}</span>
-              </span>
-              {yogaAttr && (
-                <span
-                  className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                    yogaAttr.nature === "auspicious"
-                      ? isNight
-                        ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800/60"
-                        : "bg-emerald-100 text-emerald-900"
-                      : isNight
-                        ? "bg-rose-950/80 text-rose-300 border border-rose-800/60"
-                        : "bg-rose-100 text-rose-900"
-                  }`}
-                >
-                  {yogaAttr.nature === "auspicious"
-                    ? lang === "hi"
-                      ? "शुभ"
-                      : "Auspicious"
-                    : lang === "hi"
-                      ? "अशुभ"
-                      : "Inauspicious"}
-                </span>
-              )}
-            </div>
-            {renderSegment(data.yoga, "Viṣkambha", (num, raw, l) => getLocalizedYoga(num, raw, l))}
-          </div>
-
-          <div
-            className={`mt-3 border-t pt-2 text-[11px] space-y-1 ${
-              isNight ? "border-slate-800 text-slate-400" : "border-stone-100 text-stone-500"
-            }`}
-          >
-            {yogaAttr && (
-              <div
-                className={`font-medium truncate ${isNight ? "text-amber-200" : "text-amber-950"}`}
-              >
-                {yogaAttr.meaning[lang]}
-              </div>
-            )}
-            <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "hi" ? "सूर्य व चन्द्र भोगांशों का योग" : "Sum of Sun & Moon longitudes"}
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Karana */}
-        <div
-          id="anga-karana"
-          className={`rounded-xl border p-4 shadow-xs transition-all flex flex-col justify-between ${
-            isNight
-              ? "border-indigo-800/40 bg-[#12182b] text-slate-100 hover:border-indigo-600"
-              : "border-stone-200/90 bg-white hover:border-amber-400 hover:shadow-sm"
-          }`}
-        >
-          <div>
-            <div
-              className={`flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2 ${
-                isNight ? "text-amber-300" : "text-amber-800"
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span
-                  className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                    isNight ? "bg-amber-950/80 text-amber-300" : "bg-amber-100 text-amber-900"
-                  }`}
-                >
-                  ४
-                </span>
-                <Sparkles
-                  className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`}
-                />
-                <span>{t.karana}</span>
-              </span>
-              {karAttr && (
-                <span
-                  className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                    isNight ? "bg-slate-800 text-slate-300" : "bg-stone-100 text-stone-700"
-                  }`}
-                >
-                  {karAttr.type === "chara"
-                    ? lang === "hi"
-                      ? "चर"
-                      : "Movable"
-                    : lang === "hi"
-                      ? "स्थिर"
-                      : "Fixed"}
-                </span>
-              )}
-            </div>
-            {renderSegment(data.karana, "Bava", (num, raw, l) => getLocalizedKarana(num, raw, l))}
-          </div>
-
-          <div
-            className={`mt-3 border-t pt-2 text-[11px] space-y-1 ${
-              isNight ? "border-slate-800 text-slate-400" : "border-stone-100 text-stone-500"
-            }`}
-          >
-            {karAttr && (
-              <div
-                className={`font-medium truncate ${isNight ? "text-amber-300" : "text-amber-900"}`}
-              >
-                <span className={isNight ? "text-slate-500" : "text-stone-400"}>Deity:</span>{" "}
-                {karAttr.deity[lang]}
-              </div>
-            )}
-            <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "hi" ? "तिथि का आधा भाग (६° अंतर)" : "Half of a Tithi (6° elongation)"}
-            </div>
-          </div>
-        </div>
-
-        {/* 5. Vaara */}
-        <div
-          id="anga-vaara"
-          className={`rounded-xl border p-4 shadow-xs transition-all flex flex-col justify-between ${
-            isNight
-              ? "border-indigo-800/40 bg-[#12182b] text-slate-100 hover:border-indigo-600"
-              : "border-stone-200/90 bg-white hover:border-amber-400 hover:shadow-sm"
-          }`}
-        >
-          <div>
-            <div
-              className={`flex items-center space-x-2 text-xs font-bold uppercase tracking-wider mb-2 ${
-                isNight ? "text-amber-300" : "text-amber-800"
-              }`}
-            >
-              <span
-                className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold ${
-                  isNight ? "bg-amber-950/80 text-amber-300" : "bg-amber-100 text-amber-900"
-                }`}
-              >
-                ५
-              </span>
-              <Sun className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`} />
-              <span>{t.vaara}</span>
-            </div>
-            <div className="space-y-1">
-              <div
-                className={`text-base sm:text-lg font-bold font-devanagari ${isNight ? "text-slate-100" : "text-stone-950"}`}
-              >
-                {localizedVaara}
-              </div>
-              {lang !== "en" && (
-                <div className={`text-xs ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-                  {data.vaara}
-                </div>
-              )}
-              <div
-                className={`text-xs font-semibold pt-0.5 ${isNight ? "text-amber-300" : "text-amber-900"}`}
-              >
-                {vaaraInfo.deity}
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={`mt-3 border-t pt-2 text-[11px] space-y-1 ${
-              isNight ? "border-slate-800 text-slate-400" : "border-stone-100 text-stone-500"
-            }`}
-          >
-            <div className={`text-[11px] ${isNight ? "text-amber-200" : "text-amber-950"}`}>
-              <span className={isNight ? "text-slate-500" : "text-stone-400"}>Attr:</span>{" "}
-              {vaaraInfo.metal}
-            </div>
-            <div className={`text-[10px] ${isNight ? "text-slate-400" : "text-stone-400"}`}>
-              {lang === "hi" ? "सूर्योदय से अगले सूर्योदय तक" : "From local sunrise to sunrise"}
-            </div>
-          </div>
-        </div>
+      <div className="p-3 sm:p-4 flex flex-col gap-3">
+        <VaaraRow />
+        <AngaRow
+          index={2}
+          title={lang === "hi" ? "तिथि (Lunar Day)" : "Tithi (Lunar Day)"}
+          icon={Moon}
+          segments={data.tithi}
+          localizeFn={(num, raw, l) => getLocalizedTithi(num, l)}
+          color="indigo"
+          angaType="tithi"
+        />
+        <AngaRow
+          index={3}
+          title={lang === "hi" ? "नक्षत्र (Lunar Mansion)" : "Nakshatra (Lunar Mansion)"}
+          icon={Star}
+          segments={data.nakshatra}
+          localizeFn={(num, raw, l) => getLocalizedNakshatra(num, raw, l)}
+          color="rose"
+          angaType="nakshatra"
+        />
+        <AngaRow
+          index={4}
+          title={lang === "hi" ? "योग (Luni-Solar Day)" : "Yoga (Luni-Solar Day)"}
+          icon={Activity}
+          segments={data.yoga}
+          localizeFn={(num, raw, l) => getLocalizedYoga(num, raw, l)}
+          color="cyan"
+        />
+        <AngaRow
+          index={5}
+          title={lang === "hi" ? "करण (Half Lunar Day)" : "Karana (Half Lunar Day)"}
+          icon={CircleDashed}
+          segments={data.karana}
+          localizeFn={(num, raw, l) => getLocalizedKarana(num, raw, l)}
+          color="purple"
+        />
       </div>
     </div>
   );

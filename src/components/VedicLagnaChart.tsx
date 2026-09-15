@@ -20,21 +20,55 @@ const houseCenters = {
 };
 
 const signNamesEn = ["Ar", "Ta", "Ge", "Ca", "Le", "Vi", "Li", "Sc", "Sa", "Cp", "Aq", "Pi"];
-const signNamesHi = ["मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"];
+const signNamesHi = [
+  "मेष",
+  "वृष",
+  "मिथुन",
+  "कर्क",
+  "सिंह",
+  "कन्या",
+  "तुला",
+  "वृश्चिक",
+  "धनु",
+  "मकर",
+  "कुंभ",
+  "मीन",
+];
 
 const planetAbbreviationsEn: Record<string, string> = {
-  Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me",
-  Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke",
+  Sun: "Su",
+  Moon: "Mo",
+  Mars: "Ma",
+  Mercury: "Me",
+  Jupiter: "Ju",
+  Venus: "Ve",
+  Saturn: "Sa",
+  Rahu: "Ra",
+  Ketu: "Ke",
 };
 
 const planetAbbreviationsHi: Record<string, string> = {
-  Sun: "सू", Moon: "चं", Mars: "मं", Mercury: "बु",
-  Jupiter: "गु", Venus: "शु", Saturn: "श", Rahu: "रा", Ketu: "के",
+  Sun: "सू",
+  Moon: "चं",
+  Mars: "मं",
+  Mercury: "बु",
+  Jupiter: "गु",
+  Venus: "शु",
+  Saturn: "श",
+  Rahu: "रा",
+  Ketu: "के",
 };
 
 const planetNamesHi: Record<string, string> = {
-  Sun: "सूर्य", Moon: "चन्द्र", Mars: "मंगल", Mercury: "बुध",
-  Jupiter: "गुरु", Venus: "शुक्र", Saturn: "शनि", Rahu: "राहु", Ketu: "केतु",
+  Sun: "सूर्य",
+  Moon: "चन्द्र",
+  Mars: "मंगल",
+  Mercury: "बुध",
+  Jupiter: "गुरु",
+  Venus: "शुक्र",
+  Saturn: "शनि",
+  Rahu: "राहु",
+  Ketu: "केतु",
 };
 
 export function VedicLagnaChart({ chart, lang = "en" }: { chart: BirthChart; lang?: Language }) {
@@ -155,32 +189,42 @@ export function VedicLagnaChart({ chart, lang = "en" }: { chart: BirthChart; lan
 
       <Card className="w-full md:w-1/3 shadow-sm bg-muted/20">
         <CardHeader>
-          <CardTitle className="text-md">{lang === "hi" ? "चयन विवरण" : "Selection Details"}</CardTitle>
+          <CardTitle className="text-md">
+            {lang === "hi" ? "चयन विवरण" : "Selection Details"}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {!selectedPlanet && !selectedLagna ? (
             <p className="text-sm text-muted-foreground">
-              {lang === "hi" 
-                ? "सटीक खगोलीय विवरण देखने के लिए चार्ट में किसी भी ग्रह या लग्न (Asc) पर टैप करें।" 
+              {lang === "hi"
+                ? "सटीक खगोलीय विवरण देखने के लिए चार्ट में किसी भी ग्रह या लग्न (Asc) पर टैप करें।"
                 : "Tap any planet or the Ascendant (Asc) in the chart to view precise astronomical details."}
             </p>
           ) : selectedLagna ? (
             <div className="space-y-3">
-              <h3 className="font-bold text-lg text-primary">{lang === "hi" ? "लग्न" : "Lagna (Ascendant)"}</h3>
+              <h3 className="font-bold text-lg text-primary">
+                {lang === "hi" ? "लग्न" : "Lagna (Ascendant)"}
+              </h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <span className="text-muted-foreground">{lang === "hi" ? "राशि:" : "Rāśi (Sign):"}</span>
+                <span className="text-muted-foreground">
+                  {lang === "hi" ? "राशि:" : "Rāśi (Sign):"}
+                </span>
                 <span className="font-medium">{signNames[chart.lagna.signIndex]}</span>
-                
+
                 <span className="text-muted-foreground">{lang === "hi" ? "अंश:" : "Degree:"}</span>
                 <span className="font-medium">{chart.lagna.degreeInSign.toFixed(4)}°</span>
-                
-                <span className="text-muted-foreground">{lang === "hi" ? "नक्षत्र:" : "Nakshatra:"}</span>
+
+                <span className="text-muted-foreground">
+                  {lang === "hi" ? "नक्षत्र:" : "Nakshatra:"}
+                </span>
                 <span className="font-medium">{chart.lagna.nakshatra}</span>
-                
+
                 <span className="text-muted-foreground">{lang === "hi" ? "चरण:" : "Pada:"}</span>
                 <span className="font-medium">{chart.lagna.pada}</span>
-                
-                <span className="text-muted-foreground">{lang === "hi" ? "स्पष्ट अंश:" : "Absolute Lon:"}</span>
+
+                <span className="text-muted-foreground">
+                  {lang === "hi" ? "स्पष्ट अंश:" : "Absolute Lon:"}
+                </span>
                 <span className="font-medium">{chart.lagna.longitude.toFixed(4)}°</span>
               </div>
             </div>
@@ -188,7 +232,9 @@ export function VedicLagnaChart({ chart, lang = "en" }: { chart: BirthChart; lan
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-lg text-primary">
-                  {lang === "hi" ? (planetNamesHi[selectedPlanet.id] || selectedPlanet.id) : selectedPlanet.id}
+                  {lang === "hi"
+                    ? planetNamesHi[selectedPlanet.id] || selectedPlanet.id
+                    : selectedPlanet.id}
                 </h3>
                 {selectedPlanet.retrograde && (
                   <Badge variant="outline" className="text-xs">
@@ -202,19 +248,25 @@ export function VedicLagnaChart({ chart, lang = "en" }: { chart: BirthChart; lan
                   {chart.houses.find((h) => h.signIndex === selectedPlanet.signIndex)?.houseIndex}
                 </span>
 
-                <span className="text-muted-foreground">{lang === "hi" ? "राशि:" : "Rāśi (Sign):"}</span>
+                <span className="text-muted-foreground">
+                  {lang === "hi" ? "राशि:" : "Rāśi (Sign):"}
+                </span>
                 <span className="font-medium">{signNames[selectedPlanet.signIndex]}</span>
 
                 <span className="text-muted-foreground">{lang === "hi" ? "अंश:" : "Degree:"}</span>
                 <span className="font-medium">{selectedPlanet.degreeInSign.toFixed(4)}°</span>
 
-                <span className="text-muted-foreground">{lang === "hi" ? "नक्षत्र:" : "Nakshatra:"}</span>
+                <span className="text-muted-foreground">
+                  {lang === "hi" ? "नक्षत्र:" : "Nakshatra:"}
+                </span>
                 <span className="font-medium">{selectedPlanet.nakshatra}</span>
 
                 <span className="text-muted-foreground">{lang === "hi" ? "चरण:" : "Pada:"}</span>
                 <span className="font-medium">{selectedPlanet.pada}</span>
 
-                <span className="text-muted-foreground">{lang === "hi" ? "स्पष्ट अंश:" : "Absolute Lon:"}</span>
+                <span className="text-muted-foreground">
+                  {lang === "hi" ? "स्पष्ट अंश:" : "Absolute Lon:"}
+                </span>
                 <span className="font-medium">{selectedPlanet.longitude.toFixed(4)}°</span>
               </div>
             </div>

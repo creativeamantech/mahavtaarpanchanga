@@ -11,7 +11,7 @@ import { FiveAngasCard } from "./components/FiveAngasCard";
 import { AuspiciousTimingsCard } from "./components/AuspiciousTimingsCard";
 import { GauriChoghadiyaCard } from "./components/GauriChoghadiyaCard";
 import { SwaraYogaCard } from "./components/SwaraYogaCard";
-import { ActiveCosmicForcesWidget } from "./components/ActiveCosmicForcesWidget";
+import { RunningNowWidget } from "./components/RunningNowWidget";
 import { PlanetaryPositionsCard } from "./components/PlanetaryPositionsCard";
 import { PlanetTransitionsCard } from "./components/PlanetTransitionsCard";
 import { MonthlyCalendarView } from "./components/MonthlyCalendarView";
@@ -656,6 +656,11 @@ export default function App() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+                      <div className="lg:col-span-12 space-y-10">
+                        <section>
+                          <RunningNowWidget data={panchangaData} lang={lang} theme={theme} />
+                        </section>
+                      </div>
                       <div className="lg:col-span-8 space-y-10">
                         <section>
                           <PanchangaSummaryCard data={panchangaData} lang={lang} theme={theme} />
@@ -672,13 +677,6 @@ export default function App() {
                       </div>
 
                       <div className="lg:col-span-4 space-y-10">
-                        <section>
-                          <ActiveCosmicForcesWidget
-                            data={panchangaData}
-                            lang={lang}
-                            theme={theme}
-                          />
-                        </section>
                         <section>
                           <div className="flex items-center gap-2.5 mb-4 px-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></span>

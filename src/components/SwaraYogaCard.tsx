@@ -255,7 +255,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
           {/* 1. Sunrise Swara */}
           <div
             className={`rounded-2xl border p-4 shadow-2xs flex flex-col justify-between transition-all ${
-              swaraData.sunriseWindow?.isActive ? "ring-2 ring-emerald-500 shadow-md " : ""
+              swaraData.sunriseWindow?.isActive || swaraData.middayWindow?.isActive ? "ring-2 ring-emerald-500 shadow-md " : ""
             }${
               swaraData.sunriseSwara === "ida"
                 ? "border-sky-300 bg-sky-50/50"
@@ -269,10 +269,10 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     className={`h-4 w-4 ${swaraData.sunriseSwara === "ida" ? "text-sky-600" : "text-orange-600"}`}
                   />
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-700">
-                    {lang === "hi" ? "सूर्योदय स्वर" : "Sunrise Swara"}
+                    {lang === "hi" ? "सूर्योदय व मध्याह्न स्वर" : "Sunrise & Midday Swara"}
                   </span>
                 </div>
-                {swaraData.sunriseWindow?.isActive ? (
+                {swaraData.sunriseWindow?.isActive || swaraData.middayWindow?.isActive ? (
                   <span className="inline-flex items-center space-x-1 rounded-full bg-emerald-600 text-white px-2 py-0.5 text-[10px] font-bold animate-pulse">
                     <span>●</span>
                     <span>{lang === "hi" ? "अभी सक्रिय" : "Active Now"}</span>
@@ -310,13 +310,23 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                 </div>
               </div>
 
-              {/* Exact 1-Hour Time Window Badge */}
-              <div className="mt-2.5 rounded-lg bg-white/70 border border-stone-200/60 p-1.5 text-center">
-                <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
-                  {lang === "hi" ? "काल (सूर्योदय से 1 घंटा)" : "Window (1 hr from sunrise)"}
+              {/* Exact 1-Hour Time Window Badges */}
+              <div className="mt-2.5 flex flex-col gap-1.5">
+                <div className={`rounded-lg bg-white/70 border border-stone-200/60 p-1 text-center flex flex-col sm:flex-row sm:justify-between items-center px-2 ${swaraData.sunriseWindow?.isActive ? 'ring-1 ring-emerald-500 bg-emerald-50/50' : ''}`}>
+                  <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
+                    {lang === "hi" ? "सूर्योदय काल" : "Sunrise Window"}
+                  </div>
+                  <div className="font-mono text-[11px] font-bold text-stone-900 mt-0.5 sm:mt-0">
+                    {swaraData.sunriseWindow?.windowFormatted}
+                  </div>
                 </div>
-                <div className="font-mono text-xs font-bold text-stone-900 mt-0.5">
-                  {swaraData.sunriseWindow?.windowFormatted}
+                <div className={`rounded-lg bg-white/70 border border-stone-200/60 p-1 text-center flex flex-col sm:flex-row sm:justify-between items-center px-2 ${swaraData.middayWindow?.isActive ? 'ring-1 ring-emerald-500 bg-emerald-50/50' : ''}`}>
+                  <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
+                    {lang === "hi" ? "मध्याह्न काल" : "Midday Window"}
+                  </div>
+                  <div className="font-mono text-[11px] font-bold text-stone-900 mt-0.5 sm:mt-0">
+                    {swaraData.middayWindow?.windowFormatted}
+                  </div>
                 </div>
               </div>
             </div>
@@ -575,25 +585,31 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                 <span>
                   {swaraData.activeCelestialWindow === "sunrise" &&
                     (lang === "hi"
-                      ? "वर्तमान में सूर्योदय स्वर काल सक्रिय है (सूर्योदय से 1 घंटे तक)"
-                      : "Active Now: Sunrise Swara Window (1 hr from sunrise)")}
+                      ? `वर्तमान में सूर्योदय स्वर काल सक्रिय है — ${swaraData.sunriseSwara === "ida" ? "इड़ा" : "पिङ्गला"} नाड़ी`
+                      : `Active Now: Sunrise Swara Window — ${swaraData.sunriseSwara === "ida" ? "Ida" : "Pingala"} Nadi`)}
+                  {swaraData.activeCelestialWindow === "midday" &&
+                    (lang === "hi"
+                      ? `वर्तमान में मध्याह्न (दोपहर) स्वर काल सक्रिय है — ${swaraData.sunriseSwara === "ida" ? "इड़ा" : "पिङ्गला"} नाड़ी`
+                      : `Active Now: Midday Swara Window — ${swaraData.sunriseSwara === "ida" ? "Ida" : "Pingala"} Nadi`)}
                   {swaraData.activeCelestialWindow === "sunset" &&
                     (lang === "hi"
-                      ? "वर्तमान में सूर्यास्त स्वर काल सक्रिय है (सूर्यास्त से 1 घंटा पहले)"
-                      : "Active Now: Sunset Swara Window (1 hr before sunset)")}
+                      ? `वर्तमान में सूर्यास्त स्वर काल सक्रिय है — ${swaraData.sunsetSwara === "ida" ? "इड़ा" : "पिङ्गला"} नाड़ी`
+                      : `Active Now: Sunset Swara Window — ${swaraData.sunsetSwara === "ida" ? "Ida" : "Pingala"} Nadi`)}
                   {swaraData.activeCelestialWindow === "moonrise" &&
                     (lang === "hi"
-                      ? "वर्तमान में चन्द्रोदय स्वर काल सक्रिय है (चन्द्रोदय से 1 घंटे तक)"
-                      : "Active Now: Moonrise Swara Window (1 hr from moonrise)")}
+                      ? `वर्तमान में चन्द्रोदय स्वर काल सक्रिय है — ${swaraData.moonriseSwara === "ida" ? "इड़ा" : "पिङ्गला"} नाड़ी`
+                      : `Active Now: Moonrise Swara Window — ${swaraData.moonriseSwara === "ida" ? "Ida" : "Pingala"} Nadi`)}
                   {swaraData.activeCelestialWindow === "moonset" &&
                     (lang === "hi"
-                      ? "वर्तमान में चन्द्रास्त स्वर काल सक्रिय है (चन्द्रास्त से 1 घंटा पहले)"
-                      : "Active Now: Moonset Swara Window (1 hr before moonset)")}
+                      ? `वर्तमान में चन्द्रास्त स्वर काल सक्रिय है — ${swaraData.moonsetSwara === "ida" ? "इड़ा" : "पिङ्गला"} नाड़ी`
+                      : `Active Now: Moonset Swara Window — ${swaraData.moonsetSwara === "ida" ? "Ida" : "Pingala"} Nadi`)}
                 </span>
               </div>
               <span className="font-mono font-bold text-emerald-950 bg-white/90 px-2.5 py-0.5 rounded-lg border border-emerald-300 text-center">
                 {swaraData.activeCelestialWindow === "sunrise" &&
                   swaraData.sunriseWindow?.windowFormatted}
+                {swaraData.activeCelestialWindow === "midday" &&
+                  swaraData.middayWindow?.windowFormatted}
                 {swaraData.activeCelestialWindow === "sunset" &&
                   swaraData.sunsetWindow?.windowFormatted}
                 {swaraData.activeCelestialWindow === "moonrise" &&
@@ -753,9 +769,9 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     <th className="py-2.5 px-3">Tithis</th>
                     <th className="py-2.5 px-3">Pakshya</th>
                     <th className="py-2.5 px-3">
-                      <div>Sunrise Swara</div>
+                      <div>Sunrise & Midday</div>
                       <div className="text-[10px] font-normal lowercase text-stone-500">
-                        1 hr from sunrise
+                        1 hr from sunrise/midday
                       </div>
                     </th>
                     <th className="py-2.5 px-3">
@@ -884,8 +900,8 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                         </td>
                         <td className="py-2.5 px-3 text-stone-500 text-[11px]">
                           {sunriseIsIda
-                            ? "Somya / Cooling Lunar Nectar at Dawn"
-                            : "Agni / Heating Solar Fire at Dawn"}
+                            ? "Somya / Cooling Lunar Nectar at Dawn & Midday"
+                            : "Agni / Heating Solar Fire at Dawn & Midday"}
                         </td>
                       </tr>
                     );

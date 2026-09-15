@@ -272,10 +272,11 @@ export interface SwaraYogaData {
   moonriseNostril: "Left" | "Right";
   moonsetNostril: "Left" | "Right";
   sunriseWindow?: SwaraTimingWindow;
+  middayWindow?: SwaraTimingWindow;
   sunsetWindow?: SwaraTimingWindow;
   moonriseWindow?: SwaraTimingWindow | null;
   moonsetWindow?: SwaraTimingWindow | null;
-  activeCelestialWindow?: "sunrise" | "sunset" | "moonrise" | "moonset" | null;
+  activeCelestialWindow?: "sunrise" | "midday" | "sunset" | "moonrise" | "moonset" | null;
   currentActiveSwara?: SwaraNadi;
   activeNostril?: "Left" | "Right" | "Both";
 }

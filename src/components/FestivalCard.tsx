@@ -290,7 +290,8 @@ export const FestivalCard: React.FC<FestivalCardProps> = ({ data, lang, theme })
         <div className="hidden md:flex items-center space-x-2 text-xs text-amber-900 font-semibold bg-amber-50/50 px-3 py-1.5 rounded-full border border-amber-200/80 shadow-sm">
           <Sparkles className="h-3.5 w-3.5 text-amber-600" />
           <span>
-            {getLocalizedMasa(data.masa, lang)} • {getLocalizedPaksha(data.paksha || "", lang)} {lang === "hi" ? "पक्ष" : "Pakṣa"}
+            {getLocalizedMasa(data.masa, lang)} • {getLocalizedPaksha(data.paksha || "", lang)}{" "}
+            {lang === "hi" ? "पक्ष" : "Pakṣa"}
           </span>
         </div>
       </div>

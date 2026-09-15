@@ -133,7 +133,9 @@ export function VedicHorasView({
                     {lang === "hi" ? "सक्रिय ग्रह (होरा)" : "Active Planet (Hora)"}
                   </div>
                   <div className="text-3xl font-black tracking-tight">
-                    {lang === "hi" ? rulerMapHi[activeHora.ruler] || activeHora.ruler : activeHora.ruler}
+                    {lang === "hi"
+                      ? rulerMapHi[activeHora.ruler] || activeHora.ruler
+                      : activeHora.ruler}
                   </div>
                 </div>
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-800 border border-indigo-700/50 shadow-inner">
@@ -162,10 +164,16 @@ export function VedicHorasView({
                     }`}
                   >
                     {activeHora.nadi === "ida"
-                      ? (lang === "hi" ? "इड़ा (चन्द्र नाड़ी)" : "Ida (Lunar Nadi)")
+                      ? lang === "hi"
+                        ? "इड़ा (चन्द्र नाड़ी)"
+                        : "Ida (Lunar Nadi)"
                       : activeHora.nadi === "pingala"
-                        ? (lang === "hi" ? "पिंगला (सूर्य नाड़ी)" : "Pingala (Solar Nadi)")
-                        : (lang === "hi" ? "सुषुम्ना" : "Sushumna")}
+                        ? lang === "hi"
+                          ? "पिंगला (सूर्य नाड़ी)"
+                          : "Pingala (Solar Nadi)"
+                        : lang === "hi"
+                          ? "सुषुम्ना"
+                          : "Sushumna"}
                   </span>
                 </div>
               </div>
@@ -176,7 +184,8 @@ export function VedicHorasView({
                 <span
                   className={`px-4 py-1.5 rounded-full text-sm font-bold border ${getTattvaColor(activeTattva.name)}`}
                 >
-                  {lang === "hi" ? "तत्त्व: " : "Tattva: "} {activeTattva.sanskrit} ({lang === "hi" ? getTattvaNameHi(activeTattva.name) : activeTattva.name})
+                  {lang === "hi" ? "तत्त्व: " : "Tattva: "} {activeTattva.sanskrit} (
+                  {lang === "hi" ? getTattvaNameHi(activeTattva.name) : activeTattva.name})
                 </span>
               </div>
             </div>
@@ -187,7 +196,8 @@ export function VedicHorasView({
                 <div className="flex justify-between text-xs font-bold text-stone-500 mb-1 uppercase tracking-wider">
                   <span>{lang === "hi" ? "होरा प्रगति" : "Hora Progress"}</span>
                   <span>
-                    {formatMins(now - activeHora.startTimeMs)} / {formatMins(activeHora.durationMs)} {lang === "hi" ? "मिनट" : "mins"}
+                    {formatMins(now - activeHora.startTimeMs)} / {formatMins(activeHora.durationMs)}{" "}
+                    {lang === "hi" ? "मिनट" : "mins"}
                   </span>
                 </div>
                 <div className="h-3 w-full bg-stone-100 rounded-full overflow-hidden relative border border-stone-200">
@@ -204,7 +214,8 @@ export function VedicHorasView({
                 <div className="flex justify-between text-xs font-bold text-stone-500 mb-1 uppercase tracking-wider">
                   <span>{lang === "hi" ? "तत्त्व प्रगति" : "Tattva Progress"}</span>
                   <span>
-                    {formatMins(now - activeTattva.startTimeMs)} / {formatMins(activeTattva.durationMs)} {lang === "hi" ? "मिनट" : "mins"}
+                    {formatMins(now - activeTattva.startTimeMs)} /{" "}
+                    {formatMins(activeTattva.durationMs)} {lang === "hi" ? "मिनट" : "mins"}
                   </span>
                 </div>
                 <div className="h-3 w-full bg-stone-100 rounded-full overflow-hidden relative border border-stone-200">
@@ -229,7 +240,9 @@ export function VedicHorasView({
           </div>
         ) : (
           <div className="p-8 text-center text-stone-500">
-            {lang === "hi" ? "सक्रिय होरा केवल वर्तमान दिन के लिए दिखाई जाती है।" : "Active Hora is only shown for the current day."}
+            {lang === "hi"
+              ? "सक्रिय होरा केवल वर्तमान दिन के लिए दिखाई जाती है।"
+              : "Active Hora is only shown for the current day."}
           </div>
         )}
       </div>
@@ -241,7 +254,9 @@ export function VedicHorasView({
             {lang === "hi" ? "दैनिक सारणी: २४ वैदिक होरा" : "Daily Schedule: 24 Vedic Horas"}
           </h2>
           <span className="text-xs text-stone-500 font-medium">
-            {lang === "hi" ? "ग्रह स्वामी एवं स्वर नाड़ी" : "Planetary Rulers & Matched Swara Nadis"}
+            {lang === "hi"
+              ? "ग्रह स्वामी एवं स्वर नाड़ी"
+              : "Planetary Rulers & Matched Swara Nadis"}
           </span>
         </div>
         <div className="space-y-2.5">
@@ -292,10 +307,16 @@ export function VedicHorasView({
                       className={`hidden sm:inline-flex px-2.5 py-1 rounded-full text-xs font-bold border ${hora.nadi === "ida" ? "bg-sky-50 text-sky-700 border-sky-200" : hora.nadi === "pingala" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-purple-50 text-purple-700 border-purple-200"}`}
                     >
                       {hora.nadi === "ida"
-                        ? (lang === "hi" ? "इड़ा 🔵 (चन्द्र)" : "Ida 🔵 (Lunar)")
+                        ? lang === "hi"
+                          ? "इड़ा 🔵 (चन्द्र)"
+                          : "Ida 🔵 (Lunar)"
                         : hora.nadi === "pingala"
-                          ? (lang === "hi" ? "पिंगला 🔴 (सूर्य)" : "Pingala 🔴 (Solar)")
-                          : (lang === "hi" ? "सुषुम्ना" : "Sushumna")}
+                          ? lang === "hi"
+                            ? "पिंगला 🔴 (सूर्य)"
+                            : "Pingala 🔴 (Solar)"
+                          : lang === "hi"
+                            ? "सुषुम्ना"
+                            : "Sushumna"}
                     </span>
                     {isExpanded ? (
                       <ChevronUp className="h-5 w-5 text-stone-400" />
@@ -308,7 +329,9 @@ export function VedicHorasView({
                 {isExpanded && (
                   <div className="border-t border-stone-100 bg-stone-50/50 p-4 animate-in slide-in-from-top-2">
                     <div className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-3">
-                      {lang === "hi" ? "पंच तत्त्व सूक्ष्म अवधि" : "Pancha Tattva (5 Elements) Micro-Periods"}
+                      {lang === "hi"
+                        ? "पंच तत्त्व सूक्ष्म अवधि"
+                        : "Pancha Tattva (5 Elements) Micro-Periods"}
                     </div>
                     <div className="space-y-2">
                       {hora.tattvas.map((tattva, tIdx) => {
@@ -323,7 +346,8 @@ export function VedicHorasView({
                               <span
                                 className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getTattvaColor(tattva.name)}`}
                               >
-                                {tattva.sanskrit} ({lang === "hi" ? getTattvaNameHi(tattva.name) : tattva.name})
+                                {tattva.sanskrit} (
+                                {lang === "hi" ? getTattvaNameHi(tattva.name) : tattva.name})
                               </span>
                               {isTattvaActive && (
                                 <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -349,11 +373,17 @@ export function VedicHorasView({
 
 function getTattvaNameHi(name: string) {
   switch (name) {
-    case "Prithvi": return "पृथ्वी";
-    case "Jala": return "जल";
-    case "Agni": return "अग्नि";
-    case "Vayu": return "वायु";
-    case "Akasha": return "आकाश";
-    default: return name;
+    case "Prithvi":
+      return "पृथ्वी";
+    case "Jala":
+      return "जल";
+    case "Agni":
+      return "अग्नि";
+    case "Vayu":
+      return "वायु";
+    case "Akasha":
+      return "आकाश";
+    default:
+      return name;
   }
 }

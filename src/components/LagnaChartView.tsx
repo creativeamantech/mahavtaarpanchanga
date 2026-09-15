@@ -73,9 +73,13 @@ export function LagnaChartView({ lang = "en" }: { lang?: Language }) {
     <div className="space-y-6 animate-in fade-in duration-500">
       <Card className="shadow-sm border-border/50">
         <CardHeader className="pb-3">
-          <CardTitle>{lang === "hi" ? "जन्म विवरण (जन्म कुण्डली)" : "Birth Details (Janma Kundali)"}</CardTitle>
+          <CardTitle>
+            {lang === "hi" ? "जन्म विवरण (जन्म कुण्डली)" : "Birth Details (Janma Kundali)"}
+          </CardTitle>
           <CardDescription>
-            {lang === "hi" ? "कुण्डली गणना के लिए सटीक विवरण दर्ज करें।" : "Enter exact birth details to calculate the D1 Lagna Chart."}
+            {lang === "hi"
+              ? "कुण्डली गणना के लिए सटीक विवरण दर्ज करें।"
+              : "Enter exact birth details to calculate the D1 Lagna Chart."}
           </CardDescription>
         </CardHeader>
         <CardContent>

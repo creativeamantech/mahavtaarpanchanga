@@ -241,32 +241,48 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
             </div>
           </div>
 
-          <div className="mt-3 space-y-2">
-            <div className="flex items-baseline justify-between">
-              <span
-                className={`text-xs font-medium ${isNight ? "text-slate-400" : "text-stone-600"}`}
-              >
-                {t.sunrise}
-              </span>
-              <span
-                id="sunrise-val"
-                className={`text-base font-bold font-mono ${isNight ? "text-amber-200" : "text-stone-900"}`}
-              >
-                {data.sunrise}
-              </span>
+          
+          <div className="mt-3 space-y-3">
+            <div className="flex flex-col">
+              <div className="flex items-baseline justify-between">
+                <span className={`text-xs font-medium ${isNight ? "text-slate-400" : "text-stone-600"}`}>
+                  {t.sunrise}
+                </span>
+                <span id="sunrise-val" className={`text-base font-bold font-mono ${isNight ? "text-amber-200" : "text-stone-900"}`}>
+                  {data.sunrise}
+                </span>
+              </div>
+              <div className={`text-[10px] text-right ${swara.sunriseWindow?.isActive ? 'text-emerald-600 font-bold' : isNight ? 'text-slate-500' : 'text-stone-400'}`}>
+                {swara.sunriseSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी (वाम)" : "Ida Nadi (Left)") : (lang === "hi" ? "पिङ्गला नाड़ी (दक्षिण)" : "Pingala Nadi (Right)")}
+              </div>
             </div>
-            <div className="flex items-baseline justify-between">
-              <span
-                className={`text-xs font-medium ${isNight ? "text-slate-400" : "text-stone-600"}`}
-              >
-                {t.sunset}
-              </span>
-              <span
-                id="sunset-val"
-                className={`text-base font-bold font-mono ${isNight ? "text-amber-200" : "text-stone-900"}`}
-              >
-                {data.sunset}
-              </span>
+
+            <div className="flex flex-col">
+              <div className="flex items-baseline justify-between">
+                <span className={`text-xs font-medium ${isNight ? "text-slate-400" : "text-stone-600"}`}>
+                  {t.midday}
+                </span>
+                <span className={`text-base font-bold font-mono ${isNight ? "text-amber-200" : "text-stone-900"}`}>
+                  {swara.middayWindow?.start || "—"}
+                </span>
+              </div>
+              <div className={`text-[10px] text-right ${swara.middayWindow?.isActive ? 'text-emerald-600 font-bold' : isNight ? 'text-slate-500' : 'text-stone-400'}`}>
+                {swara.sunriseSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी (वाम) - 1 घंटा" : "Ida Nadi (Left) - 1 hr") : (lang === "hi" ? "पिङ्गला नाड़ी (दक्षिण) - 1 घंटा" : "Pingala Nadi (Right) - 1 hr")}
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              <div className="flex items-baseline justify-between">
+                <span className={`text-xs font-medium ${isNight ? "text-slate-400" : "text-stone-600"}`}>
+                  {t.sunset}
+                </span>
+                <span id="sunset-val" className={`text-base font-bold font-mono ${isNight ? "text-amber-200" : "text-stone-900"}`}>
+                  {data.sunset}
+                </span>
+              </div>
+              <div className={`text-[10px] text-right ${swara.sunsetWindow?.isActive ? 'text-emerald-600 font-bold' : isNight ? 'text-slate-500' : 'text-stone-400'}`}>
+                {swara.sunsetSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी (वाम)" : "Ida Nadi (Left)") : (lang === "hi" ? "पिङ्गला नाड़ी (दक्षिण)" : "Pingala Nadi (Right)")}
+              </div>
             </div>
           </div>
 
@@ -391,6 +407,7 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
             </div>
           </div>
 
+          
           <div className="mt-3 space-y-2">
             <div className="flex items-baseline justify-between">
               <span
@@ -400,9 +417,9 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
               </span>
               <span
                 id="moonrise-val"
-                className={`text-base font-bold font-mono ${isNight ? "text-indigo-200" : "text-stone-900"}`}
+                className={`text-base font-bold font-mono ${isNight ? "text-amber-200" : "text-stone-900"}`}
               >
-                {data.moonrise || "—"}
+                {data.moonrise}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
@@ -413,9 +430,9 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
               </span>
               <span
                 id="moonset-val"
-                className={`text-base font-bold font-mono ${isNight ? "text-indigo-200" : "text-stone-900"}`}
+                className={`text-base font-bold font-mono ${isNight ? "text-amber-200" : "text-stone-900"}`}
               >
-                {data.moonset || "—"}
+                {data.moonset}
               </span>
             </div>
           </div>

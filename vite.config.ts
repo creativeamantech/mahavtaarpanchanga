@@ -17,7 +17,7 @@ export default defineConfig({
     plugins: [
       VitePWA({
         registerType: "autoUpdate",
-        includeAssets: ["favicon.png", "apple-touch-icon.png"],
+        includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon.svg"],
         manifest: {
           id: "/",
           name: "Mahavtaar Panchanga",

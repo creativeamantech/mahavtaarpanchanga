@@ -21,6 +21,7 @@ export type ActiveView =
   | "timings"
   | "planets"
   | "swara"
+  | "navtara"
   | "horas"
   | "calendar"
   | "lagna"

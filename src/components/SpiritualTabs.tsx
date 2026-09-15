@@ -56,6 +56,12 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
       subLabel: "स्वरोदय",
     },
     {
+      id: "navtara",
+      label: lang === "hi" ? "नव तारा" : "Navtara",
+      icon: "⭐",
+      subLabel: "नव तारा",
+    },
+    {
       id: "horas",
       label: lang === "hi" ? "वैदिक होरा" : "Horas",
       icon: "🕐",

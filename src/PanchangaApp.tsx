@@ -19,6 +19,7 @@ import { LocationModal } from "./components/LocationModal";
 import { SettingsModal } from "./components/SettingsModal";
 import { PrintablePanchanga } from "./components/PrintablePanchanga";
 import { VedicHorasView } from "./components/VedicHorasView";
+import { NavtaraView } from "./components/NavtaraView";
 import { LagnaChartView } from "./components/LagnaChartView";
 import { TodayScheduleView } from "./components/TodayScheduleView";
 import { FestivalsView } from "./components/FestivalsView";
@@ -43,6 +44,7 @@ import {
   Check,
   Sparkles,
   Compass,
+  Star,
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
 import {
@@ -524,6 +526,14 @@ export default function App() {
             onClick={() => setActiveView("swara")}
             theme={theme}
           />
+          
+          <NavItem
+            icon={Star}
+            label={lang === "hi" ? "नव तारा चक्र" : "Navtara Chakra"}
+            isActive={activeView === "navtara"}
+            onClick={() => setActiveView("navtara")}
+            theme={theme}
+          />
           <NavItem
             icon={Clock}
             label={lang === "hi" ? "वैदिक होरा" : "Vedic Horas"}
@@ -861,6 +871,15 @@ export default function App() {
                 )}
 
                 {/* View: Vedic Horas */}
+                {activeView === "navtara" && (
+                  <div
+                    id="view-navtara-dedicated"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
+                  >
+                    <NavtaraView data={panchangaData} lang={lang} theme={theme} />
+                  </div>
+                )}
+
                 {activeView === "horas" && (
                   <div
                     id="view-vedic-horas"

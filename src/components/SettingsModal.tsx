@@ -482,13 +482,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         type="button"
                         onClick={() => {
                           setNotifPrefs({ ...notifPrefs, customTune: tune.id as any });
-                          // Preview the sound if not default
-                          if (tune.id !== "default") {
-                            try {
-                              const audio = new Audio(`/${tune.id}.mp3`);
-                              audio.play().catch(e => console.log("Preview blocked", e));
-                            } catch (e) {}
-                          }
+                          // Preview the selected tone
+                          playNotificationTune(tune.id);
                         }}
                         className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                           (notifPrefs.customTune || "default") === tune.id

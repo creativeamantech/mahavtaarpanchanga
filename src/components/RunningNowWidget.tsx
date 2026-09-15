@@ -91,24 +91,27 @@ export const RunningNowWidget: React.FC<RunningNowWidgetProps> = ({
   // Check Muhurtas
   const activeMuhurtas: { name: string; type: "auspicious" | "inauspicious" }[] = [];
   
-  if (data.rahu_kala && nowMs >= data.rahu_kala.startTimeMs && nowMs <= data.rahu_kala.endTimeMs) {
+  const inWindow = (w?: { startTimeMs?: number; endTimeMs?: number }) =>
+    !!w && w.startTimeMs != null && w.endTimeMs != null && nowMs >= w.startTimeMs && nowMs <= w.endTimeMs;
+
+  if (inWindow(data.rahu_kala)) {
     activeMuhurtas.push({ name: lang === "hi" ? "राहु काल" : "Rahu Kala", type: "inauspicious" });
   }
-  if (data.yamaganda && nowMs >= data.yamaganda.startTimeMs && nowMs <= data.yamaganda.endTimeMs) {
+  if (inWindow(data.yamaganda)) {
     activeMuhurtas.push({ name: lang === "hi" ? "यमगण्ड" : "Yamaganda", type: "inauspicious" });
   }
-  if (data.gulika_kala && nowMs >= data.gulika_kala.startTimeMs && nowMs <= data.gulika_kala.endTimeMs) {
+  if (inWindow(data.gulika_kala)) {
     activeMuhurtas.push({ name: lang === "hi" ? "गुलिका काल" : "Gulika Kala", type: "inauspicious" });
   }
-  if (data.abhijit_muhurta && nowMs >= data.abhijit_muhurta.startTimeMs && nowMs <= data.abhijit_muhurta.endTimeMs) {
+  if (inWindow(data.abhijit_muhurta)) {
     activeMuhurtas.push({ name: lang === "hi" ? "अभिजित मुहूर्त" : "Abhijit Muhurta", type: "auspicious" });
   }
-  if (data.brahma_muhurta && nowMs >= data.brahma_muhurta.startTimeMs && nowMs <= data.brahma_muhurta.endTimeMs) {
+  if (inWindow(data.brahma_muhurta)) {
     activeMuhurtas.push({ name: lang === "hi" ? "ब्रह्म मुहूर्त" : "Brahma Muhurta", type: "auspicious" });
   }
   if (data.amrita_kala) {
     for (const am of data.amrita_kala) {
-      if (nowMs >= am.startTimeMs && nowMs <= am.endTimeMs) {
+      if (inWindow(am)) {
         activeMuhurtas.push({ name: lang === "hi" ? "अमृत काल" : "Amrita Kala", type: "auspicious" });
       }
     }

@@ -385,5 +385,6 @@ export interface UserSettings {
     isDeviceLocation?: boolean;
     accuracyMeters?: number;
   } | null;
+  birthNakshatra?: number;
   savedAt?: string;
 }

@@ -1,4 +1,8 @@
-export interface PariharaInfo {
+const fs = require('fs');
+let code = fs.readFileSync('src/lib/navtaraEngine.ts', 'utf8');
+
+// 1. Add VedhaAssessment interface
+const interfaceReplacement = `export interface PariharaInfo {
   deity_to_worship: string;
   recommended_mantra: string;
   recommended_donation: string;
@@ -34,74 +38,15 @@ export interface NavtaraResult {
   net_intensity_percentage?: number;
   parihara?: PariharaInfo;
   vedha_assessment?: VedhaAssessment;
-}
+}`;
 
-export const NAKSHATRA_NAMES = [
-  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra",
-  "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
-  "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
-  "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
-  "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
-];
+code = code.replace(/export interface PariharaInfo \{[\s\S]*?parihara\?: PariharaInfo;\n\}/, interfaceReplacement);
 
-const TARA_DEFINITIONS: Record<number, { name: string; nature: NavtaraResult["nature"]; score: number; description: string }> = {
-  1: {
-    name: "Janma",
-    nature: "Neutral / Mixed",
-    score: 50,
-    description: "Influences physical health, body, and self. Needs care during malefic transits."
-  },
-  2: {
-    name: "Sampat",
-    nature: "Highly Auspicious",
-    score: 90,
-    description: "Brings financial gains, wealth, prosperity, and material comforts."
-  },
-  3: {
-    name: "Vipat",
-    nature: "Inauspicious",
-    score: 20,
-    description: "Causes unexpected troubles, financial losses, and setbacks."
-  },
-  4: {
-    name: "Kshema",
-    nature: "Auspicious",
-    score: 80,
-    description: "Grants safety, protection, general well-being, and peace of mind."
-  },
-  5: {
-    name: "Pratyak",
-    nature: "Inauspicious",
-    score: 30,
-    description: "Creates obstacles, delays, disputes, and resistance in endeavors."
-  },
-  6: {
-    name: "Sadhak",
-    nature: "Highly Auspicious",
-    score: 100,
-    description: "Ensures accomplishment of goals, success, and spiritual/material progress."
-  },
-  7: {
-    name: "Vadha / Naidhana",
-    nature: "Severely Inauspicious",
-    score: 0,
-    description: "Indicates danger, critical illness, severe distress, or extreme obstruction."
-  },
-  8: {
-    name: "Mitra",
-    nature: "Auspicious",
-    score: 75,
-    description: "Brings friendly support, happiness, harmony, and favorable conditions."
-  },
-  9: {
-    name: "Parama Mitra",
-    nature: "Highly Auspicious",
-    score: 95,
-    description: "Bestows deep alliances, major successes, and great fulfillment of desires."
-  }
-};
+// 2. Add mock data parameters (since we don't have full ephemeris/ashtakavarga data in this engine yet, 
+// we will simulate the vedha logic based on the requested rules if optional mock data is provided, or just add the logic structure).
+// I will update calculateNavtara to accept optional transit context.
 
-export interface TransitContext {
+const calculateSignatureReplacement = `export interface TransitContext {
   planet: string;
   transit_house_from_moon: number;
   vedha_house_occupied_by?: string; // name of planet if occupied
@@ -121,25 +66,12 @@ export function calculateNavtara(
   birthNakshatraIndex: number, 
   targetNakshatraIndex: number,
   transitContext?: TransitContext
-): NavtaraResult {
-  // Distance = ((Target_Nakshatra_Index - Birth_Nakshatra_Index) + 27) % 27 + 1
-  const distance = ((targetNakshatraIndex - birthNakshatraIndex) + 27) % 27 + 1;
-  
-  let taraNumber = distance % 9;
-  if (taraNumber === 0) {
-    taraNumber = 9;
-  }
-  
-  let paryaya = 1;
-  if (distance >= 10 && distance <= 18) {
-    paryaya = 2;
-  } else if (distance >= 19 && distance <= 27) {
-    paryaya = 3;
-  }
-  
-  const taraDef = TARA_DEFINITIONS[taraNumber];
+): NavtaraResult {`;
 
+code = code.replace(/\/\*\*[\s\S]*?export function calculateNavtara\(birthNakshatraIndex: number, targetNakshatraIndex: number\): NavtaraResult \{/, calculateSignatureReplacement);
 
+// 3. Add Vedha logic inside calculateNavtara
+const logicReplacement = `
   let score = taraDef.score;
   let description = taraDef.description;
   let intensityLevel = "Low";
@@ -169,7 +101,7 @@ export function calculateNavtara(
     }
   } else if (paryaya === 2 || paryaya === 3) {
     if (taraNumber === 3 || taraNumber === 5 || taraNumber === 7) {
-      description += ` (Paryaya ${paryaya}: Malefic intensity is relatively reduced).`;
+      description += \` (Paryaya \${paryaya}: Malefic intensity is relatively reduced).\`;
       score = Math.min(100, score + 15);
     }
   }
@@ -193,18 +125,18 @@ export function calculateNavtara(
       if (!isSunSaturn && !isMoonMercury) {
         isVedhaActive = true;
         isNeutralized = true;
-        neutralizationReason += `Vedha intervention by ${transitContext.vedha_house_occupied_by}. `;
+        neutralizationReason += \`Vedha intervention by \${transitContext.vedha_house_occupied_by}. \`;
       }
     }
 
     // Rule 2: Ashtakavarga Point Override
     if (transitContext.ashtakavarga_rekhas !== undefined && transitContext.ashtakavarga_rekhas >= 5) {
       isNeutralized = true;
-      neutralizationReason += `High Ashtakavarga score (${transitContext.ashtakavarga_rekhas} Rekhas). `;
+      neutralizationReason += \`High Ashtakavarga score (\${transitContext.ashtakavarga_rekhas} Rekhas). \`;
     }
     if (transitContext.samudaya_bindus !== undefined && transitContext.samudaya_bindus >= 30) {
       isNeutralized = true;
-      neutralizationReason += `High Samudaya Bindus (${transitContext.samudaya_bindus}). `;
+      neutralizationReason += \`High Samudaya Bindus (\${transitContext.samudaya_bindus}). \`;
     }
 
     // Rule 3: Planetary Dignity & Benefic Aspect
@@ -219,7 +151,7 @@ export function calculateNavtara(
 
     if (isNeutralized) {
       netIntensityPercentage = netIntensityPercentage * 0.2; // 80% neutralized
-      description = `Neutralized / Low Risk: ${neutralizationReason.trim()} ` + description;
+      description = \`Neutralized / Low Risk: \${neutralizationReason.trim()} \` + description;
     }
 
     vedhaAssessment = {
@@ -233,47 +165,11 @@ export function calculateNavtara(
   }
 
   // 4. Parihara Allocation
-  if (taraNumber === 1 || taraNumber === 3 || taraNumber === 5 || taraNumber === 7) {
-    if (paryaya === 1) {
-      intensityLevel = "High";
-    } else if (paryaya === 2) {
-      intensityLevel = "Moderate";
-    } else if (paryaya === 3) {
-      intensityLevel = taraNumber === 7 ? "High" : "Mild";
-    }
+  if (taraNumber === 1 || taraNumber === 3 || taraNumber === 5 || taraNumber === 7) {`;
 
-    if (taraNumber === 1) {
-      parihara = {
-        deity_to_worship: "Lord Vishnu",
-        recommended_mantra: "Vishnu Sahasranama",
-        recommended_donation: "Vegetables, Green Gram (Moong), or Ghee",
-        avoid_activities: ["Unnecessary physical strain"],
-      };
-    } else if (taraNumber === 3) {
-      parihara = {
-        deity_to_worship: "Lord Ganesha",
-        recommended_mantra: "Ganapati Atharvashirsha or Gayatri Mantra",
-        recommended_donation: "Jaggery (Gud), Gold, or Copper",
-        avoid_activities: ["New financial investments", "High-value contracts", "Agreements"],
-      };
-    } else if (taraNumber === 5) {
-      parihara = {
-        deity_to_worship: "Goddess Durga",
-        recommended_mantra: "Durga Saptashati or Chandi Patha",
-        recommended_donation: "Salt (Namak), Grain/Wheat, or Sesame seeds (Til)",
-        avoid_activities: ["Confrontations", "Litigation", "Critical negotiations"],
-      };
-    } else if (taraNumber === 7) {
-      parihara = {
-        deity_to_worship: "Lord Shiva",
-        recommended_mantra: "Mahamrityunjaya Mantra or Rudra Abhisheka",
-        recommended_donation: "Sesame Oil, Til, Black Clothes, or Iron items",
-        avoid_activities: ["Dangerous driving", "Optional medical/surgical procedures"],
-      };
-    }
-  }
+code = code.replace(/  let score = taraDef\.score;\n  let description = taraDef\.description;\n  let intensityLevel = "Low";\n  let parihara: PariharaInfo \| undefined = undefined;\n\n  if \(paryaya === 1\) \{[\s\S]*?if \(taraNumber === 1 \|\| taraNumber === 3 \|\| taraNumber === 5 \|\| taraNumber === 7\) \{/, logicReplacement);
 
-
+const returnReplacement = `
   return {
     birth_nakshatra: {
       index: birthNakshatraIndex,
@@ -294,17 +190,8 @@ export function calculateNavtara(
     net_intensity_percentage: netIntensityPercentage,
     parihara,
     vedha_assessment: vedhaAssessment
-  };
-}
+  };`;
 
-/**
- * Generates the complete 27-Nakshatra Navtara mapping table for a given birth nakshatra.
- * @param birthNakshatraIndex Integer (1 to 27)
- */
-export function generateNavtaraTable(birthNakshatraIndex: number): NavtaraResult[] {
-  const table: NavtaraResult[] = [];
-  for (let targetIndex = 1; targetIndex <= 27; targetIndex++) {
-    table.push(calculateNavtara(birthNakshatraIndex, targetIndex));
-  }
-  return table;
-}
+code = code.replace(/  return \{[\s\S]*?parihara\n  \};/, returnReplacement);
+
+fs.writeFileSync('src/lib/navtaraEngine.ts', code);

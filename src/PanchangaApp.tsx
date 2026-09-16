@@ -148,6 +148,7 @@ export default function App() {
   const [monthSystem, setMonthSystem] = useState<MonthSystem>(savedSettings.monthSystem);
   const [ayanamsa, setAyanamsa] = useState<CoordinateSelection>(savedSettings.ayanamsa);
   const [theme, setTheme] = useState<AppTheme>(savedSettings.theme || "parchment");
+  const [birthNakshatra, setBirthNakshatra] = useState<number>(savedSettings.birthNakshatra || 1);
   const [activeView, setActiveView] = useState<ActiveView>("panchanga");
 
   const [isLocationOpen, setIsLocationOpen] = useState(false);
@@ -218,6 +219,7 @@ export default function App() {
       newCity: string = currentCity,
       newCoords: typeof customCoords = customCoords,
       newTheme: AppTheme = theme,
+      newBirthNakshatra: number = birthNakshatra,
     ) => {
       saveUserSettings({
         lang: newLang,
@@ -226,6 +228,7 @@ export default function App() {
         currentCity: newCity,
         customCoords: newCoords,
         theme: newTheme,
+        birthNakshatra: newBirthNakshatra,
       });
     },
     [lang, ayanamsa, monthSystem, currentCity, customCoords, theme],
@@ -401,9 +404,10 @@ export default function App() {
   const handleUpdateSettings = (
     newAyanamsa: CoordinateSelection,
     newMonthSystem: MonthSystem,
-    saveToDevice: boolean = true,
     newTheme?: AppTheme,
+    newBirthNakshatra?: number
   ) => {
+    const saveToDevice = true; // simplifying, as SettingsModal doesn't pass boolean anymore
     setAyanamsa(newAyanamsa);
     setMonthSystem(newMonthSystem);
     const activeTheme = newTheme || theme;
@@ -881,7 +885,16 @@ export default function App() {
                     id="view-navtara-dedicated"
                     className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
                   >
-                    <NavtaraView data={panchangaData} lang={lang} theme={theme} />
+                    <NavtaraView 
+                      data={panchangaData} 
+                      lang={lang} 
+                      theme={theme}
+                      birthNakshatra={birthNakshatra}
+                      onBirthNakshatraChange={(n) => {
+                        setBirthNakshatra(n);
+                        persistSettings(lang, ayanamsa, monthSystem, currentCity, customCoords, theme, n);
+                      }} 
+                    />
                   </div>
                 )}
 
@@ -1000,6 +1013,7 @@ export default function App() {
       />
 
       <SettingsModal
+        birthNakshatra={birthNakshatra}
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         ayanamsa={ayanamsa}
@@ -1009,7 +1023,7 @@ export default function App() {
         theme={theme}
         onThemeChange={(newTheme) => {
           setTheme(newTheme);
-          persistSettings(lang, ayanamsa, monthSystem, currentCity, customCoords, newTheme);
+          persistSettings(lang, ayanamsa, monthSystem, currentCity, customCoords, newTheme, birthNakshatra);
         }}
         onUpdateSettings={handleUpdateSettings}
         onResetDefaults={handleResetDefaults}

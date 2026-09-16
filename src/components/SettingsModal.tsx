@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import type { CoordinateSelection, MonthSystem, AppTheme } from "../types";
 import { type Language, translations } from "../i18n";
+import { NAKSHATRA_NAMES } from "../lib/navtaraEngine";
+import { Star } from "lucide-react";
 import {
   getNotificationPreferences,
   saveNotificationPreferences,
@@ -33,6 +35,7 @@ interface SettingsModalProps {
   monthSystem: MonthSystem;
   currentCity: string;
   theme: AppTheme;
+  birthNakshatra: number;
   onThemeChange?: (theme: AppTheme) => void;
   customCoords?: {
     lat: number;
@@ -110,6 +113,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   monthSystem,
   currentCity,
   theme,
+  birthNakshatra,
   onThemeChange,
   customCoords,
   onUpdateSettings,
@@ -119,6 +123,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [selectedAyanamsa, setSelectedAyanamsa] = useState<CoordinateSelection>(ayanamsa);
   const [selectedMonthSystem, setSelectedMonthSystem] = useState<MonthSystem>(monthSystem);
   const [selectedTheme, setSelectedTheme] = useState<AppTheme>(theme);
+  const [selectedBirthNakshatra, setSelectedBirthNakshatra] = useState<number>(birthNakshatra);
   const [notifPrefs, setNotifPrefs] = useState<NotificationPreferences>(
     defaultNotificationPreferences,
   );

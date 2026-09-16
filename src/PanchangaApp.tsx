@@ -52,7 +52,8 @@ import {
   Star,
   ListTodo,
   CalendarDays,
-  Hourglass
+  Hourglass,
+  Check
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
 import { schedulePanchangaNotifications,

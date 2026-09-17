@@ -27,7 +27,13 @@ export interface NavtaraResult {
   paryaya: number;
   tara_number: number;
   tara_name: string;
-  nature: "Auspicious" | "Inauspicious" | "Neutral" | "Highly Auspicious" | "Severely Inauspicious" | "Neutral / Mixed";
+  nature:
+    | "Auspicious"
+    | "Inauspicious"
+    | "Neutral"
+    | "Highly Auspicious"
+    | "Severely Inauspicious"
+    | "Neutral / Mixed";
   tara_score: number;
   result_description: string;
   intensity_level?: string;
@@ -37,68 +43,93 @@ export interface NavtaraResult {
 }
 
 export const NAKSHATRA_NAMES = [
-  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashirsha", "Ardra",
-  "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
-  "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
-  "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
-  "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+  "Ashwini",
+  "Bharani",
+  "Krittika",
+  "Rohini",
+  "Mrigashirsha",
+  "Ardra",
+  "Punarvasu",
+  "Pushya",
+  "Ashlesha",
+  "Magha",
+  "Purva Phalguni",
+  "Uttara Phalguni",
+  "Hasta",
+  "Chitra",
+  "Swati",
+  "Vishakha",
+  "Anuradha",
+  "Jyeshtha",
+  "Mula",
+  "Purva Ashadha",
+  "Uttara Ashadha",
+  "Shravana",
+  "Dhanishta",
+  "Shatabhisha",
+  "Purva Bhadrapada",
+  "Uttara Bhadrapada",
+  "Revati",
 ];
 
-const TARA_DEFINITIONS: Record<number, { name: string; nature: NavtaraResult["nature"]; score: number; description: string }> = {
+const TARA_DEFINITIONS: Record<
+  number,
+  { name: string; nature: NavtaraResult["nature"]; score: number; description: string }
+> = {
   1: {
     name: "Janma",
     nature: "Neutral / Mixed",
     score: 50,
-    description: "Influences physical health, body, and self. Needs care during malefic transits."
+    description: "Influences physical health, body, and self. Needs care during malefic transits.",
   },
   2: {
     name: "Sampat",
     nature: "Highly Auspicious",
     score: 90,
-    description: "Brings financial gains, wealth, prosperity, and material comforts."
+    description: "Brings financial gains, wealth, prosperity, and material comforts.",
   },
   3: {
     name: "Vipat",
     nature: "Inauspicious",
     score: 20,
-    description: "Causes unexpected troubles, financial losses, and setbacks."
+    description: "Causes unexpected troubles, financial losses, and setbacks.",
   },
   4: {
     name: "Kshema",
     nature: "Auspicious",
     score: 80,
-    description: "Grants safety, protection, general well-being, and peace of mind."
+    description: "Grants safety, protection, general well-being, and peace of mind.",
   },
   5: {
     name: "Pratyak",
     nature: "Inauspicious",
     score: 30,
-    description: "Creates obstacles, delays, disputes, and resistance in endeavors."
+    description: "Creates obstacles, delays, disputes, and resistance in endeavors.",
   },
   6: {
     name: "Sadhak",
     nature: "Highly Auspicious",
     score: 100,
-    description: "Ensures accomplishment of goals, success, and spiritual/material progress."
+    description: "Ensures accomplishment of goals, success, and spiritual/material progress.",
   },
   7: {
     name: "Vadha / Naidhana",
     nature: "Severely Inauspicious",
     score: 0,
-    description: "Indicates danger, critical illness, severe distress, or extreme obstruction."
+    description: "Indicates danger, critical illness, severe distress, or extreme obstruction.",
   },
   8: {
     name: "Mitra",
     nature: "Auspicious",
     score: 75,
-    description: "Brings friendly support, happiness, harmony, and favorable conditions."
+    description: "Brings friendly support, happiness, harmony, and favorable conditions.",
   },
   9: {
     name: "Parama Mitra",
     nature: "Highly Auspicious",
     score: 95,
-    description: "Bestows deep alliances, major successes, and great fulfillment of desires."
-  }
+    description: "Bestows deep alliances, major successes, and great fulfillment of desires.",
+  },
 };
 
 export interface TransitContext {
@@ -118,27 +149,26 @@ export interface TransitContext {
  * @param transitContext Optional transit data for Vedha calculation
  */
 export function calculateNavtara(
-  birthNakshatraIndex: number, 
+  birthNakshatraIndex: number,
   targetNakshatraIndex: number,
-  transitContext?: TransitContext
+  transitContext?: TransitContext,
 ): NavtaraResult {
   // Distance = ((Target_Nakshatra_Index - Birth_Nakshatra_Index) + 27) % 27 + 1
-  const distance = ((targetNakshatraIndex - birthNakshatraIndex) + 27) % 27 + 1;
-  
+  const distance = ((targetNakshatraIndex - birthNakshatraIndex + 27) % 27) + 1;
+
   let taraNumber = distance % 9;
   if (taraNumber === 0) {
     taraNumber = 9;
   }
-  
+
   let paryaya = 1;
   if (distance >= 10 && distance <= 18) {
     paryaya = 2;
   } else if (distance >= 19 && distance <= 27) {
     paryaya = 3;
   }
-  
-  const taraDef = TARA_DEFINITIONS[taraNumber];
 
+  const taraDef = TARA_DEFINITIONS[taraNumber];
 
   let score = taraDef.score;
   let description = taraDef.description;
@@ -156,7 +186,7 @@ export function calculateNavtara(
   } else if (paryaya === 3) {
     paryayaMultiplier = taraNumber === 7 ? 0.75 : 0.25;
   }
-  
+
   netIntensityPercentage = 100 * paryayaMultiplier;
 
   // 2. Tara specific adjustments
@@ -185,11 +215,14 @@ export function calculateNavtara(
     // For simplicity based on prompt: "Check if Vedha planet exists in paired house"
     if (transitContext.vedha_house_occupied_by) {
       // Exceptions: Sun & Saturn, Moon & Mercury
-      const isSunSaturn = (transitContext.planet === "Sun" && transitContext.vedha_house_occupied_by === "Saturn") || 
-                          (transitContext.planet === "Saturn" && transitContext.vedha_house_occupied_by === "Sun");
-      const isMoonMercury = (transitContext.planet === "Moon" && transitContext.vedha_house_occupied_by === "Mercury") || 
-                            (transitContext.planet === "Mercury" && transitContext.vedha_house_occupied_by === "Moon");
-      
+      const isSunSaturn =
+        (transitContext.planet === "Sun" && transitContext.vedha_house_occupied_by === "Saturn") ||
+        (transitContext.planet === "Saturn" && transitContext.vedha_house_occupied_by === "Sun");
+      const isMoonMercury =
+        (transitContext.planet === "Moon" &&
+          transitContext.vedha_house_occupied_by === "Mercury") ||
+        (transitContext.planet === "Mercury" && transitContext.vedha_house_occupied_by === "Moon");
+
       if (!isSunSaturn && !isMoonMercury) {
         isVedhaActive = true;
         isNeutralized = true;
@@ -198,7 +231,10 @@ export function calculateNavtara(
     }
 
     // Rule 2: Ashtakavarga Point Override
-    if (transitContext.ashtakavarga_rekhas !== undefined && transitContext.ashtakavarga_rekhas >= 5) {
+    if (
+      transitContext.ashtakavarga_rekhas !== undefined &&
+      transitContext.ashtakavarga_rekhas >= 5
+    ) {
       isNeutralized = true;
       neutralizationReason += `High Ashtakavarga score (${transitContext.ashtakavarga_rekhas} Rekhas). `;
     }
@@ -228,7 +264,7 @@ export function calculateNavtara(
       ashtakavarga_rekhas: transitContext.ashtakavarga_rekhas,
       samudaya_bindus: transitContext.samudaya_bindus,
       is_neutralized: isNeutralized,
-      neutralization_reason: neutralizationReason.trim() || undefined
+      neutralization_reason: neutralizationReason.trim() || undefined,
     };
   }
 
@@ -273,15 +309,14 @@ export function calculateNavtara(
     }
   }
 
-
   return {
     birth_nakshatra: {
       index: birthNakshatraIndex,
-      name: NAKSHATRA_NAMES[birthNakshatraIndex - 1]
+      name: NAKSHATRA_NAMES[birthNakshatraIndex - 1],
     },
     target_nakshatra: {
       index: targetNakshatraIndex,
-      name: NAKSHATRA_NAMES[targetNakshatraIndex - 1]
+      name: NAKSHATRA_NAMES[targetNakshatraIndex - 1],
     },
     distance,
     paryaya,
@@ -293,7 +328,7 @@ export function calculateNavtara(
     intensity_level: intensityLevel,
     net_intensity_percentage: netIntensityPercentage,
     parihara,
-    vedha_assessment: vedhaAssessment
+    vedha_assessment: vedhaAssessment,
   };
 }
 

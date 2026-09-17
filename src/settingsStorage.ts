@@ -39,9 +39,10 @@ export function loadUserSettings(): UserSettings {
       theme: (["parchment", "nightSky"].includes(parsed.theme)
         ? parsed.theme
         : DEFAULT_USER_SETTINGS.theme) as AppTheme,
-      birthNakshatra: typeof parsed.birthNakshatra === "number" 
-        ? parsed.birthNakshatra 
-        : DEFAULT_USER_SETTINGS.birthNakshatra,
+      birthNakshatra:
+        typeof parsed.birthNakshatra === "number"
+          ? parsed.birthNakshatra
+          : DEFAULT_USER_SETTINGS.birthNakshatra,
       customCoords:
         parsed.customCoords &&
         typeof parsed.customCoords.lat === "number" &&

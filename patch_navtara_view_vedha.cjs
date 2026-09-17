@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/components/NavtaraView.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/components/NavtaraView.tsx", "utf8");
 
 // Render net intensity and Vedha Assessment if it exists
 const vedhaBlock = `
@@ -25,6 +25,9 @@ const vedhaBlock = `
               )}
 `;
 
-code = code.replace(/\{currentTara\.parihara && \(/, vedhaBlock + `\n              {currentTara.parihara && (`);
+code = code.replace(
+  /\{currentTara\.parihara && \(/,
+  vedhaBlock + `\n              {currentTara.parihara && (`,
+);
 
-fs.writeFileSync('src/components/NavtaraView.tsx', code);
+fs.writeFileSync("src/components/NavtaraView.tsx", code);

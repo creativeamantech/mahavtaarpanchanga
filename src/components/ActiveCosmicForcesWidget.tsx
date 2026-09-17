@@ -127,23 +127,68 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
           <Wind className="w-3.5 h-3.5 text-amber-600 shrink-0" />
           <span>
             <strong>
-              {swaraData.activeCelestialWindow === "sunrise" && (lang === "hi" ? "सूर्योदय स्वर काल:" : "Sunrise Swara Sandhya:")}
-              {swaraData.activeCelestialWindow === "midday" && (lang === "hi" ? "मध्याह्न स्वर काल:" : "Midday Swara Sandhya:")}
-              {swaraData.activeCelestialWindow === "sunset" && (lang === "hi" ? "सूर्यास्त स्वर काल:" : "Sunset Swara Sandhya:")}
-              {swaraData.activeCelestialWindow === "moonrise" && (lang === "hi" ? "चन्द्रोदय स्वर काल:" : "Moonrise Swara Sandhya:")}
-              {swaraData.activeCelestialWindow === "moonset" && (lang === "hi" ? "चन्द्रास्त स्वर काल:" : "Moonset Swara Sandhya:")}
+              {swaraData.activeCelestialWindow === "sunrise" &&
+                (lang === "hi" ? "सूर्योदय स्वर काल:" : "Sunrise Swara Sandhya:")}
+              {swaraData.activeCelestialWindow === "midday" &&
+                (lang === "hi" ? "मध्याह्न स्वर काल:" : "Midday Swara Sandhya:")}
+              {swaraData.activeCelestialWindow === "sunset" &&
+                (lang === "hi" ? "सूर्यास्त स्वर काल:" : "Sunset Swara Sandhya:")}
+              {swaraData.activeCelestialWindow === "moonrise" &&
+                (lang === "hi" ? "चन्द्रोदय स्वर काल:" : "Moonrise Swara Sandhya:")}
+              {swaraData.activeCelestialWindow === "moonset" &&
+                (lang === "hi" ? "चन्द्रास्त स्वर काल:" : "Moonset Swara Sandhya:")}
             </strong>{" "}
-            {swaraData.activeCelestialWindow === "sunrise" && swaraData.sunriseWindow?.windowFormatted}
-            {swaraData.activeCelestialWindow === "midday" && swaraData.middayWindow?.windowFormatted}
-            {swaraData.activeCelestialWindow === "sunset" && swaraData.sunsetWindow?.windowFormatted}
-            {swaraData.activeCelestialWindow === "moonrise" && swaraData.moonriseWindow?.windowFormatted}
-            {swaraData.activeCelestialWindow === "moonset" && swaraData.moonsetWindow?.windowFormatted}{" "}
+            {swaraData.activeCelestialWindow === "sunrise" &&
+              swaraData.sunriseWindow?.windowFormatted}
+            {swaraData.activeCelestialWindow === "midday" &&
+              swaraData.middayWindow?.windowFormatted}
+            {swaraData.activeCelestialWindow === "sunset" &&
+              swaraData.sunsetWindow?.windowFormatted}
+            {swaraData.activeCelestialWindow === "moonrise" &&
+              swaraData.moonriseWindow?.windowFormatted}
+            {swaraData.activeCelestialWindow === "moonset" &&
+              swaraData.moonsetWindow?.windowFormatted}{" "}
             (
-            {swaraData.activeCelestialWindow === "sunrise" && (swaraData.sunriseSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी" : "Ida Nadi") : (lang === "hi" ? "पिङ्गला नाड़ी" : "Pingala Nadi"))}
-            {swaraData.activeCelestialWindow === "midday" && (swaraData.sunriseSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी" : "Ida Nadi") : (lang === "hi" ? "पिङ्गला नाड़ी" : "Pingala Nadi"))}
-            {swaraData.activeCelestialWindow === "sunset" && (swaraData.sunsetSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी" : "Ida Nadi") : (lang === "hi" ? "पिङ्गला नाड़ी" : "Pingala Nadi"))}
-            {swaraData.activeCelestialWindow === "moonrise" && (swaraData.moonriseSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी" : "Ida Nadi") : (lang === "hi" ? "पिङ्गला नाड़ी" : "Pingala Nadi"))}
-            {swaraData.activeCelestialWindow === "moonset" && (swaraData.moonsetSwara === "ida" ? (lang === "hi" ? "इड़ा नाड़ी" : "Ida Nadi") : (lang === "hi" ? "पिङ्गला नाड़ी" : "Pingala Nadi"))}
+            {swaraData.activeCelestialWindow === "sunrise" &&
+              (swaraData.sunriseSwara === "ida"
+                ? lang === "hi"
+                  ? "इड़ा नाड़ी"
+                  : "Ida Nadi"
+                : lang === "hi"
+                  ? "पिङ्गला नाड़ी"
+                  : "Pingala Nadi")}
+            {swaraData.activeCelestialWindow === "midday" &&
+              (swaraData.sunriseSwara === "ida"
+                ? lang === "hi"
+                  ? "इड़ा नाड़ी"
+                  : "Ida Nadi"
+                : lang === "hi"
+                  ? "पिङ्गला नाड़ी"
+                  : "Pingala Nadi")}
+            {swaraData.activeCelestialWindow === "sunset" &&
+              (swaraData.sunsetSwara === "ida"
+                ? lang === "hi"
+                  ? "इड़ा नाड़ी"
+                  : "Ida Nadi"
+                : lang === "hi"
+                  ? "पिङ्गला नाड़ी"
+                  : "Pingala Nadi")}
+            {swaraData.activeCelestialWindow === "moonrise" &&
+              (swaraData.moonriseSwara === "ida"
+                ? lang === "hi"
+                  ? "इड़ा नाड़ी"
+                  : "Ida Nadi"
+                : lang === "hi"
+                  ? "पिङ्गला नाड़ी"
+                  : "Pingala Nadi")}
+            {swaraData.activeCelestialWindow === "moonset" &&
+              (swaraData.moonsetSwara === "ida"
+                ? lang === "hi"
+                  ? "इड़ा नाड़ी"
+                  : "Ida Nadi"
+                : lang === "hi"
+                  ? "पिङ्गला नाड़ी"
+                  : "Pingala Nadi")}
             )
           </span>
         </div>

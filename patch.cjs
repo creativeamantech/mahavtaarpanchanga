@@ -6,12 +6,12 @@ let lines = content.split("\n");
 let start = -1;
 let end = -1;
 
-for(let i=0; i<lines.length; i++) {
-  if(lines[i].includes('label={lang === "hi" ? "वैदिक होरा" : "Vedic Horas"}')) {
-    if (lines[i+1].includes('<NavItem')) {
-       start = i - 1; // <NavItem
-       end = i + 10;
-       break;
+for (let i = 0; i < lines.length; i++) {
+  if (lines[i].includes('label={lang === "hi" ? "वैदिक होरा" : "Vedic Horas"}')) {
+    if (lines[i + 1].includes("<NavItem")) {
+      start = i - 1; // <NavItem
+      end = i + 10;
+      break;
     }
   }
 }

@@ -707,7 +707,6 @@ export function computeSwaraYoga(
     isActive: isSunriseActive,
   };
 
-
   // 1.5. Midday Swara Window: Starts at Midday, runs for 1 hour (Same as Sunrise)
   let daytimeMins = sunsetMins - sunriseMins;
   if (daytimeMins < 0) daytimeMins += 1440;

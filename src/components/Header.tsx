@@ -23,6 +23,7 @@ export type ActiveView =
   | "swara"
   | "navtara"
   | "horas"
+  | "tattva"
   | "calendar"
   | "lagna"
   | "festivals";

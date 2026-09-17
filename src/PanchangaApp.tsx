@@ -19,6 +19,7 @@ import { LocationModal } from "./components/LocationModal";
 import { SettingsModal } from "./components/SettingsModal";
 import { PrintablePanchanga } from "./components/PrintablePanchanga";
 import { VedicHorasView } from "./components/VedicHorasView";
+import { TattvaView } from "./components/TattvaView";
 import { NavtaraView } from "./components/NavtaraView";
 import { LagnaChartView } from "./components/LagnaChartView";
 import { TodayScheduleView } from "./components/TodayScheduleView";
@@ -53,15 +54,17 @@ import {
   ListTodo,
   CalendarDays,
   Hourglass,
-  Check
+  Check,
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
-import { schedulePanchangaNotifications,
+import {
+  schedulePanchangaNotifications,
   getNotificationPreferences,
 } from "./lib/notificationEngine";
 import type { ActiveView } from "./components/Header";
 import { motion, AnimatePresence } from "motion/react";
-import { loadUserSettings,
+import {
+  loadUserSettings,
   saveUserSettings,
   clearUserSettings,
   DEFAULT_USER_SETTINGS,
@@ -405,7 +408,7 @@ export default function App() {
     newAyanamsa: CoordinateSelection,
     newMonthSystem: MonthSystem,
     newTheme?: AppTheme,
-    newBirthNakshatra?: number
+    newBirthNakshatra?: number,
   ) => {
     const saveToDevice = true; // simplifying, as SettingsModal doesn't pass boolean anymore
     setAyanamsa(newAyanamsa);
@@ -549,6 +552,13 @@ export default function App() {
             label={lang === "hi" ? "वैदिक होरा" : "Horas"}
             isActive={activeView === "horas"}
             onClick={() => setActiveView("horas")}
+            theme={theme}
+          />
+          <NavItem
+            icon={Sparkles}
+            label={lang === "hi" ? "तत्व" : "Tattva"}
+            isActive={activeView === "tattva"}
+            onClick={() => setActiveView("tattva")}
             theme={theme}
           />
           <NavItem
@@ -885,16 +895,43 @@ export default function App() {
                     id="view-navtara-dedicated"
                     className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
                   >
-                    <NavtaraView 
-                      data={panchangaData} 
-                      lang={lang} 
+                    <NavtaraView
+                      data={panchangaData}
+                      lang={lang}
                       theme={theme}
                       birthNakshatra={birthNakshatra}
                       onBirthNakshatraChange={(n) => {
                         setBirthNakshatra(n);
-                        persistSettings(lang, ayanamsa, monthSystem, currentCity, customCoords, theme, n);
-                      }} 
+                        persistSettings(
+                          lang,
+                          ayanamsa,
+                          monthSystem,
+                          currentCity,
+                          customCoords,
+                          theme,
+                          n,
+                        );
+                      }}
                     />
+                  </div>
+                )}
+
+                {activeView === "tattva" && (
+                  <div
+                    id="view-tattva"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
+                  >
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
+                        <Sparkles className="w-4 h-4 text-amber-600" />
+                        {lang === "hi" ? "तत्व दर्शन" : "Tattva System"}
+                      </h2>
+                      <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
+                    </div>
+
+                    <section className="space-y-6">
+                      <TattvaView panchangaData={panchangaData} theme={theme} lang={lang} />
+                    </section>
                   </div>
                 )}
 
@@ -1023,7 +1060,15 @@ export default function App() {
         theme={theme}
         onThemeChange={(newTheme) => {
           setTheme(newTheme);
-          persistSettings(lang, ayanamsa, monthSystem, currentCity, customCoords, newTheme, birthNakshatra);
+          persistSettings(
+            lang,
+            ayanamsa,
+            monthSystem,
+            currentCity,
+            customCoords,
+            newTheme,
+            birthNakshatra,
+          );
         }}
         onUpdateSettings={handleUpdateSettings}
         onResetDefaults={handleResetDefaults}

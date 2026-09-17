@@ -255,7 +255,9 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
           {/* 1. Sunrise Swara */}
           <div
             className={`rounded-2xl border p-4 shadow-2xs flex flex-col justify-between transition-all ${
-              swaraData.sunriseWindow?.isActive || swaraData.middayWindow?.isActive ? "ring-2 ring-emerald-500 shadow-md " : ""
+              swaraData.sunriseWindow?.isActive || swaraData.middayWindow?.isActive
+                ? "ring-2 ring-emerald-500 shadow-md "
+                : ""
             }${
               swaraData.sunriseSwara === "ida"
                 ? "border-sky-300 bg-sky-50/50"
@@ -312,7 +314,9 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
 
               {/* Exact 1-Hour Time Window Badges */}
               <div className="mt-2.5 flex flex-col gap-1.5">
-                <div className={`rounded-lg bg-white/70 border border-stone-200/60 p-1 text-center flex flex-col sm:flex-row sm:justify-between items-center px-2 ${swaraData.sunriseWindow?.isActive ? 'ring-1 ring-emerald-500 bg-emerald-50/50' : ''}`}>
+                <div
+                  className={`rounded-lg bg-white/70 border border-stone-200/60 p-1 text-center flex flex-col sm:flex-row sm:justify-between items-center px-2 ${swaraData.sunriseWindow?.isActive ? "ring-1 ring-emerald-500 bg-emerald-50/50" : ""}`}
+                >
                   <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
                     {lang === "hi" ? "सूर्योदय काल" : "Sunrise Window"}
                   </div>
@@ -320,7 +324,9 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                     {swaraData.sunriseWindow?.windowFormatted}
                   </div>
                 </div>
-                <div className={`rounded-lg bg-white/70 border border-stone-200/60 p-1 text-center flex flex-col sm:flex-row sm:justify-between items-center px-2 ${swaraData.middayWindow?.isActive ? 'ring-1 ring-emerald-500 bg-emerald-50/50' : ''}`}>
+                <div
+                  className={`rounded-lg bg-white/70 border border-stone-200/60 p-1 text-center flex flex-col sm:flex-row sm:justify-between items-center px-2 ${swaraData.middayWindow?.isActive ? "ring-1 ring-emerald-500 bg-emerald-50/50" : ""}`}
+                >
                   <div className="text-[10px] font-bold text-stone-500 uppercase tracking-wider">
                     {lang === "hi" ? "मध्याह्न काल" : "Midday Window"}
                   </div>

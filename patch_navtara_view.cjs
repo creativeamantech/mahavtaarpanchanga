@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/components/NavtaraView.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/components/NavtaraView.tsx", "utf8");
 
 // Update Props
 code = code.replace(
@@ -7,7 +7,7 @@ code = code.replace(
   `theme: AppTheme;
   birthNakshatra: number;
   onBirthNakshatraChange?: (n: number) => void;
-}`
+}`,
 );
 
 // Update Component Signature and local state
@@ -18,13 +18,13 @@ code = code.replace(
   
   useEffect(() => {
     setTable(generateNavtaraTable(birthNakshatra));
-  }, [birthNakshatra]);`
+  }, [birthNakshatra]);`,
 );
 
 // Update the select onChange
 code = code.replace(
   /onChange=\{\(e\) => setBirthNakshatra\(parseInt\(e\.target\.value, 10\)\)\}/,
-  `onChange={(e) => onBirthNakshatraChange?.(parseInt(e.target.value, 10))}`
+  `onChange={(e) => onBirthNakshatraChange?.(parseInt(e.target.value, 10))}`,
 );
 
-fs.writeFileSync('src/components/NavtaraView.tsx', code);
+fs.writeFileSync("src/components/NavtaraView.tsx", code);

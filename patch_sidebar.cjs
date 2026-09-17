@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/PanchangaApp.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/PanchangaApp.tsx", "utf8");
 
 // The sidebar items match the SpiritualTabs exactly now, except we want to make sure the icons are distinct.
 // Let's do a strict replacement for the sidebar block to make sure it matches the 10 tabs perfectly in order and icon semantics.
@@ -80,6 +80,9 @@ const sidebarBlock = `<div className="flex-1 overflow-y-auto px-4 py-6 space-y-1
           />
         </div>`;
 
-code = code.replace(/<div className="flex-1 overflow-y-auto px-4 py-6 space-y-1\.5 hide-scrollbar">[\s\S]*?<\/div>/, sidebarBlock);
+code = code.replace(
+  /<div className="flex-1 overflow-y-auto px-4 py-6 space-y-1\.5 hide-scrollbar">[\s\S]*?<\/div>/,
+  sidebarBlock,
+);
 
-fs.writeFileSync('src/PanchangaApp.tsx', code);
+fs.writeFileSync("src/PanchangaApp.tsx", code);

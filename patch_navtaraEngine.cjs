@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/lib/navtaraEngine.ts', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/lib/navtaraEngine.ts", "utf8");
 
 // 1. Add PariharaInfo interface and update NavtaraResult
 const interfaceReplacement = `export interface PariharaInfo {
@@ -29,7 +29,10 @@ export interface NavtaraResult {
   parihara?: PariharaInfo;
 }`;
 
-code = code.replace(/export interface NavtaraResult \{[\s\S]*?result_description: string;\n\}/, interfaceReplacement);
+code = code.replace(
+  /export interface NavtaraResult \{[\s\S]*?result_description: string;\n\}/,
+  interfaceReplacement,
+);
 
 // 2. Update calculateNavtara logic
 const logicReplacement = `  const taraDef = TARA_DEFINITIONS[taraNumber];
@@ -113,6 +116,9 @@ const logicReplacement = `  const taraDef = TARA_DEFINITIONS[taraNumber];
     parihara
   };`;
 
-code = code.replace(/  const taraDef = TARA_DEFINITIONS\[taraNumber\];[\s\S]*?result_description: description\n  };/, logicReplacement);
+code = code.replace(
+  /  const taraDef = TARA_DEFINITIONS\[taraNumber\];[\s\S]*?result_description: description\n  };/,
+  logicReplacement,
+);
 
-fs.writeFileSync('src/lib/navtaraEngine.ts', code);
+fs.writeFileSync("src/lib/navtaraEngine.ts", code);

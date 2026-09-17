@@ -588,8 +588,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
         {filteredEvents.map((ev, eIdx) => {
           const isExpanded = expandedEventId === ev.id;
           const styles = getCategoryStyles(ev.category, ev.auspiciousness);
-          const hasHoraTattvas =
-            ev.type === "hora" && Array.isArray(ev.metadata?.tattvas);
+          const hasHoraTattvas = ev.type === "hora" && Array.isArray(ev.metadata?.tattvas);
 
           const startTimeStr = new Date(ev.startTimeMs).toLocaleTimeString([], {
             hour: "numeric",

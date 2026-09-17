@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/lib/navtaraEngine.ts', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/lib/navtaraEngine.ts", "utf8");
 
 // 1. Add VedhaAssessment interface
 const interfaceReplacement = `export interface PariharaInfo {
@@ -40,9 +40,12 @@ export interface NavtaraResult {
   vedha_assessment?: VedhaAssessment;
 }`;
 
-code = code.replace(/export interface PariharaInfo \{[\s\S]*?parihara\?: PariharaInfo;\n\}/, interfaceReplacement);
+code = code.replace(
+  /export interface PariharaInfo \{[\s\S]*?parihara\?: PariharaInfo;\n\}/,
+  interfaceReplacement,
+);
 
-// 2. Add mock data parameters (since we don't have full ephemeris/ashtakavarga data in this engine yet, 
+// 2. Add mock data parameters (since we don't have full ephemeris/ashtakavarga data in this engine yet,
 // we will simulate the vedha logic based on the requested rules if optional mock data is provided, or just add the logic structure).
 // I will update calculateNavtara to accept optional transit context.
 
@@ -68,7 +71,10 @@ export function calculateNavtara(
   transitContext?: TransitContext
 ): NavtaraResult {`;
 
-code = code.replace(/\/\*\*[\s\S]*?export function calculateNavtara\(birthNakshatraIndex: number, targetNakshatraIndex: number\): NavtaraResult \{/, calculateSignatureReplacement);
+code = code.replace(
+  /\/\*\*[\s\S]*?export function calculateNavtara\(birthNakshatraIndex: number, targetNakshatraIndex: number\): NavtaraResult \{/,
+  calculateSignatureReplacement,
+);
 
 // 3. Add Vedha logic inside calculateNavtara
 const logicReplacement = `
@@ -167,7 +173,10 @@ const logicReplacement = `
   // 4. Parihara Allocation
   if (taraNumber === 1 || taraNumber === 3 || taraNumber === 5 || taraNumber === 7) {`;
 
-code = code.replace(/  let score = taraDef\.score;\n  let description = taraDef\.description;\n  let intensityLevel = "Low";\n  let parihara: PariharaInfo \| undefined = undefined;\n\n  if \(paryaya === 1\) \{[\s\S]*?if \(taraNumber === 1 \|\| taraNumber === 3 \|\| taraNumber === 5 \|\| taraNumber === 7\) \{/, logicReplacement);
+code = code.replace(
+  /  let score = taraDef\.score;\n  let description = taraDef\.description;\n  let intensityLevel = "Low";\n  let parihara: PariharaInfo \| undefined = undefined;\n\n  if \(paryaya === 1\) \{[\s\S]*?if \(taraNumber === 1 \|\| taraNumber === 3 \|\| taraNumber === 5 \|\| taraNumber === 7\) \{/,
+  logicReplacement,
+);
 
 const returnReplacement = `
   return {
@@ -194,4 +203,4 @@ const returnReplacement = `
 
 code = code.replace(/  return \{[\s\S]*?parihara\n  \};/, returnReplacement);
 
-fs.writeFileSync('src/lib/navtaraEngine.ts', code);
+fs.writeFileSync("src/lib/navtaraEngine.ts", code);

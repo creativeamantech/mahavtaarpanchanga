@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/PanchangaApp.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/PanchangaApp.tsx", "utf8");
 
 code = code.replace(
   /<NavtaraView data=\{panchangaData\} lang=\{lang\} theme=\{theme\} \/>/g,
@@ -12,7 +12,7 @@ code = code.replace(
                         setBirthNakshatra(n);
                         persistSettings(lang, ayanamsa, monthSystem, currentCity, customCoords, theme, n);
                       }} 
-                    />`
+                    />`,
 );
 
-fs.writeFileSync('src/PanchangaApp.tsx', code);
+fs.writeFileSync("src/PanchangaApp.tsx", code);

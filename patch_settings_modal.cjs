@@ -1,12 +1,12 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/components/SettingsModal.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/components/SettingsModal.tsx", "utf8");
 
 // Add birthNakshatra prop
 code = code.replace(
   /theme: AppTheme;\n  onThemeChange\?: \(theme: AppTheme\) => void;\n/,
   `theme: AppTheme;
   birthNakshatra: number;
-  onThemeChange?: (theme: AppTheme) => void;\n`
+  onThemeChange?: (theme: AppTheme) => void;\n`,
 );
 
 // Add birthNakshatra to onUpdateSettings
@@ -17,7 +17,7 @@ code = code.replace(
     monthSystem: MonthSystem,
     theme: AppTheme,
     birthNakshatra: number
-  ) => void;`
+  ) => void;`,
 );
 
 // Update functional component props
@@ -25,27 +25,32 @@ code = code.replace(
   /theme,\n  onThemeChange,/,
   `theme,
   birthNakshatra,
-  onThemeChange,`
+  onThemeChange,`,
 );
 
 // Add selectedBirthNakshatra state
 code = code.replace(
   /const \[selectedTheme, setSelectedTheme\] = useState<AppTheme>\(theme\);/,
   `const [selectedTheme, setSelectedTheme] = useState<AppTheme>(theme);
-  const [selectedBirthNakshatra, setSelectedBirthNakshatra] = useState<number>(birthNakshatra);`
+  const [selectedBirthNakshatra, setSelectedBirthNakshatra] = useState<number>(birthNakshatra);`,
 );
 
 // Update save handler
 code = code.replace(
   /onUpdateSettings\(selectedAyanamsa, selectedMonthSystem, selectedTheme\);/,
-  `onUpdateSettings(selectedAyanamsa, selectedMonthSystem, selectedTheme, selectedBirthNakshatra);`
+  `onUpdateSettings(selectedAyanamsa, selectedMonthSystem, selectedTheme, selectedBirthNakshatra);`,
 );
 
 // Add import for NAKSHATRA_NAMES and Star icon
-code = code.replace(/import { type Language, translations } from "\.\.\/i18n";/, `import { type Language, translations } from "../i18n";\nimport { NAKSHATRA_NAMES } from "../lib/navtaraEngine";\nimport { Star } from "lucide-react";`);
+code = code.replace(
+  /import { type Language, translations } from "\.\.\/i18n";/,
+  `import { type Language, translations } from "../i18n";\nimport { NAKSHATRA_NAMES } from "../lib/navtaraEngine";\nimport { Star } from "lucide-react";`,
+);
 
 // Find the location to insert the new setting section. After "Application Theme" section
-const themeSectionMatch = code.match(/<div className="mb-6">\s*<h4 className="text-xs font-bold uppercase tracking-widest.*?Application Theme.*?<\/div>\s*<\/div>/s);
+const themeSectionMatch = code.match(
+  /<div className="mb-6">\s*<h4 className="text-xs font-bold uppercase tracking-widest.*?Application Theme.*?<\/div>\s*<\/div>/s,
+);
 if (themeSectionMatch) {
   const nakshatraSection = `
           {/* Birth Nakshatra Setting */}
@@ -84,4 +89,4 @@ if (themeSectionMatch) {
   code = code.replace(themeSectionMatch[0], themeSectionMatch[0] + nakshatraSection);
 }
 
-fs.writeFileSync('src/components/SettingsModal.tsx', code);
+fs.writeFileSync("src/components/SettingsModal.tsx", code);

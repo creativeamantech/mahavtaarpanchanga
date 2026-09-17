@@ -1,17 +1,19 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/PanchangaApp.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/PanchangaApp.tsx", "utf8");
 
 // It looks like my regex deleted the closing tag for the sidebar.
-// Let's restore from git or just fix the JSX structure. 
+// Let's restore from git or just fix the JSX structure.
 // I'll re-checkout the file and re-apply correctly.
-const cp = require('child_process');
-cp.execSync('git checkout src/PanchangaApp.tsx');
-code = fs.readFileSync('src/PanchangaApp.tsx', 'utf8');
+const cp = require("child_process");
+cp.execSync("git checkout src/PanchangaApp.tsx");
+code = fs.readFileSync("src/PanchangaApp.tsx", "utf8");
 
 // Now do the icon imports
 let importMatch = code.match(/import \{[^}]*\}\s*from "lucide-react";/);
 if (importMatch) {
-  code = code.replace(importMatch[0], `import {
+  code = code.replace(
+    importMatch[0],
+    `import {
   AlertCircle,
   RefreshCw,
   Sun,
@@ -33,10 +35,12 @@ if (importMatch) {
   ListTodo,
   CalendarDays,
   Hourglass
-} from "lucide-react";`);
+} from "lucide-react";`,
+  );
 }
 
-const originalNavItemsBlockRegex = /<div className="flex-1 overflow-y-auto px-4 py-6 space-y-1\.5 hide-scrollbar">[\s\S]*?<\/div>\s*<div\s*className={`p-5 border-t/m;
+const originalNavItemsBlockRegex =
+  /<div className="flex-1 overflow-y-auto px-4 py-6 space-y-1\.5 hide-scrollbar">[\s\S]*?<\/div>\s*<div\s*className={`p-5 border-t/m;
 const sidebarBlock = `<div className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5 hide-scrollbar">
           <div className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3 ml-2 font-sans">
             Spiritual Navigation
@@ -116,4 +120,4 @@ const sidebarBlock = `<div className="flex-1 overflow-y-auto px-4 py-6 space-y-1
           className={\`p-5 border-t`;
 
 code = code.replace(originalNavItemsBlockRegex, sidebarBlock);
-fs.writeFileSync('src/PanchangaApp.tsx', code);
+fs.writeFileSync("src/PanchangaApp.tsx", code);

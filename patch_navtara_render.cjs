@@ -1,8 +1,11 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/components/NavtaraView.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/components/NavtaraView.tsx", "utf8");
 
 // Also need to import Heart or another icon for Parihara. I'll just use what's available or add some.
-code = code.replace(/import \{ Star, Compass, ArrowRight, ShieldCheck, AlertTriangle \} from "lucide-react";/, 'import { Star, Compass, ArrowRight, ShieldCheck, AlertTriangle, Info, HeartHandshake } from "lucide-react";');
+code = code.replace(
+  /import \{ Star, Compass, ArrowRight, ShieldCheck, AlertTriangle \} from "lucide-react";/,
+  'import { Star, Compass, ArrowRight, ShieldCheck, AlertTriangle, Info, HeartHandshake } from "lucide-react";',
+);
 
 const pariharaBlock = `
               {currentTara.parihara && (
@@ -37,6 +40,9 @@ const pariharaBlock = `
               )}
             </div>`;
 
-code = code.replace(/              <\/p>\n            <\/div>/, `              </p>${pariharaBlock}`);
+code = code.replace(
+  /              <\/p>\n            <\/div>/,
+  `              </p>${pariharaBlock}`,
+);
 
-fs.writeFileSync('src/components/NavtaraView.tsx', code);
+fs.writeFileSync("src/components/NavtaraView.tsx", code);

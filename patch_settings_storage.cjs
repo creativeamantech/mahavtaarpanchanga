@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/settingsStorage.ts', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/settingsStorage.ts", "utf8");
 
 code = code.replace(
   /theme: \(\["parchment", "nightSky"\]\.includes\(parsed\.theme\)\n\s*\? parsed\.theme\n\s*: DEFAULT_USER_SETTINGS\.theme\) as AppTheme,/,
@@ -8,7 +8,7 @@ code = code.replace(
         : DEFAULT_USER_SETTINGS.theme) as AppTheme,
       birthNakshatra: typeof parsed.birthNakshatra === "number" 
         ? parsed.birthNakshatra 
-        : DEFAULT_USER_SETTINGS.birthNakshatra,`
+        : DEFAULT_USER_SETTINGS.birthNakshatra,`,
 );
 
-fs.writeFileSync('src/settingsStorage.ts', code);
+fs.writeFileSync("src/settingsStorage.ts", code);

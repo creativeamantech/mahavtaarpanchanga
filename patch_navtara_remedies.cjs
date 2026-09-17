@@ -1,5 +1,5 @@
-const fs = require('fs');
-let code = fs.readFileSync('src/components/NavtaraView.tsx', 'utf8');
+const fs = require("fs");
+let code = fs.readFileSync("src/components/NavtaraView.tsx", "utf8");
 
 const targetStr = `{/* Tara Dasa Sequence Section */}`;
 
@@ -66,4 +66,4 @@ const newSection = `
       `;
 
 code = code.replace(targetStr, newSection + targetStr);
-fs.writeFileSync('src/components/NavtaraView.tsx', code);
+fs.writeFileSync("src/components/NavtaraView.tsx", code);

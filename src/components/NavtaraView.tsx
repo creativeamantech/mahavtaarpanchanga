@@ -485,7 +485,7 @@ export function NavtaraView({
                     <span
                       className={`font-medium ${theme === "nightSky" ? "text-slate-200" : "text-stone-800"}`}
                     >
-                      {tara.parihara.deity_to_worship}
+                      {tara.parihara?.deity_to_worship}
                     </span>
                   </div>
                   <div className="flex gap-3">
@@ -497,7 +497,7 @@ export function NavtaraView({
                     <span
                       className={`font-medium ${theme === "nightSky" ? "text-slate-200" : "text-stone-800"}`}
                     >
-                      {tara.parihara.recommended_mantra}
+                      {tara.parihara?.recommended_mantra}
                     </span>
                   </div>
                   <div className="flex gap-3">
@@ -509,7 +509,7 @@ export function NavtaraView({
                     <span
                       className={`font-medium ${theme === "nightSky" ? "text-slate-200" : "text-stone-800"}`}
                     >
-                      {tara.parihara.recommended_donation}
+                      {tara.parihara?.recommended_donation}
                     </span>
                   </div>
                   <div className="flex gap-3">
@@ -521,7 +521,7 @@ export function NavtaraView({
                     <span
                       className={`font-medium ${theme === "nightSky" ? "text-slate-200" : "text-stone-800"}`}
                     >
-                      {tara.parihara.avoid_activities.join(", ")}
+                      {tara.parihara?.avoid_activities.join(", ")}
                     </span>
                   </div>
                 </div>

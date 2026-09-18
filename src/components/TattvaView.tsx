@@ -219,7 +219,7 @@ export function TattvaView({
             <div className="flex justify-between mt-2 pt-2 border-t border-amber-200/50 dark:border-amber-800/50">
               <div>
                 <div className="text-[10px] uppercase tracking-wider opacity-70">Hora</div>
-                <div className="text-sm font-medium">{activeHora ? activeHora.planet : "-"}</div>
+                <div className="text-sm font-medium">{activeHora ? (activeHora as any).planet : "-"}</div>
               </div>
             </div>
           </div>
@@ -425,7 +425,7 @@ export function TattvaView({
               <div className="text-[10px] uppercase font-bold tracking-wider opacity-70 mb-1">
                 Current Hora
               </div>
-              <div className="text-lg font-bold font-serif-vedic">{activeHora.planet}</div>
+              <div className="text-lg font-bold font-serif-vedic">{(activeHora as any).planet}</div>
             </div>
             <div className="flex gap-6">
               <div>

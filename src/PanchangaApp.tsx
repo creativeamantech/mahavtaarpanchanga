@@ -12,6 +12,7 @@ import { AuspiciousTimingsCard } from "./components/AuspiciousTimingsCard";
 import { GauriChoghadiyaCard } from "./components/GauriChoghadiyaCard";
 import { SwaraYogaCard } from "./components/SwaraYogaCard";
 import { RunningNowWidget } from "./components/RunningNowWidget";
+import { NextMajorIngressWidget } from "./components/NextMajorIngressWidget";
 import { PlanetaryPositionsCard } from "./components/PlanetaryPositionsCard";
 import { PlanetTransitionsCard } from "./components/PlanetTransitionsCard";
 import { MonthlyCalendarView } from "./components/MonthlyCalendarView";
@@ -25,6 +26,7 @@ import { LagnaChartView } from "./components/LagnaChartView";
 import { TodayScheduleView } from "./components/TodayScheduleView";
 import { FestivalsView } from "./components/FestivalsView";
 import { InvocationBanner } from "./components/InvocationBanner";
+import { NavagrahaView } from "./components/NavagrahaView";
 import type {
   PanchangaResponse,
   CityLocation,
@@ -534,6 +536,13 @@ export default function App() {
             theme={theme}
           />
           <NavItem
+            icon={Star}
+            label={lang === "hi" ? "नवग्रह मन्त्र" : "Navagraha"}
+            isActive={activeView === "navagraha"}
+            onClick={() => setActiveView("navagraha")}
+            theme={theme}
+          />
+          <NavItem
             icon={Wind}
             label={t.views.swara}
             isActive={activeView === "swara"}
@@ -824,6 +833,7 @@ export default function App() {
                     </div>
 
                     <div className="space-y-10">
+                      <NextMajorIngressWidget data={panchangaData} lang={lang} theme={theme} />
                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
                         <div className="lg:col-span-4 space-y-10">
                           <section>
@@ -865,6 +875,25 @@ export default function App() {
                         <PlanetTransitionsCard data={panchangaData} lang={lang} theme={theme} />
                       </section>
                     </div>
+                  </div>
+                )}
+
+                {/* View: Navagraha Mantras & Info */}
+                {activeView === "navagraha" && (
+                  <div
+                    id="view-navagraha"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-6xl mx-auto"
+                  >
+                    <div className="flex items-center space-x-3 mb-8">
+                      <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
+                      <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
+                        <Star className="w-4 h-4 text-amber-600" />
+                        {lang === "hi" ? "नवग्रह मन्त्र संग्रह" : "Navagraha Mantras"}
+                      </h2>
+                      <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
+                    </div>
+
+                    <NavagrahaView lang={lang} theme={theme} />
                   </div>
                 )}
 

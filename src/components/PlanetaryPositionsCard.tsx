@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Orbit,
   ArrowDownRight,
@@ -25,6 +25,47 @@ interface PlanetaryPositionsCardProps {
   theme?: AppTheme;
 }
 
+function getRealtimeRelativeText(targetDateMs: number, nowMs: number, lang: string): string {
+  const diffMs = targetDateMs - nowMs;
+  const isPast = diffMs < 0;
+  const absMs = Math.abs(diffMs);
+
+  const totalMinutes = Math.floor(absMs / 60000);
+  const totalHours = Math.floor(totalMinutes / 60);
+  const days = Math.floor(totalHours / 24);
+  const remHours = totalHours % 24;
+  const remMins = totalMinutes % 60;
+
+  if (isPast) {
+    if (days === 0) {
+      if (totalHours === 0) {
+        return lang === "hi" ? `✓ संपन्न (${remMins} मि. पहले)` : `✓ Completed (${remMins}m ago)`;
+      }
+      return lang === "hi"
+        ? `✓ संपन्न (${totalHours} घं. ${remMins} मि. पहले)`
+        : `✓ Completed (${totalHours}h ${remMins}m ago)`;
+    }
+    if (days === 1) {
+      return lang === "hi" ? `✓ संपन्न (कल)` : `✓ Completed (yesterday)`;
+    }
+    return lang === "hi" ? `✓ संपन्न (${days} दिन पहले)` : `✓ Completed (${days}d ago)`;
+  }
+
+  // Future countdown
+  if (days === 0) {
+    if (totalHours === 0) {
+      return lang === "hi" ? `⏳ ${remMins} मिनट में` : `⏳ in ${remMins}m`;
+    }
+    return lang === "hi"
+      ? `⏳ ${totalHours} घंटे ${remMins} मिनट में`
+      : `⏳ in ${totalHours}h ${remMins}m`;
+  }
+  if (days === 1) {
+    return lang === "hi" ? `⏳ कल (${remHours} घं. शेष)` : `⏳ in 1d ${remHours}h`;
+  }
+  return lang === "hi" ? `⏳ ${days} दिन ${remHours} घंटे में` : `⏳ in ${days}d ${remHours}h`;
+}
+
 export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
   data,
   lang,
@@ -32,6 +73,12 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
 }) => {
   const [displayMode, setDisplayMode] = useState<"table" | "kundali" | "transitions">("table");
   const isNight = theme === "nightSky";
+
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(timer);
+  }, []);
   const t = translations[lang];
   const planets = data.planets || [];
   const transitPlanetsMap = new Map<string, PlanetTransitStatus>(
@@ -348,7 +395,11 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
                           <div
                             className={`text-[11px] font-medium ${isNight ? "text-amber-300" : "text-amber-900"}`}
                           >
-                            {nextRasi.relativeText}
+                            {getRealtimeRelativeText(
+                              new Date(nextRasi.timestamp).getTime(),
+                              now,
+                              lang,
+                            )}
                           </div>
                           <div
                             className={`text-[10px] font-mono ${isNight ? "text-slate-400" : "text-stone-400"}`}

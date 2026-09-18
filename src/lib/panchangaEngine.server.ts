@@ -2324,11 +2324,11 @@ export function getKaranaTattvaBoundingPratipadas(
     return (solarRasiAtNm + 2) % 12 || 12;
   }
 
-  function getPreviousNm(date: Date): Astronomy.AstroTime {
+  function getPreviousNm(date: Date): Astronomy.AstroTime | null {
     return Astronomy.SearchMoonPhase(0, new Date(date.getTime() - 32 * 86400000), 33);
   }
 
-  function getNextNm(date: Date): Astronomy.AstroTime {
+  function getNextNm(date: Date): Astronomy.AstroTime | null {
     return Astronomy.SearchMoonPhase(0, new Date(date.getTime() + 5 * 86400000), 33);
   }
 
@@ -2355,7 +2355,7 @@ export function getKaranaTattvaBoundingPratipadas(
 
       boundaryCurrent = {
         timestampMs: earliestNm.date.getTime(),
-        masaNum: masa,
+        masaNum: masa as 1 | 7,
         masaName: masa === 1 ? "Caitra" : "Āśvina",
       };
       break;
@@ -2376,7 +2376,7 @@ export function getKaranaTattvaBoundingPratipadas(
     if (masa === targetMasa) {
       boundaryNext = {
         timestampMs: nm.date.getTime(),
-        masaNum: targetMasa,
+        masaNum: targetMasa as 1 | 7,
         masaName: targetMasa === 1 ? "Caitra" : "Āśvina",
       };
       break;

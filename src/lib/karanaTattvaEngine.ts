@@ -113,7 +113,7 @@ function getMasaSegmentAtNm(nmTime: Astronomy.AstroTime, ayanamsaDeg: number) {
   const sidereal = getSiderealLon(tropical, ayanamsaDeg);
   const rasi = Math.floor(sidereal / 30);
   const amantaMasaNum = (rasi + 2) % 12 || 12;
-  const baseName = rawSanskritNames.masas[amantaMasaNum.toString()] || "Unknown";
+  const baseName = (rawSanskritNames.masas as any)[amantaMasaNum.toString()] || "Unknown";
 
   return { masaNum: amantaMasaNum, masaName: baseName };
 }

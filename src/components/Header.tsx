@@ -26,7 +26,8 @@ export type ActiveView =
   | "tattva"
   | "calendar"
   | "lagna"
-  | "festivals";
+  | "festivals"
+  | "navagraha";
 
 interface HeaderProps {
   currentDate: string; // dd/mm/yyyy

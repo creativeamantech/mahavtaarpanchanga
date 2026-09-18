@@ -1,24 +1,20 @@
-const fs = require("fs");
-let content = fs.readFileSync("src/PanchangaApp.tsx", "utf8");
+const fs = require('fs');
+const file = 'src/components/PlanetTransitionsCard.tsx';
+let content = fs.readFileSync(file, 'utf8');
 
-const fixed = content.replace(
-  /<NavItem\s*<NavItem\s*icon={Star}.*?theme={theme}\s*\/>\s*theme={theme}\s*\/>/s,
-  `
-          <NavItem
-            icon={Star}
-            label={lang === "hi" ? "नव तारा चक्र" : "Navtara Chakra"}
-            isActive={activeView === "navtara"}
-            onClick={() => setActiveView("navtara")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Clock}
-            label={lang === "hi" ? "वैदिक होरा" : "Vedic Horas"}
-            isActive={activeView === "horas"}
-            onClick={() => setActiveView("horas")}
-            theme={theme}
-          />`,
-);
+const hookTarget = `  const isNight = theme === "nightSky";`;
+const hookReplace = `  const isNight = theme === "nightSky";
 
-fs.writeFileSync("src/PanchangaApp.tsx", fixed);
-console.log("Done");
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(timer);
+  }, []);`;
+content = content.replace(hookTarget, hookReplace);
+
+const alertTarget = `{ev.relativeText}`;
+const alertReplace = `{getRealtimeRelativeText(new Date(ev.timestamp).getTime(), now, lang)}`;
+content = content.replaceAll(alertTarget, alertReplace);
+
+fs.writeFileSync(file, content);
+console.log('Hooks and simple text replaced');

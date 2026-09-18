@@ -1,17 +1,16 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   ArrowRightLeft,
   Sparkles,
-  Sun,
   Flame,
   Clock,
   Calendar,
   Compass,
   ArrowDownRight,
   ArrowUpRight,
-  Filter,
   CheckCircle2,
-  AlertTriangle,
+  ChevronRight,
+  Orbit,
 } from "lucide-react";
 import type {
   PanchangaResponse,
@@ -33,130 +32,233 @@ interface PlanetTransitionsCardProps {
   theme?: AppTheme;
 }
 
-const GRAHA_THEMES: Record<string, { bg: string; text: string; border: string; bar: string }> = {
+const GRAHA_THEMES: Record<string, { bg: string; text: string; border: string; accent: string }> = {
   sun: {
-    bg: "bg-amber-100",
+    bg: "bg-amber-100/80",
     text: "text-amber-900",
     border: "border-amber-200",
-    bar: "bg-amber-500",
+    accent: "bg-amber-500",
   },
   moon: {
-    bg: "bg-indigo-100",
+    bg: "bg-indigo-100/80",
     text: "text-indigo-900",
     border: "border-indigo-200",
-    bar: "bg-indigo-500",
+    accent: "bg-indigo-500",
   },
-  mars: { bg: "bg-rose-100", text: "text-rose-900", border: "border-rose-200", bar: "bg-rose-500" },
+  mars: {
+    bg: "bg-rose-100/80",
+    text: "text-rose-900",
+    border: "border-rose-200",
+    accent: "bg-rose-500",
+  },
   mercury: {
-    bg: "bg-emerald-100",
+    bg: "bg-emerald-100/80",
     text: "text-emerald-900",
     border: "border-emerald-200",
-    bar: "bg-emerald-500",
+    accent: "bg-emerald-500",
   },
   jupiter: {
-    bg: "bg-yellow-100",
+    bg: "bg-yellow-100/80",
     text: "text-yellow-900",
     border: "border-yellow-200",
-    bar: "bg-yellow-500",
+    accent: "bg-yellow-500",
   },
   venus: {
-    bg: "bg-fuchsia-100",
+    bg: "bg-fuchsia-100/80",
     text: "text-fuchsia-900",
     border: "border-fuchsia-200",
-    bar: "bg-fuchsia-500",
+    accent: "bg-fuchsia-500",
   },
   saturn: {
-    bg: "bg-slate-200",
+    bg: "bg-slate-200/80",
     text: "text-slate-900",
     border: "border-slate-300",
-    bar: "bg-slate-600",
+    accent: "bg-slate-600",
   },
   rahu: {
-    bg: "bg-purple-100",
+    bg: "bg-purple-100/80",
     text: "text-purple-900",
     border: "border-purple-200",
-    bar: "bg-purple-600",
+    accent: "bg-purple-600",
   },
   ketu: {
-    bg: "bg-stone-200",
+    bg: "bg-stone-200/80",
     text: "text-stone-900",
     border: "border-stone-300",
-    bar: "bg-stone-600",
+    accent: "bg-stone-600",
   },
 };
 
 const GRAHA_THEMES_NIGHT: Record<
   string,
-  { bg: string; text: string; border: string; bar: string }
+  { bg: string; text: string; border: string; accent: string }
 > = {
   sun: {
-    bg: "bg-amber-950/80",
+    bg: "bg-amber-950/70",
     text: "text-amber-300",
     border: "border-amber-900/60",
-    bar: "bg-amber-500",
+    accent: "bg-amber-500",
   },
   moon: {
-    bg: "bg-indigo-950/80",
+    bg: "bg-indigo-950/70",
     text: "text-indigo-300",
     border: "border-indigo-900/60",
-    bar: "bg-indigo-500",
+    accent: "bg-indigo-500",
   },
   mars: {
-    bg: "bg-rose-950/80",
+    bg: "bg-rose-950/70",
     text: "text-rose-300",
     border: "border-rose-900/60",
-    bar: "bg-rose-500",
+    accent: "bg-rose-500",
   },
   mercury: {
-    bg: "bg-emerald-950/80",
+    bg: "bg-emerald-950/70",
     text: "text-emerald-300",
     border: "border-emerald-900/60",
-    bar: "bg-emerald-500",
+    accent: "bg-emerald-500",
   },
   jupiter: {
-    bg: "bg-yellow-950/80",
+    bg: "bg-yellow-950/70",
     text: "text-yellow-300",
     border: "border-yellow-900/60",
-    bar: "bg-yellow-500",
+    accent: "bg-yellow-500",
   },
   venus: {
-    bg: "bg-fuchsia-950/80",
+    bg: "bg-fuchsia-950/70",
     text: "text-fuchsia-300",
     border: "border-fuchsia-900/60",
-    bar: "bg-fuchsia-500",
+    accent: "bg-fuchsia-500",
   },
   saturn: {
-    bg: "bg-slate-800/80",
+    bg: "bg-slate-900/80",
     text: "text-slate-300",
-    border: "border-slate-700",
-    bar: "bg-slate-500",
+    border: "border-slate-800",
+    accent: "bg-slate-500",
   },
   rahu: {
-    bg: "bg-purple-950/80",
+    bg: "bg-purple-950/70",
     text: "text-purple-300",
     border: "border-purple-900/60",
-    bar: "bg-purple-500",
+    accent: "bg-purple-500",
   },
   ketu: {
-    bg: "bg-stone-800/80",
+    bg: "bg-stone-900/80",
     text: "text-stone-300",
-    border: "border-stone-700",
-    bar: "bg-stone-500",
+    border: "border-stone-800",
+    accent: "bg-stone-500",
   },
 };
+
+/**
+ * Calculates accurate real-time relative transit status & countdown.
+ * Differentiates past events from future countdowns and formats in Hindi/English.
+ */
+function getLiveTransitStatus(targetDateStrOrMs: string | number, nowMs: number, lang: string) {
+  const targetMs =
+    typeof targetDateStrOrMs === "number"
+      ? targetDateStrOrMs
+      : new Date(targetDateStrOrMs).getTime();
+  const diffMs = targetMs - nowMs;
+  const isPast = diffMs < 0;
+  const absMs = Math.abs(diffMs);
+
+  const totalMins = Math.floor(absMs / 60000);
+  const totalHours = Math.floor(totalMins / 60);
+  const days = Math.floor(totalHours / 24);
+  const remHours = totalHours % 24;
+  const remMins = totalMins % 60;
+
+  if (isPast) {
+    if (days === 0) {
+      if (totalHours === 0) {
+        return {
+          isPast: true,
+          label: lang === "hi" ? `✓ संपन्न (${remMins} मि. पहले)` : `✓ Completed (${remMins}m ago)`,
+          badgeClass:
+            "bg-stone-100 text-stone-600 border-stone-200 dark:bg-stone-800/90 dark:text-stone-300 dark:border-stone-700",
+        };
+      }
+      return {
+        isPast: true,
+        label:
+          lang === "hi"
+            ? `✓ संपन्न (${totalHours} घं. ${remMins} मि. पहले)`
+            : `✓ Completed (${totalHours}h ${remMins}m ago)`,
+        badgeClass:
+          "bg-stone-100 text-stone-600 border-stone-200 dark:bg-stone-800/90 dark:text-stone-300 dark:border-stone-700",
+      };
+    }
+    if (days === 1) {
+      return {
+        isPast: true,
+        label: lang === "hi" ? `✓ संपन्न (कल)` : `✓ Completed (yesterday)`,
+        badgeClass:
+          "bg-stone-100 text-stone-600 border-stone-200 dark:bg-stone-800/90 dark:text-stone-300 dark:border-stone-700",
+      };
+    }
+    return {
+      isPast: true,
+      label: lang === "hi" ? `✓ संपन्न (${days} दिन पहले)` : `✓ Completed (${days}d ago)`,
+      badgeClass:
+        "bg-stone-100 text-stone-600 border-stone-200 dark:bg-stone-800/90 dark:text-stone-300 dark:border-stone-700",
+    };
+  }
+
+  // Future countdown
+  if (days === 0) {
+    if (totalHours === 0) {
+      return {
+        isPast: false,
+        label: lang === "hi" ? `⏳ ${remMins} मिनट शेष` : `⏳ in ${remMins}m`,
+        badgeClass:
+          "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800/80 font-bold",
+      };
+    }
+    return {
+      isPast: false,
+      label:
+        lang === "hi"
+          ? `⏳ ${totalHours} घंटे ${remMins} मिनट शेष`
+          : `⏳ in ${totalHours}h ${remMins}m`,
+      badgeClass:
+        "bg-amber-100 text-amber-950 border-amber-300 dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800/80 font-bold",
+    };
+  }
+  if (days === 1) {
+    return {
+      isPast: false,
+      label: lang === "hi" ? `⏳ कल (${remHours} घं. शेष)` : `⏳ in 1d ${remHours}h`,
+      badgeClass:
+        "bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-900/60 font-semibold",
+    };
+  }
+  return {
+    isPast: false,
+    label: lang === "hi" ? `⏳ ${days} दिन ${remHours} घंटे शेष` : `⏳ in ${days}d ${remHours}h`,
+    badgeClass:
+      "bg-amber-50 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-900/60 font-semibold",
+  };
+}
 
 export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
   data,
   lang,
   theme,
 }) => {
-  const [activeTab, setActiveTab] = useState<"matrix" | "timeline">("matrix");
+  const [activeTab, setActiveTab] = useState<"cards" | "timeline">("cards");
   const [timelineFilter, setTimelineFilter] = useState<"all" | "rasi" | "nakshatra" | "today">(
     "all",
   );
   const isNight = theme === "nightSky";
-  const themeMap = isNight ? GRAHA_THEMES_NIGHT : GRAHA_THEMES;
 
+  // Dynamic real-time clock: updates every 10 seconds for ticking countdowns
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const themeMap = isNight ? GRAHA_THEMES_NIGHT : GRAHA_THEMES;
   const t = translations[lang];
   const transitionsData = data.planet_transitions;
 
@@ -186,22 +288,22 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
   return (
     <div
       id="planet-transitions-card"
-      className={`rounded-[1.5rem] p-6 sm:p-8 space-y-6 animate-in fade-in duration-500 transition-colors ${
-        isNight
-          ? "bg-[#0e1424]/90 border border-indigo-800/50 text-slate-100 shadow-xl"
-          : "glass-card"
+      className={`space-y-6 animate-in fade-in duration-500 transition-colors ${
+        isNight ? "text-slate-100" : "text-stone-900"
       }`}
     >
-      {/* Top Header */}
+      {/* Section Header with Simple View Switcher */}
       <div
         className={`flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-4 gap-3 ${
-          isNight ? "border-indigo-800/40" : "border-stone-100"
+          isNight ? "border-indigo-900/40" : "border-stone-200"
         }`}
       >
         <div className="flex items-center space-x-3">
           <div
-            className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-2xs ${
-              isNight ? "bg-amber-950/80 text-amber-300" : "bg-amber-100 text-amber-800"
+            className={`flex h-10 w-10 items-center justify-center rounded-xl shadow-xs ${
+              isNight
+                ? "bg-amber-950/80 text-amber-300 border border-amber-900/60"
+                : "bg-amber-100 text-amber-800 border border-amber-200"
             }`}
           >
             <ArrowRightLeft className="h-5 w-5" />
@@ -212,16 +314,19 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                 isNight ? "text-amber-200" : "text-stone-900"
               }`}
             >
-              {t.planetTransitionsTitle || "Graha Gochara — Planetary Transitions"}
+              {lang === "hi"
+                ? "ग्रह गोचर एवं राशि संक्रमण"
+                : "Planetary Transitions (Graha Gochara)"}
             </h3>
             <p className={`text-xs ${isNight ? "text-slate-400" : "text-stone-500"}`}>
-              {t.planetTransitionsSub ||
-                "High-precision sidereal ingress into Rashis & Nakshatras with sacred Punya Kala"}
+              {lang === "hi"
+                ? "सभी नवग्रहों की वर्तमान स्थिति एवं आगामी राशि व नक्षत्र परिवर्तन का सटीक विवरण"
+                : "Real-time planetary placements, upcoming sign & nakshatra ingresses"}
             </p>
           </div>
         </div>
 
-        {/* View switcher: Matrix / Timeline */}
+        {/* View Switcher: Simplified Cards / Timeline */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <div
             className={`inline-flex rounded-xl p-1 border text-xs font-semibold ${
@@ -230,30 +335,30 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
           >
             <button
               type="button"
-              id="transitions-view-matrix-btn"
-              onClick={() => setActiveTab("matrix")}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg transition-all ${
-                activeTab === "matrix"
+              id="transitions-view-cards-btn"
+              onClick={() => setActiveTab("cards")}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                activeTab === "cards"
                   ? isNight
-                    ? "bg-indigo-900/60 text-slate-100 font-bold shadow-2xs"
-                    : "bg-white text-stone-950 font-bold shadow-2xs"
+                    ? "bg-indigo-900/70 text-slate-100 font-bold shadow-xs"
+                    : "bg-white text-stone-950 font-bold shadow-xs"
                   : isNight
                     ? "text-slate-400 hover:text-slate-200"
                     : "text-stone-500 hover:text-stone-900"
               }`}
             >
               <Compass className="h-3.5 w-3.5" />
-              <span>{lang === "hi" ? "ग्रह स्थिति व आगामी" : "Graha Overview"}</span>
+              <span>{lang === "hi" ? "ग्रह कार्ड" : "Graha Cards"}</span>
             </button>
             <button
               type="button"
               id="transitions-view-timeline-btn"
               onClick={() => setActiveTab("timeline")}
-              className={`flex items-center space-x-1.5 px-3 py-1 rounded-lg transition-all ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg transition-all ${
                 activeTab === "timeline"
                   ? isNight
-                    ? "bg-indigo-900/60 text-amber-300 font-bold shadow-2xs"
-                    : "bg-white text-amber-950 font-bold shadow-2xs"
+                    ? "bg-indigo-900/70 text-amber-300 font-bold shadow-xs"
+                    : "bg-white text-amber-950 font-bold shadow-xs"
                   : isNight
                     ? "text-slate-400 hover:text-slate-200"
                     : "text-stone-500 hover:text-stone-900"
@@ -261,10 +366,10 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
             >
               <Clock className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`} />
               <span>
-                {lang === "hi" ? "गोचर कालक्रम" : "Transit Timeline"}
+                {lang === "hi" ? "कालक्रम" : "Timeline"}
                 {upcomingEvents.length > 0 && (
                   <span
-                    className={`ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${
+                    className={`ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] ${
                       isNight ? "bg-amber-950/80 text-amber-300" : "bg-amber-100 text-amber-900"
                     }`}
                   >
@@ -277,65 +382,75 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
         </div>
       </div>
 
-      {/* Today's Ingress Alert Banner (if any transition is happening on the selected day) */}
+      {/* Today's Ingress Alert Banner */}
       {todayEvents.length > 0 && (
         <div
           id="today-transits-banner"
-          className={`rounded-2xl p-4 shadow-xs border ${
+          className={`rounded-2xl p-4 border transition-all ${
             isNight
-              ? "bg-gradient-to-r from-amber-900/20 via-amber-800/30 to-amber-900/20 border-amber-700/50 text-amber-100"
-              : "bg-gradient-to-r from-amber-500/10 via-amber-100/40 to-amber-500/10 border-amber-300/80"
+              ? "bg-gradient-to-r from-amber-950/30 via-[#182038] to-amber-950/30 border-amber-800/50 text-amber-100"
+              : "bg-gradient-to-r from-amber-50 via-amber-100/40 to-amber-50 border-amber-300/80 text-amber-950"
           }`}
         >
           <div className="flex items-start space-x-3">
             <div
-              className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 mt-0.5 shadow-xs ${
+              className={`flex h-8 w-8 items-center justify-center rounded-xl shrink-0 mt-0.5 shadow-xs ${
                 isNight ? "bg-amber-600 text-white" : "bg-amber-500 text-white"
               }`}
             >
               <Sparkles className="h-4 w-4" />
             </div>
-            <div className="flex-1 space-y-1">
+            <div className="flex-1 space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
                 <h4
-                  className={`text-xs font-bold uppercase tracking-wider ${isNight ? "text-amber-200" : "text-amber-950"}`}
+                  className={`text-xs font-bold uppercase tracking-wider ${
+                    isNight ? "text-amber-200" : "text-amber-950"
+                  }`}
                 >
-                  {t.todayTransits || "Today's Planetary Transitions"}
+                  {lang === "hi" ? "आज के मुख्य ग्रह परिवर्तन" : "Today's Planetary Transitions"}
                 </h4>
-                <span className="rounded-full bg-amber-200/90 px-2 py-0.5 text-[10px] font-bold text-amber-900">
-                  {todayEvents.length} {lang === "hi" ? "परिवर्तन आज" : "Event(s) Today"}
+                <span className="rounded-full bg-amber-200/90 px-2 py-0.5 text-[10px] font-bold text-amber-950">
+                  {todayEvents.length} {lang === "hi" ? "परिवर्तन" : "Events"}
                 </span>
               </div>
-              <div className="space-y-1.5 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
                 {todayEvents.map((ev) => {
-                  const desc = ev.description ? ev.description[lang] || ev.description.en : "";
+                  const status = getLiveTransitStatus(ev.timestamp, now, lang);
                   return (
                     <div
                       key={ev.id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-xs text-stone-800 bg-white/70 rounded-xl px-3 py-2 border border-amber-200/60 gap-1.5"
+                      className={`flex flex-col justify-between text-xs rounded-xl px-3 py-2 border gap-1.5 ${
+                        isNight
+                          ? "bg-[#12182b]/80 border-amber-800/40 text-slate-200"
+                          : "bg-white/80 border-amber-200/70 text-stone-800"
+                      }`}
                     >
-                      <div className="flex items-center space-x-2">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-950 font-bold text-xs">
-                          {ev.symbol}
-                        </span>
-                        <span className="font-bold text-amber-950">
-                          {lang === "hi" ? ev.sanskritName : ev.planetName}
-                        </span>
-                        <span className="text-stone-400">→</span>
-                        <span className="font-semibold text-stone-900">
-                          {ev.type === "rasi" ? ev.toName || ev.toValue : ev.toName || ev.toValue}
-                        </span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-950 font-bold text-xs">
+                            {ev.symbol}
+                          </span>
+                          <span className="font-bold">
+                            {lang === "hi" ? ev.sanskritName : ev.planetName}
+                          </span>
+                          <span className="text-stone-400">→</span>
+                          <span className="font-semibold text-stone-900 dark:text-stone-100">
+                            {ev.toName || ev.toValue}
+                          </span>
+                        </div>
                         {ev.specialName && (
-                          <span className="rounded-md bg-amber-200/70 px-1.5 py-0.5 text-[10px] font-bold text-amber-900">
+                          <span className="rounded-md bg-amber-200/80 px-1.5 py-0.5 text-[10px] font-bold text-amber-950">
                             {ev.specialName}
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center space-x-2 text-stone-600 font-mono text-[11px]">
-                        <Clock className="h-3 w-3 text-amber-600" />
-                        <span className="font-bold text-stone-900">{ev.timeStr}</span>
-                        <span className="text-amber-800 font-sans font-semibold">
-                          ({ev.relativeText})
+
+                      <div className="flex items-center justify-between text-[11px] pt-1 border-t border-amber-200/40 dark:border-indigo-900/40 font-mono">
+                        <span className="text-stone-500 dark:text-slate-400">{ev.timeStr}</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold border ${status.badgeClass}`}
+                        >
+                          {status.label}
                         </span>
                       </div>
                     </div>
@@ -347,216 +462,175 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
         </div>
       )}
 
-      {/* View 1: Graha Status Grid (Matrix) */}
-      {activeTab === "matrix" && (
+      {/* VIEW 1: Clean, Simplified Graha Cards */}
+      {activeTab === "cards" && (
         <div
-          id="planet-transitions-matrix"
-          className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"
+          id="planet-transitions-cards-grid"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
         >
           {planetsList.map((planet) => {
             const grahaInfo = GRAHA_TRANSLATIONS[planet.planetId];
             const grahaLabel = grahaInfo ? grahaInfo[lang] || planet.planetName : planet.planetName;
-            const theme = themeMap[planet.planetId] || {
-              bg: isNight ? "bg-amber-950/80" : "bg-amber-100",
+            const themeStyle = themeMap[planet.planetId] || {
+              bg: isNight ? "bg-amber-950/70" : "bg-amber-100/80",
               text: isNight ? "text-amber-300" : "text-amber-900",
               border: isNight ? "border-amber-900/60" : "border-amber-200",
-              bar: "bg-amber-500",
+              accent: "bg-amber-500",
             };
 
             const nextRasi = planet.nextRasiTransit;
             const nextNak = planet.nextNakshatraTransit;
 
+            // Compute live status dynamically for this card
+            const rasiStatus = nextRasi
+              ? getLiveTransitStatus(nextRasi.timestamp, now, lang)
+              : null;
+            const nakStatus = nextNak ? getLiveTransitStatus(nextNak.timestamp, now, lang) : null;
+
             return (
               <div
                 key={planet.planetId}
-                id={`transit-card-${planet.planetId}`}
-                className={`group relative rounded-2xl border p-4 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between space-y-3 ${
+                id={`graha-card-${planet.planetId}`}
+                className={`rounded-2xl border p-4 transition-all flex flex-col justify-between space-y-3.5 shadow-2xs hover:shadow-sm ${
                   isNight
-                    ? "bg-[#12182b] border-indigo-900/40 hover:border-indigo-600"
-                    : "bg-white/80 border-stone-200/70 hover:border-amber-300"
+                    ? "bg-[#0e1424]/90 border-indigo-900/40 hover:border-indigo-700/70"
+                    : "bg-white border-stone-200/90 hover:border-amber-300"
                 }`}
               >
-                {/* Graha Header */}
-                <div>
-                  <div
-                    className={`flex items-center justify-between pb-2 border-b ${
-                      isNight ? "border-indigo-900/40" : "border-stone-100"
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2.5">
-                      <div
-                        className={`flex h-8 w-8 items-center justify-center rounded-xl ${theme.bg} ${theme.text} font-bold text-base shadow-2xs`}
-                      >
-                        {planet.symbol}
-                      </div>
-                      <div>
-                        <h4
-                          className={`font-bold text-sm font-devanagari ${isNight ? "text-slate-100" : "text-stone-900"}`}
-                        >
-                          {grahaLabel}
-                        </h4>
-                        <div
-                          className={`text-[11px] font-sans ${isNight ? "text-slate-400" : "text-stone-400"}`}
-                        >
-                          {planet.planetName} • {planet.sanskritName}
-                        </div>
-                      </div>
+                {/* 1. Header: Symbol + Names + Motion Badges */}
+                <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-indigo-900/40">
+                  <div className="flex items-center space-x-2.5">
+                    <div
+                      className={`flex h-9 w-9 items-center justify-center rounded-xl ${themeStyle.bg} ${themeStyle.text} font-bold text-lg shadow-2xs border ${themeStyle.border}`}
+                    >
+                      {planet.symbol}
                     </div>
-
-                    {/* Status Pills */}
-                    <div className="flex items-center space-x-1">
-                      {planet.isRetrograde ? (
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ${
-                            isNight
-                              ? "bg-rose-950/80 text-rose-300 border-rose-900/60"
-                              : "bg-rose-100 text-rose-900 border-rose-200"
-                          }`}
-                        >
-                          <ArrowDownRight className="mr-0.5 h-2.5 w-2.5" />
-                          {t.retrograde}
-                        </span>
-                      ) : (
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                            isNight
-                              ? "bg-slate-800/80 text-slate-300"
-                              : "bg-stone-100 text-stone-600"
-                          }`}
-                        >
-                          <ArrowUpRight
-                            className={`mr-0.5 h-2.5 w-2.5 ${isNight ? "text-slate-500" : "text-stone-400"}`}
-                          />
-                          {t.direct}
-                        </span>
-                      )}
-
-                      {planet.isCombust && (
-                        <span
-                          title={`Combust within ${planet.combustDistanceDeg}° of Sun`}
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ${
-                            isNight
-                              ? "bg-amber-950/80 text-amber-300 border-amber-900/60"
-                              : "bg-amber-100 text-amber-900 border-amber-200"
-                          }`}
-                        >
-                          <Flame
-                            className={`mr-0.5 h-2.5 w-2.5 ${isNight ? "text-amber-400" : "text-amber-600"}`}
-                          />
-                          {t.combust || "Asta"}
-                        </span>
-                      )}
+                    <div>
+                      <h4
+                        className={`font-bold text-base font-devanagari leading-tight ${
+                          isNight ? "text-slate-100" : "text-stone-900"
+                        }`}
+                      >
+                        {grahaLabel}
+                      </h4>
+                      <div
+                        className={`text-[11px] font-sans ${
+                          isNight ? "text-slate-400" : "text-stone-500"
+                        }`}
+                      >
+                        {planet.planetName} • {planet.sanskritName}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Current Sign & Degree Progress */}
-                  <div className="mt-3 space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
+                  {/* Motion Status Pills */}
+                  <div className="flex items-center space-x-1.5">
+                    {planet.isRetrograde ? (
                       <span
-                        className={`font-sans ${isNight ? "text-slate-400" : "text-stone-500"}`}
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ${
+                          isNight
+                            ? "bg-rose-950/80 text-rose-300 border-rose-900/60"
+                            : "bg-rose-100 text-rose-900 border-rose-200"
+                        }`}
                       >
-                        {lang === "hi" ? "वर्तमान राशि" : "Current Sign"}:
+                        <ArrowDownRight className="mr-0.5 h-3 w-3" />
+                        {t.retrograde}
                       </span>
+                    ) : (
                       <span
-                        className={`font-bold font-devanagari ${isNight ? "text-slate-200" : "text-stone-900"}`}
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                          isNight
+                            ? "bg-slate-800/80 text-slate-300 border-slate-700/60"
+                            : "bg-stone-100 text-stone-700 border-stone-200"
+                        }`}
                       >
-                        {planet.currentRasi}{" "}
-                        <span
-                          className={`font-mono text-[11px] ${isNight ? "text-slate-500" : "text-stone-500"}`}
-                        >
-                          ({planet.degreesInRasi})
-                        </span>
+                        <ArrowUpRight className="mr-0.5 h-3 w-3 text-stone-400" />
+                        {t.direct}
                       </span>
-                    </div>
+                    )}
 
-                    {/* Progress Bar through 30 degrees of current Rasi */}
-                    <div
-                      className="relative h-1.5 w-full overflow-hidden rounded-full bg-stone-100"
-                      style={{ backgroundColor: isNight ? "#1e293b" : "#f5f5f4" }}
-                    >
-                      <div
-                        className={`h-full ${theme.bar} transition-all duration-700`}
-                        style={{ width: `${planet.progressPercent}%` }}
-                      ></div>
-                    </div>
-                    <div
-                      className={`flex items-center justify-between text-[10px] ${isNight ? "text-slate-500" : "text-stone-400"}`}
-                    >
-                      <span>0°</span>
-                      <span>{planet.progressPercent}% in sign</span>
-                      <span>30°</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs pt-1">
+                    {planet.isCombust && (
                       <span
-                        className={`font-sans ${isNight ? "text-slate-400" : "text-stone-500"}`}
+                        title={`Combust within ${planet.combustDistanceDeg}° of Sun`}
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ${
+                          isNight
+                            ? "bg-amber-950/80 text-amber-300 border-amber-900/60"
+                            : "bg-amber-100 text-amber-900 border-amber-200"
+                        }`}
                       >
-                        {lang === "hi" ? "नक्षत्र व चरण" : "Nakshatra"}:
+                        <Flame className="mr-0.5 h-3 w-3 text-amber-600 dark:text-amber-400" />
+                        {t.combust || "Asta"}
                       </span>
-                      <span
-                        className={`font-semibold font-devanagari ${isNight ? "text-slate-200" : "text-stone-800"}`}
-                      >
-                        {planet.currentNakshatra}{" "}
-                        <span
-                          className={`text-[11px] font-sans ${isNight ? "text-amber-400" : "text-amber-800"}`}
-                        >
-                          (
-                          {lang === "hi"
-                            ? `चरण ${planet.currentPada}`
-                            : `Pāda ${planet.currentPada}`}
-                          )
-                        </span>
-                      </span>
-                    </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Next Ingress Highlights */}
+                {/* 2. Current Position Box */}
                 <div
-                  className={`mt-2 pt-2.5 border-t space-y-2 text-xs ${
-                    isNight ? "border-indigo-900/40" : "border-stone-100/90"
+                  className={`rounded-xl p-3 border space-y-1.5 ${
+                    isNight
+                      ? "bg-[#141b30]/80 border-indigo-900/30"
+                      : "bg-stone-50/70 border-stone-200/60"
                   }`}
                 >
-                  {/* Next Rasi Transit */}
-                  {nextRasi && (
-                    <div
-                      className={`rounded-xl p-2.5 border space-y-1 ${
-                        isNight
-                          ? "bg-indigo-950/40 border-amber-900/30"
-                          : "bg-amber-50/50 border-amber-200/50"
-                      }`}
-                    >
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={isNight ? "text-slate-400" : "text-stone-500"}>
+                      {lang === "hi" ? "वर्तमान राशि" : "Current Sign"}:
+                    </span>
+                    <span className="font-bold text-sm font-devanagari text-stone-900 dark:text-slate-100">
+                      {planet.currentRasi}{" "}
+                      <span className="font-mono text-xs font-normal text-amber-800 dark:text-amber-400">
+                        {planet.degreesInRasi}
+                      </span>
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-stone-200/40 dark:border-indigo-900/30">
+                    <span className={isNight ? "text-slate-400" : "text-stone-500"}>
+                      {lang === "hi" ? "नक्षत्र व चरण" : "Nakshatra"}:
+                    </span>
+                    <span className="font-medium text-xs font-devanagari text-stone-800 dark:text-slate-200">
+                      {planet.currentNakshatra}{" "}
+                      <span className="text-amber-800 dark:text-amber-400 font-sans">
+                        (
+                        {lang === "hi" ? `चरण ${planet.currentPada}` : `Pada ${planet.currentPada}`}
+                        )
+                      </span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3. Upcoming Ingress Section */}
+                <div
+                  className={`rounded-xl p-3 border space-y-2 ${
+                    isNight
+                      ? "bg-amber-950/20 border-amber-900/40"
+                      : "bg-amber-50/40 border-amber-200/70"
+                  }`}
+                >
+                  {nextRasi ? (
+                    <div>
                       <div className="flex items-center justify-between">
-                        <span
-                          className={`text-[10px] uppercase font-bold tracking-wider flex items-center gap-1 ${
-                            isNight ? "text-amber-400" : "text-amber-900"
-                          }`}
-                        >
-                          <ArrowRightLeft
-                            className={`h-3 w-3 ${isNight ? "text-amber-500" : "text-amber-700"}`}
-                          />
-                          {lang === "hi" ? "आगामी राशि गोचर" : "Next Sign Ingress"}
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 flex items-center gap-1">
+                          <ArrowRightLeft className="h-3 w-3" />
+                          {lang === "hi" ? "आगामी राशि गोचर" : "Next Ingress"}
                         </span>
-                        <span
-                          className={`rounded-full px-2 py-0.2 text-[10px] font-bold font-sans ${
-                            isNight
-                              ? "bg-amber-900/60 text-amber-200"
-                              : "bg-amber-200/80 text-amber-950"
-                          }`}
-                        >
-                          {nextRasi.relativeText}
-                        </span>
+                        {rasiStatus && (
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-[10px] border ${rasiStatus.badgeClass}`}
+                          >
+                            {rasiStatus.label}
+                          </span>
+                        )}
                       </div>
 
-                      <div className="flex items-center justify-between pt-0.5">
-                        <span
-                          className={`font-bold font-devanagari text-[13px] ${isNight ? "text-slate-100" : "text-stone-900"}`}
-                        >
+                      <div className="flex items-center justify-between pt-1.5">
+                        <span className="text-sm font-bold font-devanagari text-stone-900 dark:text-slate-100">
                           → {nextRasi.toName || nextRasi.toValue}
                         </span>
-                        <div className="text-[11px] text-stone-600 font-mono text-right">
+                        <div className="text-right text-[11px] font-mono text-stone-600 dark:text-slate-400">
                           <div>{nextRasi.dateStr}</div>
-                          <div className="text-[10px] text-stone-400">
+                          <div className="text-[10px] text-stone-500 dark:text-slate-500">
                             {nextRasi.timeStr} ({nextRasi.dayOfWeek})
                           </div>
                         </div>
@@ -565,64 +639,48 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                       {/* Sankranti & Punya Kala for Sun */}
                       {nextRasi.specialName && (
                         <div
-                          className={`mt-1 pt-1 border-t text-[11px] space-y-0.5 ${
+                          className={`mt-2 pt-1.5 border-t text-xs space-y-0.5 ${
                             isNight
                               ? "border-amber-900/40 text-amber-300"
-                              : "border-amber-200/60 text-amber-950"
+                              : "border-amber-200/70 text-amber-950"
                           }`}
                         >
-                          <div
-                            className={`font-bold flex items-center gap-1 ${isNight ? "text-amber-500" : "text-amber-900"}`}
-                          >
-                            <Sun
-                              className={`h-3 w-3 ${isNight ? "text-amber-400" : "text-amber-600"}`}
-                            />
-                            {nextRasi.specialName}
+                          <div className="flex items-center gap-1 font-bold">
+                            <Sparkles className="h-3 w-3 text-amber-500" />
+                            <span>{nextRasi.specialName}</span>
                           </div>
                           {nextRasi.punyaKala && (
-                            <div
-                              className={`text-[10px] flex items-center justify-between ${
-                                isNight ? "text-slate-400" : "text-stone-600"
-                              }`}
-                            >
-                              <span
-                                className={`font-medium ${isNight ? "text-amber-400" : "text-amber-900"}`}
-                              >
-                                {t.punyaKala || "Puṇyakāla"}:
-                              </span>
-                              <span className="font-mono">
-                                {nextRasi.punyaKala.start} – {nextRasi.punyaKala.end}
-                              </span>
+                            <div className="text-[10px] font-mono text-stone-600 dark:text-slate-400 pl-4">
+                              {lang === "hi" ? "पुण्यकाल" : "Puṇyakāla"}: {nextRasi.punyaKala.start}{" "}
+                              – {nextRasi.punyaKala.end}
                             </div>
                           )}
                         </div>
                       )}
                     </div>
+                  ) : (
+                    <div className="text-xs text-stone-400 italic">
+                      {lang === "hi"
+                        ? "निकट भविष्य में कोई राशि परिवर्तन नहीं"
+                        : "No upcoming sign ingress"}
+                    </div>
                   )}
 
-                  {/* Next Nakshatra Transit */}
+                  {/* Next Nakshatra Ingress (Compact One-Liner) */}
                   {nextNak && (
-                    <div
-                      className={`flex items-center justify-between text-[11px] px-1 ${
-                        isNight ? "text-slate-400" : "text-stone-600"
-                      }`}
-                    >
-                      <span className={isNight ? "text-slate-500" : "text-stone-400"}>
-                        {lang === "hi" ? "नक्षत्र प्रवेश" : "Next Nakṣatra"}:
+                    <div className="pt-2 border-t border-amber-200/40 dark:border-amber-900/30 flex items-center justify-between text-[11px]">
+                      <span className="text-stone-500 dark:text-slate-400">
+                        {lang === "hi" ? "आगामी नक्षत्र:" : "Next Nakṣatra:"}
                       </span>
-                      <div className="text-right">
-                        <span
-                          className={`font-semibold font-devanagari ${
-                            isNight ? "text-slate-200" : "text-stone-800"
-                          }`}
-                        >
-                          {nextNak.toName || nextNak.toValue}
+                      <div className="text-right flex items-center gap-1.5">
+                        <span className="font-semibold text-stone-900 dark:text-slate-200 font-devanagari">
+                          → {nextNak.toName || nextNak.toValue}
                         </span>
-                        <span
-                          className={`text-[10px] ml-1 ${isNight ? "text-slate-500" : "text-stone-400"}`}
-                        >
-                          ({nextNak.relativeText})
-                        </span>
+                        {nakStatus && (
+                          <span className="text-[10px] text-stone-500 dark:text-slate-400 font-sans">
+                            ({nakStatus.label.replace("✓ ", "").replace("⏳ ", "")})
+                          </span>
+                        )}
                       </div>
                     </div>
                   )}
@@ -633,30 +691,30 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
         </div>
       )}
 
-      {/* View 2: Chronological Timeline Feed */}
+      {/* VIEW 2: Clean 60-Day Transit Timeline */}
       {activeTab === "timeline" && (
         <div id="planet-transitions-timeline" className="space-y-4">
-          {/* Filter Sub-Tabs */}
+          {/* Filters */}
           <div
-            className={`flex flex-wrap items-center justify-between gap-2 pb-2 border-b ${
-              isNight ? "border-indigo-900/40" : "border-stone-100"
+            className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border ${
+              isNight ? "bg-[#12182b] border-indigo-900/40" : "bg-stone-50/70 border-stone-200"
             }`}
           >
-            <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => setTimelineFilter("all")}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                   timelineFilter === "all"
                     ? isNight
-                      ? "bg-amber-600 text-white shadow-2xs"
-                      : "bg-amber-850 text-white shadow-2xs"
+                      ? "bg-amber-600 text-white"
+                      : "bg-amber-500 text-white"
                     : isNight
-                      ? "bg-[#12182b] border border-indigo-900/40 text-slate-300 hover:bg-indigo-900/40"
+                      ? "bg-stone-800 text-slate-300 hover:bg-stone-700"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                {lang === "hi" ? "सभी गोचर" : "All Transits"} ({upcomingEvents.length})
+                {lang === "hi" ? "सभी गोचर" : "All"} ({upcomingEvents.length})
               </button>
               <button
                 type="button"
@@ -664,14 +722,14 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                   timelineFilter === "rasi"
                     ? isNight
-                      ? "bg-amber-600 text-white shadow-2xs"
-                      : "bg-amber-850 text-white shadow-2xs"
+                      ? "bg-amber-600 text-white"
+                      : "bg-amber-500 text-white"
                     : isNight
-                      ? "bg-[#12182b] border border-indigo-900/40 text-slate-300 hover:bg-indigo-900/40"
+                      ? "bg-stone-800 text-slate-300 hover:bg-stone-700"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                {lang === "hi" ? "राशि प्रवेश (संक्रांति)" : "Sign (Rāśi) Ingress"}
+                {lang === "hi" ? "केवल राशि गोचर" : "Rāśi Only"}
               </button>
               <button
                 type="button"
@@ -679,14 +737,14 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                   timelineFilter === "nakshatra"
                     ? isNight
-                      ? "bg-amber-600 text-white shadow-2xs"
-                      : "bg-amber-850 text-white shadow-2xs"
+                      ? "bg-amber-600 text-white"
+                      : "bg-amber-500 text-white"
                     : isNight
-                      ? "bg-[#12182b] border border-indigo-900/40 text-slate-300 hover:bg-indigo-900/40"
+                      ? "bg-stone-800 text-slate-300 hover:bg-stone-700"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                 }`}
               >
-                {lang === "hi" ? "नक्षत्र प्रवेश" : "Nakṣatra Ingress"}
+                {lang === "hi" ? "केवल नक्षत्र गोचर" : "Nakṣatra Only"}
               </button>
               {todayEvents.length > 0 && (
                 <button
@@ -695,11 +753,11 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                     timelineFilter === "today"
                       ? isNight
-                        ? "bg-amber-600 text-white shadow-2xs"
-                        : "bg-amber-500 text-white shadow-2xs"
+                        ? "bg-amber-600 text-white"
+                        : "bg-amber-500 text-white"
                       : isNight
-                        ? "bg-amber-900/40 text-amber-300 border border-amber-800/50 hover:bg-amber-800/40"
-                        : "bg-amber-100 text-amber-900 hover:bg-amber-200"
+                        ? "bg-amber-950/80 text-amber-300 border border-amber-800/80"
+                        : "bg-amber-100 text-amber-950 border border-amber-300"
                   }`}
                 >
                   {lang === "hi" ? "आज के गोचर" : "Today"} ({todayEvents.length})
@@ -707,190 +765,96 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
               )}
             </div>
 
-            <div className={`text-xs font-sans ${isNight ? "text-slate-500" : "text-stone-400"}`}>
-              {lang === "hi" ? "आगामी ६० दिवस" : "Next 60 days"}
+            <div className={`text-xs ${isNight ? "text-slate-400" : "text-stone-500"}`}>
+              {lang === "hi" ? "आगामी ६० दिवस का विवरण" : "Next 60 days of planetary movements"}
             </div>
           </div>
 
-          {/* Events List */}
-          <div className="space-y-3">
+          {/* Events Feed */}
+          <div className="space-y-2.5">
             {filteredEvents.map((ev) => {
-              const theme = themeMap[ev.planetId] || {
-                bg: isNight ? "bg-amber-950/80" : "bg-amber-100",
+              const themeStyle = themeMap[ev.planetId] || {
+                bg: isNight ? "bg-amber-950/70" : "bg-amber-100",
                 text: isNight ? "text-amber-300" : "text-amber-900",
                 border: isNight ? "border-amber-900/60" : "border-amber-200",
-                bar: "bg-amber-500",
+                accent: "bg-amber-500",
               };
-
-              const desc = ev.description ? ev.description[lang] || ev.description.en : "";
+              const liveStatus = getLiveTransitStatus(ev.timestamp, now, lang);
 
               return (
                 <div
                   key={ev.id}
                   id={`timeline-event-${ev.id}`}
-                  className={`rounded-2xl border p-4 transition-all ${
+                  className={`rounded-xl border p-3.5 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 ${
                     ev.isToday
                       ? isNight
-                        ? "border-amber-700/50 bg-amber-900/20 shadow-xs ring-1 ring-amber-700/30"
-                        : "border-amber-300 bg-amber-50/40 shadow-xs ring-1 ring-amber-300/40"
+                        ? "border-amber-700/60 bg-amber-950/20 shadow-xs"
+                        : "border-amber-300 bg-amber-50/50 shadow-xs"
                       : isNight
-                        ? "border-indigo-900/40 bg-[#12182b] hover:border-indigo-600"
-                        : "border-stone-200/70 bg-white hover:border-amber-200"
+                        ? "border-indigo-900/40 bg-[#0e1424]/60 hover:border-indigo-700/50"
+                        : "border-stone-200/80 bg-white hover:border-stone-300"
                   }`}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                    {/* Left: Planet badge + Details */}
-                    <div className="flex items-start space-x-3">
-                      <div
-                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${theme.bg} ${theme.text} font-bold text-lg shadow-2xs mt-0.5`}
-                      >
-                        {ev.symbol}
-                      </div>
-
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className={`font-bold text-sm font-devanagari ${
-                              isNight ? "text-slate-100" : "text-stone-900"
-                            }`}
-                          >
-                            {lang === "hi" ? ev.sanskritName : ev.planetName}
-                          </span>
-                          <span
-                            className={`text-xs ${isNight ? "text-slate-500" : "text-stone-400"}`}
-                          >
-                            (
-                            {ev.type === "rasi"
-                              ? lang === "hi"
-                                ? "राशि गोचर"
-                                : "Rāśi Transit"
-                              : lang === "hi"
-                                ? "नक्षत्र गोचर"
-                                : "Nakṣatra Transit"}
-                            )
-                          </span>
-                          {ev.isToday && (
-                            <span
-                              className={`rounded-full px-2 py-0.2 text-[10px] font-bold border ${
-                                isNight
-                                  ? "bg-emerald-950/80 text-emerald-300 border-emerald-900/60"
-                                  : "bg-emerald-100 text-emerald-800 border-emerald-300"
-                              }`}
-                            >
-                              {lang === "hi" ? "आज" : "TODAY"}
-                            </span>
-                          )}
-                          {ev.specialName && (
-                            <span
-                              className={`rounded-full px-2 py-0.2 text-[10px] font-bold border ${
-                                isNight
-                                  ? "bg-amber-900/60 text-amber-200 border-amber-800/80"
-                                  : "bg-amber-200 text-amber-950 border-amber-300"
-                              }`}
-                            >
-                              {ev.specialName}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Transition path */}
-                        <div className="flex items-center space-x-2 text-xs">
-                          <span
-                            className={`font-devanagari ${isNight ? "text-slate-400" : "text-stone-500"}`}
-                          >
-                            {ev.fromName || ev.fromValue}
-                          </span>
-                          <span
-                            className={`font-bold ${isNight ? "text-amber-500" : "text-amber-700"}`}
-                          >
-                            →
-                          </span>
-                          <span
-                            className={`font-bold font-devanagari text-sm ${isNight ? "text-slate-200" : "text-stone-900"}`}
-                          >
-                            {ev.toName || ev.toValue}
-                          </span>
-                          <span
-                            className={`text-[11px] font-sans ${isNight ? "text-slate-500" : "text-stone-400"}`}
-                          >
-                            ({ev.toValue})
-                          </span>
-                        </div>
-
-                        {/* Spiritual significance description */}
-                        {desc && (
-                          <p
-                            className={`text-xs pt-1 leading-relaxed max-w-2xl font-sans ${isNight ? "text-slate-300" : "text-stone-600"}`}
-                          >
-                            {desc}
-                          </p>
-                        )}
-
-                        {/* Solar Sankranti Punya Kala details */}
-                        {ev.punyaKala && (
-                          <div
-                            className={`mt-2 flex flex-wrap items-center gap-3 text-xs rounded-xl px-3 py-1.5 border ${
-                              isNight
-                                ? "bg-amber-950/40 border-amber-900/50"
-                                : "bg-amber-100/60 border-amber-200/80"
-                            }`}
-                          >
-                            <div
-                              className={`flex items-center space-x-1.5 font-medium ${isNight ? "text-amber-300" : "text-amber-950"}`}
-                            >
-                              <Sparkles
-                                className={`h-3.5 w-3.5 ${isNight ? "text-amber-400" : "text-amber-700"}`}
-                              />
-                              <span className="font-bold">{ev.punyaKala.name}:</span>
-                              <span className="font-mono">
-                                {ev.punyaKala.start} – {ev.punyaKala.end}
-                              </span>
-                            </div>
-                            {ev.mahaPunyaKala && (
-                              <div
-                                className={`flex items-center space-x-1 font-medium border-l pl-3 ${
-                                  isNight
-                                    ? "text-amber-400 border-amber-900"
-                                    : "text-amber-900 border-amber-300"
-                                }`}
-                              >
-                                <span className="font-bold">{ev.mahaPunyaKala.name}:</span>
-                                <span className="font-mono">
-                                  {ev.mahaPunyaKala.start} – {ev.mahaPunyaKala.end}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Right: Date, Time & Countdown Badge */}
+                  {/* Left: Planet Icon + Ingress Path */}
+                  <div className="flex items-center space-x-3">
                     <div
-                      className={`flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-1 border-t sm:border-t-0 pt-2 sm:pt-0 shrink-0 ${
-                        isNight ? "border-indigo-900/40" : "border-stone-100"
-                      }`}
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${themeStyle.bg} ${themeStyle.text} font-bold text-base shadow-2xs border ${themeStyle.border}`}
                     >
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-bold font-sans border ${
-                          isNight
-                            ? "bg-amber-900/40 text-amber-300 border-amber-900/60"
-                            : "bg-amber-100/80 text-amber-900 border-amber-200"
-                        }`}
-                      >
-                        {ev.relativeText}
-                      </span>
-                      <div
-                        className={`text-xs font-mono font-bold pt-1 ${isNight ? "text-slate-200" : "text-stone-900"}`}
-                      >
-                        {ev.dateStr}
+                      {ev.symbol}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-sm font-devanagari text-stone-900 dark:text-slate-100">
+                          {lang === "hi" ? ev.sanskritName : ev.planetName}
+                        </span>
+                        <span className="text-stone-400">→</span>
+                        <span className="font-bold text-sm font-devanagari text-amber-800 dark:text-amber-300">
+                          {ev.toName || ev.toValue}
+                        </span>
+                        <span
+                          className={`text-[10px] px-1.5 py-0.2 rounded-md font-semibold ${
+                            ev.type === "rasi"
+                              ? isNight
+                                ? "bg-indigo-950/80 text-indigo-300 border border-indigo-900/60"
+                                : "bg-indigo-50 text-indigo-700 border border-indigo-200"
+                              : isNight
+                                ? "bg-stone-800 text-stone-300 border border-stone-700"
+                                : "bg-stone-100 text-stone-600 border border-stone-200"
+                          }`}
+                        >
+                          {ev.type === "rasi"
+                            ? lang === "hi"
+                              ? "राशि"
+                              : "Rāśi"
+                            : lang === "hi"
+                              ? "नक्षत्र"
+                              : "Nakṣatra"}
+                        </span>
+                        {ev.isToday && (
+                          <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/80 px-2 py-0.2 text-[10px] font-bold">
+                            {lang === "hi" ? "आज" : "TODAY"}
+                          </span>
+                        )}
+                        {ev.specialName && (
+                          <span className="rounded-full bg-amber-200 dark:bg-amber-900/60 text-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-800 px-2 py-0.2 text-[10px] font-bold">
+                            {ev.specialName}
+                          </span>
+                        )}
                       </div>
-                      <div
-                        className={`text-[11px] font-mono ${isNight ? "text-slate-500" : "text-stone-500"}`}
-                      >
-                        {ev.timeStr} • {ev.dayOfWeek}
+
+                      <div className="text-[11px] text-stone-500 dark:text-slate-400 font-mono mt-0.5">
+                        {ev.dateStr} • {ev.timeStr} ({ev.dayOfWeek})
                       </div>
                     </div>
+                  </div>
+
+                  {/* Right: Real-time Countdown Badge */}
+                  <div className="flex items-center sm:justify-end shrink-0 pl-12 sm:pl-0">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold border ${liveStatus.badgeClass}`}
+                    >
+                      {liveStatus.label}
+                    </span>
                   </div>
                 </div>
               );
@@ -898,22 +862,6 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
           </div>
         </div>
       )}
-
-      {/* Footer notes */}
-      <div
-        className={`border-t pt-3 flex flex-wrap items-center justify-between text-xs gap-2 ${
-          isNight ? "border-indigo-900/40 text-slate-400" : "border-stone-100 text-stone-500"
-        }`}
-      >
-        <div>
-          {lang === "hi"
-            ? "* सभी ग्रह गोचर व संक्रांति समय नासा जेपीएल प्रत्यक्ष दृश्य निरयण अयनांश आधारित हैं।"
-            : "* Planetary ingress and Saṅkrānti computed with high-precision NASA JPL sidereal ephemeris."}
-        </div>
-        <div className="font-mono text-[11px] text-stone-400">
-          Root-bracketed Bisection Precision ±30s
-        </div>
-      </div>
     </div>
   );
 };

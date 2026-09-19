@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type { PanchangaResponse } from "../types";
+import type { PanchangaResponse, SwaraNadi } from "../types";
 import type { Language } from "../i18n";
 import {
   SWARA_CYCLE_RULES,
@@ -77,15 +77,15 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
     data.moonset,
   );
 
-  const sunriseDetails = SWARA_DETAILS[swaraData.sunriseSwara];
-  const sunsetDetails = SWARA_DETAILS[swaraData.sunsetSwara];
-  const moonriseDetails = SWARA_DETAILS[swaraData.moonriseSwara];
-  const moonsetDetails = SWARA_DETAILS[swaraData.moonsetSwara];
+  const sunriseDetails = SWARA_DETAILS[swaraData.sunriseSwara || "ida"];
+  const sunsetDetails = SWARA_DETAILS[swaraData.sunsetSwara || "pingala"];
+  const moonriseDetails = (swaraData.moonriseSwara && SWARA_DETAILS[swaraData.moonriseSwara]) ? SWARA_DETAILS[swaraData.moonriseSwara] : sunriseDetails;
+  const moonsetDetails = (swaraData.moonsetSwara && SWARA_DETAILS[swaraData.moonsetSwara]) ? SWARA_DETAILS[swaraData.moonsetSwara] : sunsetDetails;
 
   const horaState = resolveCurrentHora(Date.now(), data);
   const activeHora = horaState?.hora || null;
   const activeHoraTattva = horaState?.activeTattva || null;
-  const activeNadi = activeHora?.nadi || swaraData.currentActiveSwara || swaraData.sunriseSwara;
+  const activeNadi = (activeHora?.nadi || swaraData.currentActiveSwara || swaraData.sunriseSwara || "ida") as SwaraNadi;
   const activeDetails = SWARA_DETAILS[activeNadi] || sunriseDetails;
 
   const primaryNakNum = data.nakshatra?.[0]?.number || 1;
@@ -1000,7 +1000,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       </span>
                     </div>
                     <ul className="space-y-1.5 text-xs text-emerald-950 font-sans">
-                      {activeDetails.auspiciousWorks[lang].slice(0, 5).map((w, idx) => (
+                      {activeDetails.auspiciousWorks[lang].slice(0, 5).map((w: string, idx: number) => (
                         <li key={idx} className="flex items-start space-x-1.5">
                           <span className="text-emerald-700 font-bold">•</span>
                           <span>{w}</span>
@@ -1019,7 +1019,7 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       </span>
                     </div>
                     <ul className="space-y-1.5 text-xs text-rose-950 font-sans">
-                      {activeDetails.inauspiciousWorks[lang].map((w, idx) => (
+                      {activeDetails.inauspiciousWorks[lang].map((w: string, idx: number) => (
                         <li key={idx} className="flex items-start space-x-1.5">
                           <span className="text-rose-700 font-bold">•</span>
                           <span>{w}</span>

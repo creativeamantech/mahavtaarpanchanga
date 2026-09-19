@@ -12,7 +12,7 @@ describe("Vedic Hora Engine Live Resolver", () => {
     const sunsetMs = 1700043200000; // Let's pretend this is 18:00
     const nextSunriseMs = 1700086400000; // Let's pretend this is 6:00 AM next day
 
-    const mockPanchanga: PanchangaResponse = {
+    const mockPanchanga = {
       city: "Test",
       date: "14/09/2026",
       timezone: "Asia/Kolkata",
@@ -60,7 +60,7 @@ describe("Vedic Hora Engine Live Resolver", () => {
       sunrise_ms: sunriseMs,
       sunset_ms: sunsetMs,
       next_sunrise_ms: nextSunriseMs,
-    };
+    } as unknown as PanchangaResponse;
 
     // Test A — Sunrise
     const resA = resolveCurrentHora(sunriseMs, mockPanchanga);

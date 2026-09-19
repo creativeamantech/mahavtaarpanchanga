@@ -190,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span className="font-serif-vedic font-bold text-base sm:text-lg text-[#F0C96A] tracking-tight leading-tight">
-                  Mahavtaar Panchangaa
+                  Mahavtaar Panchanga
                 </span>
                 <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider bg-white/15 text-amber-200 border border-white/20">
                   Drik

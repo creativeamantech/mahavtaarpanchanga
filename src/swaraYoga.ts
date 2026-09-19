@@ -818,10 +818,10 @@ export function computeSwaraYoga(
   } else if (isSunsetActive) {
     currentActiveSwara = rule.sunsetSwara;
     activeNostril = rule.sunsetNostril;
-  } else if (isMoonriseActive) {
+  } else if (isMoonriseActive && rule.moonriseSwara && rule.moonriseNostril) {
     currentActiveSwara = rule.moonriseSwara;
     activeNostril = rule.moonriseNostril;
-  } else if (isMoonsetActive) {
+  } else if (isMoonsetActive && rule.moonsetSwara && rule.moonsetNostril) {
     currentActiveSwara = rule.moonsetSwara;
     activeNostril = rule.moonsetNostril;
   }

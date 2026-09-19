@@ -22,7 +22,6 @@ import { PrintablePanchanga } from "./components/PrintablePanchanga";
 import { VedicHorasView } from "./components/VedicHorasView";
 import { TattvaView } from "./components/TattvaView";
 import { NavtaraView } from "./components/NavtaraView";
-import { LagnaChartView } from "./components/LagnaChartView";
 import { TodayScheduleView } from "./components/TodayScheduleView";
 import { FestivalsView } from "./components/FestivalsView";
 import { InvocationBanner } from "./components/InvocationBanner";
@@ -578,13 +577,6 @@ export default function App() {
             theme={theme}
           />
           <NavItem
-            icon={Compass}
-            label={lang === "hi" ? "लग्न कुण्डली" : "Lagna"}
-            isActive={activeView === "lagna"}
-            onClick={() => setActiveView("lagna")}
-            theme={theme}
-          />
-          <NavItem
             icon={Flame}
             label={lang === "hi" ? "पर्व व व्रत" : "Festivals"}
             isActive={activeView === "festivals"}
@@ -981,23 +973,6 @@ export default function App() {
                     <section className="space-y-6">
                       <VedicHorasView panchangaData={panchangaData} lang={lang} />
                     </section>
-                  </div>
-                )}
-
-                {/* View: Janma Lagna Chart */}
-                {activeView === "lagna" && (
-                  <div
-                    id="view-janma-lagna"
-                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
-                  >
-                    <div className="flex items-center space-x-3 mb-8">
-                      <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
-                      <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
-                        D1 Rāśi Chart
-                      </h2>
-                      <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
-                    </div>
-                    <LagnaChartView lang={lang} />
                   </div>
                 )}
 

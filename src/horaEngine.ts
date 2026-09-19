@@ -133,7 +133,7 @@ export function computeDailyHoras(
   const dayHoraDuration = dayDurationMs / 12;
   const nightHoraDuration = nightDurationMs / 12;
 
-  const initialNadi = computeSwaraYoga(tithiNum, "00:00:00", "00:00:00").sunriseSwara; // sunrise Swara rules based on tithi
+  const initialNadi = computeSwaraYoga(tithiNum, "00:00:00", "00:00:00").sunriseSwara || "ida"; // sunrise Swara rules based on tithi
   const startIndex = WEEKDAY_START_INDEX[weekday % 7];
 
   const horas: Hora[] = [];

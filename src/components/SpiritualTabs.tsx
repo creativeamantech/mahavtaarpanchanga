@@ -86,12 +86,6 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
       subLabel: "मास-पत्रकम्",
     },
     {
-      id: "lagna",
-      label: lang === "hi" ? "लग्न कुण्डली" : "Lagna",
-      icon: "🔯",
-      subLabel: "लग्नम्",
-    },
-    {
       id: "festivals",
       label: lang === "hi" ? "पर्व व व्रत" : "Festivals",
       icon: "🪔",

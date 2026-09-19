@@ -447,15 +447,60 @@ html.dark [id^="calendar-cell-"]:hover {
   background-color: rgba(30, 41, 69, 0.6) !important;
 }
 
-/* Print Overrides: Always clean light background for paper printing */
+/* Print Overrides: Always clean light background for paper printing & PDF export */
 @media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
   body,
   .theme-night-sky,
   [data-theme="nightSky"],
   html.dark body {
     background-color: #ffffff !important;
     background-image: none !important;
-    color: #000000 !important;
+    color: #111827 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide root background layout elements when printing modals */
+  #printable-navtara-modal,
+  #printable-panchanga-modal {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+    backdrop-filter: none !important;
+  }
+
+  #printable-navtara-dialog,
+  #printable-panchanga-dialog {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+
+  #navtara-report-sheet,
+  #print-sheet-content {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .print-no-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
 

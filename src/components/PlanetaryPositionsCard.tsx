@@ -236,7 +236,7 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
                 const grahaLabel = grahaInfo ? grahaInfo[lang] || planet.name : planet.name;
                 const rasiLabel = getLocalizedRasi(planet.rasi, lang);
                 const nakLabel = getLocalizedNakshatra(
-                  planet.nakshatraNumber,
+                  planet.nakshatraNumber || planet.nakshatra_number || 1,
                   planet.nakshatra,
                   lang,
                 );
@@ -346,7 +346,7 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
                     <td
                       className={`px-3.5 py-3.5 font-mono text-xs ${isNight ? "text-slate-400" : "text-stone-600"}`}
                     >
-                      {planet.siderealLongitude.toFixed(4)}°
+                      {(planet.siderealLongitude ?? planet.longitude).toFixed(4)}°
                     </td>
 
                     {/* Retrograde Status */}

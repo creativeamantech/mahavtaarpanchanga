@@ -110,7 +110,7 @@ export function getCanonicalNadiAtTime(
     }
   }
 
-  return activeSwara;
+  return activeSwara || "ida";
 }
 
 export function computeTithiTattvaPeriods(panchangaData: PanchangaResponse): TithiTattvaPeriod[] {

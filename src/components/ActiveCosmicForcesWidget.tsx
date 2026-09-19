@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Clock, Sparkles, Compass, Wind } from "lucide-react";
-import type { PanchangaResponse, AppTheme } from "../types";
+import type { PanchangaResponse, AppTheme, SwaraNadi } from "../types";
 import type { Language } from "../i18n";
 import { computeSwaraYoga, SWARA_DETAILS } from "../swaraYoga";
 import { resolveCurrentHora } from "../horaEngine";
@@ -61,8 +61,8 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
   const horaState = resolveCurrentHora(now.getTime(), data);
   const activeHora = horaState?.hora || null;
   const activeTattva = horaState?.activeTattva || null;
-  const activeNadi = activeHora?.nadi || swaraData.sunriseSwara;
-  const nadiDetails = SWARA_DETAILS[activeNadi];
+  const activeNadi = (activeHora?.nadi || swaraData.sunriseSwara || "ida") as SwaraNadi;
+  const nadiDetails = SWARA_DETAILS[activeNadi] || SWARA_DETAILS.ida;
 
   const formatCountdown = (ms: number) => {
     if (ms <= 0) return "0m 00s";

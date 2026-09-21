@@ -302,9 +302,9 @@ export function VedicHorasView({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2 sm:space-x-4">
                     <span
-                      className={`hidden sm:inline-flex px-2.5 py-1 rounded-full text-xs font-bold border ${hora.nadi === "ida" ? "bg-sky-50 text-sky-700 border-sky-200" : hora.nadi === "pingala" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-purple-50 text-purple-700 border-purple-200"}`}
+                      className={`inline-flex px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold border shrink-0 ${hora.nadi === "ida" ? "bg-sky-50 text-sky-700 border-sky-200" : hora.nadi === "pingala" ? "bg-orange-50 text-orange-700 border-orange-200" : "bg-purple-50 text-purple-700 border-purple-200"}`}
                     >
                       {hora.nadi === "ida"
                         ? lang === "hi"
@@ -319,16 +319,56 @@ export function VedicHorasView({
                             : "Sushumna"}
                     </span>
                     {isExpanded ? (
-                      <ChevronUp className="h-5 w-5 text-stone-400" />
+                      <ChevronUp className="h-5 w-5 text-stone-400 shrink-0" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-stone-400" />
+                      <ChevronDown className="h-5 w-5 text-stone-400 shrink-0" />
                     )}
                   </div>
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-stone-100 bg-stone-50/50 p-4 animate-in slide-in-from-top-2">
-                    <div className="text-xs font-bold text-stone-500 uppercase tracking-widest mb-3">
+                  <div className="border-t border-stone-100 bg-stone-50/50 p-4 animate-in slide-in-from-top-2 space-y-3">
+                    {/* Nadi guidance bar */}
+                    <div
+                      className={`p-2.5 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+                        hora.nadi === "ida"
+                          ? "bg-sky-50/80 border-sky-200 text-sky-900"
+                          : hora.nadi === "pingala"
+                          ? "bg-orange-50/80 border-orange-200 text-orange-900"
+                          : "bg-purple-50/80 border-purple-200 text-purple-900"
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold">
+                        <span>
+                          {hora.nadi === "ida"
+                            ? lang === "hi"
+                              ? "🔵 चन्द्र नाड़ी (इड़ा स्वर - बायाँ नासिका छिद्र)"
+                              : "🔵 Lunar Nadi (Ida Swara - Left Nostril)"
+                            : hora.nadi === "pingala"
+                            ? lang === "hi"
+                              ? "🔴 सूर्य नाड़ी (पिंगला स्वर - दायाँ नासिका छिद्र)"
+                              : "🔴 Solar Nadi (Pingala Swara - Right Nostril)"
+                            : lang === "hi"
+                            ? "🟣 सुषुम्ना नाड़ी (मध्यम स्वर)"
+                            : "🟣 Sushumna Nadi"}
+                        </span>
+                      </div>
+                      <div className="text-[11px] opacity-85">
+                        {hora.nadi === "ida"
+                          ? lang === "hi"
+                            ? "शीतल व सौम्य · विद्या, अध्ययन, व्यापार व शांति कर्म हेतु शुभ"
+                            : "Cooling & receptive · Ideal for study, spiritual work & calm actions"
+                          : hora.nadi === "pingala"
+                          ? lang === "hi"
+                            ? "उष्ण व तेजस्वी · व्यायाम, भोजन, प्रतियोगिता व परिश्रम हेतु श्रेष्ठ"
+                            : "Heating & active · Ideal for meals, workouts & dynamic efforts"
+                          : lang === "hi"
+                          ? "ध्यान व समाधि योग"
+                          : "Meditation & stillness"}
+                      </div>
+                    </div>
+
+                    <div className="text-xs font-bold text-stone-500 uppercase tracking-widest">
                       {lang === "hi"
                         ? "पंच तत्त्व सूक्ष्म अवधि"
                         : "Pancha Tattva (5 Elements) Micro-Periods"}

@@ -462,7 +462,55 @@ export function normalizeDailySchedule(
       currentNow,
     );
 
+    const GRAHA_HI_NAMES: Record<string, { hi: string; sa: string }> = {
+      Sun: { hi: "सूर्य", sa: "सूर्य" },
+      Moon: { hi: "चन्द्र", sa: "चन्द्र" },
+      Mars: { hi: "मंगल", sa: "मङ्गल" },
+      Mercury: { hi: "बुध", sa: "बुध" },
+      Jupiter: { hi: "गुरु (बृहस्पति)", sa: "गुरु" },
+      Venus: { hi: "शुक्र", sa: "शुक्र" },
+      Saturn: { hi: "शनि", sa: "शनि" },
+    };
+
+    const TATTVA_HI_NAMES: Record<string, string> = {
+      Akasha: "आकाश",
+      Vayu: "वायु",
+      Agni: "अग्नि",
+      Prithvi: "पृथ्वी",
+      Jala: "जल",
+      Space: "आकाश",
+      Air: "वायु",
+      Fire: "अग्नि",
+      Earth: "पृथ्वी",
+      Water: "जल",
+    };
+
+    const NADI_LABELS: Record<string, { hi: string; en: string; swaraHi: string; swaraEn: string }> = {
+      ida: {
+        hi: "चन्द्र नाड़ी (इड़ा · वाम स्वर)",
+        en: "Lunar Nadi (Ida · Left Swara)",
+        swaraHi: "वाम नासिका (बायाँ स्वर - शीतल/सौम्य)",
+        swaraEn: "Left Nostril (Cooling/Receptive)",
+      },
+      pingala: {
+        hi: "सूर्य नाड़ी (पिंगला · दायाँ स्वर)",
+        en: "Solar Nadi (Pingala · Right Swara)",
+        swaraHi: "दक्षिण नासिका (दायाँ स्वर - उष्ण/क्रियाशील)",
+        swaraEn: "Right Nostril (Heating/Active)",
+      },
+      sushumna: {
+        hi: "सुषुम्ना नाड़ी (मध्यम स्वर)",
+        en: "Sushumna Nadi (Middle Swara)",
+        swaraHi: "मध्यम स्वर (ध्यान/समाधि योग)",
+        swaraEn: "Middle Swara (Meditative/Neutral)",
+      },
+    };
+
     dailyHoras.horas.forEach((h) => {
+      const rulerHi = GRAHA_HI_NAMES[h.ruler]?.hi || h.ruler;
+      const rulerSa = GRAHA_HI_NAMES[h.ruler]?.sa || h.ruler;
+      const nadiMeta = NADI_LABELS[h.nadi] || NADI_LABELS.ida;
+
       // 3.1 Planetary Hora Event
       events.push({
         id: `hora-${h.index}-${h.startTimeMs}`,
@@ -472,26 +520,31 @@ export function normalizeDailySchedule(
         startTimeMs: h.startTimeMs,
         endTimeMs: h.endTimeMs,
         durationMs: h.durationMs,
-        title: lang === "hi" ? `${h.ruler} होरा` : `${h.ruler} Hora`,
+        title: lang === "hi" ? `${rulerHi} होरा` : `${h.ruler} Hora`,
         subtitle:
           lang === "hi"
-            ? `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${h.nadi === "ida" ? "चन्द्र नाड़ी (इड़ा)" : "सूर्य नाड़ी (पिंगला)"}`
-            : `${h.isDay ? "Day" : "Night"} Hora #${h.index} · ${h.nadi === "ida" ? "Lunar Nadi (IDA)" : "Solar Nadi (PINGALA)"}`,
+            ? `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${nadiMeta.hi}`
+            : `${h.isDay ? "Day" : "Night"} Hora #${h.index} · ${nadiMeta.en}`,
         localizedTitle: {
           en: `${h.ruler} Hora`,
-          hi: `${h.ruler} होरा`,
-          sa: `${h.ruler} होरा`,
+          hi: `${rulerHi} होरा`,
+          sa: `${rulerSa} होरा`,
         },
         localizedSubtitle: {
-          en: `${h.isDay ? "Day" : "Night"} Hora #${h.index} · ${h.nadi === "ida" ? "Lunar (Ida)" : "Solar (Pingala)"}`,
-          hi: `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${h.nadi === "ida" ? "चन्द्र (इड़ा)" : "सूर्य (पिङ्गला)"}`,
-          sa: `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${h.nadi === "ida" ? "चन्द्र (इड़ा)" : "सूर्य (पिङ्गला)"}`,
+          en: `${h.isDay ? "Day" : "Night"} Hora #${h.index} · ${nadiMeta.en}`,
+          hi: `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${nadiMeta.hi}`,
+          sa: `${h.isDay ? "दिन" : "रात्रि"} होरा #${h.index} · ${nadiMeta.hi}`,
         },
         metadata: {
           horaIndex: h.index,
           ruler: h.ruler,
+          rulerHi,
           isDay: h.isDay,
           nadi: h.nadi,
+          nadiLabel: lang === "hi" ? nadiMeta.hi : nadiMeta.en,
+          nadiSwara: lang === "hi" ? nadiMeta.swaraHi : nadiMeta.swaraEn,
+          nadiHi: nadiMeta.hi,
+          nadiEn: nadiMeta.en,
           tattvas: h.tattvas,
         },
         priority: EVENT_PRIORITIES.hora,
@@ -500,6 +553,8 @@ export function normalizeDailySchedule(
 
       // 3.2 Hora-Tattva Micro-Period Events (All 5 periods)
       h.tattvas.forEach((tp, tIdx) => {
+        const tattvaHi = TATTVA_HI_NAMES[tp.sanskrit] || TATTVA_HI_NAMES[tp.name] || tp.name;
+
         events.push({
           id: `hora-tattva-${h.index}-${tp.sanskrit}-${tp.startTimeMs}`,
           type: "hora-tattva",
@@ -510,23 +565,28 @@ export function normalizeDailySchedule(
           durationMs: tp.durationMs,
           title:
             lang === "hi"
-              ? `${tp.sanskrit} तत्त्व (${tp.name})`
+              ? `${tp.sanskrit} तत्त्व (${tattvaHi})`
               : `${tp.sanskrit} Tattva (${tp.name})`,
           subtitle:
             lang === "hi"
-              ? `${h.ruler} होरा · सूक्ष्म काल ${tIdx + 1}/5`
-              : `${h.ruler} Hora · Micro-period ${tIdx + 1}/5`,
+              ? `${rulerHi} होरा · ${nadiMeta.hi} · सूक्ष्म काल ${tIdx + 1}/5`
+              : `${h.ruler} Hora · ${nadiMeta.en} · Micro-period ${tIdx + 1}/5`,
           localizedTitle: {
             en: `${tp.sanskrit} Tattva (${tp.name})`,
-            hi: `${tp.sanskrit} तत्त्व (${tp.name})`,
+            hi: `${tp.sanskrit} तत्त्व (${tattvaHi})`,
             sa: `${tp.sanskrit}-तत्त्वम्`,
           },
           metadata: {
             parentHoraIndex: h.index,
             parentHoraRuler: h.ruler,
+            parentHoraRulerHi: rulerHi,
+            nadi: h.nadi,
+            nadiLabel: lang === "hi" ? nadiMeta.hi : nadiMeta.en,
+            nadiSwara: lang === "hi" ? nadiMeta.swaraHi : nadiMeta.swaraEn,
             tattvaIndex: tIdx + 1,
             sanskrit: tp.sanskrit,
             name: tp.name,
+            nameHi: tattvaHi,
           },
           priority: EVENT_PRIORITIES["hora-tattva"],
           colorTheme: getEventColorTheme("hora-tattva"),

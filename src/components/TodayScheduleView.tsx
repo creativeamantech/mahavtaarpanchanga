@@ -36,6 +36,29 @@ import type {
   UnifiedDailySchedule,
 } from "../lib/dailyScheduleModel";
 
+const GRAHA_NAMES_HI: Record<string, string> = {
+  Sun: "सूर्य",
+  Moon: "चन्द्र",
+  Mars: "मंगल",
+  Mercury: "बुध",
+  Jupiter: "गुरु (बृहस्पति)",
+  Venus: "शुक्र",
+  Saturn: "शनि",
+};
+
+const TATTVA_NAMES_HI: Record<string, string> = {
+  Akasha: "आकाश",
+  Vayu: "वायु",
+  Agni: "अग्नि",
+  Prithvi: "पृथ्वी",
+  Jala: "जल",
+  Space: "आकाश",
+  Air: "वायु",
+  Fire: "अग्नि",
+  Earth: "पृथ्वी",
+  Water: "जल",
+};
+
 interface TodayScheduleViewProps {
   data: PanchangaResponse;
   lang: Language;
@@ -359,7 +382,9 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                     <span className="text-sm font-black uppercase tracking-wider text-emerald-800 dark:text-emerald-300 font-devanagari flex items-center gap-1.5 leading-none">
                       <Activity className="w-4 h-4 text-emerald-600 shrink-0" />
                       {liveState.horaState?.hora
-                        ? `${liveState.horaState.hora.ruler} Hora`
+                        ? lang === "hi"
+                          ? `${GRAHA_NAMES_HI[liveState.horaState.hora.ruler] || liveState.horaState.hora.ruler} होरा`
+                          : `${liveState.horaState.hora.ruler} Hora`
                         : "Live Cosmic State"}
                     </span>
                     {liveState.horaState?.horaRemainingMs != null && (
@@ -636,6 +661,40 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                       {styles.label}
                     </span>
 
+                    {/* Dedicated Nadi Badge for Hora & Hora-Tattva */}
+                    {(ev.type === "hora" || ev.type === "hora-tattva") && ev.metadata?.nadi && (
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border flex items-center gap-1 shadow-2xs ${
+                          ev.metadata.nadi === "ida"
+                            ? "bg-sky-50 dark:bg-sky-950/70 text-sky-800 dark:text-sky-200 border-sky-300 dark:border-sky-700"
+                            : ev.metadata.nadi === "pingala"
+                            ? "bg-orange-50 dark:bg-orange-950/70 text-orange-800 dark:text-orange-200 border-orange-300 dark:border-orange-700"
+                            : "bg-purple-50 dark:bg-purple-950/70 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-700"
+                        }`}
+                      >
+                        {ev.metadata.nadi === "ida" ? (
+                          <Moon className="w-3 h-3 text-sky-600 dark:text-sky-400" />
+                        ) : ev.metadata.nadi === "pingala" ? (
+                          <Sun className="w-3 h-3 text-orange-600 dark:text-orange-400" />
+                        ) : (
+                          <Wind className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                        )}
+                        <span>
+                          {ev.metadata.nadi === "ida"
+                            ? lang === "hi"
+                              ? "चन्द्र नाड़ी (इड़ा · वाम)"
+                              : "Ida Nadi (Lunar · Left)"
+                            : ev.metadata.nadi === "pingala"
+                            ? lang === "hi"
+                              ? "सूर्य नाड़ी (पिंगला · दायाँ)"
+                              : "Pingala Nadi (Solar · Right)"
+                            : lang === "hi"
+                            ? "सुषुम्ना नाड़ी"
+                            : "Sushumna Nadi"}
+                        </span>
+                      </span>
+                    )}
+
                     {ev.isCurrent && (
                       <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-white animate-pulse">
                         {lang === "hi" ? "अभी चल रहा है" : "ACTIVE NOW"}
@@ -679,6 +738,115 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                         {ev.subtitle}
                       </p>
                     )}
+
+                    {/* Integrated Graha · Nadi · Tattva Strip for Hora Events */}
+                    {ev.type === "hora" && (
+                      <div className="mt-3 pt-2.5 border-t border-stone-100 dark:border-slate-800/80 flex flex-wrap items-center gap-2 text-xs">
+                        {/* 1. Graha (Planet) */}
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 font-medium shadow-2xs">
+                          {ev.metadata?.isDay ? (
+                            <Sun className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                          ) : (
+                            <Moon className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+                          )}
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                            {lang === "hi" ? "ग्रह:" : "Planet:"}
+                          </span>
+                          <span className="font-bold">
+                            {lang === "hi"
+                              ? String(ev.metadata?.rulerHi || GRAHA_NAMES_HI[String(ev.metadata?.ruler)] || ev.metadata?.ruler)
+                              : String(ev.metadata?.ruler)}
+                          </span>
+                          <span className="text-[10px] text-stone-400 dark:text-slate-500 font-normal">
+                            ({ev.metadata?.isDay ? (lang === "hi" ? "दिन" : "Day") : (lang === "hi" ? "रात्रि" : "Night")})
+                          </span>
+                        </div>
+
+                        {/* 2. Nadi & Swara */}
+                        <div
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-medium shadow-2xs ${
+                            ev.metadata?.nadi === "ida"
+                              ? "bg-sky-50 dark:bg-sky-950/40 border-sky-200/90 dark:border-sky-800/50 text-sky-900 dark:text-sky-200"
+                              : ev.metadata?.nadi === "pingala"
+                              ? "bg-orange-50 dark:bg-orange-950/40 border-orange-200/90 dark:border-orange-800/50 text-orange-900 dark:text-orange-200"
+                              : "bg-purple-50 dark:bg-purple-950/40 border-purple-200/90 dark:border-purple-800/50 text-purple-900 dark:text-purple-200"
+                          }`}
+                        >
+                          <Wind className="w-3.5 h-3.5 shrink-0" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider opacity-80">
+                            {lang === "hi" ? "नाड़ी:" : "Nadi:"}
+                          </span>
+                          <span className="font-bold">
+                            {ev.metadata?.nadi === "ida"
+                              ? (lang === "hi" ? "चन्द्र नाड़ी (इड़ा · वाम स्वर)" : "Ida Nadi (Lunar · Left)")
+                              : ev.metadata?.nadi === "pingala"
+                              ? (lang === "hi" ? "सूर्य नाड़ी (पिंगला · दायाँ स्वर)" : "Pingala Nadi (Solar · Right)")
+                              : (lang === "hi" ? "सुषुम्ना नाड़ी (मध्यम स्वर)" : "Sushumna Nadi")}
+                          </span>
+                        </div>
+
+                        {/* 3. Tattvas */}
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/40 text-purple-900 dark:text-purple-200 font-medium shadow-2xs">
+                          <Layers className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-purple-700 dark:text-purple-400">
+                            {lang === "hi" ? "तत्त्व:" : "Tattvas:"}
+                          </span>
+                          <span className="font-bold">
+                            {lang === "hi" ? "5 सूक्ष्म काल (आकाश ➔ जल)" : "5 Micro-Periods (Akasha ➔ Jala)"}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Integrated Graha · Nadi · Tattva Strip for Hora-Tattva Micro-periods */}
+                    {ev.type === "hora-tattva" && (
+                      <div className="mt-2.5 pt-2 border-t border-stone-100 dark:border-slate-800/80 flex flex-wrap items-center gap-2 text-xs">
+                        {/* Tattva */}
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-purple-50 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/40 text-purple-900 dark:text-purple-200 font-medium">
+                          <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                          <span className="text-[11px] font-bold uppercase text-purple-700 dark:text-purple-400">
+                            {lang === "hi" ? "तत्त्व:" : "Tattva:"}
+                          </span>
+                          <span className="font-bold">
+                            {String(ev.metadata?.sanskrit)} ({lang === "hi" ? String(ev.metadata?.nameHi || TATTVA_NAMES_HI[String(ev.metadata?.name)] || ev.metadata?.name) : String(ev.metadata?.name)})
+                          </span>
+                        </div>
+
+                        {/* Parent Planet */}
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/40 text-amber-900 dark:text-amber-200 font-medium">
+                          <span className="text-[11px] font-bold uppercase text-amber-700 dark:text-amber-400">
+                            {lang === "hi" ? "मूल होरा:" : "Hora:"}
+                          </span>
+                          <span className="font-bold">
+                            {lang === "hi"
+                              ? `${String(ev.metadata?.parentHoraRulerHi || GRAHA_NAMES_HI[String(ev.metadata?.parentHoraRuler)] || ev.metadata?.parentHoraRuler)} होरा`
+                              : `${String(ev.metadata?.parentHoraRuler)} Hora`}{" "}
+                            #{String(ev.metadata?.parentHoraIndex)}
+                          </span>
+                        </div>
+
+                        {/* Parent Nadi */}
+                        {ev.metadata?.nadi && (
+                          <div
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-medium ${
+                              ev.metadata.nadi === "ida"
+                                ? "bg-sky-50 dark:bg-sky-950/40 border-sky-200 text-sky-900 dark:text-sky-200"
+                                : "bg-orange-50 dark:bg-orange-950/40 border-orange-200 text-orange-900 dark:text-orange-200"
+                            }`}
+                          >
+                            <Wind className="w-3.5 h-3.5" />
+                            <span className="text-[11px] font-bold uppercase opacity-80">
+                              {lang === "hi" ? "नाड़ी:" : "Nadi:"}
+                            </span>
+                            <span className="font-bold">
+                              {ev.metadata.nadi === "ida"
+                                ? (lang === "hi" ? "चन्द्र नाड़ी (इड़ा स्वर)" : "Ida Nadi (Lunar · Left)")
+                                : (lang === "hi" ? "सूर्य नाड़ी (पिंगला स्वर)" : "Pingala Nadi (Solar · Right)")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {(hasHoraTattvas || ev.type.startsWith("tithi-swara")) && (
@@ -709,13 +877,86 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                 {/* Expanded Content */}
                 {isExpanded && (
                   <div className="mt-3 pt-3 border-t border-stone-100 dark:border-slate-800 space-y-3 animate-in fade-in duration-150">
+                    {/* Dedicated Nadi & Swara Guidance for Hora */}
+                    {ev.type === "hora" && ev.metadata?.nadi && (
+                      <div
+                        className={`p-3 rounded-lg border text-xs space-y-2.5 ${
+                          ev.metadata.nadi === "ida"
+                            ? "bg-sky-50/80 dark:bg-sky-950/30 border-sky-200/80 dark:border-sky-800/40"
+                            : ev.metadata.nadi === "pingala"
+                            ? "bg-orange-50/80 dark:bg-orange-950/30 border-orange-200/80 dark:border-orange-800/40"
+                            : "bg-purple-50/80 dark:bg-purple-950/30 border-purple-200/80 dark:border-purple-800/40"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200/70 dark:border-slate-700/60 pb-2">
+                          <div className="flex items-center gap-1.5 font-bold text-stone-900 dark:text-white">
+                            <Wind className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                            <span className="text-[11px] uppercase tracking-wider">
+                              {lang === "hi"
+                                ? "शिव स्वरोदय नाड़ी विश्लेषण (Nadi & Swara Guidance)"
+                                : "Shiva Swarodaya Nadi Guidance"}
+                            </span>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                              ev.metadata.nadi === "ida"
+                                ? "bg-sky-100 dark:bg-sky-900 text-sky-800 dark:text-sky-200 border border-sky-300 dark:border-sky-700"
+                                : "bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-300 dark:border-orange-700"
+                            }`}
+                          >
+                            {ev.metadata.nadi === "ida"
+                              ? (lang === "hi" ? "इड़ा नाड़ी · वाम नासिका स्वर" : "Ida · Left Nostril")
+                              : (lang === "hi" ? "पिंगला नाड़ी · दक्षिण नासिका स्वर" : "Pingala · Right Nostril")}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-stone-700 dark:text-slate-300">
+                          <div className="flex items-start gap-1.5">
+                            <strong className="text-stone-900 dark:text-white shrink-0">
+                              {lang === "hi" ? "स्वर प्रकृति:" : "Swara Nature:"}
+                            </strong>
+                            <span>
+                              {ev.metadata.nadi === "ida"
+                                ? (lang === "hi"
+                                    ? "शीतल, सौम्य, चन्द्र शक्ति व अमृत प्रभाव (बायाँ नासिका छिद्र सक्रिय रहना श्रेष्ठ)"
+                                    : "Cooling, calm, lunar energy (Left nostril active is ideal)")
+                                : (lang === "hi"
+                                    ? "उष्ण, तेज, सूर्य शक्ति व पराक्रमी प्रभाव (दायाँ नासिका छिद्र सक्रिय रहना श्रेष्ठ)"
+                                    : "Heating, dynamic, solar vitality (Right nostril active is ideal)")}
+                            </span>
+                          </div>
+                          <div className="flex items-start gap-1.5">
+                            <strong className="text-stone-900 dark:text-white shrink-0">
+                              {lang === "hi" ? "अनुकूल कार्य:" : "Favorable Deeds:"}
+                            </strong>
+                            <span>
+                              {ev.metadata.nadi === "ida"
+                                ? (lang === "hi"
+                                    ? "विद्यारम्भ, अध्ययन, पूजन, गृहप्रवेश, शांति कर्म, नए वस्त्र, आभूषण, यात्रा"
+                                    : "Study, spiritual practices, peace work, trade, home entry, travel")
+                                : (lang === "hi"
+                                    ? "शारीरिक परिश्रम, व्यायाम, भोजन, प्रतियोगिता, शास्त्रार्थ, औषधि सेवन, यात्रा"
+                                    : "Physical workouts, meals, debate, competition, taking medicine, travel")}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     {hasHoraTattvas && (
                       <div className="space-y-2 bg-purple-50/50 dark:bg-purple-900/10 p-3 rounded-lg border border-purple-100 dark:border-purple-800/30">
-                        <div className="text-[11px] font-bold uppercase tracking-wider text-purple-800 dark:text-purple-300 flex items-center gap-1.5">
-                          <Layers className="w-4 h-4 text-purple-600" />
-                          {lang === "hi"
-                            ? "पंच-तत्त्व सूक्ष्म अनुक्रम (Pancha-Tattva Sequence)"
-                            : "Pancha-Tattva Micro-Sequence"}
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-purple-800 dark:text-purple-300 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <Layers className="w-4 h-4 text-purple-600" />
+                            <span>
+                              {lang === "hi"
+                                ? "पंच-तत्त्व सूक्ष्म अनुक्रम (Pancha-Tattva Sequence)"
+                                : "Pancha-Tattva Micro-Sequence"}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-normal">
+                            {lang === "hi" ? "होरा की 5 सूक्ष्म अवधियाँ" : "5 Micro-Periods of Hora"}
+                          </span>
                         </div>
                         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2">
                           {(ev.metadata?.tattvas as TattvaPeriod[]).map((tp, idx) => {
@@ -730,8 +971,11 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                                     : "border-stone-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 text-stone-700 dark:text-slate-300 hover:border-purple-300"
                                 }`}
                               >
-                                <div className="text-xs font-bold truncate mb-0.5">
-                                  {tp.sanskrit}
+                                <div className="text-xs font-bold truncate mb-0.5 flex items-center justify-between">
+                                  <span>{tp.sanskrit}</span>
+                                  <span className="text-[10px] font-normal opacity-75">
+                                    {lang === "hi" ? TATTVA_NAMES_HI[tp.name] || tp.name : tp.name}
+                                  </span>
                                 </div>
                                 <div className="text-[10px] text-stone-500 dark:text-slate-400 truncate font-mono">
                                   {tp.startTime}–{tp.endTime}

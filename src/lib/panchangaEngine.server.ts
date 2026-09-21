@@ -49,54 +49,502 @@ export function initPanchangaEngine() {
   cityList.sort((a, b) => b.population - a.population);
 }
 
-export function searchCities(query: string, limit: number = 10): CityLocation[] {
+// Comprehensive Hindi to English Name Aliases Map for Indian Cities & Tirthas
+const HINDI_CITY_MAP: Record<string, string> = {
+  अयोध्या: "ayodhya",
+  फैजाबाद: "ayodhya",
+  दिल्ली: "delhi",
+  "नई दिल्ली": "new delhi",
+  वाराणसी: "varanasi",
+  काशी: "varanasi",
+  बनारस: "varanasi",
+  उज्जैन: "ujjain",
+  हरिद्वार: "haridwar",
+  हार्डवार: "haridwar",
+  प्रयागराज: "prayagraj",
+  इलाहाबाद: "prayagraj",
+  ऋषिकेश: "rishikesh",
+  मथुरा: "mathura",
+  वृन्दावन: "vrindavan",
+  वृंदावन: "vrindavan",
+  गोवर्धन: "govardhan",
+  बरसाना: "barsana",
+  केदारनाथ: "kedarnath",
+  बद्रीनाथ: "badrinath",
+  गंगोत्री: "gangotri",
+  यमुनोत्री: "yamunotri",
+  रामेश्वरम: "rameswaram",
+  रामेश्वर: "rameswaram",
+  तिरुपति: "tirupati",
+  पुरी: "puri",
+  जगन्नाथपुरी: "puri",
+  द्वारका: "dwarka",
+  द्वारिका: "dwarka",
+  सोमनाथ: "somnath",
+  शिरडी: "shirdi",
+  साईं: "shirdi",
+  "बोध गया": "bodh gaya",
+  बोधगया: "bodh gaya",
+  गया: "gaya",
+  कुरुक्षेत्र: "kurukshetra",
+  पुष्कर: "pushkar",
+  हम्पी: "hampi",
+  श्रृंगेरी: "sringeri",
+  शृंगेरी: "sringeri",
+  नाथद्वारा: "nathdwara",
+  ओंकारेश्वर: "omkareshwar, in",
+  महाकालेश्वर: "mahakaleshwar, in",
+  त्र्यंबकेश्वर: "trimbakeshwar, in",
+  त्रयंबकेश्वर: "trimbakeshwar, in",
+  घृष्णेश्वर: "grishneshwar, in",
+  भीमाशंकर: "bhimashankar, in",
+  नागेश्वर: "nageshwar, in",
+  वैद्यनाथ: "vaidyanath, in",
+  बैजनाथ: "deoghar, in",
+  मल्लिकार्जुन: "srisailam, in",
+  श्रीशैलम: "srisailam, in",
+  चित्रकूट: "chitrakoot, in",
+  नैमिषारण्य: "naimisharanya, in",
+  "माउंट आबू": "mount abu, in",
+  पालीताना: "palitana, in",
+  पावागढ़: "pavagadh, in",
+  अंबाजी: "ambaji, in",
+  श्रवणबेलगोला: "shravanabelagola, in",
+  तारापीठ: "tarapith, in",
+  कालीघाट: "kalighat",
+  कामाख्या: "kamakhya, in",
+  अमरनाथ: "amarnath, in",
+  "वैष्णो देवी": "vaishno devi, in",
+  कटरा: "katra",
+  मणिकरण: "manikaran, in",
+  "हेमकुंड साहिब": "hemkund sahib, in",
+  जयपुर: "jaipur",
+  जोधपुर: "jodhpur",
+  उदयपुर: "udaipur",
+  कोटा: "kota",
+  बीकानेर: "bikaner",
+  अजमेर: "ajmer",
+  अलवर: "alwar",
+  भरतपुर: "bharatpur",
+  सीकर: "sikar",
+  पाली: "pali",
+  भीलवाड़ा: "bhilwara",
+  चित्तौड़गढ़: "chittorgarh",
+  झुंझुनू: "jhunjhunu",
+  नागौर: "nagaur",
+  बांसवाड़ा: "banswara",
+  डूंगरपुर: "dungarpur",
+  झालावाड़: "jhalawar",
+  बूंदी: "bundi",
+  बारां: "baran",
+  "सवाई माधोपुर": "sawai madhopur",
+  धौलपुर: "dhaulpur",
+  करौली: "karauli",
+  दौसा: "dausa",
+  टोंक: "tonk",
+  चूरू: "churu",
+  हनुमानगढ़: "hanumangarh",
+  गंगानगर: "ganganagar",
+  जालोर: "jalore",
+  सिरोही: "sirohi",
+  बाड़मेर: "barmer",
+  जैसलमेर: "jaisalmer",
+  इन्दौर: "indore",
+  इंदौर: "indore",
+  भोपाल: "bhopal",
+  ग्वालियर: "gwalior",
+  जबलपुर: "jabalpur",
+  रीवा: "rewa",
+  सतना: "satna",
+  सागर: "sagar",
+  रतलाम: "ratlam",
+  विदिशा: "vidisha",
+  सीहोर: "sehore",
+  रायसेन: "raisen",
+  राजगढ़: "rajgarh",
+  शाजापुर: "shajapur",
+  "आगर मालवा": "agar malwa",
+  देवास: "dewas",
+  मंदसौर: "mandsaur",
+  नीमच: "neemuch",
+  धार: "dhar",
+  झाबुआ: "jhabua",
+  अलीराजपुर: "alirajpur",
+  बड़वानी: "barwani",
+  खरगोन: "khargone",
+  खंडवा: "khandwa",
+  बुरहानपुर: "burhanpur",
+  हरदा: "harda",
+  होशंगाबाद: "narmadapuram",
+  नर्मदापुरम: "narmadapuram",
+  बैतूल: "betul",
+  छिंदवाड़ा: "chhindwara",
+  सिवनी: "seoni",
+  नरसिंहपुर: "narsinghpur",
+  दमोह: "damoh",
+  पन्ना: "panna",
+  छतरपुर: "chhatarpur",
+  टीकमगढ़: "tikamgarh",
+  दतिया: "datia",
+  शिवपुरी: "shivpuri",
+  गुना: "guna",
+  अशोकनगर: "ashoknagar",
+  मुरैना: "morena",
+  भिंड: "bhind",
+  श्योपुर: "sheopur",
+  कटनी: "katni",
+  मंडला: "mandla",
+  डिंडोरी: "dindori",
+  बालाघाट: "balaghat",
+  अनूपपुर: "anuppur",
+  उमरिया: "umaria",
+  शहडोल: "shahdol",
+  सीधी: "sidhi",
+  सिंगरौली: "singrauli",
+  मुंबई: "mumbai",
+  बंबई: "mumbai",
+  बॉम्बे: "mumbai",
+  पुणे: "pune",
+  पूना: "pune",
+  नागपुर: "nagpur",
+  नासिक: "nashik",
+  नाशिक: "nashik",
+  औरंगाबाद: "chhatrapati sambhajinagar",
+  "छत्रपति संभाजीनगर": "chhatrapati sambhajinagar",
+  उस्मानाबाद: "dharashiv",
+  धाराशिव: "dharashiv",
+  कोल्हापुर: "kolhapur",
+  सोलापुर: "solapur",
+  अमरावती: "amravati",
+  नांदेड़: "nanded",
+  जलगांव: "jalgaon",
+  अहमदाबाद: "ahmedabad",
+  सूरत: "surat",
+  वडोदरा: "vadodara",
+  बड़ौदा: "vadodara",
+  राजकोट: "rajkot",
+  भावनगर: "bhavnagar",
+  जामनगर: "jamnagar",
+  जूनागढ़: "junagadh",
+  गांधीनगर: "gandhinagar",
+  आनंद: "anand",
+  नवसारी: "navsari",
+  भरूच: "bharuch",
+  लखनऊ: "lucknow",
+  कानपुर: "kanpur",
+  आगरा: "agra",
+  नोएडा: "noida",
+  "ग्रेटर नोएडा": "greater noida",
+  गाजियाबाद: "ghaziabad",
+  मेरठ: "meerut",
+  अलीगढ़: "aligarh",
+  बरेली: "bareilly",
+  मुरादाबाद: "moradabad",
+  सहारनपुर: "saharanpur",
+  गोरखपुर: "gorakhpur",
+  झांसी: "jhansi",
+  मुजफ्फरनगर: "muzaffarnagar",
+  ललितपुर: "lalitpur",
+  बांदा: "banda",
+  बस्ती: "basti",
+  देवरिया: "deoria",
+  गाजीपुर: "ghazipur",
+  गोंडा: "gonda",
+  जौनपुर: "jaunpur",
+  मिर्जापुर: "mirzapur",
+  प्रतापगढ़: "pratapgarh",
+  रायबरेली: "rae bareli",
+  सीतापुर: "sitapur",
+  सुल्तानपुर: "sultanpur",
+  उन्नाव: "unnao",
+  बलिया: "ballia",
+  आजमगढ़: "azamgarh",
+  पटना: "patna",
+  मुजफ्फरपुर: "muzaffarpur",
+  भागलपुर: "bhagalpur",
+  दरभंगा: "darbhanga",
+  पूर्णिया: "purnia",
+  आरा: "arrah",
+  भोजपुर: "bhojpur",
+  बेगूसराय: "begusarai",
+  कटिहार: "katihar",
+  मुंगेर: "munger",
+  छपरा: "chhapra",
+  सारण: "saran",
+  सासाराम: "sasaram",
+  रोहतास: "rohtas",
+  समस्तीपुर: "samastipur",
+  हाजीपुर: "hajipur",
+  वैशाली: "vaishali",
+  सीवान: "siwan",
+  मोतिहारी: "motihari",
+  बेतिया: "bettiah",
+  किशनगंज: "kishanganj",
+  सहरसा: "saharsa",
+  बक्सर: "buxar",
+  सीतामढ़ी: "sitamarhi",
+  मधुबनी: "madhubani",
+  गोपालगंज: "gopalganj",
+  खगड़िया: "khagaria",
+  मधेपुरा: "madhepura",
+  जमुई: "jamui",
+  नवादा: "nawada",
+  बांका: "banka",
+  अररिया: "araria",
+  सुपौल: "supaul",
+  शेखपुरा: "sheikhpura",
+  लखीसराय: "lakhisarai",
+  कैमूर: "kaimur",
+  भभुआ: "bhabua",
+  शिवहर: "sheohar",
+  कोलकाता: "kolkata",
+  कलकत्ता: "kolkata",
+  हावड़ा: "howrah",
+  दुर्गापुर: "durgapur",
+  आसनसोल: "asansol",
+  सिलीगुड़ी: "siliguri",
+  बेंगलुरु: "bengaluru",
+  बैंगलोर: "bengaluru",
+  मैसूर: "mysuru",
+  मैसुरु: "mysuru",
+  बेलगाम: "belagavi",
+  बेलगावी: "belagavi",
+  हुबली: "hubballi",
+  हुब्बली: "hubballi",
+  गुलबर्गा: "kalaburagi",
+  कलबुर्गी: "kalaburagi",
+  मंगलौर: "mangaluru",
+  मंगलोर: "mangaluru",
+  चेन्नई: "chennai",
+  मद्रास: "chennai",
+  मदुरै: "madurai",
+  कोयंबटूर: "coimbatore",
+  तिरुचिरापल्ली: "tiruchirappalli",
+  त्रिची: "tiruchirappalli",
+  सलेम: "salem",
+  तंजावूर: "thanjavur",
+  कांचीपुरम: "kanchipuram",
+  हैदराबाद: "hyderabad",
+  सिकंदराबाद: "secunderabad",
+  वारंगल: "warangal",
+  विशाखापत्तनम: "visakhapatnam",
+  विजाग: "visakhapatnam",
+  विजयवाड़ा: "vijayawada",
+  गुंटूर: "guntur",
+  तिरुवनंतपुरम: "thiruvananthapuram",
+  त्रिवेंद्रम: "thiruvananthapuram",
+  कोच्चि: "kochi",
+  कोचीन: "kochi",
+  कोझिकोड: "kozhikode",
+  कालीकट: "kozhikode",
+  त्रिशूर: "thrissur",
+  चंडीगढ़: "chandigarh",
+  अमृतसर: "amritsar",
+  लुधियाना: "ludhiana",
+  जालंधर: "jalandhar",
+  पटियाला: "patiala",
+  बठिंडा: "bathinda",
+  शिमला: "shimla",
+  धर्मशाला: "dharamshala",
+  मनाली: "manali",
+  कुल्लू: "kullu",
+  देहरादून: "dehradun",
+  नैनीताल: "nainital",
+  अल्मोड़ा: "almora",
+  जम्मू: "jammu",
+  श्रीनगर: "srinagar",
+  लेह: "leh",
+  गुवाहाटी: "guwahati",
+  गौहाटी: "guwahati",
+  शिलांग: "shillong",
+  अगरतला: "agartala",
+  आइजोल: "aizawl",
+  इंफाल: "imphal",
+  कोहिमा: "kohima",
+  ईटानगर: "itanagar",
+  गंगटोक: "gangtok",
+  भुवनेश्वर: "bhubaneswar",
+  कटक: "cuttack",
+  राउरकेला: "rourkela",
+  संबलपुर: "sambalpur",
+  रायपुर: "raipur",
+  बिलासपुर: "bilaspur",
+  दुर्ग: "durg",
+  भिलाई: "bhilai",
+  रांची: "ranchi",
+  जमशेदपुर: "jamshedpur",
+  धनबाद: "dhanbad",
+  बोकारो: "bokaro",
+  देवघर: "deoghar",
+  काठमांडू: "kathmandu",
+  पोखरा: "pokhara",
+  जनकपुर: "janakpur",
+};
+
+// Common English historical & colloquial aliases
+const ENGLISH_ALIASES: Record<string, string> = {
+  allahabad: "prayagraj",
+  kashi: "varanasi",
+  banaras: "varanasi",
+  benares: "varanasi",
+  bombay: "mumbai",
+  bangalore: "bengaluru",
+  madras: "chennai",
+  calcutta: "kolkata",
+  poona: "pune",
+  baroda: "vadodara",
+  gurgaon: "gurugram",
+  hardwar: "haridwar",
+  hoshangabad: "narmadapuram",
+  aurangabad: "chhatrapati sambhajinagar",
+  osmanabad: "dharashiv",
+  belgaum: "belagavi",
+  hubli: "hubballi",
+  gulbarga: "kalaburagi",
+  mangalore: "mangaluru",
+  mysore: "mysuru",
+  vizag: "visakhapatnam",
+  waltair: "visakhapatnam",
+  bezwada: "vijayawada",
+  faizabad: "ayodhya",
+  cochin: "kochi",
+  trivandrum: "thiruvananthapuram",
+  calicut: "kozhikode",
+  gauhati: "guwahati",
+  simla: "shimla",
+  cawnpore: "kanpur",
+  jabalpore: "jabalpur",
+  pondicherry: "puducherry",
+  trichy: "tiruchirappalli",
+  rameswaram: "rameshwaram",
+};
+
+// Transliterate Devanagari string to approximate Latin English phonetic string
+function transliterateDevanagari(text: string): string {
+  const consonants: Record<string, string> = {
+    क: "k", ख: "kh", ग: "g", घ: "gh", ङ: "ng",
+    च: "ch", छ: "chh", ज: "j", झ: "jh", ञ: "ny",
+    ट: "t", ठ: "th", ड: "d", ढ: "dh", ण: "n",
+    त: "t", थ: "th", द: "d", ध: "dh", न: "n",
+    प: "p", फ: "ph", ब: "b", भ: "bh", म: "m",
+    य: "y", र: "r", ल: "l", व: "v", श: "sh", ष: "sh", स: "s", ह: "h",
+    क्ष: "ksh", त्र: "tr", ज्ञ: "gy",
+  };
+  const vowels: Record<string, string> = {
+    अ: "a", आ: "a", इ: "i", ई: "i", उ: "u", ऊ: "u", ऋ: "ri",
+    ए: "e", ऐ: "ai", ओ: "o", औ: "au", अं: "an", अः: "ah",
+  };
+  const matras: Record<string, string> = {
+    "ा": "a", "ि": "i", "ी": "i", "ु": "u", "ू": "u", "ृ": "ri",
+    "े": "e", "ै": "ai", "ो": "o", "ौ": "au", "ं": "n", "ँ": "n", "़": "",
+  };
+
+  let res = "";
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const next = text[i + 1];
+
+    if (consonants[ch]) {
+      res += consonants[ch];
+      if (next === "्") {
+        i++; // skip virama
+      } else if (matras[next]) {
+        res += matras[next];
+        i++; // skip matra
+      } else if (consonants[next] || vowels[next]) {
+        res += "a"; // inherent vowel
+      }
+    } else if (vowels[ch]) {
+      res += vowels[ch];
+    } else if (matras[ch]) {
+      res += matras[ch];
+    } else if (/[a-zA-Z0-9\s,.-]/.test(ch)) {
+      res += ch;
+    }
+  }
+  return res.toLowerCase().trim();
+}
+
+export function searchCities(query: string, limit: number = 25): CityLocation[] {
   if (!query || query.trim().length === 0) {
-    // Return top famous Indian and global cities by default
-    const defaults = [
-      "Bengaluru, IN",
-      "New Delhi, IN",
-      "Mumbai, IN",
-      "Chennai, IN",
-      "Kolkata, IN",
-      "Varanasi, IN",
-      "Tirupati, IN",
-      "London, GB",
-      "New York, US",
-      "Singapore, SG",
-    ];
-    return defaults
-      .filter((k) => citiesData[k])
-      .map((k) => ({
-        name: k,
-        country: citiesData[k].country,
-        latitude: citiesData[k].latitude,
-        longitude: citiesData[k].longitude,
-        timezone: citiesData[k].timezone,
-        population: citiesData[k].population,
-      }));
+    return getPopularCities();
   }
 
-  const cleanQuery = query.toLowerCase().trim();
+  const rawQuery = query.trim();
+  let normalizedQuery = rawQuery.toLowerCase();
+
+  // 1. Check direct Hindi exact match or partial replace
+  for (const [hi, en] of Object.entries(HINDI_CITY_MAP)) {
+    if (rawQuery.includes(hi)) {
+      normalizedQuery = normalizedQuery.replace(hi.toLowerCase(), en);
+    }
+  }
+
+  // 2. If it still contains Devanagari characters, transliterate
+  if (/[\u0900-\u097F]/.test(normalizedQuery)) {
+    const transliterated = transliterateDevanagari(normalizedQuery);
+    if (transliterated) {
+      normalizedQuery = transliterated;
+    }
+  }
+
+  // 3. Apply English aliases
+  for (const [alias, target] of Object.entries(ENGLISH_ALIASES)) {
+    if (normalizedQuery.includes(alias)) {
+      normalizedQuery = normalizedQuery.replace(alias, target);
+    }
+  }
+
+  const cleanQuery = normalizedQuery.trim();
+  const queryTokens = cleanQuery.split(/[\s,]+/).filter((t) => t.length > 0);
+  const querySkeleton = cleanQuery.replace(/[^a-z]/g, "").replace(/[aeiou]/g, "");
+
   const results: { key: string; score: number }[] = [];
 
   for (const item of cityList) {
     const keyLower = item.key.toLowerCase();
     const nameLower = item.name.toLowerCase();
+    const isIndia = item.country === "IN" || keyLower.endsWith(", in");
+    const popBonus = Math.min(item.population / 10000, 500);
+    const inBonus = isIndia ? 600 : 0;
+
+    let matchScore = 0;
 
     if (nameLower === cleanQuery) {
-      results.push({ key: item.key, score: 1000 + item.population });
+      matchScore = 3000;
+    } else if (keyLower === cleanQuery) {
+      matchScore = 2500;
     } else if (nameLower.startsWith(cleanQuery)) {
-      results.push({ key: item.key, score: 500 + item.population });
+      matchScore = 1800;
     } else if (keyLower.startsWith(cleanQuery)) {
-      results.push({ key: item.key, score: 300 + item.population });
+      matchScore = 1400;
     } else if (nameLower.includes(cleanQuery)) {
-      results.push({ key: item.key, score: 100 + item.population });
+      matchScore = 1000;
     } else if (keyLower.includes(cleanQuery)) {
-      results.push({ key: item.key, score: 50 + item.population });
+      matchScore = 800;
+    } else if (queryTokens.length > 1) {
+      // Multi-token match (e.g. "Delhi IN", "Jaipur India")
+      const allTokensMatch = queryTokens.every(
+        (tok) => keyLower.includes(tok) || (tok === "india" && isIndia) || (tok === "in" && isIndia),
+      );
+      if (allTokensMatch) {
+        matchScore = 600;
+      }
+    } else if (querySkeleton.length >= 3) {
+      // Consonant skeleton match for phonetic variations
+      const itemSkeleton = nameLower.replace(/[^a-z]/g, "").replace(/[aeiou]/g, "");
+      if (itemSkeleton === querySkeleton) {
+        matchScore = 700;
+      } else if (itemSkeleton.startsWith(querySkeleton)) {
+        matchScore = 500;
+      }
     }
 
-    if (results.length >= 100 && item.population < 50000) {
-      break;
+    if (matchScore > 0) {
+      results.push({
+        key: item.key,
+        score: matchScore + inBonus + popBonus,
+      });
     }
   }
 
@@ -106,10 +554,10 @@ export function searchCities(query: string, limit: number = 10): CityLocation[] 
     const info = citiesData[r.key];
     return {
       name: r.key,
-      country: info.country,
+      country: info.country || (r.key.endsWith(", IN") ? "IN" : ""),
       latitude: info.latitude,
       longitude: info.longitude,
-      timezone: info.timezone,
+      timezone: info.timezone || "Asia/Kolkata",
       population: info.population,
     };
   });
@@ -145,7 +593,7 @@ export function findNearestCity(
       minDistance = dist;
       closest = {
         name: key,
-        country: (info as any).country || "",
+        country: (info as any).country || (key.endsWith(", IN") ? "IN" : ""),
         latitude: cLat,
         longitude: cLon,
         timezone: (info as any).timezone || "Asia/Kolkata",
@@ -162,10 +610,10 @@ export function resolveCity(cityName: string): CityLocation {
   if (direct) {
     return {
       name: cityName,
-      country: direct.country,
+      country: direct.country || (cityName.endsWith(", IN") ? "IN" : ""),
       latitude: direct.latitude,
       longitude: direct.longitude,
-      timezone: direct.timezone,
+      timezone: direct.timezone || "Asia/Kolkata",
       population: direct.population,
     };
   }
@@ -175,10 +623,10 @@ export function resolveCity(cityName: string): CityLocation {
     if (key.toLowerCase() === query || key.toLowerCase().startsWith(query + ",")) {
       return {
         name: key,
-        country: info.country,
+        country: info.country || (key.endsWith(", IN") ? "IN" : ""),
         latitude: info.latitude,
         longitude: info.longitude,
-        timezone: info.timezone,
+        timezone: info.timezone || "Asia/Kolkata",
         population: info.population,
       };
     }
@@ -1257,14 +1705,36 @@ export function calculatePlanetTransitions(
 
 export function getPopularCities(): CityLocation[] {
   const popular = [
-    "Bengaluru, IN",
-    "New Delhi, IN",
-    "Mumbai, IN",
-    "Chennai, IN",
-    "Kolkata, IN",
+    "Ayodhya, IN",
     "Varanasi, IN",
     "Ujjain, IN",
+    "Haridwar, IN",
+    "Mathura, IN",
+    "Vrindavan, IN",
+    "Prayagraj, IN",
+    "Tirupati, IN",
+    "Puri, IN",
+    "Somnath, IN",
+    "Dwarka, IN",
+    "Rameswaram, IN",
+    "Kedarnath, IN",
+    "Badrinath, IN",
+    "Rishikesh, IN",
+    "Shirdi, IN",
+    "New Delhi, IN",
+    "Bengaluru, IN",
+    "Mumbai, IN",
+    "Kolkata, IN",
+    "Chennai, IN",
     "Hyderabad, IN",
+    "Jaipur, IN",
+    "Ahmedabad, IN",
+    "Pune, IN",
+    "Lucknow, IN",
+    "Patna, IN",
+    "Bhopal, IN",
+    "Indore, IN",
+    "Kathmandu, NP",
     "London, GB",
     "New York, US",
     "Singapore, SG",

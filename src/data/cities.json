@@ -3957,7 +3957,7 @@
   "Ash-Shaykh Zayid, EG": {
     "country": "EG",
     "latitude": 30.02,
-    "longitude": 31.0,
+    "longitude": 31,
     "population": 95854,
     "timezone": "Africa/Cairo"
   },
@@ -4033,10 +4033,10 @@
   },
   "Ashoknagar, IN": {
     "country": "IN",
-    "latitude": 24.57578,
-    "longitude": 77.73123,
-    "population": 81828,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.58,
+    "longitude": 77.73,
+    "timezone": "Asia/Kolkata",
+    "population": 90000
   },
   "Ashuganj City, BD": {
     "country": "BD",
@@ -4502,10 +4502,10 @@
   },
   "Azamgarh, IN": {
     "country": "IN",
-    "latitude": 26.06832,
-    "longitude": 83.18358,
-    "population": 116644,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.0688,
+    "longitude": 83.1837,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Azare, NG": {
     "country": "NG",
@@ -5139,10 +5139,10 @@
   },
   "Balaghat, IN": {
     "country": "IN",
-    "latitude": 21.8156,
-    "longitude": 80.18845,
-    "population": 84261,
-    "timezone": "Asia/Kolkata"
+    "latitude": 21.81,
+    "longitude": 80.19,
+    "timezone": "Asia/Kolkata",
+    "population": 110000
   },
   "Balakovo, RU": {
     "country": "RU",
@@ -5489,10 +5489,10 @@
   },
   "Banda, IN": {
     "country": "IN",
-    "latitude": 25.47758,
-    "longitude": 80.33491,
-    "population": 152218,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.4754,
+    "longitude": 80.3347,
+    "timezone": "Asia/Kolkata",
+    "population": 160000
   },
   "Bandar Abbas, IR": {
     "country": "IR",
@@ -6525,10 +6525,10 @@
   },
   "Basti, IN": {
     "country": "IN",
-    "latitude": 26.78817,
-    "longitude": 82.71617,
-    "population": 115115,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.7995,
+    "longitude": 82.7634,
+    "timezone": "Asia/Kolkata",
+    "population": 130000
   },
   "Basuo, CN": {
     "country": "CN",
@@ -7799,17 +7799,17 @@
   },
   "Bettiah, IN": {
     "country": "IN",
-    "latitude": 26.80229,
-    "longitude": 84.50311,
-    "population": 132209,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.8028,
+    "longitude": 84.5028,
+    "timezone": "Asia/Kolkata",
+    "population": 140000
   },
   "Betul, IN": {
     "country": "IN",
-    "latitude": 21.90056,
-    "longitude": 77.90229,
-    "population": 103330,
-    "timezone": "Asia/Kolkata"
+    "latitude": 21.9,
+    "longitude": 77.9,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Bexley, GB": {
     "country": "GB",
@@ -8023,10 +8023,10 @@
   },
   "Bhind, IN": {
     "country": "IN",
-    "latitude": 26.56671,
-    "longitude": 78.78728,
-    "population": 197585,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.5654,
+    "longitude": 78.7906,
+    "timezone": "Asia/Kolkata",
+    "population": 200000
   },
   "Bhisho, ZA": {
     "country": "ZA",
@@ -8982,7 +8982,7 @@
   },
   "Bolenge, CD": {
     "country": "CD",
-    "latitude": 0.0,
+    "latitude": 0,
     "longitude": 18.21667,
     "population": 79648,
     "timezone": "Africa/Kinshasa"
@@ -10068,7 +10068,7 @@
   "Buenaventura, CO": {
     "country": "CO",
     "latitude": 3.58333,
-    "longitude": -77.0,
+    "longitude": -77,
     "population": 432385,
     "timezone": "America/Bogota"
   },
@@ -10648,10 +10648,10 @@
   },
   "Buxar, IN": {
     "country": "IN",
-    "latitude": 25.57548,
-    "longitude": 83.98043,
-    "population": 102861,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.5647,
+    "longitude": 83.9777,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Buynaksk, RU": {
     "country": "RU",
@@ -13147,10 +13147,10 @@
   },
   "Chhatarpur, IN": {
     "country": "IN",
-    "latitude": 24.9177,
-    "longitude": 79.58871,
-    "population": 142128,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.92,
+    "longitude": 79.58,
+    "timezone": "Asia/Kolkata",
+    "population": 160000
   },
   "Chhindwara, IN": {
     "country": "IN",
@@ -13574,7 +13574,7 @@
   },
   "Chiryu, JP": {
     "country": "JP",
-    "latitude": 35.0,
+    "latitude": 35,
     "longitude": 137.03333,
     "population": 72193,
     "timezone": "Asia/Tokyo"
@@ -15877,10 +15877,10 @@
   },
   "Damoh, IN": {
     "country": "IN",
-    "latitude": 23.83312,
-    "longitude": 79.4419,
-    "population": 139561,
-    "timezone": "Asia/Kolkata"
+    "latitude": 23.83,
+    "longitude": 79.44,
+    "timezone": "Asia/Kolkata",
+    "population": 150000
   },
   "Danane, CI": {
     "country": "CI",
@@ -15969,7 +15969,7 @@
   "Daqing, CN": {
     "country": "CN",
     "latitude": 46.58333,
-    "longitude": 125.0,
+    "longitude": 125,
     "population": 1604027,
     "timezone": "Asia/Shanghai"
   },
@@ -16157,10 +16157,10 @@
   },
   "Datia, IN": {
     "country": "IN",
-    "latitude": 25.67312,
-    "longitude": 78.45908,
-    "population": 100284,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.67,
+    "longitude": 78.47,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Datong, CN": {
     "country": "CN",
@@ -16647,10 +16647,10 @@
   },
   "Deoria, IN": {
     "country": "IN",
-    "latitude": 26.50167,
-    "longitude": 83.77936,
-    "population": 129570,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.5024,
+    "longitude": 83.7791,
+    "timezone": "Asia/Kolkata",
+    "population": 140000
   },
   "Depok, ID": {
     "country": "ID",
@@ -16878,10 +16878,10 @@
   },
   "Dhar, IN": {
     "country": "IN",
-    "latitude": 22.59373,
-    "longitude": 75.29774,
-    "population": 93917,
-    "timezone": "Asia/Kolkata"
+    "latitude": 22.6,
+    "longitude": 75.3,
+    "timezone": "Asia/Kolkata",
+    "population": 110000
   },
   "Dharan, NP": {
     "country": "NP",
@@ -19552,10 +19552,10 @@
   },
   "Faridabad, IN": {
     "country": "IN",
-    "latitude": 28.41124,
-    "longitude": 77.31316,
-    "population": 1414050,
-    "timezone": "Asia/Kolkata"
+    "latitude": 28.4089,
+    "longitude": 77.3178,
+    "timezone": "Asia/Kolkata",
+    "population": 1400000
   },
   "Faridkot, IN": {
     "country": "IN",
@@ -21708,17 +21708,17 @@
   },
   "Ghaziabad, IN": {
     "country": "IN",
-    "latitude": 28.66535,
-    "longitude": 77.43915,
-    "population": 1199191,
-    "timezone": "Asia/Kolkata"
+    "latitude": 28.6692,
+    "longitude": 77.4538,
+    "timezone": "Asia/Kolkata",
+    "population": 2400000
   },
   "Ghazipur, IN": {
     "country": "IN",
-    "latitude": 25.58333,
-    "longitude": 83.58526,
-    "population": 103095,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.584,
+    "longitude": 83.577,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Ghazni, AF": {
     "country": "AF",
@@ -22562,10 +22562,10 @@
   },
   "Greater Noida, IN": {
     "country": "IN",
-    "latitude": 28.49615,
-    "longitude": 77.53601,
-    "population": 293908,
-    "timezone": "Asia/Kolkata"
+    "latitude": 28.4744,
+    "longitude": 77.504,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Greater Sudbury, CA": {
     "country": "CA",
@@ -23199,10 +23199,10 @@
   },
   "Guna, IN": {
     "country": "IN",
-    "latitude": 24.64691,
-    "longitude": 77.3113,
-    "population": 180935,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.65,
+    "longitude": 77.32,
+    "timezone": "Asia/Kolkata",
+    "population": 180000
   },
   "Gunan, CN": {
     "country": "CN",
@@ -23710,10 +23710,10 @@
   },
   "Hajipur, IN": {
     "country": "IN",
-    "latitude": 25.68544,
-    "longitude": 85.20981,
-    "population": 147688,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.6858,
+    "longitude": 85.2146,
+    "timezone": "Asia/Kolkata",
+    "population": 160000
   },
   "Hakkari, TR": {
     "country": "TR",
@@ -24123,10 +24123,10 @@
   },
   "Harda, IN": {
     "country": "IN",
-    "latitude": 22.34414,
-    "longitude": 77.09536,
-    "population": 74268,
-    "timezone": "Asia/Kolkata"
+    "latitude": 22.3395,
+    "longitude": 77.095,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
   },
   "Hardoi, IN": {
     "country": "IN",
@@ -24144,10 +24144,10 @@
   },
   "Haridwar, IN": {
     "country": "IN",
-    "latitude": 29.94791,
-    "longitude": 78.16025,
-    "population": 186079,
-    "timezone": "Asia/Kolkata"
+    "latitude": 29.9457,
+    "longitude": 78.1642,
+    "timezone": "Asia/Kolkata",
+    "population": 310000
   },
   "Harihar, IN": {
     "country": "IN",
@@ -28267,10 +28267,10 @@
   },
   "Jaunpur, IN": {
     "country": "IN",
-    "latitude": 25.75356,
-    "longitude": 82.68689,
-    "population": 169572,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.7464,
+    "longitude": 82.6837,
+    "timezone": "Asia/Kolkata",
+    "population": 190000
   },
   "Jaworzno, PL": {
     "country": "PL",
@@ -29996,7 +29996,7 @@
   },
   "Kameoka, JP": {
     "country": "JP",
-    "latitude": 35.0,
+    "latitude": 35,
     "longitude": 135.58333,
     "population": 97181,
     "timezone": "Asia/Tokyo"
@@ -30241,10 +30241,10 @@
   },
   "Kanchipuram, IN": {
     "country": "IN",
-    "latitude": 12.83515,
-    "longitude": 79.70006,
-    "population": 221715,
-    "timezone": "Asia/Kolkata"
+    "latitude": 12.8342,
+    "longitude": 79.7036,
+    "timezone": "Asia/Kolkata",
+    "population": 240000
   },
   "Kanchrapara, IN": {
     "country": "IN",
@@ -31550,10 +31550,10 @@
   },
   "Khandwa, IN": {
     "country": "IN",
-    "latitude": 21.82427,
-    "longitude": 76.35086,
-    "population": 200738,
-    "timezone": "Asia/Kolkata"
+    "latitude": 21.8311,
+    "longitude": 76.3497,
+    "timezone": "Asia/Kolkata",
+    "population": 250000
   },
   "Khanna, IN": {
     "country": "IN",
@@ -31613,10 +31613,10 @@
   },
   "Khargone, IN": {
     "country": "IN",
-    "latitude": 21.82292,
-    "longitude": 75.61394,
-    "population": 116150,
-    "timezone": "Asia/Kolkata"
+    "latitude": 21.8239,
+    "longitude": 75.6094,
+    "timezone": "Asia/Kolkata",
+    "population": 140000
   },
   "Kharian, PK": {
     "country": "PK",
@@ -32334,10 +32334,10 @@
   },
   "Kishanganj, IN": {
     "country": "IN",
-    "latitude": 26.10224,
-    "longitude": 87.95534,
-    "population": 105782,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.0967,
+    "longitude": 87.9408,
+    "timezone": "Asia/Kolkata",
+    "population": 110000
   },
   "Kishangarh, IN": {
     "country": "IN",
@@ -34036,7 +34036,7 @@
   "Kurihara, JP": {
     "country": "JP",
     "latitude": 38.75,
-    "longitude": 141.0,
+    "longitude": 141,
     "population": 66565,
     "timezone": "Asia/Tokyo"
   },
@@ -34847,10 +34847,10 @@
   },
   "Lalitpur, IN": {
     "country": "IN",
-    "latitude": 24.69007,
-    "longitude": 78.41915,
-    "population": 126475,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.69,
+    "longitude": 78.41,
+    "timezone": "Asia/Kolkata",
+    "population": 140000
   },
   "Lalmonirhat, BD": {
     "country": "BD",
@@ -37633,10 +37633,10 @@
   },
   "Madhubani, IN": {
     "country": "IN",
-    "latitude": 26.35367,
-    "longitude": 86.07169,
-    "population": 75736,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.3533,
+    "longitude": 86.0718,
+    "timezone": "Asia/Kolkata",
+    "population": 90000
   },
   "Madhurampur Dehri, IN": {
     "country": "IN",
@@ -37731,10 +37731,10 @@
   },
   "Madurai, IN": {
     "country": "IN",
-    "latitude": 9.919,
-    "longitude": 78.11953,
-    "population": 1465625,
-    "timezone": "Asia/Kolkata"
+    "latitude": 9.9252,
+    "longitude": 78.1198,
+    "timezone": "Asia/Kolkata",
+    "population": 1600000
   },
   "Maduravoyal, IN": {
     "country": "IN",
@@ -38550,10 +38550,10 @@
   },
   "Mandsaur, IN": {
     "country": "IN",
-    "latitude": 24.07184,
-    "longitude": 75.06986,
-    "population": 141667,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.0722,
+    "longitude": 75.0683,
+    "timezone": "Asia/Kolkata",
+    "population": 180000
   },
   "Mandurah, AU": {
     "country": "AU",
@@ -39551,10 +39551,10 @@
   },
   "Mathura, IN": {
     "country": "IN",
-    "latitude": 27.5035,
-    "longitude": 77.67215,
-    "population": 330511,
-    "timezone": "Asia/Kolkata"
+    "latitude": 27.4924,
+    "longitude": 77.6737,
+    "timezone": "Asia/Kolkata",
+    "population": 460000
   },
   "Mati, PH": {
     "country": "PH",
@@ -39978,10 +39978,10 @@
   },
   "Meerut, IN": {
     "country": "IN",
-    "latitude": 28.98002,
-    "longitude": 77.70636,
-    "population": 1223184,
-    "timezone": "Asia/Kolkata"
+    "latitude": 28.9845,
+    "longitude": 77.7064,
+    "timezone": "Asia/Kolkata",
+    "population": 1420000
   },
   "Meguro, JP": {
     "country": "JP",
@@ -40986,10 +40986,10 @@
   },
   "Mirzapur, IN": {
     "country": "IN",
-    "latitude": 25.1449,
-    "longitude": 82.56534,
-    "population": 220029,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.146,
+    "longitude": 82.569,
+    "timezone": "Asia/Kolkata",
+    "population": 240000
   },
   "Misato, JP": {
     "country": "JP",
@@ -41833,10 +41833,10 @@
   },
   "Morena, IN": {
     "country": "IN",
-    "latitude": 26.49892,
-    "longitude": 77.99534,
-    "population": 200482,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.5,
+    "longitude": 77.9944,
+    "timezone": "Asia/Kolkata",
+    "population": 280000
   },
   "Moreno Valley, US": {
     "country": "US",
@@ -41869,7 +41869,7 @@
   "Moriya, JP": {
     "country": "JP",
     "latitude": 35.93333,
-    "longitude": 140.0,
+    "longitude": 140,
     "population": 68777,
     "timezone": "Asia/Tokyo"
   },
@@ -44290,7 +44290,7 @@
   },
   "Newcastle under Lyme, GB": {
     "country": "GB",
-    "latitude": 53.0,
+    "latitude": 53,
     "longitude": -2.23333,
     "population": 127727,
     "timezone": "Europe/London"
@@ -44899,10 +44899,10 @@
   },
   "Noida, IN": {
     "country": "IN",
-    "latitude": 28.58,
-    "longitude": 77.33,
-    "population": 293908,
-    "timezone": "Asia/Kolkata"
+    "latitude": 28.5355,
+    "longitude": 77.391,
+    "timezone": "Asia/Kolkata",
+    "population": 640000
   },
   "Noisy-le-Grand, FR": {
     "country": "FR",
@@ -45956,7 +45956,7 @@
   },
   "Okegawa, JP": {
     "country": "JP",
-    "latitude": 36.0,
+    "latitude": 36,
     "longitude": 139.55722,
     "population": 75062,
     "timezone": "Asia/Tokyo"
@@ -46635,7 +46635,7 @@
   },
   "Otsu, JP": {
     "country": "JP",
-    "latitude": 35.0,
+    "latitude": 35,
     "longitude": 135.86667,
     "population": 345070,
     "timezone": "Asia/Tokyo"
@@ -47258,10 +47258,10 @@
   },
   "Palitana, IN": {
     "country": "IN",
-    "latitude": 21.52519,
-    "longitude": 71.82309,
-    "population": 64497,
-    "timezone": "Asia/Kolkata"
+    "latitude": 21.5222,
+    "longitude": 71.8264,
+    "timezone": "Asia/Kolkata",
+    "population": 90000
   },
   "Pallabi, BD": {
     "country": "BD",
@@ -49569,7 +49569,7 @@
   "Pleiku, VN": {
     "country": "VN",
     "latitude": 13.98333,
-    "longitude": 108.0,
+    "longitude": 108,
     "population": 114225,
     "timezone": "Asia/Ho_Chi_Minh"
   },
@@ -50457,7 +50457,7 @@
   },
   "Puchong, MY": {
     "country": "MY",
-    "latitude": 3.0,
+    "latitude": 3,
     "longitude": 101.61667,
     "population": 375181,
     "timezone": "Asia/Kuala_Lumpur"
@@ -50744,10 +50744,10 @@
   },
   "Puri, IN": {
     "country": "IN",
-    "latitude": 19.79825,
-    "longitude": 85.82494,
-    "population": 200564,
-    "timezone": "Asia/Kolkata"
+    "latitude": 19.8135,
+    "longitude": 85.8312,
+    "timezone": "Asia/Kolkata",
+    "population": 220000
   },
   "Purley, GB": {
     "country": "GB",
@@ -51207,7 +51207,7 @@
   "Qiuji, CN": {
     "country": "CN",
     "latitude": 33.8,
-    "longitude": 118.0,
+    "longitude": 118,
     "population": 76343,
     "timezone": "Asia/Shanghai"
   },
@@ -52879,10 +52879,10 @@
   },
   "Rishikesh, IN": {
     "country": "IN",
-    "latitude": 30.10778,
-    "longitude": 78.29255,
-    "population": 66390,
-    "timezone": "Asia/Kolkata"
+    "latitude": 30.0869,
+    "longitude": 78.2676,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Rishon LeTsiyyon, IL": {
     "country": "IL",
@@ -53824,10 +53824,10 @@
   },
   "Saharsa, IN": {
     "country": "IN",
-    "latitude": 25.87498,
-    "longitude": 86.59611,
-    "population": 156540,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.8835,
+    "longitude": 86.6006,
+    "timezone": "Asia/Kolkata",
+    "population": 170000
   },
   "Sahaswan, IN": {
     "country": "IN",
@@ -54454,10 +54454,10 @@
   },
   "Samastipur, IN": {
     "country": "IN",
-    "latitude": 25.86222,
-    "longitude": 85.77953,
-    "population": 67925,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.8628,
+    "longitude": 85.7811,
+    "timezone": "Asia/Kolkata",
+    "population": 70000
   },
   "Samba, AO": {
     "country": "AO",
@@ -55946,7 +55946,7 @@
   "Santo Domingo Oeste, DO": {
     "country": "DO",
     "latitude": 18.5,
-    "longitude": -70.0,
+    "longitude": -70,
     "population": 701269,
     "timezone": "America/Santo_Domingo"
   },
@@ -56435,10 +56435,10 @@
   },
   "Sasaram, IN": {
     "country": "IN",
-    "latitude": 24.94942,
-    "longitude": 84.01645,
-    "population": 147408,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.9515,
+    "longitude": 84.0159,
+    "timezone": "Asia/Kolkata",
+    "population": 160000
   },
   "Sasebo, JP": {
     "country": "JP",
@@ -56814,9 +56814,9 @@
   "Sehore, IN": {
     "country": "IN",
     "latitude": 23.2,
-    "longitude": 77.08333,
-    "population": 109118,
-    "timezone": "Asia/Kolkata"
+    "longitude": 77.08,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Seinaejoki, FI": {
     "country": "FI",
@@ -56988,10 +56988,10 @@
   },
   "Seoni, IN": {
     "country": "IN",
-    "latitude": 22.08503,
-    "longitude": 79.55037,
-    "population": 102343,
-    "timezone": "Asia/Kolkata"
+    "latitude": 22.08,
+    "longitude": 79.55,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Seosan, KR": {
     "country": "KR",
@@ -57380,10 +57380,10 @@
   },
   "Shahdol, IN": {
     "country": "IN",
-    "latitude": 23.29356,
-    "longitude": 81.3619,
-    "population": 89289,
-    "timezone": "Asia/Kolkata"
+    "latitude": 23.29,
+    "longitude": 81.36,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Shahecheng, CN": {
     "country": "CN",
@@ -57492,10 +57492,10 @@
   },
   "Shajapur, IN": {
     "country": "IN",
-    "latitude": 23.42637,
-    "longitude": 76.27775,
-    "population": 69263,
-    "timezone": "Asia/Kolkata"
+    "latitude": 23.27,
+    "longitude": 76.28,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
   },
   "Shajing Town, CN": {
     "country": "CN",
@@ -57863,10 +57863,10 @@
   },
   "Sheopur, IN": {
     "country": "IN",
-    "latitude": 25.66472,
-    "longitude": 76.69616,
-    "population": 71951,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.6667,
+    "longitude": 76.7,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
   },
   "Sheptytskyi, UA": {
     "country": "UA",
@@ -57941,7 +57941,7 @@
   "Shibukawa, JP": {
     "country": "JP",
     "latitude": 36.48333,
-    "longitude": 139.0,
+    "longitude": 139,
     "population": 76098,
     "timezone": "Asia/Tokyo"
   },
@@ -58178,10 +58178,10 @@
   },
   "Shivpuri, IN": {
     "country": "IN",
-    "latitude": 25.42378,
-    "longitude": 77.66223,
-    "population": 179977,
-    "timezone": "Asia/Kolkata"
+    "latitude": 25.43,
+    "longitude": 77.65,
+    "timezone": "Asia/Kolkata",
+    "population": 180000
   },
   "Shiwan, CN": {
     "country": "CN",
@@ -58892,10 +58892,10 @@
   },
   "Singrauli, IN": {
     "country": "IN",
-    "latitude": 24.19973,
-    "longitude": 82.67535,
-    "population": 220257,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.2,
+    "longitude": 82.67,
+    "timezone": "Asia/Kolkata",
+    "population": 250000
   },
   "Sinhyeon, KR": {
     "country": "KR",
@@ -59095,17 +59095,17 @@
   },
   "Sitamarhi, IN": {
     "country": "IN",
-    "latitude": 26.59357,
-    "longitude": 85.4906,
-    "population": 67818,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.5976,
+    "longitude": 85.4891,
+    "timezone": "Asia/Kolkata",
+    "population": 110000
   },
   "Sitapur, IN": {
     "country": "IN",
-    "latitude": 27.56192,
-    "longitude": 80.68265,
-    "population": 164435,
-    "timezone": "Asia/Kolkata"
+    "latitude": 27.5644,
+    "longitude": 80.6829,
+    "timezone": "Asia/Kolkata",
+    "population": 190000
   },
   "Sitiawan, MY": {
     "country": "MY",
@@ -59172,10 +59172,10 @@
   },
   "Siwan, IN": {
     "country": "IN",
-    "latitude": 26.22096,
-    "longitude": 84.35609,
-    "population": 135066,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.2223,
+    "longitude": 84.3567,
+    "timezone": "Asia/Kolkata",
+    "population": 140000
   },
   "Skanes, TN": {
     "country": "TN",
@@ -60649,10 +60649,10 @@
   },
   "Sultanpur, IN": {
     "country": "IN",
-    "latitude": 26.25788,
-    "longitude": 82.07269,
-    "population": 110368,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.2648,
+    "longitude": 82.0727,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
   },
   "Sumare, BR": {
     "country": "BR",
@@ -61350,7 +61350,7 @@
   "Tagajo-shi, JP": {
     "country": "JP",
     "latitude": 38.3,
-    "longitude": 141.0,
+    "longitude": 141,
     "population": 62827,
     "timezone": "Asia/Tokyo"
   },
@@ -63176,10 +63176,10 @@
   },
   "Thanjavur, IN": {
     "country": "IN",
-    "latitude": 10.78523,
-    "longitude": 79.13909,
-    "population": 291067,
-    "timezone": "Asia/Kolkata"
+    "latitude": 10.787,
+    "longitude": 79.1378,
+    "timezone": "Asia/Kolkata",
+    "population": 230000
   },
   "Thanlyin, MM": {
     "country": "MM",
@@ -63477,7 +63477,7 @@
   },
   "Tianliu, CN": {
     "country": "CN",
-    "latitude": 37.0,
+    "latitude": 37,
     "longitude": 118.78333,
     "population": 67165,
     "timezone": "Asia/Shanghai"
@@ -63561,10 +63561,10 @@
   },
   "Tikamgarh, IN": {
     "country": "IN",
-    "latitude": 24.74327,
-    "longitude": 78.83061,
-    "population": 79106,
-    "timezone": "Asia/Kolkata"
+    "latitude": 24.75,
+    "longitude": 78.83,
+    "timezone": "Asia/Kolkata",
+    "population": 90000
   },
   "Tikhoretsk, RU": {
     "country": "RU",
@@ -63736,10 +63736,10 @@
   },
   "Tirupati, IN": {
     "country": "IN",
-    "latitude": 13.63551,
-    "longitude": 79.41989,
-    "population": 295323,
-    "timezone": "Asia/Kolkata"
+    "latitude": 13.6288,
+    "longitude": 79.4192,
+    "timezone": "Asia/Kolkata",
+    "population": 460000
   },
   "Tirupattur, IN": {
     "country": "IN",
@@ -63898,7 +63898,7 @@
   "Tocoa, HN": {
     "country": "HN",
     "latitude": 15.68333,
-    "longitude": -86.0,
+    "longitude": -86,
     "population": 111972,
     "timezone": "America/Tegucigalpa"
   },
@@ -65535,10 +65535,10 @@
   },
   "Ujjain, IN": {
     "country": "IN",
-    "latitude": 23.18239,
-    "longitude": 75.77643,
-    "population": 515215,
-    "timezone": "Asia/Kolkata"
+    "latitude": 23.1765,
+    "longitude": 75.7885,
+    "timezone": "Asia/Kolkata",
+    "population": 550000
   },
   "Ujpest, HU": {
     "country": "HU",
@@ -65704,7 +65704,7 @@
   "Unaizah, SA": {
     "country": "SA",
     "latitude": 26.1,
-    "longitude": 44.0,
+    "longitude": 44,
     "population": 183319,
     "timezone": "Asia/Riyadh"
   },
@@ -65766,10 +65766,10 @@
   },
   "Unnao, IN": {
     "country": "IN",
-    "latitude": 26.54706,
-    "longitude": 80.48781,
-    "population": 161671,
-    "timezone": "Asia/Kolkata"
+    "latitude": 26.5393,
+    "longitude": 80.4878,
+    "timezone": "Asia/Kolkata",
+    "population": 190000
   },
   "Upata, VE": {
     "country": "VE",
@@ -66711,10 +66711,10 @@
   },
   "Vidisha, IN": {
     "country": "IN",
-    "latitude": 23.52604,
-    "longitude": 77.81092,
-    "population": 155951,
-    "timezone": "Asia/Kolkata"
+    "latitude": 23.53,
+    "longitude": 77.82,
+    "timezone": "Asia/Kolkata",
+    "population": 160000
   },
   "Vidradnyi, UA": {
     "country": "UA",
@@ -66788,10 +66788,10 @@
   },
   "Vijayawada, IN": {
     "country": "IN",
-    "latitude": 16.50745,
-    "longitude": 80.6466,
-    "population": 1143232,
-    "timezone": "Asia/Kolkata"
+    "latitude": 16.5062,
+    "longitude": 80.648,
+    "timezone": "Asia/Kolkata",
+    "population": 1100000
   },
   "Vikindu, TZ": {
     "country": "TZ",
@@ -67124,7 +67124,7 @@
   },
   "Vinh Tuy, VN": {
     "country": "VN",
-    "latitude": 21.0,
+    "latitude": 21,
     "longitude": 105.88333,
     "population": 86618,
     "timezone": "Asia/Bangkok"
@@ -67460,10 +67460,10 @@
   },
   "Vrindavan, IN": {
     "country": "IN",
-    "latitude": 27.58105,
-    "longitude": 77.69662,
-    "population": 60195,
-    "timezone": "Asia/Kolkata"
+    "latitude": 27.5806,
+    "longitude": 77.7006,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
   },
   "Vryheid, ZA": {
     "country": "ZA",
@@ -67782,7 +67782,7 @@
   },
   "Warangal, IN": {
     "country": "IN",
-    "latitude": 18.0,
+    "latitude": 18,
     "longitude": 79.58333,
     "population": 704570,
     "timezone": "Asia/Kolkata"
@@ -70149,7 +70149,7 @@
   "Yingtan, CN": {
     "country": "CN",
     "latitude": 28.23333,
-    "longitude": 117.0,
+    "longitude": 117,
     "population": 214229,
     "timezone": "Asia/Shanghai"
   },
@@ -70708,7 +70708,7 @@
   },
   "Yuzivskyi, UA": {
     "country": "UA",
-    "latitude": 48.0,
+    "latitude": 48,
     "longitude": 37.80006,
     "population": 94228,
     "timezone": "Europe/Kyiv"
@@ -71685,5 +71685,481 @@
     "longitude": 36.97561,
     "population": 62000,
     "timezone": "Europe/Moscow"
+  },
+  "Ayodhya, IN": {
+    "country": "IN",
+    "latitude": 26.7922,
+    "longitude": 82.1998,
+    "timezone": "Asia/Kolkata",
+    "population": 300000
+  },
+  "Kedarnath, IN": {
+    "country": "IN",
+    "latitude": 30.7346,
+    "longitude": 79.0669,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Badrinath, IN": {
+    "country": "IN",
+    "latitude": 30.7433,
+    "longitude": 79.4938,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Gangotri, IN": {
+    "country": "IN",
+    "latitude": 30.9947,
+    "longitude": 78.9398,
+    "timezone": "Asia/Kolkata",
+    "population": 30000
+  },
+  "Yamunotri, IN": {
+    "country": "IN",
+    "latitude": 31.014,
+    "longitude": 78.46,
+    "timezone": "Asia/Kolkata",
+    "population": 30000
+  },
+  "Somnath, IN": {
+    "country": "IN",
+    "latitude": 20.888,
+    "longitude": 70.4012,
+    "timezone": "Asia/Kolkata",
+    "population": 150000
+  },
+  "Dwarka, IN": {
+    "country": "IN",
+    "latitude": 22.2442,
+    "longitude": 68.9685,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
+  },
+  "Rameswaram, IN": {
+    "country": "IN",
+    "latitude": 9.2876,
+    "longitude": 79.3129,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
+  },
+  "Rameshwaram, IN": {
+    "country": "IN",
+    "latitude": 9.2876,
+    "longitude": 79.3129,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
+  },
+  "Shirdi, IN": {
+    "country": "IN",
+    "latitude": 19.7667,
+    "longitude": 74.4766,
+    "timezone": "Asia/Kolkata",
+    "population": 150000
+  },
+  "Bodh Gaya, IN": {
+    "country": "IN",
+    "latitude": 24.6961,
+    "longitude": 84.9869,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
+  },
+  "Kurukshetra, IN": {
+    "country": "IN",
+    "latitude": 29.9695,
+    "longitude": 76.8783,
+    "timezone": "Asia/Kolkata",
+    "population": 200000
+  },
+  "Pushkar, IN": {
+    "country": "IN",
+    "latitude": 26.4897,
+    "longitude": 74.5511,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
+  },
+  "Hampi, IN": {
+    "country": "IN",
+    "latitude": 15.335,
+    "longitude": 76.46,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Sringeri, IN": {
+    "country": "IN",
+    "latitude": 13.418,
+    "longitude": 75.2559,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Nathdwara, IN": {
+    "country": "IN",
+    "latitude": 24.9312,
+    "longitude": 73.8188,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
+  },
+  "Omkareshwar, IN": {
+    "country": "IN",
+    "latitude": 22.2458,
+    "longitude": 76.1508,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Mahakaleshwar, IN": {
+    "country": "IN",
+    "latitude": 23.1827,
+    "longitude": 75.7682,
+    "timezone": "Asia/Kolkata",
+    "population": 550000
+  },
+  "Trimbakeshwar, IN": {
+    "country": "IN",
+    "latitude": 19.9328,
+    "longitude": 73.5307,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
+  },
+  "Grishneshwar, IN": {
+    "country": "IN",
+    "latitude": 20.0238,
+    "longitude": 75.1793,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Bhimashankar, IN": {
+    "country": "IN",
+    "latitude": 19.0722,
+    "longitude": 73.5358,
+    "timezone": "Asia/Kolkata",
+    "population": 40000
+  },
+  "Nageshwar, IN": {
+    "country": "IN",
+    "latitude": 22.335,
+    "longitude": 69.0906,
+    "timezone": "Asia/Kolkata",
+    "population": 40000
+  },
+  "Srisailam (Mallikarjuna), IN": {
+    "country": "IN",
+    "latitude": 16.0744,
+    "longitude": 78.8683,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
+  },
+  "Chitrakoot, IN": {
+    "country": "IN",
+    "latitude": 25.184,
+    "longitude": 80.8655,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
+  },
+  "Govardhan, IN": {
+    "country": "IN",
+    "latitude": 27.4984,
+    "longitude": 77.4646,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
+  },
+  "Barsana, IN": {
+    "country": "IN",
+    "latitude": 27.6478,
+    "longitude": 77.3756,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Naimisharanya, IN": {
+    "country": "IN",
+    "latitude": 27.3484,
+    "longitude": 80.4856,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Mount Abu, IN": {
+    "country": "IN",
+    "latitude": 24.5926,
+    "longitude": 72.7156,
+    "timezone": "Asia/Kolkata",
+    "population": 70000
+  },
+  "Pavagadh, IN": {
+    "country": "IN",
+    "latitude": 22.4633,
+    "longitude": 73.5325,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Ambaji, IN": {
+    "country": "IN",
+    "latitude": 24.3317,
+    "longitude": 72.8492,
+    "timezone": "Asia/Kolkata",
+    "population": 75000
+  },
+  "Shravanabelagola, IN": {
+    "country": "IN",
+    "latitude": 12.8584,
+    "longitude": 76.4862,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Tarapith, IN": {
+    "country": "IN",
+    "latitude": 24.1128,
+    "longitude": 87.8014,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Kamakhya, IN": {
+    "country": "IN",
+    "latitude": 26.1664,
+    "longitude": 91.7061,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
+  },
+  "Vaishno Devi (Katra), IN": {
+    "country": "IN",
+    "latitude": 32.9922,
+    "longitude": 74.9542,
+    "timezone": "Asia/Kolkata",
+    "population": 150000
+  },
+  "Amarnath, IN": {
+    "country": "IN",
+    "latitude": 34.2157,
+    "longitude": 75.5039,
+    "timezone": "Asia/Kolkata",
+    "population": 30000
+  },
+  "Manikaran, IN": {
+    "country": "IN",
+    "latitude": 32.0275,
+    "longitude": 77.3503,
+    "timezone": "Asia/Kolkata",
+    "population": 30000
+  },
+  "Hemkund Sahib, IN": {
+    "country": "IN",
+    "latitude": 30.7,
+    "longitude": 79.58,
+    "timezone": "Asia/Kolkata",
+    "population": 20000
+  },
+  "Neemuch, IN": {
+    "country": "IN",
+    "latitude": 24.475,
+    "longitude": 74.87,
+    "timezone": "Asia/Kolkata",
+    "population": 150000
+  },
+  "Narsinghpur, IN": {
+    "country": "IN",
+    "latitude": 22.95,
+    "longitude": 79.2,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
+  },
+  "Dindori, IN": {
+    "country": "IN",
+    "latitude": 22.95,
+    "longitude": 81.08,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Mandla, IN": {
+    "country": "IN",
+    "latitude": 22.6,
+    "longitude": 80.38,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
+  },
+  "Anuppur, IN": {
+    "country": "IN",
+    "latitude": 23.11,
+    "longitude": 81.69,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Umaria, IN": {
+    "country": "IN",
+    "latitude": 23.53,
+    "longitude": 80.83,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Sidhi, IN": {
+    "country": "IN",
+    "latitude": 24.42,
+    "longitude": 81.88,
+    "timezone": "Asia/Kolkata",
+    "population": 80000
+  },
+  "Panna, IN": {
+    "country": "IN",
+    "latitude": 24.72,
+    "longitude": 80.2,
+    "timezone": "Asia/Kolkata",
+    "population": 70000
+  },
+  "Raisen, IN": {
+    "country": "IN",
+    "latitude": 23.33,
+    "longitude": 77.78,
+    "timezone": "Asia/Kolkata",
+    "population": 70000
+  },
+  "Rajgarh, IN": {
+    "country": "IN",
+    "latitude": 24.01,
+    "longitude": 76.73,
+    "timezone": "Asia/Kolkata",
+    "population": 60000
+  },
+  "Agar Malwa, IN": {
+    "country": "IN",
+    "latitude": 23.71,
+    "longitude": 76.02,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Jhabua, IN": {
+    "country": "IN",
+    "latitude": 22.77,
+    "longitude": 74.6,
+    "timezone": "Asia/Kolkata",
+    "population": 50000
+  },
+  "Alirajpur, IN": {
+    "country": "IN",
+    "latitude": 22.3,
+    "longitude": 74.35,
+    "timezone": "Asia/Kolkata",
+    "population": 40000
+  },
+  "Barwani, IN": {
+    "country": "IN",
+    "latitude": 22.03,
+    "longitude": 74.9,
+    "timezone": "Asia/Kolkata",
+    "population": 70000
+  },
+  "Narmadapuram (Hoshangabad), IN": {
+    "country": "IN",
+    "latitude": 22.75,
+    "longitude": 77.73,
+    "timezone": "Asia/Kolkata",
+    "population": 150000
+  },
+  "Chhatrapati Sambhajinagar (Aurangabad), IN": {
+    "country": "IN",
+    "latitude": 19.8762,
+    "longitude": 75.3433,
+    "timezone": "Asia/Kolkata",
+    "population": 1200000
+  },
+  "Dharashiv (Osmanabad), IN": {
+    "country": "IN",
+    "latitude": 18.1856,
+    "longitude": 76.0419,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
+  },
+  "Belagavi (Belgaum), IN": {
+    "country": "IN",
+    "latitude": 15.8497,
+    "longitude": 74.4977,
+    "timezone": "Asia/Kolkata",
+    "population": 650000
+  },
+  "Hubballi (Hubli), IN": {
+    "country": "IN",
+    "latitude": 15.3647,
+    "longitude": 75.124,
+    "timezone": "Asia/Kolkata",
+    "population": 950000
+  },
+  "Kalaburagi (Gulbarga), IN": {
+    "country": "IN",
+    "latitude": 17.3297,
+    "longitude": 76.8343,
+    "timezone": "Asia/Kolkata",
+    "population": 600000
+  },
+  "Mangaluru (Mangalore), IN": {
+    "country": "IN",
+    "latitude": 12.9141,
+    "longitude": 74.856,
+    "timezone": "Asia/Kolkata",
+    "population": 500000
+  },
+  "Mysuru (Mysore), IN": {
+    "country": "IN",
+    "latitude": 12.2958,
+    "longitude": 76.6394,
+    "timezone": "Asia/Kolkata",
+    "population": 920000
+  },
+  "Visakhapatnam (Vizag), IN": {
+    "country": "IN",
+    "latitude": 17.6868,
+    "longitude": 83.2185,
+    "timezone": "Asia/Kolkata",
+    "population": 2050000
+  },
+  "Prayagraj (Allahabad), IN": {
+    "country": "IN",
+    "latitude": 25.4358,
+    "longitude": 81.8463,
+    "timezone": "Asia/Kolkata",
+    "population": 1500000
+  },
+  "Varanasi (Kashi / Banaras), IN": {
+    "country": "IN",
+    "latitude": 25.3176,
+    "longitude": 82.9739,
+    "timezone": "Asia/Kolkata",
+    "population": 1400000
+  },
+  "Gurugram (Gurgaon), IN": {
+    "country": "IN",
+    "latitude": 28.4595,
+    "longitude": 77.0266,
+    "timezone": "Asia/Kolkata",
+    "population": 1150000
+  },
+  "Gonda, IN": {
+    "country": "IN",
+    "latitude": 27.1337,
+    "longitude": 81.9619,
+    "timezone": "Asia/Kolkata",
+    "population": 140000
+  },
+  "Pratapgarh, IN": {
+    "country": "IN",
+    "latitude": 25.8967,
+    "longitude": 81.9443,
+    "timezone": "Asia/Kolkata",
+    "population": 100000
+  },
+  "Rae Bareli, IN": {
+    "country": "IN",
+    "latitude": 26.2303,
+    "longitude": 81.2409,
+    "timezone": "Asia/Kolkata",
+    "population": 200000
+  },
+  "Ballia, IN": {
+    "country": "IN",
+    "latitude": 25.76,
+    "longitude": 84.15,
+    "timezone": "Asia/Kolkata",
+    "population": 120000
+  },
+  "Motihari, IN": {
+    "country": "IN",
+    "latitude": 26.6468,
+    "longitude": 84.9089,
+    "timezone": "Asia/Kolkata",
+    "population": 140000
   }
 }

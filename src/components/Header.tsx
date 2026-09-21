@@ -20,6 +20,7 @@ export type ActiveView =
   | "today"
   | "timings"
   | "planets"
+  | "kundli"
   | "swara"
   | "navtara"
   | "horas"

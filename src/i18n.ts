@@ -12,13 +12,24 @@ export interface TranslationDictionary {
   changeLocation: string;
   settings: string;
   print: string;
+  dailyPanchanga: string;
+  muhurtasAndTimings: string;
+  grahaSthiti: string;
+  monthCalendar: string;
   views: {
     panchanga: string;
+    today: string;
     timings: string;
     choghadiya: string;
     planets: string;
-    calendar: string;
+    kundli: string;
+    navagraha: string;
     swara: string;
+    navtara: string;
+    horas: string;
+    tattva: string;
+    calendar: string;
+    festivals: string;
     transitions?: string;
   };
   vedicAlmanac: string;
@@ -145,13 +156,24 @@ export const translations: Record<Language, TranslationDictionary> = {
     changeLocation: "Change Location",
     settings: "Settings",
     print: "Print / Export",
+    dailyPanchanga: "Daily Panchanga",
+    muhurtasAndTimings: "Auspicious Muhūrtas",
+    grahaSthiti: "Graha Sthiti (Planets)",
+    monthCalendar: "Monthly Calendar",
     views: {
       panchanga: "Daily Panchanga",
+      today: "Daily Schedule",
       timings: "Auspicious Muhūrtas",
       choghadiya: "Gaurī / Choghadiya",
       planets: "Graha Sthiti (Planets)",
-      calendar: "Monthly Calendar",
+      kundli: "Janm Kundli & Astrology",
+      navagraha: "Navagraha Mantras",
       swara: "Swara Yoga (Swarodaya)",
+      navtara: "Navtara Chakra",
+      horas: "Vedic Horas",
+      tattva: "Pancha Tattva",
+      calendar: "Monthly Calendar",
+      festivals: "Festivals & Vratas",
     },
     vedicAlmanac: "Vedic Almanac Hierarchy",
     samvatsara: "Saṁvatsara",
@@ -276,13 +298,24 @@ export const translations: Record<Language, TranslationDictionary> = {
     changeLocation: "स्थान बदलें",
     settings: "सेटिंग्स व अयनांश",
     print: "मुद्रण / पीडीएफ",
+    dailyPanchanga: "दैनिक पंचांग",
+    muhurtasAndTimings: "शुभ-अशुभ मुहूर्त",
+    grahaSthiti: "ग्रह स्थिति",
+    monthCalendar: "मासिक पंचांग",
     views: {
-      panchanga: "दैनिक पञ्चाङ्ग",
+      panchanga: "दैनिक पंचांग",
+      today: "दैनिक समय-सारणी",
       timings: "शुभ-अशुभ मुहूर्त",
       choghadiya: "चौघड़िया मुहूर्त",
       planets: "ग्रह स्थिति",
+      kundli: "जन्म कुण्डली",
+      navagraha: "नवग्रह मन्त्र व उपाय",
+      swara: "शिव स्वरोदय",
+      navtara: "नव तारा चक्र",
+      horas: "वैदिक होरा चक्र",
+      tattva: "तत्व दर्शन",
       calendar: "मासिक पंचांग",
-      swara: "स्वरोदय (स्वर योग)",
+      festivals: "पर्व व व्रत",
     },
     vedicAlmanac: "वैदिक पंचांग क्रम",
     samvatsara: "संवत्सर",

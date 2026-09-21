@@ -97,6 +97,61 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
   const [selectedMonth, setSelectedMonth] = useState<number>(initialMonth || currentDateParsed.month);
   const cityName = propCityName || data?.city || "New Delhi, IN";
 
+  // Helper to format Date as YYYY-MM-DD for HTML5 date inputs
+  const formatDateForInput = (d: Date): string => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  // Date Selection Mode: "month" (पूरा माह) | "custom" (कस्टम दिनांक सीमा: प्रारंभ से अंतिम तिथि)
+  const [dateSelectionMode, setDateSelectionMode] = useState<"month" | "custom">("month");
+
+  const [customStartDate, setCustomStartDate] = useState<string>(() => {
+    const today = new Date();
+    return formatDateForInput(today);
+  });
+
+  const [customEndDate, setCustomEndDate] = useState<string>(() => {
+    const end = new Date();
+    end.setDate(end.getDate() + 29); // 30-day window by default
+    return formatDateForInput(end);
+  });
+
+  // Quick Range Preset Handlers
+  const applyPreset15Days = () => {
+    const today = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + 14);
+    setCustomStartDate(formatDateForInput(today));
+    setCustomEndDate(formatDateForInput(end));
+  };
+
+  const applyPreset30Days = () => {
+    const today = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + 29);
+    setCustomStartDate(formatDateForInput(today));
+    setCustomEndDate(formatDateForInput(end));
+  };
+
+  const applyPresetThisMonth = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    setCustomStartDate(formatDateForInput(start));
+    setCustomEndDate(formatDateForInput(end));
+  };
+
+  const applyPresetNextMonth = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+    setCustomStartDate(formatDateForInput(start));
+    setCustomEndDate(formatDateForInput(end));
+  };
+
   // Monthly Panchanga days state & loading
   const [monthDays, setMonthDays] = useState<MonthlyPanchangaDay[]>([]);
   const [isLoadingMonth, setIsLoadingMonth] = useState<boolean>(false);
@@ -119,33 +174,53 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
   const [includeRemedies, setIncludeRemedies] = useState<boolean>(true);
   const [includeTaraDasa, setIncludeTaraDasa] = useState<boolean>(true);
 
-  // Load user feedbacks whenever person or month/year changes
+  // Load user feedbacks whenever person or date range changes
   useEffect(() => {
-    const fbs = loadStoredNavtaraFeedbacks(personName, selectedYear, selectedMonth);
-    setUserFeedbacks(fbs);
-  }, [personName, selectedYear, selectedMonth]);
+    if (dateSelectionMode === "custom" && customStartDate && customEndDate) {
+      const p1 = customStartDate.split("-").map(Number);
+      const p2 = customEndDate.split("-").map(Number);
+      const y1 = p1[0] || selectedYear;
+      const m1 = p1[1] || selectedMonth;
+      const y2 = p2[0] || selectedYear;
+      const m2 = p2[1] || selectedMonth;
+      const fbs1 = loadStoredNavtaraFeedbacks(personName, y1, m1);
+      const fbs2 = (y1 !== y2 || m1 !== m2) ? loadStoredNavtaraFeedbacks(personName, y2, m2) : {};
+      setUserFeedbacks({ ...fbs1, ...fbs2 });
+    } else {
+      const fbs = loadStoredNavtaraFeedbacks(personName, selectedYear, selectedMonth);
+      setUserFeedbacks(fbs);
+    }
+  }, [personName, selectedYear, selectedMonth, dateSelectionMode, customStartDate, customEndDate]);
 
-  // Fetch month panchanga data when in monthly mode
+  // Fetch month or custom date range panchanga data
   useEffect(() => {
     let isCancelled = false;
-    async function fetchMonthData() {
+    async function fetchPeriodData() {
       setIsLoadingMonth(true);
       setLoadError(null);
       try {
         const monthSys = data?.month_system || "amanta";
         const ayan = data?.ayanamsa_key || "citra";
-        const url = `/api/panchanga/month?year=${selectedYear}&month=${selectedMonth}&city=${encodeURIComponent(
-          cityName,
-        )}&month_system=${monthSys}&ayanamsa=${ayan}`;
+        let url = "";
+        if (dateSelectionMode === "custom") {
+          url = `/api/panchanga/month?from=${customStartDate}&to=${customEndDate}&city=${encodeURIComponent(
+            cityName,
+          )}&month_system=${monthSys}&ayanamsa=${ayan}`;
+        } else {
+          url = `/api/panchanga/month?year=${selectedYear}&month=${selectedMonth}&city=${encodeURIComponent(
+            cityName,
+          )}&month_system=${monthSys}&ayanamsa=${ayan}`;
+        }
+
         const res = await fetch(url);
-        if (!res.ok) throw new Error("Failed to load monthly data");
+        if (!res.ok) throw new Error("Failed to load period data");
         const json = await res.json();
         if (!isCancelled && json.days) {
           setMonthDays(json.days);
         }
       } catch (err: any) {
         if (!isCancelled) {
-          setLoadError(err?.message || "Could not load month data");
+          setLoadError(err?.message || "Could not load data");
         }
       } finally {
         if (!isCancelled) {
@@ -155,9 +230,19 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     }
 
     if (reportMode === "monthly") {
-      fetchMonthData();
+      fetchPeriodData();
     }
-  }, [selectedYear, selectedMonth, cityName, reportMode, data?.month_system, data?.ayanamsa_key]);
+  }, [
+    selectedYear,
+    selectedMonth,
+    dateSelectionMode,
+    customStartDate,
+    customEndDate,
+    cityName,
+    reportMode,
+    data?.month_system,
+    data?.ayanamsa_key,
+  ]);
 
   // Daily snapshot data
   const dailyReportData = useMemo(() => {
@@ -170,7 +255,24 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     );
   }, [personName, selectedNakshatra, selectedPada, data]);
 
-  // Monthly report data
+  const isHindi = reportLang === "hi";
+
+  // Dynamic Date Range label
+  const dateRangeLabel = useMemo(() => {
+    if (dateSelectionMode === "custom") {
+      if (monthDays.length > 0) {
+        const first = monthDays[0].date;
+        const last = monthDays[monthDays.length - 1].date;
+        return isHindi ? `${first} से ${last}` : `${first} to ${last}`;
+      }
+      return isHindi ? `${customStartDate} से ${customEndDate}` : `${customStartDate} to ${customEndDate}`;
+    }
+    return isHindi
+      ? `${getMonthNameHi(selectedMonth)} ${selectedYear}`
+      : `${getMonthNameEn(selectedMonth)} ${selectedYear}`;
+  }, [dateSelectionMode, monthDays, customStartDate, customEndDate, selectedMonth, selectedYear, isHindi]);
+
+  // Monthly or Custom Date Range report data
   const monthlyReportData: MonthlyNavtaraReportData = useMemo(() => {
     return computeMonthlyNavtaraReport(
       personName,
@@ -181,6 +283,12 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       cityName,
       monthDays,
       userFeedbacks,
+      {
+        isDateRange: dateSelectionMode === "custom",
+        dateRangeLabel,
+        fromDate: customStartDate,
+        toDate: customEndDate,
+      },
     );
   }, [
     personName,
@@ -191,16 +299,26 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     cityName,
     monthDays,
     userFeedbacks,
+    dateSelectionMode,
+    dateRangeLabel,
+    customStartDate,
+    customEndDate,
   ]);
 
   const upcomingIngresses = useMemo(() => {
     return getUpcomingNakshatraTransitions(data);
   }, [data]);
 
-  // Calendar month day-of-week & categorized day groupings
+  // Calendar month / range day-of-week & categorized day groupings
   const firstDayWeekday = useMemo(() => {
+    if (dateSelectionMode === "custom" && customStartDate) {
+      const parts = customStartDate.split("-").map(Number);
+      if (parts.length === 3) {
+        return new Date(parts[0], parts[1] - 1, parts[2]).getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+      }
+    }
     return new Date(selectedYear, selectedMonth - 1, 1).getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
-  }, [selectedYear, selectedMonth]);
+  }, [dateSelectionMode, customStartDate, selectedYear, selectedMonth]);
 
   const categorizedDays = useMemo(() => {
     const auspicious = monthlyReportData.days.filter((d) => d.dayNatureCategory === "auspicious");
@@ -273,9 +391,11 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         heightLeft -= pageHeight;
       }
 
-      const monthName = getMonthNameEn(selectedMonth);
+      const filePeriod = dateSelectionMode === "custom"
+        ? `${customStartDate}_to_${customEndDate}`
+        : `${getMonthNameEn(selectedMonth)}_${selectedYear}`;
       const safeName = (personName || "User").replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, "_");
-      const filename = `Navtara_Report_${monthName}_${selectedYear}_${safeName}.pdf`;
+      const filename = `Navtara_Report_${filePeriod}_${safeName}.pdf`;
 
       pdf.save(filename);
 
@@ -315,42 +435,204 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         inp.setAttribute("value", inp.value);
       });
 
-      const styles = Array.from(document.querySelectorAll("style, link[rel='stylesheet']"))
+      // Extract inline <style> elements from DOM to retain custom styles
+      const inlineStyles = Array.from(document.querySelectorAll("style"))
+        .map((el) => el.innerHTML)
+        .join("\n");
+
+      // Only preserve absolute stylesheet links (e.g. Google fonts) to prevent 404s when opening offline or publishing
+      const externalStyles = Array.from(document.querySelectorAll("link[rel='stylesheet']"))
+        .filter((el) => {
+          const href = el.getAttribute("href") || "";
+          return href.startsWith("http://") || href.startsWith("https://");
+        })
         .map((el) => el.outerHTML)
         .join("\n");
 
       const isHi = reportLang === "hi";
       const sanitizedName = (personName || "native").trim().toLowerCase().replace(/\s+/g, "_");
-      const storageKey = `navtara_feedback_${sanitizedName}_${selectedYear}_${selectedMonth}`;
+      const storageKey = dateSelectionMode === "custom"
+        ? `navtara_feedback_${sanitizedName}_${customStartDate}_${customEndDate}`
+        : `navtara_feedback_${sanitizedName}_${selectedYear}_${selectedMonth}`;
       const preloadedJson = JSON.stringify(userFeedbacks);
+
+      const filePeriod = dateSelectionMode === "custom"
+        ? `${customStartDate}_to_${customEndDate}`
+        : `${getMonthNameEn(selectedMonth)}_${selectedYear}`;
 
       const fullHtml = `<!DOCTYPE html>
 <html lang="${isHi ? "hi" : "en"}">
 <head>
   <meta charset="utf-8">
-  <title>Navtara Report - ${selectedMonth}/${selectedYear} - ${personName}</title>
+  <title>Navtara Report - ${dateRangeLabel} - ${personName}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  ${styles}
+  
+  <!-- Google Fonts for authentic Vedic typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Noto+Serif+Devanagari:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  ${externalStyles}
+
+  <!-- Tailwind CSS standalone CDN engine for published & offline rendering -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans Devanagari"', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+            devanagari: ['"Noto Sans Devanagari"', 'system-ui', 'sans-serif'],
+            'serif-vedic': ['"Noto Serif Devanagari"', 'Georgia', 'serif'],
+            cinzel: ['Cinzel', 'Georgia', 'serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Complete Standalone Fallback Styles -->
   <style>
-    body { margin: 0; padding: 12px; background: #fafaf9; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .html-opt-btn { cursor: pointer; transition: all 0.15s ease; user-select: none; }
-    .html-opt-btn:active { transform: scale(0.96); }
-    .html-opt-selected { font-weight: bold; }
-    @media (max-width: 767px) {
+    ${inlineStyles}
+  </style>
+  <style>
+    /* Reset & Base Fonts */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      background: #fafaf9;
+      color: #1c1917;
+      font-family: "Noto Sans Devanagari", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    .font-devanagari { font-family: "Noto Sans Devanagari", system-ui, sans-serif !important; }
+    .font-serif-vedic { font-family: "Noto Serif Devanagari", Georgia, serif !important; }
+    .font-cinzel { font-family: "Cinzel", Georgia, serif !important; }
+
+    /* Hide elements marked hidden on screen */
+    .hidden { display: none !important; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #e7e5e4; padding: 6px 8px; }
+    th { background: #fef3c7; color: #78350f; font-weight: 700; }
+
+    /* Grid & Flex Fallbacks */
+    .grid { display: grid; }
+    .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .gap-1\.5 { gap: 6px; }
+    .gap-2 { gap: 8px; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .flex-1 { flex: 1 1 0%; }
+    .w-full { width: 100%; }
+
+    /* Interactive Feedback Buttons */
+    .html-opt-btn {
+      border-radius: 8px;
+      padding: 8px 4px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border: 1.5px solid #d6d3d1;
+      background: #ffffff;
+      color: #44403c;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      user-select: none;
+    }
+    .html-opt-btn:hover {
+      background: #f5f5f4;
+    }
+    .html-opt-btn.opt-selected[data-feeling="great"],
+    .html-opt-btn[data-selected="true"][data-feeling="great"] {
+      background: #059669 !important;
+      color: #ffffff !important;
+      border-color: #047857 !important;
+      box-shadow: 0 0 0 2px #6ee7b7 !important;
+      font-weight: 700 !important;
+    }
+    .html-opt-btn.opt-selected[data-feeling="neutral"],
+    .html-opt-btn[data-selected="true"][data-feeling="neutral"] {
+      background: #d97706 !important;
+      color: #ffffff !important;
+      border-color: #b45309 !important;
+      box-shadow: 0 0 0 2px #fde68a !important;
+      font-weight: 700 !important;
+    }
+    .html-opt-btn.opt-selected[data-feeling="challenging"],
+    .html-opt-btn[data-selected="true"][data-feeling="challenging"] {
+      background: #dc2626 !important;
+      color: #ffffff !important;
+      border-color: #b91c1c !important;
+      box-shadow: 0 0 0 2px #fca5a5 !important;
+      font-weight: 700 !important;
+    }
+    .html-opt-btn.opt-selected span,
+    .html-opt-btn[data-selected="true"] span {
+      color: #ffffff !important;
+    }
+
+    /* Note Input & Button */
+    input[data-note-input] {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 11px;
+      border: 1px solid #d6d3d1;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1c1917;
+      outline: none;
+      box-sizing: border-box;
+    }
+    input[data-note-input]:focus {
+      border-color: #d97706;
+      background: #fffbeb;
+      box-shadow: 0 0 0 2px #fde68a;
+    }
+    button[data-note-save] {
+      background: #b45309;
+      color: #ffffff;
+      font-weight: bold;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 11px;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    button[data-note-save]:hover {
+      background: #92400e;
+    }
+
+    /* Responsive Views */
+    @media (max-width: 768px) {
       .desktop-table-view { display: none !important; }
       .mobile-cards-view { display: block !important; }
     }
-    @media (min-width: 768px) {
+    @media (min-width: 769px) {
       .desktop-table-view { display: block !important; }
       .mobile-cards-view { display: none !important; }
     }
+
+    /* Print Styles */
     @media print {
+      @page { size: A4; margin: 10mm; }
+      body { padding: 0 !important; background: #ffffff !important; }
       .screen-only-banner { display: none !important; }
-      .mobile-cards-view { display: none !important; }
-      .desktop-table-view { display: block !important; }
-      body { padding: 0; background: #ffffff; }
       .print\\:hidden { display: none !important; }
       .print\\:block { display: block !important; }
+      .desktop-table-view { display: block !important; }
+      .mobile-cards-view { display: none !important; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+      thead { display: table-header-group; }
     }
   </style>
 </head>
@@ -366,12 +648,16 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
           📱 ${isHi ? "मोबाइल और कंप्यूटर दोनों पर पूरी तरह इंटरैक्टिव — 3 विकल्प (🟢/🟡/🔴) चुनें और अनुभव नोट लिखें। डेटा इस ब्राउज़र में सुरक्षित रहेगा।" : "Interactive on both mobile & desktop — select options (🟢/🟡/🔴) and write notes. Saves automatically in this browser."}
         </p>
       </div>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <button onclick="window.print()" style="background:#b45309;color:#fff;font-weight:bold;padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-          🖨️ ${isHi ? "प्रिंट / PDF सेव करें" : "Print / Save PDF"}
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <button id="toggle-view-btn" onclick="toggleReportView()" style="background:#0284c7;color:#fff;font-weight:bold;padding:9px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+          <span id="toggle-view-icon">📱</span>
+          <span id="toggle-view-text">${isHi ? "व्यू बदलें (Cards / Table)" : "Toggle View"}</span>
+        </button>
+        <button onclick="window.print()" style="background:#b45309;color:#fff;font-weight:bold;padding:9px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+          🖨️ ${isHi ? "प्रिंट / PDF" : "Print / PDF"}
         </button>
         <button onclick="exportJournalData()" style="background:#44403c;color:#fff;font-weight:600;padding:9px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;">
-          💾 ${isHi ? "बैकअप लें (JSON)" : "Backup JSON"}
+          💾 ${isHi ? "बैकअप (JSON)" : "Backup JSON"}
         </button>
       </div>
     </div>
@@ -413,41 +699,45 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         window._tTimer = setTimeout(() => { t.style.opacity = "0"; }, 2400);
       }
 
+      window.toggleReportView = function() {
+        const mobileEl = document.querySelector('.mobile-cards-view');
+        const desktopEl = document.querySelector('.desktop-table-view');
+        if (!mobileEl || !desktopEl) return;
+
+        const isMobileHidden = window.getComputedStyle(mobileEl).display === 'none';
+        if (isMobileHidden) {
+          mobileEl.style.setProperty('display', 'block', 'important');
+          desktopEl.style.setProperty('display', 'none', 'important');
+          document.getElementById('toggle-view-icon').textContent = '💻';
+          document.getElementById('toggle-view-text').textContent = '${isHi ? "टेबल व्यू देखें" : "Switch to Table"}';
+          showToast("${isHi ? "📱 मोबाइल कार्ड व्यू सक्रिय" : "Mobile Card View active"}");
+        } else {
+          mobileEl.style.setProperty('display', 'none', 'important');
+          desktopEl.style.setProperty('display', 'block', 'important');
+          document.getElementById('toggle-view-icon').textContent = '📱';
+          document.getElementById('toggle-view-text').textContent = '${isHi ? "कार्ड व्यू देखें" : "Switch to Cards"}';
+          showToast("${isHi ? "💻 टेबल व्यू सक्रिय" : "Table View active"}");
+        }
+      };
+
       function syncFeedbackUI() {
         document.querySelectorAll('[data-feedback-container]').forEach(function(container) {
           const dateStr = container.getAttribute('data-date');
           const fb = data[dateStr];
-          const rating = fb ? fb.rating : null;
-          const note = fb ? (fb.note || "") : "";
+          const rating = (fb && fb.rating !== undefined) ? fb.rating : 0;
+          const note = (fb && fb.note) ? fb.note : "";
 
           // Sync 3 option buttons
           container.querySelectorAll('[data-feedback-opt]').forEach(function(btn) {
             const btnRating = parseInt(btn.getAttribute('data-rating'), 10);
-            const feeling = btn.getAttribute('data-feeling');
-            const isSelected = rating === btnRating;
+            const isSelected = rating > 0 && rating === btnRating;
 
             if (isSelected) {
               btn.setAttribute('data-selected', 'true');
-              btn.classList.add('html-opt-selected');
-              if (feeling === 'great') {
-                btn.style.backgroundColor = '#059669';
-                btn.style.color = '#ffffff';
-                btn.style.borderColor = '#047857';
-              } else if (feeling === 'neutral') {
-                btn.style.backgroundColor = '#d97706';
-                btn.style.color = '#ffffff';
-                btn.style.borderColor = '#b45309';
-              } else {
-                btn.style.backgroundColor = '#dc2626';
-                btn.style.color = '#ffffff';
-                btn.style.borderColor = '#b91c1c';
-              }
+              btn.classList.add('opt-selected');
             } else {
               btn.removeAttribute('data-selected');
-              btn.classList.remove('html-opt-selected');
-              btn.style.backgroundColor = '#ffffff';
-              btn.style.color = '#44403c';
-              btn.style.borderColor = '#d6d3d1';
+              btn.classList.remove('opt-selected');
             }
           });
 
@@ -460,7 +750,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
           // Sync checkmark status badge
           const statusBadge = container.querySelector('[data-saved-badge]');
           if (statusBadge) {
-            statusBadge.style.display = (rating !== null || note) ? 'inline-flex' : 'none';
+            statusBadge.style.display = (rating > 0 || note.length > 0) ? 'inline-flex' : 'none';
           }
         });
       }
@@ -471,17 +761,19 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         if (!btn) return;
         e.preventDefault();
 
-        const container = btn.closest('[data-feedback-container]');
         const dateStr = btn.getAttribute('data-date');
         const day = parseInt(btn.getAttribute('data-day'), 10);
         const rating = parseInt(btn.getAttribute('data-rating'), 10);
         const feeling = btn.getAttribute('data-feeling') || 'neutral';
 
-        // Preserve existing note or currently typed note
-        const noteInp = container ? container.querySelector('[data-note-input]') : null;
+        // Preserve existing note or currently typed note in any input matching this date
         let currentNote = (data[dateStr] && data[dateStr].note) ? data[dateStr].note : "";
-        if (noteInp && noteInp.value !== undefined) {
-          currentNote = noteInp.value.trim();
+        const allInputs = document.querySelectorAll('[data-feedback-container][data-date="' + dateStr + '"] [data-note-input]');
+        for (let i = 0; i < allInputs.length; i++) {
+          if (allInputs[i].value && allInputs[i].value.trim().length > 0) {
+            currentNote = allInputs[i].value.trim();
+            break;
+          }
         }
 
         data[dateStr] = {
@@ -513,8 +805,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         data[dateStr] = {
           dateStr: dateStr,
           day: day,
-          rating: existing.rating !== undefined ? existing.rating : 5,
-          feeling: existing.feeling || (existing.rating >= 4 ? 'great' : existing.rating === 3 ? 'neutral' : 'challenging'),
+          rating: existing.rating !== undefined ? existing.rating : 0,
+          feeling: existing.feeling || 'great',
           note: inp.value.trim(),
           loggedAtMs: Date.now()
         };
@@ -523,11 +815,21 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
           localStorage.setItem(KEY, JSON.stringify(data));
         } catch(err) {}
 
-        const container = inp.closest('[data-feedback-container]');
-        const statusBadge = container ? container.querySelector('[data-saved-badge]') : null;
-        if (statusBadge) {
-          statusBadge.style.display = 'inline-flex';
-        }
+        // Keep all inputs matching this date synchronized
+        const allInps = document.querySelectorAll('[data-feedback-container][data-date="' + dateStr + '"] [data-note-input]');
+        allInps.forEach(function(other) {
+          if (other !== inp) {
+            other.value = inp.value;
+          }
+        });
+
+        const containers = document.querySelectorAll('[data-feedback-container][data-date="' + dateStr + '"]');
+        containers.forEach(function(c) {
+          const statusBadge = c.querySelector('[data-saved-badge]');
+          if (statusBadge) {
+            statusBadge.style.display = (inp.value.trim().length > 0 || (existing.rating && existing.rating > 0)) ? 'inline-flex' : 'none';
+          }
+        });
       });
 
       // Handle Explicit Note Save Button
@@ -545,7 +847,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         data[dateStr] = {
           dateStr: dateStr,
           day: day,
-          rating: existing.rating !== undefined ? existing.rating : 5,
+          rating: existing.rating !== undefined ? existing.rating : 0,
           feeling: existing.feeling || 'great',
           note: noteVal,
           loggedAtMs: Date.now()
@@ -565,7 +867,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
           const u = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = u;
-          a.download = "Navtara_Journal_${selectedYear}_${selectedMonth}_" + "${sanitizedName}" + ".json";
+          a.download = "Navtara_Journal_${filePeriod}_" + "${sanitizedName}" + ".json";
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -576,7 +878,12 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       };
 
       // Initial synchronization on load
-      setTimeout(syncFeedbackUI, 50);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncFeedbackUI);
+      } else {
+        syncFeedbackUI();
+      }
+      setTimeout(syncFeedbackUI, 100);
     })();
   </script>
 </body>
@@ -586,8 +893,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const monthName = getMonthNameEn(selectedMonth);
-      a.download = `Navtara_Report_${monthName}_${selectedYear}.html`;
+      a.download = `Navtara_Report_${filePeriod}_${sanitizedName}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -621,22 +927,36 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     }
   };
 
+  const parseYearMonthFromDateStr = (dateStr: string, fallbackYear: number, fallbackMonth: number) => {
+    if (dateStr && dateStr.includes("/")) {
+      const parts = dateStr.split("/").map(Number);
+      if (parts.length === 3 && !isNaN(parts[1]) && !isNaN(parts[2])) {
+        return { year: parts[2], month: parts[1] };
+      }
+    }
+    return { year: fallbackYear, month: fallbackMonth };
+  };
+
   // Quick 1-click feedback options (🟢 शुभ, 🟡 सामान्य, 🔴 संभलकर)
   const handleQuickFeedback = (dateStr: string, dayNum: number, rating: number, explicitNote?: string) => {
     const existing = userFeedbacks[dateStr];
     let noteToSave = explicitNote !== undefined ? explicitNote : (existing?.note || "");
 
-    // Read from DOM input if user had typed without blurring
+    // Read from any matching DOM input if user had typed without blurring
     if (explicitNote === undefined && typeof document !== "undefined") {
-      const activeInp = document.querySelector(
+      const inputs = document.querySelectorAll<HTMLInputElement>(
         `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`
-      ) as HTMLInputElement | null;
-      if (activeInp && activeInp.value !== undefined && activeInp.value.trim().length > 0) {
-        noteToSave = activeInp.value.trim();
+      );
+      for (const inp of Array.from(inputs)) {
+        if (inp && inp.value !== undefined && inp.value.trim().length > 0) {
+          noteToSave = inp.value.trim();
+          break;
+        }
       }
     }
 
-    const updated = saveDailyNavtaraFeedback(personName, selectedYear, selectedMonth, {
+    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(dateStr, selectedYear, selectedMonth);
+    const updated = saveDailyNavtaraFeedback(personName, targetYear, targetMonth, {
       dateStr,
       day: dayNum,
       rating,
@@ -644,7 +964,30 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       note: noteToSave.trim(),
       loggedAtMs: Date.now(),
     });
-    setUserFeedbacks({ ...updated });
+
+    // Synchronize note across all matching input elements in DOM
+    if (typeof document !== "undefined") {
+      const inputs = document.querySelectorAll<HTMLInputElement>(
+        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`
+      );
+      inputs.forEach((inp) => {
+        inp.value = noteToSave.trim();
+      });
+    }
+
+    setUserFeedbacks((prev) => ({
+      ...prev,
+      ...updated,
+      [dateStr]: {
+        dateStr,
+        day: dayNum,
+        rating,
+        feeling: rating >= 4 ? "great" : rating === 3 ? "neutral" : "challenging",
+        note: noteToSave.trim(),
+        loggedAtMs: Date.now(),
+      },
+    }));
+
     setDownloadSuccessToast(
       isHindi
         ? rating >= 4
@@ -660,9 +1003,12 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
   // Update note on blur, enter key, or explicit save button
   const handleUpdateNote = (dateStr: string, dayNum: number, note: string) => {
     const existing = userFeedbacks[dateStr];
-    const rating = existing?.rating !== undefined ? existing.rating : 5;
+    // Retain chosen rating if present, or set to 0 if not selected yet
+    const rating = existing?.rating !== undefined ? existing.rating : 0;
     const feeling = existing?.feeling || (rating >= 4 ? "great" : rating === 3 ? "neutral" : "challenging");
-    const updated = saveDailyNavtaraFeedback(personName, selectedYear, selectedMonth, {
+    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(dateStr, selectedYear, selectedMonth);
+
+    const updated = saveDailyNavtaraFeedback(personName, targetYear, targetMonth, {
       dateStr,
       day: dayNum,
       rating,
@@ -670,7 +1016,30 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       note: note.trim(),
       loggedAtMs: Date.now(),
     });
-    setUserFeedbacks({ ...updated });
+
+    // Synchronize note across all matching input elements in DOM
+    if (typeof document !== "undefined") {
+      const inputs = document.querySelectorAll<HTMLInputElement>(
+        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`
+      );
+      inputs.forEach((inp) => {
+        inp.value = note.trim();
+      });
+    }
+
+    setUserFeedbacks((prev) => ({
+      ...prev,
+      ...updated,
+      [dateStr]: {
+        dateStr,
+        day: dayNum,
+        rating,
+        feeling,
+        note: note.trim(),
+        loggedAtMs: Date.now(),
+      },
+    }));
+
     setDownloadSuccessToast(
       isHindi ? "✓ अनुभव नोट सुरक्षित हुआ!" : "✓ Experience note saved!"
     );
@@ -678,7 +1047,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
   };
 
   const handleSaveFeedback = (dateStr: string, dayNum: number) => {
-    const updated = saveDailyNavtaraFeedback(personName, selectedYear, selectedMonth, {
+    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(dateStr, selectedYear, selectedMonth);
+    const updated = saveDailyNavtaraFeedback(personName, targetYear, targetMonth, {
       dateStr,
       day: dayNum,
       rating: feedbackRating,
@@ -686,12 +1056,22 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       note: feedbackNote.trim(),
       loggedAtMs: Date.now(),
     });
-    setUserFeedbacks({ ...updated });
+    setUserFeedbacks((prev) => ({
+      ...prev,
+      ...updated,
+      [dateStr]: {
+        dateStr,
+        day: dayNum,
+        rating: feedbackRating,
+        feeling: feedbackRating >= 4 ? "great" : feedbackRating === 3 ? "good" : "challenging",
+        note: feedbackNote.trim(),
+        loggedAtMs: Date.now(),
+      },
+    }));
     setEditingDayDate(null);
     setFeedbackNote("");
   };
 
-  const isHindi = reportLang === "hi";
   const padaMeta = PADA_EXPLANATIONS[selectedPada] || PADA_EXPLANATIONS[1];
 
   const getTaraBadgeColor = (nature: string) => {
@@ -896,33 +1276,117 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
               </span>
             </div>
 
-            {/* Month & Year Selectors for Monthly Mode */}
+            {/* Period Selection: Month vs Custom Date Range */}
             {reportMode === "monthly" && (
-              <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded border border-stone-300">
-                <Calendar className="w-3.5 h-3.5 text-amber-800" />
-                <span className="font-bold text-stone-700">{isHindi ? "माह:" : "Month:"}</span>
-                <select
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  className="bg-transparent text-xs font-bold text-stone-800 outline-none cursor-pointer"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                    <option key={m} value={m}>
-                      {isHindi ? getMonthNameHi(m) : getMonthNameEn(m)}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  className="bg-transparent text-xs font-bold text-stone-800 outline-none cursor-pointer"
-                >
-                  {[2024, 2025, 2026, 2027, 2028].map((y) => (
-                    <option key={y} value={y}>
-                      {y}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 bg-amber-100/70 border border-amber-300/80 p-1.5 rounded-xl">
+                {/* Mode Toggle Pills */}
+                <div className="flex items-center bg-white/80 p-0.5 rounded-lg border border-amber-300/60 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setDateSelectionMode("month")}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                      dateSelectionMode === "month"
+                        ? "bg-amber-800 text-white shadow-xs"
+                        : "text-amber-900 hover:text-amber-950"
+                    }`}
+                  >
+                    {isHindi ? "📅 पूरा माह" : "📅 Month"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDateSelectionMode("custom")}
+                    className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-all cursor-pointer ${
+                      dateSelectionMode === "custom"
+                        ? "bg-amber-800 text-white shadow-xs"
+                        : "text-amber-900 hover:text-amber-950"
+                    }`}
+                  >
+                    {isHindi ? "📆 कस्टम दिनांक सीमा" : "📆 Custom Range"}
+                  </button>
+                </div>
+
+                {/* Option 1: Month & Year Selectors */}
+                {dateSelectionMode === "month" && (
+                  <div className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-lg border border-stone-300 shadow-xs">
+                    <Calendar className="w-3.5 h-3.5 text-amber-800" />
+                    <span className="font-bold text-stone-700 text-[11px]">{isHindi ? "माह:" : "Month:"}</span>
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                      className="bg-transparent text-xs font-bold text-stone-800 outline-none cursor-pointer"
+                    >
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                        <option key={m} value={m}>
+                          {isHindi ? getMonthNameHi(m) : getMonthNameEn(m)}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={selectedYear}
+                      onChange={(e) => setSelectedYear(Number(e.target.value))}
+                      className="bg-transparent text-xs font-bold text-stone-800 outline-none cursor-pointer"
+                    >
+                      {[2024, 2025, 2026, 2027, 2028].map((y) => (
+                        <option key={y} value={y}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Option 2: Custom Date Range (From - To) */}
+                {dateSelectionMode === "custom" && (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-lg border border-stone-300 shadow-xs">
+                      <span className="text-[10px] font-bold text-stone-600">{isHindi ? "से:" : "From:"}</span>
+                      <input
+                        type="date"
+                        value={customStartDate}
+                        onChange={(e) => setCustomStartDate(e.target.value)}
+                        className="text-xs font-bold text-stone-800 bg-transparent outline-none cursor-pointer"
+                      />
+                    </div>
+                    <div className="flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-lg border border-stone-300 shadow-xs">
+                      <span className="text-[10px] font-bold text-stone-600">{isHindi ? "तक:" : "To:"}</span>
+                      <input
+                        type="date"
+                        value={customEndDate}
+                        onChange={(e) => setCustomEndDate(e.target.value)}
+                        className="text-xs font-bold text-stone-800 bg-transparent outline-none cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Quick Range Presets */}
+                    <div className="hidden lg:flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={applyPreset15Days}
+                        className="px-1.5 py-0.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded text-[10px] font-semibold cursor-pointer"
+                      >
+                        15d
+                      </button>
+                      <button
+                        type="button"
+                        onClick={applyPreset30Days}
+                        className="px-1.5 py-0.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded text-[10px] font-semibold cursor-pointer"
+                      >
+                        30d
+                      </button>
+                      <button
+                        type="button"
+                        onClick={applyPresetThisMonth}
+                        className="px-1.5 py-0.5 bg-white hover:bg-stone-100 text-stone-700 border border-stone-300 rounded text-[10px] font-semibold cursor-pointer"
+                      >
+                        {isHindi ? "चालू" : "Current"}
+                      </button>
+                    </div>
+
+                    <span className="text-[10px] font-bold text-amber-900 bg-amber-200/90 px-1.5 py-0.5 rounded-md">
+                      {monthDays.length} {isHindi ? "दिन" : "days"}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1161,8 +1625,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
               <h1 className="text-2xl sm:text-3xl font-black mt-1.5 tracking-tight font-serif-vedic text-amber-950">
                 {reportMode === "monthly"
                   ? isHindi
-                    ? `सम्पूर्ण मासिक नवतारा गोचर एवं दैनिक अनुभव डायरी — ${getMonthNameHi(selectedMonth)} ${selectedYear}`
-                    : `Complete Monthly Navtara Transit & Experience Journal — ${getMonthNameEn(selectedMonth)} ${selectedYear}`
+                    ? `सम्पूर्ण नवतारा गोचर एवं दैनिक अनुभव डायरी — ${dateRangeLabel}`
+                    : `Complete Navtara Transit & Experience Journal — ${dateRangeLabel}`
                   : isHindi
                     ? "महावतार नवतारा चक्र एवं नक्षत्र गोचर दैनिक रिपोर्ट"
                     : "Mahavtaar Navtara Chakra & Star Transit Daily Report"}
@@ -1177,7 +1641,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                 <span>•</span>
                 <span>
                   {reportMode === "monthly"
-                    ? `${getMonthNameHi(selectedMonth)} ${selectedYear}`
+                    ? dateRangeLabel
                     : data?.date || new Date().toLocaleDateString()}
                 </span>
                 <span>•</span>

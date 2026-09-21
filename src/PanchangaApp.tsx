@@ -26,6 +26,7 @@ import { TodayScheduleView } from "./components/TodayScheduleView";
 import { FestivalsView } from "./components/FestivalsView";
 import { InvocationBanner } from "./components/InvocationBanner";
 import { NavagrahaView } from "./components/NavagrahaView";
+import { KundliView } from "./components/KundliView";
 import type {
   PanchangaResponse,
   CityLocation,
@@ -75,26 +76,31 @@ import {
 const NavItem = ({
   icon: Icon,
   label,
+  subLabel,
+  badge,
   isActive,
   onClick,
   theme,
 }: {
   icon: React.ElementType;
   label: string;
+  subLabel?: string;
+  badge?: string;
   isActive: boolean;
   onClick: () => void;
   theme: AppTheme;
 }) => (
   <button
+    type="button"
     onClick={onClick}
-    className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl font-devanagari transition-all group relative overflow-hidden ${
+    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all group relative overflow-hidden ${
       isActive
         ? theme === "nightSky"
-          ? "text-amber-300 font-bold bg-indigo-950/70 border border-indigo-500/40 shadow-xs"
-          : "text-amber-950 font-bold bg-amber-100/50 border border-amber-200/60 shadow-xs"
+          ? "text-amber-300 font-bold bg-indigo-950/80 border border-indigo-500/40 shadow-xs"
+          : "text-amber-950 font-bold bg-amber-100/70 border border-amber-300/70 shadow-xs"
         : theme === "nightSky"
-          ? "text-slate-300 hover:text-white hover:bg-slate-800/60"
-          : "text-stone-600 hover:text-stone-900 hover:bg-stone-100/80"
+          ? "text-slate-300 hover:text-white hover:bg-slate-800/60 border border-transparent"
+          : "text-stone-700 hover:text-stone-950 hover:bg-stone-100/90 border border-transparent"
     }`}
   >
     {isActive && (
@@ -103,24 +109,62 @@ const NavItem = ({
         className={`absolute inset-0 rounded-xl -z-10 shadow-xs border ${
           theme === "nightSky"
             ? "bg-indigo-900/40 border-indigo-500/40"
-            : "bg-white/60 border-amber-200/80"
+            : "bg-white/70 border-amber-300/80"
         }`}
         initial={false}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
       />
     )}
-    <Icon
-      className={`w-5 h-5 shrink-0 transition-transform ${
-        isActive
-          ? theme === "nightSky"
-            ? "text-amber-300 scale-110"
-            : "text-amber-700 scale-110"
-          : theme === "nightSky"
-            ? "text-slate-400 group-hover:text-slate-200"
-            : "text-stone-400 group-hover:text-stone-600"
-      }`}
-    />
-    <span className="text-sm tracking-wide z-10">{label}</span>
+    <div className="flex items-center space-x-2.5 min-w-0 flex-1">
+      <div
+        className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-all ${
+          isActive
+            ? theme === "nightSky"
+              ? "bg-amber-400/20 text-amber-300 ring-1 ring-amber-400/40"
+              : "bg-amber-600/15 text-amber-800 ring-1 ring-amber-600/30"
+            : theme === "nightSky"
+              ? "bg-slate-800/80 text-slate-400 group-hover:text-slate-200 group-hover:bg-slate-700/80"
+              : "bg-stone-200/60 text-stone-500 group-hover:text-stone-800 group-hover:bg-stone-200"
+        }`}
+      >
+        <Icon className="w-4 h-4 shrink-0" />
+      </div>
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="text-xs sm:text-[13px] font-semibold tracking-tight truncate leading-tight">
+          {label}
+        </span>
+        {subLabel && (
+          <span
+            className={`text-[10px] tracking-normal truncate leading-tight mt-0.5 ${
+              isActive
+                ? theme === "nightSky"
+                  ? "text-amber-300/80"
+                  : "text-amber-800/90 font-medium"
+                : theme === "nightSky"
+                  ? "text-slate-400/80 group-hover:text-slate-300"
+                  : "text-stone-500/80 group-hover:text-stone-700"
+            }`}
+          >
+            {subLabel}
+          </span>
+        )}
+      </div>
+    </div>
+    {badge && (
+      <span
+        className={`ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0 ${
+          isActive
+            ? theme === "nightSky"
+              ? "bg-amber-400/25 text-amber-200 border border-amber-400/40"
+              : "bg-amber-200/80 text-amber-900 border border-amber-300"
+            : theme === "nightSky"
+              ? "bg-slate-800 text-slate-400 border border-slate-700"
+              : "bg-stone-100 text-stone-500 border border-stone-200"
+        }`}
+      >
+        {badge}
+      </span>
+    )}
   </button>
 );
 
@@ -502,87 +546,144 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-1.5 hide-scrollbar">
-          <div className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-3 ml-2 font-sans">
-            Spiritual Navigation
+        <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-4 hide-scrollbar">
+          {/* Section 1: Core Panchanga & Timings */}
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400/90 mb-2 px-2.5 font-sans flex items-center justify-between">
+              <span>{lang === "hi" ? "पंचांग व काल" : "Panchanga & Time"}</span>
+              <span className="text-[9px] text-amber-600/70 font-mono">01</span>
+            </div>
+            <div className="space-y-1">
+              <NavItem
+                icon={Sun}
+                label={t.views.panchanga}
+                subLabel={lang === "hi" ? "पञ्च अङ्गानि • तिथि, वार, नक्षत्र" : "Five Limbs • Tithi, Nakshatra"}
+                isActive={activeView === "panchanga"}
+                onClick={() => setActiveView("panchanga")}
+                theme={theme}
+              />
+              <NavItem
+                icon={ListTodo}
+                label={t.views.today}
+                subLabel={lang === "hi" ? "दैनिक समय-सारणी व अनुक्रम" : "Day Schedule & Timeline"}
+                isActive={activeView === "today"}
+                onClick={() => setActiveView("today")}
+                theme={theme}
+              />
+              <NavItem
+                icon={Clock}
+                label={t.views.timings}
+                subLabel={lang === "hi" ? "अभिजीत, ब्रह्म, राहु काल" : "Abhijit, Brahma, Rahu Kala"}
+                isActive={activeView === "timings"}
+                onClick={() => setActiveView("timings")}
+                theme={theme}
+              />
+            </div>
           </div>
-          <NavItem
-            icon={Sun}
-            label={t.dailyPanchanga}
-            isActive={activeView === "panchanga"}
-            onClick={() => setActiveView("panchanga")}
-            theme={theme}
-          />
-          <NavItem
-            icon={ListTodo}
-            label={lang === "hi" ? "दैनिक समय-सारणी" : "Schedule"}
-            isActive={activeView === "today"}
-            onClick={() => setActiveView("today")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Clock}
-            label={t.muhurtasAndTimings}
-            isActive={activeView === "timings"}
-            onClick={() => setActiveView("timings")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Moon}
-            label={t.grahaSthiti}
-            isActive={activeView === "planets"}
-            onClick={() => setActiveView("planets")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Star}
-            label={lang === "hi" ? "नवग्रह मन्त्र" : "Navagraha"}
-            isActive={activeView === "navagraha"}
-            onClick={() => setActiveView("navagraha")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Wind}
-            label={t.views.swara}
-            isActive={activeView === "swara"}
-            onClick={() => setActiveView("swara")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Star}
-            label={lang === "hi" ? "नव तारा" : "Navtara"}
-            isActive={activeView === "navtara"}
-            onClick={() => setActiveView("navtara")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Hourglass}
-            label={lang === "hi" ? "वैदिक होरा" : "Horas"}
-            isActive={activeView === "horas"}
-            onClick={() => setActiveView("horas")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Sparkles}
-            label={lang === "hi" ? "तत्व" : "Tattva"}
-            isActive={activeView === "tattva"}
-            onClick={() => setActiveView("tattva")}
-            theme={theme}
-          />
-          <NavItem
-            icon={CalendarDays}
-            label={t.monthCalendar}
-            isActive={activeView === "calendar"}
-            onClick={() => setActiveView("calendar")}
-            theme={theme}
-          />
-          <NavItem
-            icon={Flame}
-            label={lang === "hi" ? "पर्व व व्रत" : "Festivals"}
-            isActive={activeView === "festivals"}
-            onClick={() => setActiveView("festivals")}
-            theme={theme}
-          />
+
+          {/* Section 2: Vedic Astrology & Ephemeris */}
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400/90 mb-2 px-2.5 font-sans flex items-center justify-between">
+              <span>{lang === "hi" ? "ज्योतिष व कुण्डली" : "Astrology & Kundli"}</span>
+              <span className="text-[9px] text-amber-600/70 font-mono">02</span>
+            </div>
+            <div className="space-y-1">
+              <NavItem
+                icon={Moon}
+                label={t.views.planets}
+                subLabel={lang === "hi" ? "नवग्रह प्रत्यक्ष खगोलीय स्थिति" : "Navagraha Ephemeris & Ingress"}
+                isActive={activeView === "planets"}
+                onClick={() => setActiveView("planets")}
+                theme={theme}
+              />
+              <NavItem
+                icon={Compass}
+                label={t.views.kundli}
+                subLabel={lang === "hi" ? "लग्न, विंशोत्तरी, KP, गोचर" : "Birth Charts, KP, Gochar, Dasha"}
+                badge={lang === "hi" ? "11 विधाएं" : "11 Tabs"}
+                isActive={activeView === "kundli" || activeView === "lagna"}
+                onClick={() => setActiveView("kundli")}
+                theme={theme}
+              />
+              <NavItem
+                icon={Star}
+                label={t.views.navagraha}
+                subLabel={lang === "hi" ? "बीज मन्त्र, स्तोत्र व रत्न उपाय" : "Mantras, Stotram & Remedies"}
+                isActive={activeView === "navagraha"}
+                onClick={() => setActiveView("navagraha")}
+                theme={theme}
+              />
+            </div>
+          </div>
+
+          {/* Section 3: Esoteric & Yoga */}
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400/90 mb-2 px-2.5 font-sans flex items-center justify-between">
+              <span>{lang === "hi" ? "स्वरोदय व तत्व" : "Esoteric & Swara"}</span>
+              <span className="text-[9px] text-amber-600/70 font-mono">03</span>
+            </div>
+            <div className="space-y-1">
+              <NavItem
+                icon={Wind}
+                label={t.views.swara}
+                subLabel={lang === "hi" ? "इड़ा, पिङ्गला, सुषुम्णा नाड़ी" : "Ida, Pingala & Breath Flow"}
+                isActive={activeView === "swara"}
+                onClick={() => setActiveView("swara")}
+                theme={theme}
+              />
+              <NavItem
+                icon={Star}
+                label={t.views.navtara}
+                subLabel={lang === "hi" ? "जन्मतारा से सम्पद-विपत् चक्र" : "Janma to Ati-Mitra Matrix"}
+                isActive={activeView === "navtara"}
+                onClick={() => setActiveView("navtara")}
+                theme={theme}
+              />
+              <NavItem
+                icon={Hourglass}
+                label={t.views.horas}
+                subLabel={lang === "hi" ? "सूर्योदय कालीन 24 होरा चक्र" : "24 Hourly Planetary Rulers"}
+                isActive={activeView === "horas"}
+                onClick={() => setActiveView("horas")}
+                theme={theme}
+              />
+              <NavItem
+                icon={Sparkles}
+                label={t.views.tattva}
+                subLabel={lang === "hi" ? "पंच महाभूत तत्व काल गणना" : "Five Elemental Cycles"}
+                isActive={activeView === "tattva"}
+                onClick={() => setActiveView("tattva")}
+                theme={theme}
+              />
+            </div>
+          </div>
+
+          {/* Section 4: Calendar & Festivals */}
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400/90 mb-2 px-2.5 font-sans flex items-center justify-between">
+              <span>{lang === "hi" ? "मासिक पंचांग व पर्व" : "Calendar & Festivals"}</span>
+              <span className="text-[9px] text-amber-600/70 font-mono">04</span>
+            </div>
+            <div className="space-y-1">
+              <NavItem
+                icon={CalendarDays}
+                label={t.views.calendar}
+                subLabel={lang === "hi" ? "सम्पूर्ण मास की तिथियाँ व वार" : "Complete Month Grid"}
+                isActive={activeView === "calendar"}
+                onClick={() => setActiveView("calendar")}
+                theme={theme}
+              />
+              <NavItem
+                icon={Flame}
+                label={t.views.festivals}
+                subLabel={lang === "hi" ? "एकादशी, प्रदोष, संक्रांति व जयंतियां" : "Ekadashi, Pradosh & Vratas"}
+                badge={lang === "hi" ? "पर्व" : "Vrat"}
+                isActive={activeView === "festivals"}
+                onClick={() => setActiveView("festivals")}
+                theme={theme}
+              />
+            </div>
+          </div>
         </div>
         <div
           className={`p-5 border-t ${theme === "nightSky" ? "border-indigo-950/60" : "border-amber-200/50"}`}
@@ -867,6 +968,22 @@ export default function App() {
                         <PlanetTransitionsCard data={panchangaData} lang={lang} theme={theme} />
                       </section>
                     </div>
+                  </div>
+                )}
+
+                {/* View: Janm Kundli Dedicated */}
+                {(activeView === "kundli" || activeView === "lagna") && (
+                  <div
+                    id="view-kundli-dedicated"
+                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-7xl mx-auto"
+                  >
+                    <KundliView
+                      initialCity={currentCity}
+                      initialLat={customCoords?.lat}
+                      initialLon={customCoords?.lon}
+                      initialTimezone={customCoords?.tz}
+                      initialAyanamsa={ayanamsa}
+                    />
                   </div>
                 )}
 

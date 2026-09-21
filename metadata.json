@@ -1,6 +1,6 @@
 {
   "name": "Mahavtaar Panchanga",
-  "description": "Comprehensive Vedic Panchanga almanac with astronomical calculations, five angas, planetary transits, unified Today schedule timeline, Hora-Tattva micro-periods, and live notification system.",
+  "description": "Comprehensive Vedic Panchanga almanac with Drik Ganita Janm Kundli calculations, D1 & D9 Navamsha charts, Vimshottari Dasha, Avakahada Chakra, Dosha analysis, planetary transits, and auspicious timings.",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1296,6 +1296,10 @@ export interface MonthlyNavtaraReportData {
     toTaraNature: string;
     resultingTara: string;
   }>;
+  isDateRange?: boolean;
+  dateRangeLabel?: string;
+  fromDate?: string;
+  toDate?: string;
 }
 
 const MONTH_NAMES_HI = [
@@ -1345,6 +1349,7 @@ export function computeMonthlyNavtaraReport(
   cityName: string = "New Delhi, IN",
   monthDays: any[] = [],
   userFeedbacks: Record<string, DailyUserFeedback> = {},
+  rangeConfig?: { isDateRange?: boolean; dateRangeLabel?: string; fromDate?: string; toDate?: string },
 ): MonthlyNavtaraReportData {
   const birthMeta =
     ALL_27_NAKSHATRAS.find((n) => n.index === birthNakshatraIndex) || ALL_27_NAKSHATRAS[0];
@@ -1574,5 +1579,9 @@ export function computeMonthlyNavtaraReport(
       matchedAuspiciousCount,
     },
     keyTransitions,
+    isDateRange: rangeConfig?.isDateRange || false,
+    dateRangeLabel: rangeConfig?.dateRangeLabel,
+    fromDate: rangeConfig?.fromDate,
+    toDate: rangeConfig?.toDate,
   };
 }

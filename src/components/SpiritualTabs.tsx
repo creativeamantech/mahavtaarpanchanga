@@ -50,6 +50,12 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
       subLabel: "ग्रहस्थिति",
     },
     {
+      id: "kundli",
+      label: lang === "hi" ? "जन्म कुण्डली" : "Janm Kundli",
+      icon: "☸️",
+      subLabel: "कुण्डली",
+    },
+    {
       id: "navagraha",
       label: lang === "hi" ? "नवग्रह मन्त्र" : "Navagraha",
       icon: "🕉️",

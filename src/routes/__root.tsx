@@ -89,14 +89,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Comprehensive Vedic Panchanga almanac with astronomical calculations, five angas, planetary transits, unified Today schedule timeline, Hora-Tattva micro-periods, and live notification system.",
+          "Comprehensive Vedic Panchanga almanac with Drik Ganita Janm Kundli calculations, D1 & D9 Navamsha charts, Vimshottari Dasha, Avakahada Chakra, Dosha analysis, planetary transits, and auspicious timings.",
       },
       { name: "author", content: "Mahavtaar" },
       { property: "og:title", content: "Mahavtaar Panchanga" },
       {
         property: "og:description",
         content:
-          "Comprehensive Vedic Panchanga almanac with astronomical calculations, five angas, planetary transits, unified Today schedule timeline, Hora-Tattva micro-periods, and live notification system.",
+          "Comprehensive Vedic Panchanga almanac with Drik Ganita Janm Kundli calculations, D1 & D9 Navamsha charts, Vimshottari Dasha, Avakahada Chakra, Dosha analysis, planetary transits, and auspicious timings.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

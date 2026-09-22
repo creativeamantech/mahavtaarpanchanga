@@ -9,6 +9,7 @@ import {
   Loader2,
   Printer,
   Calendar as CalendarIcon,
+  Home,
 } from "lucide-react";
 import { type Language, translations } from "../i18n";
 import type { AppTheme, PanchangaResponse } from "../types";
@@ -16,6 +17,7 @@ import { PWAInstallButton } from "./PWAInstallButton";
 import { getLocalizedMasa, getLocalizedPaksha, getLocalizedVaara } from "../i18n";
 
 export type ActiveView =
+  | "home"
   | "panchanga"
   | "today"
   | "timings"
@@ -54,8 +56,10 @@ export const Header: React.FC<HeaderProps> = ({
   currentCity,
   isDeviceLocation = false,
   isDetectingLocation = false,
+  activeView = "home",
   panchangaData,
   onDateChange,
+  onViewChange,
   onOpenLocation,
   onDetectDeviceLocation,
   onOpenSettings,
@@ -176,31 +180,56 @@ export const Header: React.FC<HeaderProps> = ({
       {/* ─── HEADER TOP ─────────────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] py-2 gap-2">
-          {/* App Name & Sacred Vedic Branding */}
-          <div className="flex items-center space-x-2.5 sm:space-x-3.5 shrink-0">
-            <div
-              className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl shadow-inner border ${
-                isNight
-                  ? "bg-indigo-950/80 border-indigo-700/60 text-[#F0C96A]"
-                  : "bg-white/10 border-white/15 text-[#F0C96A]"
+          {/* App Name & Sacred Vedic Branding with Home Link */}
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => onViewChange?.("home")}
+              className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl shadow-inner border transition-all hover:scale-105 cursor-pointer ${
+                activeView === "home"
+                  ? "bg-amber-500 text-stone-950 border-amber-300 ring-2 ring-amber-400/50 shadow-md"
+                  : isNight
+                  ? "bg-indigo-950/80 border-indigo-700/60 text-[#F0C96A] hover:bg-indigo-900"
+                  : "bg-white/10 border-white/15 text-[#F0C96A] hover:bg-white/20"
               }`}
+              title={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
+              aria-label="Home Hub"
             >
               <span className="font-serif-vedic font-bold text-xl sm:text-2xl leading-none">ॐ</span>
-            </div>
+            </button>
 
-            <div className="flex flex-col">
+            <div
+              className="flex flex-col cursor-pointer group"
+              onClick={() => onViewChange?.("home")}
+              title={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
+            >
               <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="font-serif-vedic font-bold text-base sm:text-lg text-[#F0C96A] tracking-tight leading-tight">
+                <span className="font-serif-vedic font-bold text-base sm:text-lg text-[#F0C96A] tracking-tight leading-tight group-hover:underline decoration-amber-400/50">
                   Mahavtaar Panchanga
                 </span>
                 <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider bg-white/15 text-amber-200 border border-white/20">
                   Drik
                 </span>
               </div>
-              <span className="text-[11px] font-devanagari text-white/60 tracking-wider leading-none mt-0.5">
-                महावतार पञ्चाङ्ग
+              <span className="text-[11px] font-devanagari text-white/60 tracking-wider leading-none mt-0.5 flex items-center gap-1">
+                <span>महावतार पञ्चाङ्ग</span>
+                <span className="text-[9px] text-amber-400/80">• {lang === "hi" ? "होम" : "Home"}</span>
               </span>
             </div>
+
+            {/* Quick Home Pill Button */}
+            <button
+              type="button"
+              onClick={() => onViewChange?.("home")}
+              className={`hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all border ${
+                activeView === "home"
+                  ? "bg-amber-500 text-stone-950 border-amber-400 shadow-xs"
+                  : "bg-white/10 hover:bg-white/20 border-white/15 text-amber-300"
+              }`}
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>{lang === "hi" ? "होम हब" : "Home"}</span>
+            </button>
           </div>
 
           {/* Action Bar */}

@@ -8,6 +8,7 @@ interface SpiritualTabsProps {
   onViewChange: (view: ActiveView) => void;
   lang: Language;
   theme?: AppTheme;
+  orderedViews?: ActiveView[];
 }
 
 export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
@@ -15,16 +16,23 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
   onViewChange,
   lang,
   theme = "parchment",
+  orderedViews,
 }) => {
   const t = translations[lang];
   const isNight = theme === "nightSky";
 
-  const tabs: {
+  const rawTabs: {
     id: ActiveView;
     label: string;
     icon: string;
     subLabel?: string;
   }[] = [
+    {
+      id: "home",
+      label: lang === "hi" ? "मुख्य पृष्ठ" : "Home Hub",
+      icon: "🏠",
+      subLabel: "होम",
+    },
     {
       id: "panchanga",
       label: t.views.panchanga || (lang === "hi" ? "दैनिक पंचांग" : "Panchanga"),
@@ -98,6 +106,26 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
       subLabel: "उत्सव",
     },
   ];
+
+  // If user has custom ordered views, sort tabs based on orderedViews
+  const tabs = React.useMemo(() => {
+    if (!orderedViews || orderedViews.length === 0) return rawTabs;
+    const tabMap = new Map<ActiveView, (typeof rawTabs)[0]>();
+    rawTabs.forEach((t) => tabMap.set(t.id, t));
+
+    const sorted: typeof rawTabs = [];
+    orderedViews.forEach((viewId) => {
+      const found = tabMap.get(viewId);
+      if (found) sorted.push(found);
+    });
+    // Add any remaining tabs not in orderedViews
+    rawTabs.forEach((t) => {
+      if (!sorted.find((s) => s.id === t.id)) {
+        sorted.push(t);
+      }
+    });
+    return sorted;
+  }, [orderedViews, lang, t]);
 
   return (
     <nav

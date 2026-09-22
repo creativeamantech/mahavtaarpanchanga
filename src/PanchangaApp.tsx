@@ -57,6 +57,7 @@ import {
   CalendarDays,
   Hourglass,
   Check,
+  Home,
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
 import {
@@ -71,6 +72,12 @@ import {
   clearUserSettings,
   DEFAULT_USER_SETTINGS,
 } from "./settingsStorage";
+import { HomeHubView } from "./components/HomeHubView";
+import {
+  getStoredNavPreferences,
+  saveNavPreferences,
+  type NavPreferences,
+} from "./lib/navPreferences";
 
 // Sidebar Navigation Item Component
 const NavItem = ({
@@ -197,7 +204,18 @@ export default function App() {
   const [ayanamsa, setAyanamsa] = useState<CoordinateSelection>(savedSettings.ayanamsa);
   const [theme, setTheme] = useState<AppTheme>(savedSettings.theme || "parchment");
   const [birthNakshatra, setBirthNakshatra] = useState<number>(savedSettings.birthNakshatra || 1);
-  const [activeView, setActiveView] = useState<ActiveView>("panchanga");
+
+  // User Navigation Preferences (Order, Default Landing Page, Layout Format)
+  const initialNavPrefs = getStoredNavPreferences();
+  const [navPreferences, setNavPreferences] = useState<NavPreferences>(initialNavPrefs);
+  const [activeView, setActiveView] = useState<ActiveView>(
+    initialNavPrefs.defaultLandingView || "home"
+  );
+
+  const handleUpdateNavPreferences = (newPrefs: NavPreferences) => {
+    setNavPreferences(newPrefs);
+    saveNavPreferences(newPrefs);
+  };
 
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -547,6 +565,19 @@ export default function App() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-4 hide-scrollbar">
+          {/* Section 0: Home Hub */}
+          <div>
+            <NavItem
+              icon={Home}
+              label={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
+              subLabel={lang === "hi" ? "कस्टमाइजेबल डैशबोर्ड व प्राथमिकताएं" : "Custom Dashboard & Sorting"}
+              badge={lang === "hi" ? "केन्द्र" : "Hub"}
+              isActive={activeView === "home"}
+              onClick={() => setActiveView("home")}
+              theme={theme}
+            />
+          </div>
+
           {/* Section 1: Core Panchanga & Timings */}
           <div>
             <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400/90 mb-2 px-2.5 font-sans flex items-center justify-between">
@@ -725,6 +756,7 @@ export default function App() {
           onViewChange={setActiveView}
           lang={lang}
           theme={theme}
+          orderedViews={navPreferences.orderedViews}
         />
 
         {/* Scrollable Content */}
@@ -733,12 +765,16 @@ export default function App() {
           className="flex-1 w-full overflow-y-auto relative z-10 hide-scrollbar"
         >
           <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            {/* Spiritual Context Banner */}
-            {activeView !== "calendar" && !error && !isLoading && panchangaData && (
-              <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-500">
-                <InvocationBanner lang={lang} theme={theme} data={panchangaData} />
-              </div>
-            )}
+            {/* Spiritual Context Banner (shown on standard views) */}
+            {activeView !== "calendar" &&
+              activeView !== "home" &&
+              !error &&
+              !isLoading &&
+              panchangaData && (
+                <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <InvocationBanner lang={lang} theme={theme} data={panchangaData} />
+                </div>
+              )}
 
             {/* Error State */}
             {error && (
@@ -760,8 +796,23 @@ export default function App() {
               </div>
             )}
 
-            {/* Loading Indicator */}
-            {isLoading && !panchangaData ? (
+            {/* View: Home Hub (Central Customizable Dashboard) */}
+            {activeView === "home" ? (
+              <div
+                id="view-home-hub"
+                className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-7xl mx-auto"
+              >
+                <HomeHubView
+                  data={panchangaData}
+                  lang={lang}
+                  theme={theme}
+                  navPreferences={navPreferences}
+                  onUpdateNavPreferences={handleUpdateNavPreferences}
+                  onSelectView={setActiveView}
+                  onOpenSettings={() => setIsSettingsOpen(true)}
+                />
+              </div>
+            ) : isLoading && !panchangaData ? (
               <div
                 id="loading-state"
                 className="flex flex-col items-center justify-center py-32 text-center"

@@ -91,14 +91,22 @@ export const Route = createFileRoute("/api/panchanga/month")({
               count++;
             }
 
-            return Response.json({
-              year,
-              month,
-              isDateRange: true,
-              fromDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`,
-              toDate: `${stop.getFullYear()}-${String(stop.getMonth() + 1).padStart(2, "0")}-${String(stop.getDate()).padStart(2, "0")}`,
-              days,
-            });
+            return Response.json(
+              {
+                year,
+                month,
+                isDateRange: true,
+                fromDate: `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}-${String(start.getDate()).padStart(2, "0")}`,
+                toDate: `${stop.getFullYear()}-${String(stop.getMonth() + 1).padStart(2, "0")}-${String(stop.getDate()).padStart(2, "0")}`,
+                days,
+              },
+              {
+                headers: {
+                  "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+                  "Access-Control-Allow-Origin": "*",
+                },
+              },
+            );
           }
 
           // Default full month mode
@@ -141,11 +149,23 @@ export const Route = createFileRoute("/api/panchanga/month")({
             }
           }
 
-          return Response.json({ year, month, isDateRange: false, days });
-        } catch (err: any) {
           return Response.json(
-            { error: err?.message || "Failed to compute monthly panchanga" },
-            { status: 500 },
+            { year, month, isDateRange: false, days },
+            {
+              headers: {
+                "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+                "Access-Control-Allow-Origin": "*",
+              },
+            },
+          );
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : "Failed to compute monthly panchanga";
+          return Response.json(
+            { error: message },
+            {
+              status: 500,
+              headers: { "Access-Control-Allow-Origin": "*" },
+            },
           );
         }
       },

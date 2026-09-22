@@ -78,6 +78,12 @@ import {
   saveNavPreferences,
   type NavPreferences,
 } from "./lib/navPreferences";
+import {
+  getPanchangaCacheKey,
+  loadCachedPanchanga,
+  saveCachedPanchanga,
+  loadLastSuccessfulPanchanga,
+} from "./lib/panchangaCache";
 
 // Sidebar Navigation Item Component
 const NavItem = ({
@@ -387,8 +393,24 @@ export default function App() {
 
   // Fetch Panchanga data whenever date, city/coords, or calculation settings change
   const fetchPanchanga = useCallback(() => {
-    setIsLoading(true);
     setError(null);
+
+    const cacheKey = getPanchangaCacheKey(
+      currentDate,
+      currentCity,
+      customCoords,
+      monthSystem,
+      ayanamsa,
+    );
+
+    // SWR Pattern: Immediate hydration from localStorage cache if available
+    const cachedData = loadCachedPanchanga(cacheKey);
+    if (cachedData) {
+      setPanchangaData(cachedData);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
 
     let url = `/api/panchanga?date=${encodeURIComponent(currentDate)}&month_system=${monthSystem}&ayanamsa=${ayanamsa}`;
 
@@ -400,7 +422,10 @@ export default function App() {
       url += `&city=${encodeURIComponent(currentCity)}`;
     }
 
-    let retries = 2;
+    let attempt = 0;
+    const maxRetries = 4;
+    const delays = [500, 1000, 1800, 3000];
+
     const attemptFetch = () => {
       fetch(url)
         .then(async (res) => {
@@ -412,25 +437,54 @@ export default function App() {
         })
         .then((data: PanchangaResponse) => {
           setPanchangaData(data);
+          saveCachedPanchanga(cacheKey, data);
+          setError(null);
           setIsLoading(false);
         })
         .catch((err: Error) => {
-          if (retries > 0 && err.message === "Failed to fetch") {
-            retries--;
-            setTimeout(attemptFetch, 1000);
+          if (attempt < maxRetries) {
+            const delay = delays[attempt] || 1500;
+            attempt++;
+            setTimeout(attemptFetch, delay);
             return;
           }
-          console.error("Panchanga fetch error:", err);
+
+          console.warn("Panchanga fetch error after retries:", err);
+
+          // If cached data is already active on screen, don't interrupt the user
+          if (cachedData) {
+            setIsLoading(false);
+            return;
+          }
+
+          // Fallback to any recent valid calculation on this device
+          const fallback = loadLastSuccessfulPanchanga();
+          if (fallback) {
+            setPanchangaData(fallback);
+            setIsLoading(false);
+            showToast("Showing saved offline calculation. Tap Retry to refresh.");
+            return;
+          }
+
           setError(err.message || "Failed to calculate Panchanga for this date and location.");
           setIsLoading(false);
         });
     };
 
     attemptFetch();
-  }, [currentDate, currentCity, customCoords, monthSystem, ayanamsa]);
+  }, [currentDate, currentCity, customCoords, monthSystem, ayanamsa, showToast]);
 
   useEffect(() => {
     fetchPanchanga();
+  }, [fetchPanchanga]);
+
+  // Auto-refetch when network reconnects
+  useEffect(() => {
+    const handleOnline = () => {
+      fetchPanchanga();
+    };
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
   }, [fetchPanchanga]);
 
   const handleSelectCity = (city: CityLocation, saveDefault: boolean = true) => {
@@ -780,19 +834,31 @@ export default function App() {
             {error && (
               <div
                 id="error-banner"
-                className="mb-8 flex items-start space-x-3 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-900 shadow-sm max-w-5xl mx-auto"
+                className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50/90 dark:bg-rose-950/40 p-4 text-rose-900 dark:text-rose-200 shadow-sm max-w-5xl mx-auto"
               >
-                <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h4 className="text-sm font-bold">Calculation Notice</h4>
-                  <p className="text-xs text-rose-700 mt-0.5">{error}</p>
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-sm font-bold">Calculation Notice</h4>
+                    <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">{error}</p>
+                  </div>
                 </div>
-                <button
-                  onClick={fetchPanchanga}
-                  className="inline-flex items-center rounded-xl border border-rose-300 bg-white px-3.5 py-1.5 text-xs font-bold text-rose-850 hover:bg-rose-100 transition-colors"
-                >
-                  <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Retry
-                </button>
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                  {customCoords && (
+                    <button
+                      onClick={() => handleSelectCity({ name: "Bengaluru, IN", country: "IN", latitude: 12.9716, longitude: 77.5946, timezone: "Asia/Kolkata" }, true)}
+                      className="inline-flex items-center rounded-xl border border-rose-300 dark:border-rose-700 bg-white dark:bg-stone-900 px-3 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-stone-800 transition-colors"
+                    >
+                      Reset Location
+                    </button>
+                  )}
+                  <button
+                    onClick={fetchPanchanga}
+                    className="inline-flex items-center rounded-xl border border-rose-300 dark:border-rose-700 bg-white dark:bg-stone-900 px-3.5 py-1.5 text-xs font-bold text-rose-850 dark:text-rose-200 hover:bg-rose-100 dark:hover:bg-stone-800 transition-colors shadow-xs"
+                  >
+                    <RefreshCw className="mr-1.5 h-3.5 w-3.5" /> Retry
+                  </button>
+                </div>
               </div>
             )}
 

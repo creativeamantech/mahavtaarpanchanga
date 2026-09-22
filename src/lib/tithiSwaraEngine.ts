@@ -225,6 +225,9 @@ export function getTithiSwaraRule(
  * Localized human display labels for Nadi.
  */
 export function getNadiDisplayLabel(nadi: Nadi, lang: "en" | "hi" | "sa" = "en"): string {
+  if (lang === "sa") {
+    return nadi === "ida" ? "इडा (वामस्वरः)" : "पिङ्गला (दक्षिणस्वरः)";
+  }
   if (lang === "hi") {
     return nadi === "ida" ? "इड़ा (बायां स्वर)" : "पिंगला (दायां स्वर)";
   }

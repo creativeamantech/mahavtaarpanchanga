@@ -754,6 +754,58 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   {c.label}
                 </button>
               ))}
+
+              {/* Shodashavarga All 16 Charts Selector */}
+              <div className="relative inline-flex items-center">
+                <select
+                  value={activeChartType}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setActiveChartType(e.target.value as KundliChartType);
+                    }
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border appearance-none cursor-pointer pr-7 ${
+                    ![
+                      "d1",
+                      "d9",
+                      "chandra",
+                      "surya",
+                      "d10",
+                      "chalit",
+                    ].includes(activeChartType)
+                      ? "bg-amber-600 text-amber-50 border-amber-400 font-bold shadow-md"
+                      : "bg-amber-950/50 text-amber-300/90 border-amber-500/20 hover:bg-amber-900/60 hover:text-amber-100"
+                  }`}
+                  title="षोडशवर्ग (सभी 16 वर्ग चक्र)"
+                >
+                  <option value="" disabled className="bg-stone-900 text-stone-400">
+                    षोडशवर्ग (D1-D60) ▾
+                  </option>
+                  {[
+                    { id: "d1", label: "D1 - लग्न / राशि (Rashi)" },
+                    { id: "d2", label: "D2 - होरा (Hora)" },
+                    { id: "d3", label: "D3 - द्रेष्काण (Drekkana)" },
+                    { id: "d4", label: "D4 - चतुर्थांश (Chaturthamsha)" },
+                    { id: "d7", label: "D7 - सप्तांश (Saptamsha)" },
+                    { id: "d9", label: "D9 - नवांश (Navamsha)" },
+                    { id: "d10", label: "D10 - दशांश (Dashamsha)" },
+                    { id: "d12", label: "D12 - द्वादशांश (Dwadashamsha)" },
+                    { id: "d16", label: "D16 - षोडशांश (Shodashamsha)" },
+                    { id: "d20", label: "D20 - विंशांश (Vimshamsha)" },
+                    { id: "d24", label: "D24 - चतुर्विंशांश (Chaturvimshamsha)" },
+                    { id: "d27", label: "D27 - सप्तविंशांश (Saptavimshamsha)" },
+                    { id: "d30", label: "D30 - त्रिंशांश (Trimshamsha)" },
+                    { id: "d40", label: "D40 - खवेदांश (Khavedamsha)" },
+                    { id: "d45", label: "D45 - अक्षवेदांश (Akshavedamsha)" },
+                    { id: "d60", label: "D60 - षष्ट्यंश (Shashtiamsha)" },
+                  ].map((v) => (
+                    <option key={v.id} value={v.id} className="bg-stone-900 text-amber-200">
+                      {v.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute right-2 text-amber-400 text-[10px]">▼</div>
+              </div>
             </div>
 
             {/* Visual Customization Options (Style, Degrees, Size, Dual View) */}

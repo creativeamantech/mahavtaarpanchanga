@@ -1,7 +1,36 @@
 import * as Astronomy from "astronomy-engine";
 import { CoordinateSelection } from "../types";
+import {
+  ALL_SHODASHAVARGA_TYPES,
+  VARGA_DEFINITIONS,
+  VargaEngine,
+} from "../kundali/varga/VargaEngine";
+import {
+  VargaChartResult,
+  VargaType,
+} from "../kundali/contracts/IVargaEngine";
+import { CanonicalBodyId } from "../kundali/astronomy/AstronomicalContext";
 
-export type KundliChartType = "d1" | "d9" | "chandra" | "surya" | "d10" | "chalit";
+export type KundliChartType =
+  | "d1"
+  | "d2"
+  | "d3"
+  | "d4"
+  | "d7"
+  | "d9"
+  | "d10"
+  | "d12"
+  | "d16"
+  | "d20"
+  | "d24"
+  | "d27"
+  | "d30"
+  | "d40"
+  | "d45"
+  | "d60"
+  | "chandra"
+  | "surya"
+  | "chalit";
 export type KundliChartStyle = "north" | "south";
 
 export type PlanetId =
@@ -214,6 +243,8 @@ export interface FullKundliData {
   housesSurya: KundliHouse[];
   housesD10: KundliHouse[];
   housesChalit: KundliHouse[];
+  shodashavarga?: Record<VargaType, VargaChartResult>;
+  vargaHouses?: Record<VargaType, KundliHouse[]>;
   avakahada: AvakahadaDetails;
   vimshottari: {
     balanceAtBirth: {
@@ -500,41 +531,11 @@ export function calculateNakshatraInfo(longitude: number): {
 }
 
 export function calculateNavamshaSignIndex(longitude: number): number {
-  const norm = normalize360(longitude);
-  let signIndex = Math.floor(norm / 30);
-  if (isNaN(signIndex) || signIndex < 0) signIndex = 0;
-  signIndex = signIndex % 12;
-  const degInSign = norm % 30;
-  let padaInSign = Math.floor(degInSign / (30 / 9)); // 0 to 8
-  if (isNaN(padaInSign) || padaInSign < 0) padaInSign = 0;
-  if (padaInSign > 8) padaInSign = 8;
-
-  // Navamsha rules:
-  // Fiery signs (0, 4, 8) start from Aries (0)
-  // Earthy signs (1, 5, 9) start from Capricorn (9)
-  // Airy signs (2, 6, 10) start from Libra (6)
-  // Watery signs (3, 7, 11) start from Cancer (3)
-  let startNavamsha = 0;
-  if ([0, 4, 8].includes(signIndex)) startNavamsha = 0; // Aries
-  else if ([1, 5, 9].includes(signIndex)) startNavamsha = 9; // Capricorn
-  else if ([2, 6, 10].includes(signIndex)) startNavamsha = 6; // Libra
-  else if ([3, 7, 11].includes(signIndex)) startNavamsha = 3; // Cancer
-
-  return (startNavamsha + padaInSign) % 12;
+  return VargaEngine.calculatePositionInVarga(longitude, "D9").destinationSignIndex;
 }
 
 export function calculateDashamshaSignIndex(longitude: number): number {
-  const norm = normalize360(longitude);
-  const signIndex = Math.floor(norm / 30);
-  const degInSign = norm % 30;
-  const part = Math.floor(degInSign / 3); // 0-9
-  if (signIndex % 2 === 0) {
-    // Odd sign (Aries=0, Gemini=2, Leo=4, Libra=6, Sag=8, Aqu=10)
-    return (signIndex + part) % 12;
-  } else {
-    // Even sign (Taurus=1, Cancer=3, Virgo=5, Scorpio=7, Cap=9, Pisces=11)
-    return (signIndex + 8 + part) % 12;
-  }
+  return VargaEngine.calculatePositionInVarga(longitude, "D10").destinationSignIndex;
 }
 
 export function getPlanetDignity(
@@ -949,6 +950,64 @@ export function computeFullKundli(
   const housesSurya = buildHouses(sunSignIndex, "surya");
   const housesD10 = buildHouses(lagnaD10SignIndex, "d10");
   const housesChalit = buildHouses(lagnaSignIndex, "chalit");
+
+  // Canonical Shodashavarga Calculation
+  const vargaEngine = new VargaEngine();
+  const planetSiderealLons = {} as Record<CanonicalBodyId, number>;
+  planets.forEach((p) => {
+    planetSiderealLons[p.id as CanonicalBodyId] = p.longitude;
+  });
+  const shodashavarga = vargaEngine.calculateShodashavarga(siderealAsc, planetSiderealLons);
+
+  // Construct houses for each of the 16 Shodashavarga charts
+  const vargaHouses = {} as Record<VargaType, KundliHouse[]>;
+  for (const varga of ALL_SHODASHAVARGA_TYPES) {
+    const vResult = shodashavarga[varga];
+    const vH: KundliHouse[] = [];
+    for (let h = 1; h <= 12; h++) {
+      const sIndex = (vResult.lagnaSignIndex + h - 1) % 12;
+      const sMeta = ZODIAC_SIGNS[sIndex] || ZODIAC_SIGNS[0];
+      const hMeta = HOUSE_NAMES[h - 1] || HOUSE_NAMES[0];
+      const sigMeta = HOUSE_SIGNIFICANCE[h - 1] || HOUSE_SIGNIFICANCE[0];
+
+      const occupyingPlanets = planets.filter((p) => {
+        const vPos = vResult.planets[p.id as CanonicalBodyId];
+        return vPos && vPos.houseNumber === h;
+      });
+
+      const aspectingPlanets: KundliPlanet[] = [];
+      planets.forEach((p) => {
+        const vPos = vResult.planets[p.id as CanonicalBodyId];
+        if (!vPos) return;
+        const distFromPlanet = ((sIndex - vPos.signIndex + 12) % 12) + 1;
+        let hasAspect = false;
+        if (distFromPlanet === 7) hasAspect = true;
+        if (p.id === "Mars" && (distFromPlanet === 4 || distFromPlanet === 8)) hasAspect = true;
+        if (["Jupiter", "Rahu", "Ketu"].includes(p.id) && (distFromPlanet === 5 || distFromPlanet === 9))
+          hasAspect = true;
+        if (p.id === "Saturn" && (distFromPlanet === 3 || distFromPlanet === 10)) hasAspect = true;
+        if (hasAspect && !occupyingPlanets.some((op) => op.id === p.id)) {
+          aspectingPlanets.push(p);
+        }
+      });
+
+      const lordPlanet = planets.find((p) => p.nameEn === sMeta.lord);
+      vH.push({
+        houseNumber: h,
+        signIndex: sIndex,
+        signNameEn: sMeta.en,
+        signNameHi: sMeta.hi,
+        lordEn: sMeta.lord,
+        lordHi: lordPlanet ? lordPlanet.nameHi : sMeta.lord,
+        planets: occupyingPlanets,
+        aspectingPlanets,
+        significanceEn: sigMeta.en,
+        significanceHi: sigMeta.hi,
+        nameSanskrit: hMeta.sa,
+      });
+    }
+    vargaHouses[varga] = vH;
+  }
 
   // 4. Avakahada Chakra Calculation
   const moonNakInfo = calculateNakshatraInfo(moonObj.longitude);
@@ -1473,6 +1532,8 @@ export function computeFullKundli(
     housesSurya,
     housesD10,
     housesChalit,
+    shodashavarga,
+    vargaHouses,
     avakahada,
     vimshottari: {
       balanceAtBirth: {

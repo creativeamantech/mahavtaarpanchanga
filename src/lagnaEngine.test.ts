@@ -1,4 +1,4 @@
-import { expect, test, describe } from "bun:test";
+import { expect, test, describe } from "vitest";
 import { computeBirthChart } from "./lib/lagnaEngine.server";
 
 describe("Lagna Engine D1 Chart", () => {

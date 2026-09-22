@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { MonthSystem, MonthlyPanchangaDay } from "../types";
 import { type Language, translations, getLocalizedVaara } from "../i18n";
+import { getMonthCacheKey, loadCachedMonth, saveCachedMonth } from "../lib/panchangaCache";
 
 interface MonthlyCalendarViewProps {
   currentDateStr: string;
@@ -121,8 +122,22 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   useEffect(() => {
     let isCancelled = false;
     async function loadMonth() {
-      setIsLoading(true);
-      let retries = 2;
+      const cacheKey = getMonthCacheKey(year, month, currentCity, monthSystem, ayanamsa);
+      const cached = loadCachedMonth(cacheKey);
+
+      if (cached && cached.length > 0) {
+        setDays(cached);
+        const match = cached.find((d: MonthlyPanchangaDay) => d.date === currentDateStr);
+        setInspectedDay(match || cached[0] || null);
+        setIsLoading(false);
+      } else {
+        setIsLoading(true);
+      }
+
+      let attempt = 0;
+      const maxRetries = 4;
+      const delays = [500, 1000, 1800, 3000];
+
       const attemptFetch = async () => {
         try {
           const res = await fetch(
@@ -130,29 +145,27 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
               currentCity,
             )}&month_system=${monthSystem}&ayanamsa=${ayanamsa}`,
           );
-          if (!res.ok) throw new Error("Failed to load month data");
+          if (!res.ok) throw new Error(`Failed to load month data (Status ${res.status})`);
           const json = await res.json();
           if (!isCancelled && json.days) {
             setDays(json.days);
+            saveCachedMonth(cacheKey, json.days);
             // Set initial inspected day matching currentDateStr or day 1
             const match = json.days.find((d: MonthlyPanchangaDay) => d.date === currentDateStr);
             setInspectedDay(match || json.days[0] || null);
+            setIsLoading(false);
           }
         } catch (err: unknown) {
-          const errMsg = err instanceof Error ? err.message : String(err);
-          if (retries > 0 && errMsg === "Failed to fetch" && !isCancelled) {
-            retries--;
-            setTimeout(attemptFetch, 1000);
+          if (attempt < maxRetries && !isCancelled) {
+            const delay = delays[attempt] || 1500;
+            attempt++;
+            setTimeout(attemptFetch, delay);
             return;
           }
-          console.error("Error fetching monthly panchanga:", err);
+          console.warn("Could not load monthly panchanga after retries:", err);
           if (!isCancelled) {
             setIsLoading(false);
           }
-        }
-        if (!isCancelled && retries === 2) {
-          // Success path, since if it failed and retried it returned early
-          // actually, no, if it succeeds it hits here. But wait, let's just use a boolean flag
         }
       };
 

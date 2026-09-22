@@ -7,6 +7,7 @@ import {
   KundliHouse,
   ZODIAC_SIGNS,
 } from "../lib/kundliEngine";
+import { VargaType } from "../kundali/contracts/IVargaEngine";
 import { Sparkles, Info, Eye, Layers, Compass, ZoomIn, ZoomOut, Check, ChevronRight } from "lucide-react";
 
 interface KundliChartRendererProps {
@@ -33,31 +34,50 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
 
   // Select the appropriate house layout based on active chart type
-  let currentHouses: KundliHouse[] = kundliData.housesD1;
-  let chartTitle = "लग्न कुण्डली (D1 - Birth Chart)";
-  let chartSubtitle = "मूल जन्म चक्र (Rasi Chart) - शारीरिक संरचना, स्वभाव, स्वास्थ्य एवं जीवन का आधार";
+  const VARGA_TITLES: Record<string, { title: string; subtitle: string }> = {
+    d1: { title: "लग्न कुण्डली (D1 - Birth Chart)", subtitle: "मूल जन्म चक्र (Rasi Chart) - शारीरिक संरचना, स्वभाव, स्वास्थ्य एवं जीवन का आधार" },
+    d2: { title: "होरा कुण्डली (D2 - Hora)", subtitle: "धन, सम्पत्ति, राजकोष, पारिवारिक समृद्धि एवं वाणी का विचार" },
+    d3: { title: "द्रेष्काण कुण्डली (D3 - Drekkana)", subtitle: "भाई-बहन, पराक्रम, साहस, उद्यम एवं ऊर्जा का चक्र" },
+    d4: { title: "चतुर्थांश कुण्डली (D4 - Chaturthamsha)", subtitle: "भूमि, भवन, अचल सम्पत्ति, गृहसुख एवं भाग्य" },
+    d7: { title: "सप्तांश कुण्डली (D7 - Saptamsha)", subtitle: "सन्तान सुख, संतति, वंश वृद्धि एवं सृजनात्मक सामर्थ्य" },
+    d9: { title: "नवांश कुण्डली (D9 - Navamsha)", subtitle: "धर्म, भाग्य, जीवनसाथी, वैवाहिक सुख एवं उत्तरार्ध जीवन का सूक्ष्म चक्र" },
+    d10: { title: "दशांश कुण्डली (D10 - Dashamsha)", subtitle: "कार्यक्षेत्र, व्यवसाय, आजीविका, प्रसिद्धि एवं कर्मफल का सूक्ष्म विश्लेषण" },
+    d12: { title: "द्वादशांश कुण्डली (D12 - Dwadashamsha)", subtitle: "माता-पिता, कुल, पूर्वज एवं पितृ ऋण का विचार" },
+    d16: { title: "षोडशांश कुण्डली (D16 - Shodashamsha)", subtitle: "वाहन सुख, यात्राएं, मानसिक सुख-शान्ति एवं सुख-साधन" },
+    d20: { title: "विंशांश कुण्डली (D20 - Vimshamsha)", subtitle: "आध्यात्मिक साधना, उपासना, मन्त्र सिद्धि एवं धार्मिक निष्ठा" },
+    d24: { title: "चतुर्विंशांश कुण्डली (D24 - Chaturvimshamsha)", subtitle: "उच्च विद्या, ज्ञान, बुद्धि, कौशल एवं शैक्षणिक सिद्धि" },
+    d27: { title: "सप्तविंशांश कुण्डली (D27 - Saptavimshamsha / Bhamsa)", subtitle: "शारीरिक बल, आंतरिक सामर्थ्य, कमजोरी एवं सहनशक्ति" },
+    d30: { title: "त्रिंशांश कुण्डली (D30 - Trimshamsha)", subtitle: "अनिष्ट, अरिष्ट, रोग, गुप्त शत्रु एवं चारित्रिक बाधाएं" },
+    d40: { title: "खवेदांश कुण्डली (D40 - Khavedamsha)", subtitle: "शुभाशुभ फल, मातृकुल का प्रभाव एवं आकस्मिक घटनाएं" },
+    d45: { title: "अक्षवेदांश कुण्डली (D45 - Akshavedamsha)", subtitle: "आचरण, चरित्र की शुद्धि एवं सर्वविध मंगल-कल्याण" },
+    d60: { title: "षष्ट्यंश कुण्डली (D60 - Shashtiamsha)", subtitle: "सूक्ष्म प्रारब्ध, संचित कर्म एवं जीवन के समस्त गूढ़ फल" },
+    chandra: { title: "चन्द्र कुण्डली (Chandra Lagna)", subtitle: "मन, भावनाएं, मानसिक शांति, माता एवं जनसम्पर्क का विश्लेषण" },
+    surya: { title: "सूर्य कुण्डली (Surya Lagna)", subtitle: "आत्मबल, पिता, मान-सम्मान, प्रतिष्ठा एवं आत्मिक तेज का चक्र" },
+    chalit: { title: "भाव चलित कुण्डली (Bhava Chalita)", subtitle: "भाव-मध्य व भाव-संधि आधारित वास्तविक ग्रह स्थिति एवं भाव फल" },
+  };
 
-  if (activeChartType === "d9") {
+  let currentHouses: KundliHouse[] = kundliData.housesD1;
+  const vKey = activeChartType.toUpperCase() as VargaType;
+
+  if (activeChartType === "d1") {
+    currentHouses = kundliData.housesD1;
+  } else if (activeChartType === "d9") {
     currentHouses = kundliData.housesD9;
-    chartTitle = "नवांश कुण्डली (D9 - Navamsha)";
-    chartSubtitle = "धर्म, भाग्य, जीवनसाथी, वैवाहिक सुख एवं उत्तरार्ध जीवन का सूक्ष्म चक्र";
   } else if (activeChartType === "chandra") {
     currentHouses = kundliData.housesChandra;
-    chartTitle = "चन्द्र कुण्डली (Chandra Lagna)";
-    chartSubtitle = "मन, भावनाएं, मानसिक शांति, माता एवं जनसम्पर्क का विश्लेषण";
   } else if (activeChartType === "surya") {
     currentHouses = kundliData.housesSurya;
-    chartTitle = "सूर्य कुण्डली (Surya Lagna)";
-    chartSubtitle = "आत्मबल, पिता, मान-सम्मान, प्रतिष्ठा एवं आत्मिक तेज का चक्र";
   } else if (activeChartType === "d10") {
     currentHouses = kundliData.housesD10 || kundliData.housesD1;
-    chartTitle = "दशांश कुण्डली (D10 - Dashamsha)";
-    chartSubtitle = "कार्यक्षेत्र, व्यवसाय, आजीविका, प्रसिद्धि एवं कर्मफल का सूक्ष्म विश्लेषण";
   } else if (activeChartType === "chalit") {
     currentHouses = kundliData.housesChalit || kundliData.housesD1;
-    chartTitle = "भाव चलित कुण्डली (Bhava Chalita)";
-    chartSubtitle = "भाव-मध्य व भाव-संधि आधारित वास्तविक ग्रह स्थिति एवं भाव फल";
+  } else if (kundliData.vargaHouses && kundliData.vargaHouses[vKey]) {
+    currentHouses = kundliData.vargaHouses[vKey];
   }
+
+  const chartMeta = VARGA_TITLES[activeChartType] || VARGA_TITLES.d1;
+  const chartTitle = chartMeta.title;
+  const chartSubtitle = chartMeta.subtitle;
 
   // Active inspected house is selectedHouseNumber or hoveredHouse or House 1
   const inspectedHouseNum = hoveredHouse || selectedHouseNumber || 1;

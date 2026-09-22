@@ -42,11 +42,20 @@ export const Route = createFileRoute("/api/panchanga")({
                 )
               : computePanchanga(city || "Bengaluru, IN", targetDateStr, monthSystem, ayanamsa);
 
-          return Response.json(result);
-        } catch (err: any) {
+          return Response.json(result, {
+            headers: {
+              "Cache-Control": "public, max-age=1800, stale-while-revalidate=86400",
+              "Access-Control-Allow-Origin": "*",
+            },
+          });
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : "Failed to compute panchanga";
           return Response.json(
-            { error: err?.message || "Failed to compute panchanga" },
-            { status: 400 },
+            { error: message },
+            {
+              status: 400,
+              headers: { "Access-Control-Allow-Origin": "*" },
+            },
           );
         }
       },

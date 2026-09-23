@@ -111,8 +111,11 @@ export function computeGochara(
   });
 
   // Calculate Rahu/Ketu Mean Node
-  const moonNode = Astronomy.MoonNode(transitDate);
-  const tropicalRahu = moonNode ? (moonNode.node_ecl.elon + 360) % 360 : 0;
+  const astroTime = Astronomy.MakeTime(transitDate);
+  const ut = astroTime && typeof astroTime.ut === "number" && !isNaN(astroTime.ut) ? astroTime.ut : 0;
+  const T = ut / 36525.0;
+  let tropicalRahu = 125.04452 - 1934.136261 * T + 0.0020708 * T * T + (T * T * T) / 450000;
+  tropicalRahu = ((tropicalRahu % 360) + 360) % 360;
   const siderealRahu = ((tropicalRahu - ayanamsaDeg) % 360 + 360) % 360;
   const rahuSign = Math.floor(siderealRahu / 30);
   const ketuSign = (rahuSign + 6) % 12;

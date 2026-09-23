@@ -212,26 +212,26 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-gradient-to-b from-amber-950 via-stone-950 to-stone-900 border border-amber-500/40 rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden text-amber-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200 select-text">
+      <div className="bg-zinc-900 border border-zinc-700 rounded-2xl sm:rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden text-zinc-100">
         {/* Modal Header */}
-        <div className="p-4 sm:p-5 border-b border-amber-500/20 flex items-center justify-between bg-amber-950/40">
+        <div className="p-4 sm:p-5 border-b border-zinc-700 flex items-center justify-between bg-zinc-850">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+            <div className="p-2 rounded-xl bg-zinc-800 border border-zinc-700 text-amber-400">
               <MapPin className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-amber-100 flex items-center gap-2">
+              <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                 जन्म स्थान चयन (Select Birth City)
               </h3>
-              <p className="text-xs text-amber-300/70">
+              <p className="text-xs text-zinc-400">
                 सटीक अक्षांश, देशान्तर व स्थानीय समयानुसार अचूक लग्न कुण्डली गणना
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-amber-300/70 hover:text-amber-100 hover:bg-amber-900/40 rounded-xl transition-all"
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all cursor-pointer"
             aria-label="बंद करें"
           >
             <X className="w-5 h-5" />
@@ -239,28 +239,28 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
         </div>
 
         {/* GPS Quick Action Strip */}
-        <div className="px-4 sm:px-5 py-3 bg-amber-900/20 border-b border-amber-500/20 flex flex-wrap items-center justify-between gap-2.5">
+        <div className="px-4 sm:px-5 py-3 bg-zinc-800/60 border-b border-zinc-700 flex flex-wrap items-center justify-between gap-2.5">
           <button
             onClick={handleDetectGPS}
             disabled={gpsStatus.loading}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-600/30 hover:bg-amber-500/40 text-amber-200 border border-amber-400/40 text-xs font-semibold transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 min-h-[40px] px-3.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-600 text-xs font-semibold transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {gpsStatus.loading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
+              <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
             ) : (
-              <Navigation className="w-4 h-4 text-amber-300" />
+              <Navigation className="w-4 h-4 text-amber-400" />
             )}
             <span>वर्तमान स्थान (Live GPS) से लें</span>
           </button>
 
           {gpsStatus.detected && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-emerald-300 font-medium">
+              <span className="text-xs text-emerald-400 font-medium">
                 ✓ {gpsStatus.detected.name} ({gpsStatus.detected.lat}°, {gpsStatus.detected.lon}°)
               </span>
               <button
                 onClick={() => handleApplyCity(gpsStatus.detected!)}
-                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold"
+                className="px-2.5 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold cursor-pointer"
               >
                 लागू करें
               </button>
@@ -268,67 +268,36 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
           )}
 
           {gpsStatus.error && (
-            <span className="text-xs text-rose-400 font-medium">{gpsStatus.error}</span>
+            <span className="text-xs text-red-400 font-medium">{gpsStatus.error}</span>
           )}
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 px-4 pt-3 border-b border-amber-500/15 overflow-x-auto scrollbar-none text-xs font-semibold">
-          <button
-            onClick={() => setActiveTab("search")}
-            className={`px-3.5 py-2 rounded-t-xl border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === "search"
-                ? "border-amber-400 text-amber-100 bg-amber-900/30"
-                : "border-transparent text-amber-300/60 hover:text-amber-200"
-            }`}
-          >
-            <Search className="w-3.5 h-3.5" />
-            खोजें (Search)
-          </button>
-          <button
-            onClick={() => setActiveTab("pilgrimage")}
-            className={`px-3.5 py-2 rounded-t-xl border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === "pilgrimage"
-                ? "border-amber-400 text-amber-100 bg-amber-900/30"
-                : "border-transparent text-amber-300/60 hover:text-amber-200"
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            तीर्थ व पवित्र नगर
-          </button>
-          <button
-            onClick={() => setActiveTab("popular")}
-            className={`px-3.5 py-2 rounded-t-xl border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === "popular"
-                ? "border-amber-400 text-amber-100 bg-amber-900/30"
-                : "border-transparent text-amber-300/60 hover:text-amber-200"
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            भारत के महानगर
-          </button>
-          <button
-            onClick={() => setActiveTab("global")}
-            className={`px-3.5 py-2 rounded-t-xl border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === "global"
-                ? "border-amber-400 text-amber-100 bg-amber-900/30"
-                : "border-transparent text-amber-300/60 hover:text-amber-200"
-            }`}
-          >
-            <Globe2 className="w-3.5 h-3.5" />
-            विश्व के प्रमुख नगर
-          </button>
-          <button
-            onClick={() => setActiveTab("custom")}
-            className={`px-3.5 py-2 rounded-t-xl border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap ${
-              activeTab === "custom"
-                ? "border-amber-400 text-amber-100 bg-amber-900/30"
-                : "border-transparent text-amber-300/60 hover:text-amber-200"
-            }`}
-          >
-            <Compass className="w-3.5 h-3.5" />
-            कस्टम निर्देशांक
-          </button>
+        <div className="flex items-center gap-1 px-4 pt-3 border-b border-zinc-700 overflow-x-auto scrollbar-none text-xs font-semibold">
+          {[
+            { id: "search", label: "खोजें (Search)", icon: Search },
+            { id: "pilgrimage", label: "तीर्थ व पवित्र नगर", icon: Sparkles },
+            { id: "popular", label: "भारत के महानगर", icon: Building2 },
+            { id: "global", label: "विश्व के प्रमुख नगर", icon: Globe2 },
+            { id: "custom", label: "कस्टम निर्देशांक", icon: Compass },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`min-h-[40px] px-3.5 py-2 rounded-t-xl border-b-2 transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? "border-amber-500 text-white bg-zinc-800 font-bold"
+                    : "border-transparent text-zinc-400 hover:text-zinc-200"
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 ${isActive ? "text-amber-400" : "text-zinc-400"}`} />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Tab Content Body */}
@@ -337,13 +306,13 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
           {activeTab === "search" && (
             <div className="space-y-3">
               <div className="relative">
-                <Search className="w-4 h-4 text-amber-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="नगर का नाम लिखें (उदा. Varanasi, Ujjain, Jaipur, London)..."
-                  className="w-full bg-amber-950/70 border border-amber-500/40 rounded-xl pl-10 pr-10 py-2.5 text-sm text-amber-100 placeholder-amber-400/40 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 shadow-inner"
+                  className="w-full bg-zinc-800 border border-zinc-600 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 min-h-[44px]"
                   autoFocus
                 />
                 {isLoading && (
@@ -352,14 +321,14 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                 {searchTerm && !isLoading && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-amber-400/60 hover:text-amber-200"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              <div className="divide-y divide-amber-500/10 max-h-72 overflow-y-auto rounded-xl border border-amber-500/20 bg-amber-950/20">
+              <div className="divide-y divide-zinc-700 max-h-72 overflow-y-auto rounded-xl border border-zinc-700 bg-zinc-800/40">
                 {searchResults.length > 0 ? (
                   searchResults.map((city, idx) => {
                     const isSelected = selectedCityName.toLowerCase().includes(city.name.toLowerCase().split(",")[0]);
@@ -374,25 +343,25 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                             tz: city.timezone,
                           })
                         }
-                        className={`p-3 flex items-center justify-between cursor-pointer transition-all hover:bg-amber-900/40 ${
-                          isSelected ? "bg-amber-800/40 border-l-4 border-amber-400" : ""
+                        className={`p-3 flex items-center justify-between cursor-pointer transition-all hover:bg-zinc-800 ${
+                          isSelected ? "bg-zinc-800 border-l-4 border-amber-500" : ""
                         }`}
                       >
                         <div className="flex items-center gap-2.5">
                           <MapPin className="w-4 h-4 text-amber-400 shrink-0" />
                           <div>
-                            <div className="text-sm font-semibold text-amber-100">{city.name}</div>
-                            <div className="text-xs text-amber-300/60">
+                            <div className="text-sm font-semibold text-white">{city.name}</div>
+                            <div className="text-xs text-zinc-400">
                               अक्षांश: {city.latitude.toFixed(4)}°N • देशान्तर: {city.longitude.toFixed(4)}°E • {city.timezone}
                             </div>
                           </div>
                         </div>
-                        {isSelected && <Check className="w-4 h-4 text-amber-300" />}
+                        {isSelected && <Check className="w-4 h-4 text-amber-400" />}
                       </div>
                     );
                   })
                 ) : (
-                  <div className="p-8 text-center text-xs text-amber-300/60">
+                  <div className="p-8 text-center text-xs text-zinc-400">
                     {isLoading ? "खोज रहे हैं..." : "कोई नगर नहीं मिला। कृपया अलग नाम लिखकर खोजें।"}
                   </div>
                 )}
@@ -407,16 +376,16 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                 <div
                   key={c.name}
                   onClick={() => handleApplyCity(c)}
-                  className="p-3 rounded-xl border border-amber-500/20 bg-amber-950/30 hover:bg-amber-900/40 hover:border-amber-400/50 cursor-pointer transition-all flex flex-col justify-between"
+                  className="p-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-750 hover:border-amber-500 cursor-pointer transition-all flex flex-col justify-between min-h-[64px]"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="text-sm font-bold text-amber-100">{c.name.split(",")[0]}</div>
+                      <div className="text-sm font-bold text-white">{c.name.split(",")[0]}</div>
                       <div className="text-xs text-amber-400 font-medium mt-0.5">{c.desc}</div>
                     </div>
-                    <Sparkles className="w-4 h-4 text-amber-400/80" />
+                    <Sparkles className="w-4 h-4 text-amber-400" />
                   </div>
-                  <div className="text-[11px] text-amber-300/60 mt-2 font-mono">
+                  <div className="text-[11px] text-zinc-400 mt-2 font-mono">
                     {c.lat.toFixed(2)}°N, {c.lon.toFixed(2)}°E • {c.tz}
                   </div>
                 </div>
@@ -431,11 +400,11 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                 <div
                   key={c.name}
                   onClick={() => handleApplyCity(c)}
-                  className="p-3 rounded-xl border border-amber-500/20 bg-amber-950/30 hover:bg-amber-900/40 hover:border-amber-400/50 cursor-pointer transition-all flex items-center justify-between"
+                  className="p-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-750 hover:border-amber-500 cursor-pointer transition-all flex items-center justify-between min-h-[60px]"
                 >
                   <div>
-                    <div className="text-sm font-bold text-amber-100">{c.name.split(",")[0]}</div>
-                    <div className="text-[11px] text-amber-300/60 font-mono">
+                    <div className="text-sm font-bold text-white">{c.name.split(",")[0]}</div>
+                    <div className="text-[11px] text-zinc-400 font-mono">
                       {c.lat.toFixed(2)}°N, {c.lon.toFixed(2)}°E
                     </div>
                   </div>
@@ -452,11 +421,11 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                 <div
                   key={c.name}
                   onClick={() => handleApplyCity(c)}
-                  className="p-3 rounded-xl border border-amber-500/20 bg-amber-950/30 hover:bg-amber-900/40 hover:border-amber-400/50 cursor-pointer transition-all flex items-center justify-between"
+                  className="p-3 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-750 hover:border-amber-500 cursor-pointer transition-all flex items-center justify-between min-h-[60px]"
                 >
                   <div>
-                    <div className="text-sm font-bold text-amber-100">{c.name}</div>
-                    <div className="text-[11px] text-amber-300/60 font-mono">{c.tz}</div>
+                    <div className="text-sm font-bold text-white">{c.name}</div>
+                    <div className="text-[11px] text-zinc-400 font-mono">{c.tz}</div>
                   </div>
                   <Globe2 className="w-4 h-4 text-amber-400" />
                 </div>
@@ -468,7 +437,7 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
           {activeTab === "custom" && (
             <form onSubmit={handleCustomSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-amber-300 block mb-1">
+                <label className="text-xs font-semibold text-zinc-300 block mb-1">
                   स्थान का नाम (Location Name):
                 </label>
                 <input
@@ -476,14 +445,14 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
                   placeholder="उदा. मेरा जन्म स्थान"
-                  className="w-full bg-amber-950/60 border border-amber-500/30 rounded-xl p-2.5 text-xs sm:text-sm text-amber-100 focus:outline-none focus:border-amber-400"
+                  className="w-full bg-zinc-800 border border-zinc-600 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="text-xs font-semibold text-amber-300 block mb-1">
+                  <label className="text-xs font-semibold text-zinc-300 block mb-1">
                     अक्षांश (Latitude in Degrees, + उत्तर / - दक्षिण):
                   </label>
                   <input
@@ -492,13 +461,13 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                     value={customLat}
                     onChange={(e) => setCustomLat(e.target.value)}
                     placeholder="उदा. 28.6139"
-                    className="w-full bg-amber-950/60 border border-amber-500/30 rounded-xl p-2.5 text-xs sm:text-sm text-amber-100 focus:outline-none focus:border-amber-400 font-mono"
+                    className="w-full bg-zinc-800 border border-zinc-600 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-500 font-mono min-h-[44px]"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-amber-300 block mb-1">
+                  <label className="text-xs font-semibold text-zinc-300 block mb-1">
                     देशान्तर (Longitude in Degrees, + पूर्व / - पश्चिम):
                   </label>
                   <input
@@ -507,23 +476,23 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                     value={customLon}
                     onChange={(e) => setCustomLon(e.target.value)}
                     placeholder="उदा. 77.2090"
-                    className="w-full bg-amber-950/60 border border-amber-500/30 rounded-xl p-2.5 text-xs sm:text-sm text-amber-100 focus:outline-none focus:border-amber-400 font-mono"
+                    className="w-full bg-zinc-800 border border-zinc-600 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-500 font-mono min-h-[44px]"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-amber-300 block mb-1">
+                <label className="text-xs font-semibold text-zinc-300 block mb-1">
                   समय क्षेत्र (Time Zone):
                 </label>
                 <select
                   value={customTz}
                   onChange={(e) => setCustomTz(e.target.value)}
-                  className="w-full bg-amber-950/60 border border-amber-500/30 rounded-xl p-2.5 text-xs sm:text-sm text-amber-100 focus:outline-none focus:border-amber-400 font-mono"
+                  className="w-full bg-zinc-800 border border-zinc-600 rounded-xl p-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-amber-500 font-mono min-h-[44px]"
                 >
                   {COMMON_TIMEZONES.map((tz) => (
-                    <option key={tz.tz} value={tz.tz} className="bg-stone-900 text-amber-100">
+                    <option key={tz.tz} value={tz.tz} className="bg-zinc-900 text-white">
                       {tz.label} ({tz.tz})
                     </option>
                   ))}
@@ -534,13 +503,13 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 rounded-xl bg-amber-950 border border-amber-500/30 text-amber-200 text-xs font-semibold hover:bg-amber-900"
+                  className="px-4 py-2 rounded-xl bg-zinc-800 border border-zinc-600 text-zinc-200 text-xs font-semibold hover:bg-zinc-700 min-h-[40px] cursor-pointer"
                 >
                   रद्द करें
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg active:scale-95"
+                  className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-lg active:scale-95 min-h-[40px] cursor-pointer"
                 >
                   कस्टम स्थान लागू करें
                 </button>

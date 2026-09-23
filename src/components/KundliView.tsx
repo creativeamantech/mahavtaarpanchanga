@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
   computeFullKundli,
   FullKundliData,
   KundliChartType,
   KundliChartStyle,
   KundliHouse,
+  KundliPlanet,
   ZODIAC_SIGNS,
 } from "../lib/kundliEngine";
 import { KundliChartRenderer } from "./KundliChartRenderer";
@@ -14,6 +15,7 @@ import { GunaMilanView } from "./GunaMilanView";
 import { KpAstrologyView } from "./KpAstrologyView";
 import { GocharView } from "./GocharView";
 import { JaiminiView } from "./JaiminiView";
+import { ShadbalaView } from "./ShadbalaView";
 import { CoordinateSelection } from "../types";
 import {
   Sparkles,
@@ -48,6 +50,14 @@ import {
   Heart,
   BarChart2,
   RefreshCw,
+  Zap,
+  ChevronRight,
+  SlidersHorizontal,
+  X,
+  Share2,
+  Info,
+  ArrowRight,
+  TrendingUp,
 } from "lucide-react";
 
 interface KundliViewProps {
@@ -71,7 +81,13 @@ interface SavedProfile {
   gender?: string;
 }
 
-const POPULAR_BIRTH_CITIES: { name: string; country: string; lat: number; lon: number; tz: string }[] = [
+const POPULAR_BIRTH_CITIES: {
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+  tz: string;
+}[] = [
   { name: "Varanasi (Kashi), India", country: "IN", lat: 25.3176, lon: 82.9739, tz: "Asia/Kolkata" },
   { name: "Ujjain (Mahakal), India", country: "IN", lat: 23.1765, lon: 75.7885, tz: "Asia/Kolkata" },
   { name: "New Delhi, India", country: "IN", lat: 28.6139, lon: 77.209, tz: "Asia/Kolkata" },
@@ -100,8 +116,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
   const matchedInitialCity = useMemo(() => {
     if (!initialCity) return POPULAR_BIRTH_CITIES[0];
     const prefix = initialCity.split(",")[0].trim().toLowerCase();
-    const found = POPULAR_BIRTH_CITIES.find((c) =>
-      c.name.toLowerCase().includes(prefix) || prefix.includes(c.name.toLowerCase().split(",")[0].trim())
+    const found = POPULAR_BIRTH_CITIES.find(
+      (c) =>
+        c.name.toLowerCase().includes(prefix) ||
+        prefix.includes(c.name.toLowerCase().split(",")[0].trim())
     );
     return found || POPULAR_BIRTH_CITIES[0];
   }, [initialCity]);
@@ -120,43 +138,70 @@ export const KundliView: React.FC<KundliViewProps> = ({
       : matchedInitialCity.name
   );
   const [latitude, setLatitude] = useState<number>(
-    typeof initialLat === "number" && !isNaN(initialLat) ? initialLat : matchedInitialCity.lat
+    typeof initialLat === "number" && !isNaN(initialLat)
+      ? initialLat
+      : matchedInitialCity.lat
   );
   const [longitude, setLongitude] = useState<number>(
-    typeof initialLon === "number" && !isNaN(initialLon) ? initialLon : matchedInitialCity.lon
+    typeof initialLon === "number" && !isNaN(initialLon)
+      ? initialLon
+      : matchedInitialCity.lon
   );
   const [timezone, setTimezone] = useState<string>(
     initialTimezone || matchedInitialCity.tz || "Asia/Kolkata"
   );
-  const [ayanamsaKey, setAyanamsaKey] = useState<CoordinateSelection>(initialAyanamsa || "citra");
+  const [ayanamsaKey, setAyanamsaKey] = useState<CoordinateSelection>(
+    initialAyanamsa || "citra"
+  );
   const [isCityModalOpen, setIsCityModalOpen] = useState<boolean>(false);
   const [isFormCollapsed, setIsFormCollapsed] = useState<boolean>(false);
-  const [showAdvancedLocation, setShowAdvancedLocation] = useState<boolean>(false);
+  const [showAdvancedLocation, setShowAdvancedLocation] =
+    useState<boolean>(false);
 
   // Chart Presentation States
-  const [activeChartType, setActiveChartType] = useState<KundliChartType>("d1");
+  const [activeChartType, setActiveChartType] =
+    useState<KundliChartType>("d1");
   const [chartStyle, setChartStyle] = useState<KundliChartStyle>("north");
   const [showDegrees, setShowDegrees] = useState<boolean>(true);
-  const [chartSize, setChartSize] = useState<"standard" | "large" | "compact">("standard");
   const [isDualView, setIsDualView] = useState<boolean>(false);
   const [selectedHouse, setSelectedHouse] = useState<KundliHouse | null>(null);
+  const [selectedPlanet, setSelectedPlanet] = useState<KundliPlanet | null>(
+    null
+  );
+  const [isMobileInspectorOpen, setIsMobileInspectorOpen] =
+    useState<boolean>(false);
+
+  // Tab Navigation State
   const [selectedTab, setSelectedTab] = useState<
+    | "overview"
     | "chart"
     | "planets"
     | "bhavas"
     | "dasha"
+    | "shadbala"
+    | "jaimini"
     | "ashtakavarga"
+    | "kp"
+    | "yogas"
+    | "doshas"
     | "gunaMilan"
     | "gochar"
-    | "kp"
-    | "doshas"
-    | "yogas"
     | "avakahada"
-    | "jaimini"
-  >("chart");
-  const [expandedMahadasha, setExpandedMahadasha] = useState<string | null>(null);
-  const [expandedAntardasha, setExpandedAntardasha] = useState<string | null>(null);
-  const [yogaFilter, setYogaFilter] = useState<"all" | "auspicious" | "inauspicious">("all");
+  >("overview");
+
+  const [expandedMahadasha, setExpandedMahadasha] = useState<string | null>(
+    null
+  );
+  const [expandedAntardasha, setExpandedAntardasha] = useState<string | null>(
+    null
+  );
+  const [yogaFilter, setYogaFilter] = useState<
+    "all" | "auspicious" | "inauspicious"
+  >("all");
+  const [planetFilter, setPlanetFilter] = useState<
+    "all" | "benefic" | "malefic" | "retrograde" | "exalted"
+  >("all");
+  const [planetSearchQuery, setPlanetSearchQuery] = useState<string>("");
 
   // Saved Profiles in LocalStorage
   const [savedProfiles, setSavedProfiles] = useState<SavedProfile[]>([]);
@@ -190,7 +235,17 @@ export const KundliView: React.FC<KundliViewProps> = ({
       personName,
       gender
     );
-  }, [birthDate, birthTime, latitude, longitude, timezone, selectedCity, ayanamsaKey, personName, gender]);
+  }, [
+    birthDate,
+    birthTime,
+    latitude,
+    longitude,
+    timezone,
+    selectedCity,
+    ayanamsaKey,
+    personName,
+    gender,
+  ]);
 
   // Set default expanded Mahadasha to current active one
   useEffect(() => {
@@ -198,6 +253,13 @@ export const KundliView: React.FC<KundliViewProps> = ({
       setExpandedMahadasha(kundliData.vimshottari.currentMahadasha.planet);
     }
   }, [kundliData, expandedMahadasha]);
+
+  // Set initial selected house to House 1 if null
+  useEffect(() => {
+    if (!selectedHouse && kundliData.housesD1 && kundliData.housesD1.length > 0) {
+      setSelectedHouse(kundliData.housesD1[0]);
+    }
+  }, [kundliData, selectedHouse]);
 
   // Time Stepper Function (for Birth Time Rectification and Prashna)
   const adjustBirthTimeMinutes = (mins: number) => {
@@ -209,7 +271,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
       const newM = Math.floor((normalizedSec % 3600) / 60);
       const newS = normalizedSec % 60;
       setBirthTime(
-        `${String(newH).padStart(2, "0")}:${String(newM).padStart(2, "0")}:${String(newS).padStart(2, "0")}`
+        `${String(newH).padStart(2, "0")}:${String(newM).padStart(
+          2,
+          "0"
+        )}:${String(newS).padStart(2, "0")}`
       );
     } catch {
       // ignore
@@ -217,7 +282,12 @@ export const KundliView: React.FC<KundliViewProps> = ({
   };
 
   // Handle City Change from Modal
-  const handleCitySelectFromModal = (city: { name: string; lat: number; lon: number; tz: string }) => {
+  const handleCitySelectFromModal = (city: {
+    name: string;
+    lat: number;
+    lon: number;
+    tz: string;
+  }) => {
     setSelectedCity(city.name);
     setLatitude(city.lat);
     setLongitude(city.lon);
@@ -249,7 +319,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
       ayanamsaKey,
       gender,
     };
-    const updated = [newProfile, ...savedProfiles.filter((p) => p.name !== newProfile.name)].slice(0, 10);
+    const updated = [
+      newProfile,
+      ...savedProfiles.filter((p) => p.name !== newProfile.name),
+    ].slice(0, 10);
     setSavedProfiles(updated);
     try {
       localStorage.setItem("drik_kundli_profiles", JSON.stringify(updated));
@@ -290,8 +363,45 @@ export const KundliView: React.FC<KundliViewProps> = ({
     window.print();
   };
 
+  // Filtered Planets
+  const filteredPlanets = useMemo(() => {
+    return kundliData.planets.filter((planet) => {
+      if (planetSearchQuery) {
+        const q = planetSearchQuery.toLowerCase();
+        const matchesName =
+          planet.nameHi.toLowerCase().includes(q) ||
+          planet.nameEn.toLowerCase().includes(q) ||
+          planet.signNameHi.toLowerCase().includes(q) ||
+          planet.nakshatraNameHi.toLowerCase().includes(q);
+        if (!matchesName) return false;
+      }
+      if (planetFilter === "benefic") return planet.isBenefic;
+      if (planetFilter === "malefic") return !planet.isBenefic;
+      if (planetFilter === "retrograde") return planet.isRetrograde;
+      if (planetFilter === "exalted")
+        return planet.dignity === "exalted" || planet.dignity === "own";
+      return true;
+    });
+  }, [kundliData.planets, planetFilter, planetSearchQuery]);
+
+  // House click handler
+  const handleHouseSelect = (house: KundliHouse) => {
+    setSelectedHouse(house);
+    setSelectedPlanet(null);
+    setIsMobileInspectorOpen(true);
+  };
+
+  // Planet click handler
+  const handlePlanetSelect = (planet: KundliPlanet) => {
+    setSelectedPlanet(planet);
+    const house =
+      kundliData.housesD1.find((h) => h.houseNumber === planet.houseD1) || null;
+    if (house) setSelectedHouse(house);
+    setIsMobileInspectorOpen(true);
+  };
+
   return (
-    <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6 space-y-5 select-text text-amber-100">
+    <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-6 space-y-4 sm:space-y-6 select-text text-amber-100">
       {/* City Search Modal */}
       <KundliCityModal
         isOpen={isCityModalOpen}
@@ -300,62 +410,146 @@ export const KundliView: React.FC<KundliViewProps> = ({
         onSelectCity={handleCitySelectFromModal}
       />
 
-      {/* Top Banner & Control Bar */}
-      <div className="bg-gradient-to-r from-stone-950 via-amber-950/60 to-stone-950 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-amber-500/30 backdrop-blur-md shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-3.5">
-        <div>
-          <div className="flex items-center gap-2 text-amber-400 mb-1">
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span className="text-[11px] font-bold tracking-widest uppercase bg-amber-900/60 px-2.5 py-0.5 rounded-full border border-amber-500/40">
-              वैदिक दृक-गणित कुण्डली प्रणाली
-            </span>
-            <span className="text-[11px] text-amber-300/80 font-mono hidden lg:inline">
-              अयनांश: {kundliData.profile.ayanamsaName} ({kundliData.profile.ayanamsaDeg.toFixed(2)}°)
-            </span>
+      {/* ================= TOP WORKSPACE COMMAND HEADER ================= */}
+      <div className="bg-gradient-to-r from-stone-950 via-amber-950/80 to-stone-950 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-amber-500/30 backdrop-blur-md shadow-2xl space-y-3.5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 text-amber-400 mb-1 flex-wrap">
+              <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="text-[11px] font-bold tracking-widest uppercase bg-amber-900/70 px-2.5 py-0.5 rounded-full border border-amber-500/40 text-amber-200">
+                वैदिक कुण्डली अनुसंधान केंद्र (Kundali Intelligence Workspace)
+              </span>
+              <span className="text-[11px] text-amber-300/80 font-mono hidden sm:inline">
+                अयनांश: {kundliData.profile.ayanamsaName} (
+                {kundliData.profile.ayanamsaDeg.toFixed(2)}°)
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-100 tracking-tight flex items-center gap-2">
+              <span>{kundliData.profile.name}</span>
+              <span className="text-xs sm:text-sm font-semibold text-amber-300/80 font-mono">
+                ({kundliData.profile.birthDate} • {kundliData.profile.birthTime})
+              </span>
+            </h1>
+            <p className="text-xs text-amber-300/80 mt-0.5 flex items-center gap-1.5 flex-wrap">
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-amber-400" />
+                {kundliData.profile.cityName}
+              </span>
+              <span>•</span>
+              <span className="font-mono">
+                {latitude.toFixed(4)}°N, {longitude.toFixed(4)}°E
+              </span>
+              <span>•</span>
+              <span className="text-amber-400 font-semibold">
+                {gender === "male"
+                  ? "पुरुष (Male)"
+                  : gender === "female"
+                  ? "स्त्री (Female)"
+                  : "जातक"}
+              </span>
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-amber-100 tracking-tight flex items-center gap-2">
-            जन्म कुण्डली एवं षोडशवर्ग चक्र (Janm Kundli)
-          </h1>
-          <p className="text-xs text-amber-300/80 mt-0.5">
-            {kundliData.profile.name} • जन्म: {kundliData.profile.birthDate} {kundliData.profile.birthTime} • {kundliData.profile.cityName.split(",")[0]}
-          </p>
+
+          {/* Quick Command Action Buttons */}
+          <div className="flex items-center flex-wrap gap-2">
+            <button
+              onClick={handleSetCurrentTime}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-900/60 hover:bg-amber-800/70 text-amber-200 border border-amber-500/30 text-xs font-semibold transition-all shadow-md active:scale-95"
+              title="वर्तमान समय की प्रश्न कुण्डली बनाएं"
+            >
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
+              प्रश्न (Now)
+            </button>
+
+            <button
+              onClick={handleSaveProfile}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-700/70 hover:bg-amber-600/80 text-amber-100 border border-amber-400/40 text-xs font-semibold transition-all shadow-md active:scale-95"
+            >
+              <Save className="w-3.5 h-3.5 text-amber-300" />
+              सहेजें
+            </button>
+
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 text-amber-200 border border-amber-500/30 text-xs font-semibold transition-all shadow-md active:scale-95"
+            >
+              <Printer className="w-3.5 h-3.5 text-amber-400" />
+              प्रिंट / PDF
+            </button>
+
+            <button
+              onClick={() => setIsFormCollapsed(!isFormCollapsed)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-500/25 text-xs font-semibold transition-all shadow-md"
+              title={
+                isFormCollapsed
+                  ? "जन्म विवरण प्रविष्टि खोलें"
+                  : "जन्म विवरण प्रविष्टि छुपाएं"
+              }
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
+              <span>{isFormCollapsed ? "विवरण सम्पादित करें" : "संक्षिप्त करें"}</span>
+              {isFormCollapsed ? (
+                <ChevronDown className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronUp className="w-3.5 h-3.5" />
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Quick Action Buttons */}
-        <div className="flex items-center flex-wrap gap-2">
-          <button
-            onClick={handleSetCurrentTime}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-900/50 hover:bg-amber-800/60 text-amber-200 border border-amber-500/30 text-xs font-semibold transition-all shadow-md active:scale-95"
-            title="वर्तमान समय की प्रश्न कुण्डली बनाएं"
-          >
+        {/* Quick Time Rectification Bar */}
+        <div className="flex items-center justify-between gap-2 pt-2 border-t border-amber-500/20 text-xs flex-wrap">
+          <div className="flex items-center gap-1.5 text-amber-300/80 font-medium">
             <Clock className="w-3.5 h-3.5 text-amber-400" />
-            प्रश्न (Now)
-          </button>
-
-          <button
-            onClick={handleSaveProfile}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-700/60 hover:bg-amber-600/70 text-amber-100 border border-amber-400/40 text-xs font-semibold transition-all shadow-md active:scale-95"
-          >
-            <Save className="w-3.5 h-3.5 text-amber-300" />
-            सहेजें
-          </button>
-
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 text-amber-200 border border-amber-500/30 text-xs font-semibold transition-all shadow-md active:scale-95"
-          >
-            <Printer className="w-3.5 h-3.5 text-amber-400" />
-            प्रिंट / PDF
-          </button>
-
-          <button
-            onClick={() => setIsFormCollapsed(!isFormCollapsed)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-800 text-amber-300 border border-amber-500/25 text-xs font-semibold transition-all"
-            title={isFormCollapsed ? "जन्म विवरण प्रविष्टि खोलें" : "जन्म विवरण प्रविष्टि छुपाएं"}
-          >
-            <Sliders className="w-3.5 h-3.5 text-amber-400" />
-            <span>{isFormCollapsed ? "विवरण बदलें" : "संक्षिप्त करें"}</span>
-            {isFormCollapsed ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
-          </button>
+            <span>जन्म समय सूक्ष्म सुधार (Rectification):</span>
+          </div>
+          <div className="flex items-center gap-1 text-[11px] font-mono">
+            <button
+              onClick={() => adjustBirthTimeMinutes(-60)}
+              className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded-md border border-amber-500/25"
+              title="1 घंटा घटाएं"
+            >
+              -1h
+            </button>
+            <button
+              onClick={() => adjustBirthTimeMinutes(-5)}
+              className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded-md border border-amber-500/25"
+              title="5 मिनट घटाएं"
+            >
+              -5m
+            </button>
+            <button
+              onClick={() => adjustBirthTimeMinutes(-1)}
+              className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded-md border border-amber-500/25"
+              title="1 मिनट घटाएं"
+            >
+              -1m
+            </button>
+            <span className="px-2 py-0.5 bg-stone-900 text-amber-300 font-bold rounded-md border border-amber-500/30">
+              {birthTime}
+            </span>
+            <button
+              onClick={() => adjustBirthTimeMinutes(1)}
+              className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded-md border border-amber-500/25"
+              title="1 मिनट बढ़ाएं"
+            >
+              +1m
+            </button>
+            <button
+              onClick={() => adjustBirthTimeMinutes(5)}
+              className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded-md border border-amber-500/25"
+              title="5 मिनट बढ़ाएं"
+            >
+              +5m
+            </button>
+            <button
+              onClick={() => adjustBirthTimeMinutes(60)}
+              className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded-md border border-amber-500/25"
+              title="1 घंटा बढ़ाएं"
+            >
+              +1h
+            </button>
+          </div>
         </div>
       </div>
 
@@ -384,7 +578,9 @@ export const KundliView: React.FC<KundliViewProps> = ({
             >
               <User className="w-3 h-3 text-amber-400" />
               <span>{p.name}</span>
-              <span className="text-[10px] opacity-60">({p.birthDate.slice(0, 4)})</span>
+              <span className="text-[10px] opacity-60">
+                ({p.birthDate.slice(0, 4)})
+              </span>
               <button
                 onClick={(e) => handleDeleteProfile(p.id, e)}
                 className="hover:text-rose-400 ml-1 text-xs font-bold"
@@ -397,68 +593,21 @@ export const KundliView: React.FC<KundliViewProps> = ({
         </div>
       )}
 
-      {/* Birth Input Controls Panel (Collapsible) */}
+      {/* ================= BIRTH INPUT CONTROLS PANEL (COLLAPSIBLE) ================= */}
       {!isFormCollapsed && (
-        <div className="bg-stone-950/80 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-5 backdrop-blur-sm shadow-xl space-y-3.5 animate-fadeIn">
+        <div className="bg-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-5 backdrop-blur-sm shadow-xl space-y-3.5 animate-fadeIn">
           <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
             <h2 className="text-xs sm:text-sm font-bold text-amber-200 flex items-center gap-2 uppercase tracking-wider">
               <User className="w-4 h-4 text-amber-400" />
-              जन्म विवरण प्रविष्टि (Birth Details Form)
+              जन्म विवरण प्रविष्टि (Birth Data Form)
             </h2>
-
-            {/* Quick Rectification Stepper Buttons */}
-            <div className="flex items-center gap-1 text-[11px]">
-              <span className="text-amber-300/70 mr-1 hidden sm:inline">समय सुधार:</span>
-              <button
-                onClick={() => adjustBirthTimeMinutes(-60)}
-                className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded border border-amber-500/20"
-                title="1 घंटा घटाएं"
-              >
-                -1h
-              </button>
-              <button
-                onClick={() => adjustBirthTimeMinutes(-5)}
-                className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded border border-amber-500/20"
-                title="5 मिनट घटाएं"
-              >
-                -5m
-              </button>
-              <button
-                onClick={() => adjustBirthTimeMinutes(-1)}
-                className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded border border-amber-500/20"
-                title="1 मिनट घटाएं"
-              >
-                -1m
-              </button>
-              <button
-                onClick={() => adjustBirthTimeMinutes(1)}
-                className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded border border-amber-500/20"
-                title="1 मिनट बढ़ाएं"
-              >
-                +1m
-              </button>
-              <button
-                onClick={() => adjustBirthTimeMinutes(5)}
-                className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded border border-amber-500/20"
-                title="5 मिनट बढ़ाएं"
-              >
-                +5m
-              </button>
-              <button
-                onClick={() => adjustBirthTimeMinutes(60)}
-                className="bg-amber-950 hover:bg-amber-900 text-amber-200 px-2 py-0.5 rounded border border-amber-500/20"
-                title="1 घंटा बढ़ाएं"
-              >
-                +1h
-              </button>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {/* Person Name */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-amber-300 flex items-center gap-1">
-                <User className="w-3.5 h-3.5 text-amber-400" /> जातक का नाम (Name):
+                <User className="w-3.5 h-3.5 text-amber-400" /> जातक का नाम:
               </label>
               <input
                 type="text"
@@ -554,7 +703,9 @@ export const KundliView: React.FC<KundliViewProps> = ({
               </label>
               <select
                 value={ayanamsaKey}
-                onChange={(e) => setAyanamsaKey(e.target.value as CoordinateSelection)}
+                onChange={(e) =>
+                  setAyanamsaKey(e.target.value as CoordinateSelection)
+                }
                 className="w-full bg-amber-950/50 border border-amber-500/30 rounded-xl px-3 py-1.5 text-xs text-amber-100 focus:outline-none focus:border-amber-400"
               >
                 <option value="citra">चित्रापक्षीय / लाहिरी (Lahiri Ayanamsa - Drik)</option>
@@ -572,8 +723,16 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 onClick={() => setShowAdvancedLocation(!showAdvancedLocation)}
                 className="w-full py-1.5 px-3 rounded-xl bg-amber-950/40 border border-amber-500/20 text-xs text-amber-300 hover:text-amber-100 flex items-center justify-center gap-1.5"
               >
-                <span>{showAdvancedLocation ? "कस्टम अक्षांश/देशांतर छुपाएं" : "कस्टम अक्षांश/देशांतर देखें"}</span>
-                {showAdvancedLocation ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                <span>
+                  {showAdvancedLocation
+                    ? "कस्टम अक्षांश/देशांतर छुपाएं"
+                    : "कस्टम अक्षांश/देशांतर देखें"}
+                </span>
+                {showAdvancedLocation ? (
+                  <ChevronUp className="w-3.5 h-3.5" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5" />
+                )}
               </button>
             </div>
           </div>
@@ -582,7 +741,9 @@ export const KundliView: React.FC<KundliViewProps> = ({
           {showAdvancedLocation && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-amber-950/60 rounded-xl border border-amber-500/20 text-xs animate-fadeIn">
               <div>
-                <label className="text-amber-300 font-semibold block mb-1">अक्षांश (Latitude):</label>
+                <label className="text-amber-300 font-semibold block mb-1">
+                  अक्षांश (Latitude):
+                </label>
                 <input
                   type="number"
                   step="0.0001"
@@ -592,7 +753,9 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 />
               </div>
               <div>
-                <label className="text-amber-300 font-semibold block mb-1">देशांतर (Longitude):</label>
+                <label className="text-amber-300 font-semibold block mb-1">
+                  देशांतर (Longitude):
+                </label>
                 <input
                   type="number"
                   step="0.0001"
@@ -602,7 +765,9 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 />
               </div>
               <div>
-                <label className="text-amber-300 font-semibold block mb-1">समय क्षेत्र (Timezone):</label>
+                <label className="text-amber-300 font-semibold block mb-1">
+                  समय क्षेत्र (Timezone):
+                </label>
                 <input
                   type="text"
                   value={timezone}
@@ -615,98 +780,23 @@ export const KundliView: React.FC<KundliViewProps> = ({
         </div>
       )}
 
-      {/* Top 5 Essential Vital Astrological Badges */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3.5">
-        {/* 1. Lagna */}
-        <div className="bg-stone-950/80 border border-amber-500/30 p-3 sm:p-3.5 rounded-2xl shadow-md">
-          <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">लग्न (Ascendant)</div>
-          <div className="text-sm sm:text-base font-black text-amber-100 mt-0.5">
-            {kundliData.lagna.signNameHi} ({kundliData.lagna.degreeInSign.toFixed(1)}°)
-          </div>
-          <div className="text-[11px] text-amber-300/70 truncate mt-0.5">
-            {kundliData.lagna.nakshatraNameHi} (पाद {kundliData.lagna.pada}) • {kundliData.lagna.lordHi}
-          </div>
-        </div>
-
-        {/* 2. Moon Sign */}
-        <div className="bg-stone-950/80 border border-amber-500/30 p-3 sm:p-3.5 rounded-2xl shadow-md">
-          <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">चन्द्र राशि (Moon Sign)</div>
-          <div className="text-sm sm:text-base font-black text-amber-100 mt-0.5">
-            {kundliData.chandraLagna.signNameHi}
-          </div>
-          <div className="text-[11px] text-amber-300/70 truncate mt-0.5">
-            {kundliData.planets.find((p) => p.id === "Moon")?.nakshatraNameHi} • {kundliData.avakahada.gana.hi} गण
-          </div>
-        </div>
-
-        {/* 3. Sun Sign */}
-        <div className="bg-stone-950/80 border border-amber-500/30 p-3 sm:p-3.5 rounded-2xl shadow-md">
-          <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">सूर्य राशि (Sun Sign)</div>
-          <div className="text-sm sm:text-base font-black text-amber-100 mt-0.5">
-            {kundliData.suryaLagna.signNameHi}
-          </div>
-          <div className="text-[11px] text-amber-300/70 truncate mt-0.5">
-            {kundliData.planets.find((p) => p.id === "Sun")?.nakshatraNameHi} • {kundliData.planets.find((p) => p.id === "Sun")?.degreeInSign.toFixed(1)}°
-          </div>
-        </div>
-
-        {/* 4. Active Dasha */}
-        <div className="bg-stone-950/80 border border-amber-500/30 p-3 sm:p-3.5 rounded-2xl shadow-md">
-          <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
-            <Clock className="w-3 h-3" /> सक्रिय महादशा
-          </div>
-          <div className="text-sm sm:text-base font-black text-amber-100 mt-0.5 truncate">
-            {kundliData.vimshottari.currentMahadasha?.planetNameHi || "गुरु"}
-            {kundliData.vimshottari.currentAntardasha ? `-${kundliData.vimshottari.currentAntardasha.planetNameHi}` : ""}
-          </div>
-          <div className="text-[11px] text-amber-300/70 truncate mt-0.5 font-mono">
-            तक: {kundliData.vimshottari.currentAntardasha?.endDate.slice(0, 10) || "2028"}
-          </div>
-        </div>
-
-        {/* 5. Dosha Indicators */}
-        <div className="bg-stone-950/80 border border-amber-500/30 p-3 sm:p-3.5 rounded-2xl shadow-md col-span-2 sm:col-span-1">
-          <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
-            <ShieldAlert className="w-3 h-3" /> मुख्य दोष स्थिति
-          </div>
-          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-            <span
-              className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
-                kundliData.doshas.manglik.isManglik
-                  ? "bg-rose-950 text-rose-300 border-rose-500/40"
-                  : "bg-emerald-950 text-emerald-300 border-emerald-500/40"
-              }`}
-            >
-              {kundliData.doshas.manglik.isManglik ? "मांगलिक" : "मांगलिक नहीं"}
-            </span>
-            <span
-              className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
-                kundliData.doshas.kalsarpa.present
-                  ? "bg-amber-950 text-amber-300 border-amber-500/40"
-                  : "bg-emerald-950 text-emerald-300 border-emerald-500/40"
-              }`}
-            >
-              {kundliData.doshas.kalsarpa.present ? "कालसर्प" : "कालसर्प मुक्त"}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Feature Tabs Navigation Bar */}
+      {/* ================= PRIMARY NAVIGATION BAR ================= */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-amber-500/25 scrollbar-thin">
         {[
+          { id: "overview", label: "अवलोकन (Overview)", icon: Sparkles },
           { id: "chart", label: "कुण्डली चक्र (Charts)", icon: Compass },
           { id: "planets", label: "ग्रह स्पष्ट (Planets DMS)", icon: Sun },
           { id: "bhavas", label: "द्वादश भाव (12 Houses)", icon: Layers },
           { id: "dasha", label: "विंशोत्तरी दशा (Dasha Tree)", icon: Clock },
+          { id: "shadbala", label: "षड्बल (Shadbala)", icon: Zap },
+          { id: "jaimini", label: "जैमिनी पद्धति (Jaimini)", icon: Award },
           { id: "ashtakavarga", label: "अष्टकवर्ग (SAV/BAV)", icon: BarChart2 },
+          { id: "kp", label: "के.पी. पद्धति (KP Cusps)", icon: Compass },
+          { id: "yogas", label: "शुभ राजयोग (Yogas)", icon: Award },
+          { id: "doshas", label: "दोष विश्लेषण (Doshas)", icon: ShieldAlert },
           { id: "gunaMilan", label: "गुण मिलान (Matchmaking)", icon: Heart },
           { id: "gochar", label: "गोचर प्रभाव (Transits)", icon: RefreshCw },
-          { id: "kp", label: "के.पी. पद्धति (KP Cusps)", icon: Compass },
-          { id: "doshas", label: "दोष विश्लेषण (Doshas)", icon: ShieldAlert },
-          { id: "yogas", label: "शुभ राजयोग (Yogas)", icon: Award },
           { id: "avakahada", label: "अवकहड़ा चक्र (Avakahada)", icon: BookOpen },
-          { id: "jaimini", label: "जैमिनी पद्धति (Jaimini)", icon: Award },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = selectedTab === tab.id;
@@ -720,19 +810,319 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   : "bg-amber-950/30 text-amber-300/70 border-transparent hover:bg-amber-900/30 hover:text-amber-100"
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? "text-amber-400" : "text-amber-400/60"}`} />
+              <Icon
+                className={`w-4 h-4 ${
+                  isActive ? "text-amber-400" : "text-amber-400/60"
+                }`}
+              />
               <span>{tab.label}</span>
             </button>
           );
         })}
       </div>
 
+      {/* ================= TAB 0: OVERVIEW INTELLIGENCE DASHBOARD ================= */}
+      {selectedTab === "overview" && (
+        <div className="space-y-5 animate-fadeIn">
+          {/* Top 5 Essential Vital Astrological Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {/* 1. Lagna */}
+            <div className="bg-stone-950/90 border border-amber-500/30 p-3.5 rounded-2xl shadow-md">
+              <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">
+                लग्न (Ascendant)
+              </div>
+              <div className="text-base font-black text-amber-100 mt-0.5">
+                {kundliData.lagna.signNameHi} ({kundliData.lagna.degreeInSign.toFixed(1)}°)
+              </div>
+              <div className="text-[11px] text-amber-300/70 truncate mt-0.5">
+                {kundliData.lagna.nakshatraNameHi} (पाद {kundliData.lagna.pada}) • {kundliData.lagna.lordHi}
+              </div>
+            </div>
+
+            {/* 2. Moon Sign */}
+            <div className="bg-stone-950/90 border border-amber-500/30 p-3.5 rounded-2xl shadow-md">
+              <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">
+                चन्द्र राशि (Moon Sign)
+              </div>
+              <div className="text-base font-black text-amber-100 mt-0.5">
+                {kundliData.chandraLagna.signNameHi}
+              </div>
+              <div className="text-[11px] text-amber-300/70 truncate mt-0.5">
+                {kundliData.planets.find((p) => p.id === "Moon")?.nakshatraNameHi} • {kundliData.avakahada.gana.hi} गण
+              </div>
+            </div>
+
+            {/* 3. Sun Sign */}
+            <div className="bg-stone-950/90 border border-amber-500/30 p-3.5 rounded-2xl shadow-md">
+              <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">
+                सूर्य राशि (Sun Sign)
+              </div>
+              <div className="text-base font-black text-amber-100 mt-0.5">
+                {kundliData.suryaLagna.signNameHi}
+              </div>
+              <div className="text-[11px] text-amber-300/70 truncate mt-0.5">
+                {kundliData.planets.find((p) => p.id === "Sun")?.nakshatraNameHi} • {kundliData.planets.find((p) => p.id === "Sun")?.degreeInSign.toFixed(1)}°
+              </div>
+            </div>
+
+            {/* 4. Active Dasha */}
+            <div className="bg-stone-950/90 border border-amber-500/30 p-3.5 rounded-2xl shadow-md">
+              <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                <Clock className="w-3 h-3" /> सक्रिय महादशा
+              </div>
+              <div className="text-base font-black text-amber-100 mt-0.5 truncate">
+                {kundliData.vimshottari.currentMahadasha?.planetNameHi || "गुरु"}
+                {kundliData.vimshottari.currentAntardasha
+                  ? `-${kundliData.vimshottari.currentAntardasha.planetNameHi}`
+                  : ""}
+              </div>
+              <div className="text-[11px] text-amber-300/70 truncate mt-0.5 font-mono">
+                तक: {kundliData.vimshottari.currentAntardasha?.endDate.slice(0, 10) || "2028"}
+              </div>
+            </div>
+
+            {/* 5. Dosha Indicators */}
+            <div className="bg-stone-950/90 border border-amber-500/30 p-3.5 rounded-2xl shadow-md col-span-2 sm:col-span-1">
+              <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                <ShieldAlert className="w-3 h-3" /> मुख्य दोष स्थिति
+              </div>
+              <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+                    kundliData.doshas.manglik.isManglik
+                      ? "bg-rose-950 text-rose-300 border-rose-500/40"
+                      : "bg-emerald-950 text-emerald-300 border-emerald-500/40"
+                  }`}
+                >
+                  {kundliData.doshas.manglik.isManglik ? "मांगलिक" : "मांगलिक नहीं"}
+                </span>
+                <span
+                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+                    kundliData.doshas.kalsarpa.present
+                      ? "bg-amber-950 text-amber-300 border-amber-500/40"
+                      : "bg-emerald-950 text-emerald-300 border-emerald-500/40"
+                  }`}
+                >
+                  {kundliData.doshas.kalsarpa.present ? "कालसर्प" : "कालसर्प मुक्त"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Hub Navigation Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+            {[
+              {
+                title: "लग्न कुण्डली (D1)",
+                desc: "मूल जन्म चक्र",
+                icon: Compass,
+                action: () => {
+                  setActiveChartType("d1");
+                  setSelectedTab("chart");
+                },
+              },
+              {
+                title: "नवांश चक्र (D9)",
+                desc: "भाग्य व विवाह",
+                icon: Sparkles,
+                action: () => {
+                  setActiveChartType("d9");
+                  setSelectedTab("chart");
+                },
+              },
+              {
+                title: "विंशोत्तरी दशा",
+                desc: "120-वर्षीय समय चक्र",
+                icon: Clock,
+                action: () => setSelectedTab("dasha"),
+              },
+              {
+                title: "षड्बल विश्लेषण",
+                desc: "6-स्तरीय ग्रह बल",
+                icon: Zap,
+                action: () => setSelectedTab("shadbala"),
+              },
+              {
+                title: "जैमिनी पद्धति",
+                desc: "कारक व अरूढ़",
+                icon: Award,
+                action: () => setSelectedTab("jaimini"),
+              },
+              {
+                title: "अष्टकवर्ग (SAV)",
+                desc: "सामर्थ्य मैट्रिक्स",
+                icon: BarChart2,
+                action: () => setSelectedTab("ashtakavarga"),
+              },
+              {
+                title: "गुण मिलान",
+                desc: "अष्टकूट 36 अंक",
+                icon: Heart,
+                action: () => setSelectedTab("gunaMilan"),
+              },
+            ].map((card, idx) => {
+              const Icon = card.icon;
+              return (
+                <button
+                  key={idx}
+                  onClick={card.action}
+                  className="bg-amber-950/40 hover:bg-amber-900/50 border border-amber-500/20 hover:border-amber-400/40 p-3 rounded-2xl text-left transition-all group flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Icon className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                    <ArrowRight className="w-3 h-3 text-amber-400/60 group-hover:text-amber-200 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-xs text-amber-100 block">
+                      {card.title}
+                    </span>
+                    <span className="text-[10px] text-amber-300/60 block">
+                      {card.desc}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Quick Dual Preview: D1 Chart + Core Planetary Table */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            {/* Chart Area */}
+            <div className="lg:col-span-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-amber-200 flex items-center gap-1.5">
+                  <Compass className="w-4 h-4 text-amber-400" />
+                  लग्न कुण्डली चक्र (D1 Birth Chart)
+                </h3>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() =>
+                      setChartStyle(chartStyle === "north" ? "south" : "north")
+                    }
+                    className="text-[11px] px-2.5 py-1 rounded-lg bg-amber-950/60 border border-amber-500/25 text-amber-300 hover:text-amber-100"
+                  >
+                    {chartStyle === "north" ? "उत्तर (Diamond)" : "दक्षिण (Square)"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveChartType("d1");
+                      setSelectedTab("chart");
+                    }}
+                    className="text-[11px] px-2.5 py-1 rounded-lg bg-amber-700/60 border border-amber-400/40 text-amber-100 font-semibold"
+                  >
+                    विस्तार से देखें
+                  </button>
+                </div>
+              </div>
+
+              <KundliChartRenderer
+                kundliData={kundliData}
+                activeChartType="d1"
+                chartStyle={chartStyle}
+                showDegrees={showDegrees}
+                onSelectHouse={handleHouseSelect}
+                onSelectPlanet={handlePlanetSelect}
+                selectedHouseNumber={selectedHouse?.houseNumber}
+              />
+            </div>
+
+            {/* Quick Planetary Snapshot & Active Yogas */}
+            <div className="lg:col-span-6 space-y-4">
+              {/* Planetary Quick List */}
+              <div className="bg-stone-950/90 border border-amber-500/25 rounded-2xl p-4 space-y-2.5">
+                <div className="flex items-center justify-between border-b border-amber-500/15 pb-2">
+                  <h4 className="text-xs font-bold text-amber-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    ग्रह स्थिति सारांश (Planetary Status)
+                  </h4>
+                  <button
+                    onClick={() => setSelectedTab("planets")}
+                    className="text-amber-400 hover:text-amber-200 text-xs font-medium underline"
+                  >
+                    सम्पूर्ण DMS सारणी ➔
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                  {kundliData.planets.map((planet) => (
+                    <div
+                      key={planet.id}
+                      onClick={() => handlePlanetSelect(planet)}
+                      className="bg-amber-950/40 hover:bg-amber-900/40 border border-amber-500/15 p-2 rounded-xl cursor-pointer transition-all"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-100 flex items-center gap-1">
+                          <span className="text-amber-400">{planet.symbol}</span>
+                          <span>{planet.nameHi.split(" ")[0]}</span>
+                        </span>
+                        {planet.isRetrograde && (
+                          <span className="text-[9px] bg-amber-900 text-amber-300 px-1 rounded">
+                            व
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-amber-300/80 mt-0.5">
+                        {planet.signNameHi.split(" ")[0]} • {planet.degreeInSign.toFixed(1)}°
+                      </div>
+                      <div className="text-[10px] text-amber-400/70 truncate">
+                        {planet.nakshatraNameHi} ({planet.pada})
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Active Yogas & Rules Snapshot */}
+              <div className="bg-stone-950/90 border border-amber-500/25 rounded-2xl p-4 space-y-2.5">
+                <div className="flex items-center justify-between border-b border-amber-500/15 pb-2">
+                  <h4 className="text-xs font-bold text-amber-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-amber-400" />
+                    सक्रिय वैदिक योग (Active Yogas)
+                  </h4>
+                  <button
+                    onClick={() => setSelectedTab("yogas")}
+                    className="text-amber-400 hover:text-amber-200 text-xs font-medium underline"
+                  >
+                    सभी योग देखें ➔
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {kundliData.yogas
+                    .filter((y) => y.present)
+                    .slice(0, 3)
+                    .map((yoga, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-amber-950/30 border border-emerald-500/30 p-2.5 rounded-xl text-xs space-y-1"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-emerald-300 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            {yoga.nameHi}
+                          </span>
+                          <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.2 rounded font-semibold border border-emerald-500/30">
+                            सक्रिय
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-amber-200/80 line-clamp-2">
+                          {yoga.descriptionHi}
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ================= TAB 1: KUNDLI CHARTS & SHODASHVARGA ================= */}
       {selectedTab === "chart" && (
-        <div className="space-y-4">
+        <div className="space-y-4 animate-fadeIn">
           {/* Chart Controls Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-stone-950/80 p-3.5 rounded-2xl border border-amber-500/25 shadow-lg">
-            {/* Chart Type Selector */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-stone-950/90 p-3.5 rounded-2xl border border-amber-500/25 shadow-lg">
+            {/* Primary Varga Selectors */}
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-xs font-bold text-amber-300 mr-1 flex items-center gap-1">
                 <Layers className="w-3.5 h-3.5 text-amber-400" /> चक्र:
@@ -808,18 +1198,22 @@ export const KundliView: React.FC<KundliViewProps> = ({
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute right-2 text-amber-400 text-[10px]">▼</div>
+                <div className="pointer-events-none absolute right-2 text-amber-400 text-[10px]">
+                  ▼
+                </div>
               </div>
             </div>
 
-            {/* Visual Customization Options (Style, Degrees, Size, Dual View) */}
+            {/* Visual Customization Options */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* Style Selector */}
               <div className="flex items-center rounded-xl bg-amber-950/60 p-0.5 border border-amber-500/20 text-xs">
                 <button
                   onClick={() => setChartStyle("north")}
                   className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                    chartStyle === "north" ? "bg-amber-600 text-white font-bold shadow-xs" : "text-amber-300/80"
+                    chartStyle === "north"
+                      ? "bg-amber-600 text-white font-bold shadow-xs"
+                      : "text-amber-300/80"
                   }`}
                 >
                   उत्तर (Diamond)
@@ -827,7 +1221,9 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 <button
                   onClick={() => setChartStyle("south")}
                   className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                    chartStyle === "south" ? "bg-amber-600 text-white font-bold shadow-xs" : "text-amber-300/80"
+                    chartStyle === "south"
+                      ? "bg-amber-600 text-white font-bold shadow-xs"
+                      : "text-amber-300/80"
                   }`}
                 >
                   दक्षिण (Square)
@@ -844,10 +1240,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 }`}
                 title="चार्ट में ग्रहों के अंश दिखाएं या छुपाएं"
               >
-                डिग्री (12°) {showDegrees ? "✓" : "✗"}
+                अंश (Degrees) {showDegrees ? "✓" : "✗"}
               </button>
 
-              {/* Dual View Toggle (D1 + D9 Side by Side) */}
+              {/* Dual View Toggle */}
               <button
                 onClick={() => setIsDualView(!isDualView)}
                 className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1 transition-all ${
@@ -858,7 +1254,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 title="D1 और D9 को एक साथ देखें"
               >
                 <Split className="w-3.5 h-3.5" />
-                <span>D1 + D9 युगल दृश्य</span>
+                <span>D1 + D9 युगल</span>
               </button>
             </div>
           </div>
@@ -876,7 +1272,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   activeChartType="d1"
                   chartStyle={chartStyle}
                   showDegrees={showDegrees}
-                  onSelectHouse={(house) => setSelectedHouse(house)}
+                  onSelectHouse={handleHouseSelect}
+                  onSelectPlanet={handlePlanetSelect}
                   selectedHouseNumber={selectedHouse?.houseNumber}
                 />
               </div>
@@ -891,30 +1288,181 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   activeChartType="d9"
                   chartStyle={chartStyle}
                   showDegrees={showDegrees}
-                  onSelectHouse={(house) => setSelectedHouse(house)}
+                  onSelectHouse={handleHouseSelect}
+                  onSelectPlanet={handlePlanetSelect}
                   selectedHouseNumber={selectedHouse?.houseNumber}
                 />
               </div>
             </div>
           ) : (
-            /* Single Primary Chart Renderer */
-            <KundliChartRenderer
-              kundliData={kundliData}
-              activeChartType={activeChartType}
-              chartStyle={chartStyle}
-              showDegrees={showDegrees}
-              chartSize={chartSize}
-              onSelectHouse={(house) => setSelectedHouse(house)}
-              selectedHouseNumber={selectedHouse?.houseNumber}
-            />
+            /* Standard 2-Column Responsive Workspace */
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* Chart on Left / Main Area */}
+              <div className="lg:col-span-8">
+                <KundliChartRenderer
+                  kundliData={kundliData}
+                  activeChartType={activeChartType}
+                  chartStyle={chartStyle}
+                  showDegrees={showDegrees}
+                  onSelectHouse={handleHouseSelect}
+                  onSelectPlanet={handlePlanetSelect}
+                  selectedHouseNumber={selectedHouse?.houseNumber}
+                />
+              </div>
+
+              {/* Real-time Contextual House & Planet Inspector Panel on Right */}
+              <div className="lg:col-span-4 space-y-4">
+                {selectedHouse && (
+                  <div className="bg-stone-950/90 rounded-2xl border border-amber-500/30 p-4 space-y-3 shadow-xl">
+                    <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                      <div>
+                        <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
+                          भाव अनुसन्धान (House Inspector)
+                        </span>
+                        <h4 className="text-sm font-black text-amber-100">
+                          {selectedHouse.houseNumber}म भाव — {selectedHouse.nameSanskrit}
+                        </h4>
+                      </div>
+                      <span className="bg-amber-900/60 text-amber-200 text-xs px-2.5 py-1 rounded-lg border border-amber-500/30 font-bold">
+                        {selectedHouse.signNameHi} (स्वामी: {selectedHouse.lordHi})
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-amber-200/90 leading-relaxed">
+                      {selectedHouse.significanceHi}
+                    </p>
+
+                    {/* House Occupants */}
+                    <div className="pt-2 border-t border-amber-500/15 space-y-1.5">
+                      <span className="text-xs font-bold text-amber-300 block">
+                        भाव में स्थित ग्रह:
+                      </span>
+                      {selectedHouse.planets.length > 0 ? (
+                        <div className="space-y-1">
+                          {selectedHouse.planets.map((p) => (
+                            <div
+                              key={p.id}
+                              onClick={() => handlePlanetSelect(p)}
+                              className="p-2 rounded-xl bg-amber-950/50 hover:bg-amber-900/50 border border-amber-500/20 flex items-center justify-between text-xs cursor-pointer transition-colors"
+                            >
+                              <span className="font-bold text-amber-100 flex items-center gap-1.5">
+                                <span className="text-amber-400">{p.symbol}</span>
+                                <span>{p.nameHi}</span>
+                              </span>
+                              <span className="text-amber-300/80 font-mono">
+                                {p.degreeInSign.toFixed(2)}° ({p.nakshatraNameHi})
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-amber-400/60 italic block">
+                          इस भाव में कोई ग्रह स्थित नहीं है।
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Aspecting Planets */}
+                    <div className="pt-2 border-t border-amber-500/15 space-y-1">
+                      <span className="text-xs font-bold text-amber-300 block">
+                        भाव पर दृष्टि रखने वाले ग्रह:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedHouse.aspectingPlanets.length > 0 ? (
+                          selectedHouse.aspectingPlanets.map((p) => (
+                            <span
+                              key={p.id}
+                              className="bg-amber-900/50 text-amber-200 text-[11px] px-2 py-0.5 rounded-lg border border-amber-500/25"
+                            >
+                              {p.nameHi}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-amber-400/60">
+                            कोई प्रत्यक्ष दृष्टि नहीं
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected Planet Inspector Card */}
+                {selectedPlanet && (
+                  <div className="bg-stone-950/90 rounded-2xl border border-amber-500/30 p-4 space-y-2.5 shadow-xl animate-fadeIn">
+                    <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl text-amber-400">
+                          {selectedPlanet.symbol}
+                        </span>
+                        <div>
+                          <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider block">
+                            ग्रह विश्लेषण
+                          </span>
+                          <h4 className="text-sm font-black text-amber-100">
+                            {selectedPlanet.nameHi} ({selectedPlanet.nameEn})
+                          </h4>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+                          selectedPlanet.dignity === "exalted"
+                            ? "bg-emerald-950 text-emerald-300 border-emerald-500/40"
+                            : selectedPlanet.dignity === "debilitated"
+                            ? "bg-rose-950 text-rose-300 border-rose-500/40"
+                            : "bg-amber-950 text-amber-300 border-amber-500/30"
+                        }`}
+                      >
+                        {selectedPlanet.dignityLabelHi}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="bg-amber-950/40 p-2 rounded-lg border border-amber-500/15">
+                        <span className="text-[10px] text-amber-400/80 block">
+                          राशि व भोगांश:
+                        </span>
+                        <span className="font-bold text-amber-100">
+                          {selectedPlanet.signNameHi} ({selectedPlanet.degreeInSign.toFixed(2)}°)
+                        </span>
+                      </div>
+                      <div className="bg-amber-950/40 p-2 rounded-lg border border-amber-500/15">
+                        <span className="text-[10px] text-amber-400/80 block">
+                          नक्षत्र व चरण:
+                        </span>
+                        <span className="font-bold text-amber-100">
+                          {selectedPlanet.nakshatraNameHi} ({selectedPlanet.pada})
+                        </span>
+                      </div>
+                      <div className="bg-amber-950/40 p-2 rounded-lg border border-amber-500/15">
+                        <span className="text-[10px] text-amber-400/80 block">
+                          नक्षत्र / उप स्वामी:
+                        </span>
+                        <span className="font-bold text-amber-100">
+                          {selectedPlanet.nakshatraLord} / {selectedPlanet.subLord}
+                        </span>
+                      </div>
+                      <div className="bg-amber-950/40 p-2 rounded-lg border border-amber-500/15">
+                        <span className="text-[10px] text-amber-400/80 block">
+                          D1 / D9 भाव:
+                        </span>
+                        <span className="font-bold text-amber-100">
+                          {selectedPlanet.houseD1}म / {selectedPlanet.houseD9}म भाव
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       )}
 
       {/* ================= TAB 2: PLANETARY POSITIONS TABLE (GRAHA SPASHTA) ================= */}
       {selectedTab === "planets" && (
-        <div className="bg-stone-950/80 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
+        <div className="bg-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-4 animate-fadeIn">
+          <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-amber-500/20 pb-3 gap-3">
             <div>
               <h3 className="text-base sm:text-lg font-bold text-amber-200 flex items-center gap-2">
                 <Sun className="w-5 h-5 text-amber-400" />
@@ -924,8 +1472,44 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 दृक-गणित स्पष्ट भोगांश, नक्षत्र, चरण, गति, वक्री/अस्त स्थिति, गरिमा एवं जैमिनी कारक
               </p>
             </div>
+
+            {/* Filter and Search Bar */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-amber-400" />
+                <input
+                  type="text"
+                  placeholder="ग्रह खोजें..."
+                  value={planetSearchQuery}
+                  onChange={(e) => setPlanetSearchQuery(e.target.value)}
+                  className="bg-amber-950/50 border border-amber-500/30 rounded-xl pl-8 pr-3 py-1 text-xs text-amber-100 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="flex items-center rounded-xl bg-amber-950/60 p-0.5 border border-amber-500/20 text-xs">
+                {[
+                  { id: "all", label: "सभी" },
+                  { id: "benefic", label: "शुभ ग्रह" },
+                  { id: "malefic", label: "पाप ग्रह" },
+                  { id: "retrograde", label: "वक्री" },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setPlanetFilter(f.id as typeof planetFilter)}
+                    className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+                      planetFilter === f.id
+                        ? "bg-amber-600 text-white font-bold shadow-xs"
+                        : "text-amber-300/80"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
+          {/* Desktop Table View */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
@@ -951,7 +1535,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   </td>
                   <td className="p-3">{kundliData.lagna.signNameHi}</td>
                   <td className="p-3 font-mono font-bold text-amber-200">
-                    {kundliData.lagna.dms.deg}° {kundliData.lagna.dms.min}&apos; {kundliData.lagna.dms.sec}&quot;
+                    {kundliData.lagna.dms.deg}° {kundliData.lagna.dms.min}&apos;{" "}
+                    {kundliData.lagna.dms.sec}&quot;
                   </td>
                   <td className="p-3">
                     {kundliData.lagna.nakshatraNameHi} (चरण {kundliData.lagna.pada})
@@ -964,8 +1549,11 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   <td className="p-3">-</td>
                 </tr>
 
-                {kundliData.planets.map((planet) => (
-                  <tr key={planet.id} className="hover:bg-amber-900/20 transition-colors">
+                {filteredPlanets.map((planet) => (
+                  <tr
+                    key={planet.id}
+                    className="hover:bg-amber-900/20 transition-colors"
+                  >
                     <td className="p-3 font-bold flex items-center gap-2">
                       <span className="text-amber-400">{planet.symbol}</span>
                       <span className="text-amber-100">
@@ -990,9 +1578,15 @@ export const KundliView: React.FC<KundliViewProps> = ({
                       {planet.nakshatraNameHi} (चरण {planet.pada})
                     </td>
                     <td className="p-3 font-medium">{planet.nakshatraLord}</td>
-                    <td className="p-3 text-amber-300/80 font-medium">{planet.subLord}</td>
-                    <td className="p-3 font-bold text-amber-300">{planet.houseD1}म</td>
-                    <td className="p-3 font-bold text-amber-300/80">{planet.houseD9}म</td>
+                    <td className="p-3 text-amber-300/80 font-medium">
+                      {planet.subLord}
+                    </td>
+                    <td className="p-3 font-bold text-amber-300">
+                      {planet.houseD1}म
+                    </td>
+                    <td className="p-3 font-bold text-amber-300/80">
+                      {planet.houseD9}म
+                    </td>
                     <td className="p-3">
                       <span
                         className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
@@ -1021,7 +1615,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
       {/* ================= TAB 3: 12 BHAVAS & CHALIT VIEW ================= */}
       {selectedTab === "bhavas" && (
-        <div className="bg-stone-950/80 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-4">
+        <div className="bg-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-4 animate-fadeIn">
           <div className="border-b border-amber-500/20 pb-3">
             <h3 className="text-base sm:text-lg font-bold text-amber-200 flex items-center gap-2">
               <Compass className="w-5 h-5 text-amber-400" />
@@ -1033,63 +1627,95 @@ export const KundliView: React.FC<KundliViewProps> = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {kundliData.housesD1.map((house) => (
-              <div
-                key={house.houseNumber}
-                className="bg-amber-950/40 border border-amber-500/20 rounded-2xl p-4 space-y-2.5 hover:border-amber-400/40 transition-colors shadow-md"
-              >
-                <div className="flex items-center justify-between text-xs border-b border-amber-500/15 pb-2">
-                  <span className="font-bold text-amber-100 text-sm">
-                    {house.houseNumber}म भाव ({house.nameSanskrit})
-                  </span>
-                  <span className="text-amber-400 font-bold bg-amber-900/60 px-2 py-0.5 rounded-md border border-amber-500/30">
-                    {house.signNameHi} (स्वामी: {house.lordHi})
-                  </span>
-                </div>
-
-                <p className="text-xs text-amber-200/90 leading-relaxed line-clamp-3">
-                  {house.significanceHi}
-                </p>
-
-                <div className="pt-2 border-t border-amber-500/10 space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-amber-400 font-bold text-[11px]">स्थित ग्रह:</span>
-                    {house.planets.length > 0 ? (
-                      house.planets.map((p) => (
-                        <span
-                          key={p.id}
-                          className="bg-amber-800/60 text-amber-100 text-[11px] px-2 py-0.5 rounded-lg border border-amber-500/30 font-semibold"
-                        >
-                          {p.nameHi} ({p.degreeInSign.toFixed(1)}°)
+            {kundliData.housesD1.map((house) => {
+              const isKendra = [1, 4, 7, 10].includes(house.houseNumber);
+              const isTrikona = [1, 5, 9].includes(house.houseNumber);
+              const isDusthana = [6, 8, 12].includes(house.houseNumber);
+              return (
+                <div
+                  key={house.houseNumber}
+                  className="bg-amber-950/40 border border-amber-500/20 rounded-2xl p-4 space-y-2.5 hover:border-amber-400/40 transition-colors shadow-md flex flex-col justify-between"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs border-b border-amber-500/15 pb-2">
+                      <span className="font-bold text-amber-100 text-sm">
+                        {house.houseNumber}म भाव ({house.nameSanskrit})
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {isKendra && (
+                          <span className="text-[10px] bg-amber-900/60 text-amber-300 px-1.5 py-0.2 rounded border border-amber-500/30 font-bold">
+                            केन्द्र
+                          </span>
+                        )}
+                        {isTrikona && !isKendra && (
+                          <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-500/30 font-bold">
+                            त्रिकोण
+                          </span>
+                        )}
+                        {isDusthana && (
+                          <span className="text-[10px] bg-rose-950 text-rose-300 px-1.5 py-0.2 rounded border border-rose-500/30 font-bold">
+                            दुःस्थान
+                          </span>
+                        )}
+                        <span className="text-amber-400 font-bold bg-amber-900/60 px-2 py-0.5 rounded-md border border-amber-500/30">
+                          {house.signNameHi} (स्वामी: {house.lordHi})
                         </span>
-                      ))
-                    ) : (
-                      <span className="text-amber-400/60 text-[11px]">कोई ग्रह नहीं</span>
-                    )}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-amber-200/90 leading-relaxed">
+                      {house.significanceHi}
+                    </p>
                   </div>
 
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-amber-400/80 font-bold text-[11px]">दृष्टि प्रभाव:</span>
-                    {house.aspectingPlanets.length > 0 ? (
-                      house.aspectingPlanets.map((p) => (
-                        <span key={p.id} className="text-amber-300 text-[11px]">
-                          {p.nameHi},
+                  <div className="pt-2 border-t border-amber-500/10 space-y-1.5 text-xs">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-amber-400 font-bold text-[11px]">
+                        स्थित ग्रह:
+                      </span>
+                      {house.planets.length > 0 ? (
+                        house.planets.map((p) => (
+                          <span
+                            key={p.id}
+                            className="bg-amber-800/60 text-amber-100 text-[11px] px-2 py-0.5 rounded-lg border border-amber-500/30 font-semibold"
+                          >
+                            {p.nameHi} ({p.degreeInSign.toFixed(1)}°)
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-amber-400/60 text-[11px]">
+                          कोई ग्रह नहीं
                         </span>
-                      ))
-                    ) : (
-                      <span className="text-amber-400/60 text-[11px]">कोई नहीं</span>
-                    )}
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-amber-400/80 font-bold text-[11px]">
+                        दृष्टि प्रभाव:
+                      </span>
+                      {house.aspectingPlanets.length > 0 ? (
+                        house.aspectingPlanets.map((p) => (
+                          <span key={p.id} className="text-amber-300 text-[11px]">
+                            {p.nameHi},
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-amber-400/60 text-[11px]">
+                          कोई नहीं
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* ================= TAB 4: VIMSHOTTARI DASHA ENGINE ================= */}
       {selectedTab === "dasha" && (
-        <div className="bg-stone-950/80 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-5">
+        <div className="bg-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-5 animate-fadeIn">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-500/20 pb-3 gap-2">
             <div>
               <h3 className="text-base sm:text-lg font-bold text-amber-200 flex items-center gap-2">
@@ -1098,7 +1724,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
               </h3>
               <p className="text-xs text-amber-300/70 mt-0.5">
                 जन्म समय भोग्य दशा: {kundliData.vimshottari.balanceAtBirth.lord} (
-                {kundliData.vimshottari.balanceAtBirth.years} वर्ष, {kundliData.vimshottari.balanceAtBirth.months} माह,{" "}
+                {kundliData.vimshottari.balanceAtBirth.years} वर्ष,{" "}
+                {kundliData.vimshottari.balanceAtBirth.months} माह,{" "}
                 {kundliData.vimshottari.balanceAtBirth.days} दिन)
               </p>
             </div>
@@ -1114,7 +1741,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   {kundliData.vimshottari.currentAntardasha
                     ? ` / ${kundliData.vimshottari.currentAntardasha.planetNameHi} अन्तर्दशा`
                     : ""}
-                  {kundliData.vimshottari.canonicalTimeline?.currentPeriods.pratyantardasha
+                  {kundliData.vimshottari.canonicalTimeline?.currentPeriods
+                    .pratyantardasha
                     ? ` / ${kundliData.vimshottari.canonicalTimeline.currentPeriods.pratyantardasha.lordNameHi} प्रत्यन्तर`
                     : ""}
                 </span>
@@ -1136,13 +1764,17 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   }`}
                 >
                   <div
-                    onClick={() => setExpandedMahadasha(isExpanded ? null : maha.planet)}
+                    onClick={() =>
+                      setExpandedMahadasha(isExpanded ? null : maha.planet)
+                    }
                     className="p-4 flex items-center justify-between cursor-pointer select-none text-xs sm:text-sm"
                   >
                     <div className="flex items-center gap-3">
                       <span
                         className={`w-3 h-3 rounded-full ${
-                          maha.isCurrent ? "bg-emerald-400 animate-ping" : "bg-amber-600/60"
+                          maha.isCurrent
+                            ? "bg-emerald-400 animate-ping"
+                            : "bg-amber-600/60"
                         }`}
                       ></span>
                       <span className="font-bold text-amber-100 text-sm sm:text-base">
@@ -1157,7 +1789,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
                     <div className="flex items-center gap-4 text-xs">
                       <span className="text-amber-300/80 font-mono font-semibold">
-                        {maha.startDate} से {maha.endDate} ({maha.durationYears} वर्ष)
+                        {maha.startDate} से {maha.endDate} ({maha.durationYears}{" "}
+                        वर्ष)
                       </span>
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4 text-amber-400" />
@@ -1171,17 +1804,21 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   {isExpanded && (
                     <div className="p-4 pt-0 border-t border-amber-500/15 animate-fadeIn">
                       <div className="text-[11px] font-bold text-amber-400 mb-2.5">
-                        {maha.planetNameHi} महादशा के अन्तर्गत 9 अन्तर्दशाएं (प्रत्यन्तर्दशा देखने हेतु क्लिक करें):
+                        {maha.planetNameHi} महादशा के अन्तर्गत 9 अन्तर्दशाएं
+                        (प्रत्यन्तर्दशा देखने हेतु क्लिक करें):
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
                         {maha.antardashas.map((antar) => {
                           const antarKey = `${maha.planet}-${antar.planet}`;
-                          const isAntarExpanded = expandedAntardasha === antarKey;
+                          const isAntarExpanded =
+                            expandedAntardasha === antarKey;
                           return (
                             <div
                               key={antar.planet}
                               className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
-                                isAntarExpanded ? "col-span-full ring-1 ring-amber-400/60" : ""
+                                isAntarExpanded
+                                  ? "col-span-full ring-1 ring-amber-400/60"
+                                  : ""
                               } ${
                                 antar.isCurrent
                                   ? "bg-amber-700/70 border-amber-300 font-bold text-amber-50 shadow-md"
@@ -1189,12 +1826,17 @@ export const KundliView: React.FC<KundliViewProps> = ({
                               }`}
                             >
                               <div
-                                onClick={() => setExpandedAntardasha(isAntarExpanded ? null : antarKey)}
+                                onClick={() =>
+                                  setExpandedAntardasha(
+                                    isAntarExpanded ? null : antarKey
+                                  )
+                                }
                                 className="cursor-pointer select-none"
                               >
                                 <div className="flex items-center justify-between">
                                   <span className="font-semibold flex items-center gap-1.5">
-                                    {maha.planetNameHi}-{antar.planetNameHi} ({antar.planet})
+                                    {maha.planetNameHi}-{antar.planetNameHi} (
+                                    {antar.planet})
                                     {antar.pratyantardashas && (
                                       <span className="text-[9px] px-1 py-0.2 rounded bg-amber-900/60 text-amber-300 border border-amber-500/30">
                                         9 प्रत्यन्तर {isAntarExpanded ? "▲" : "▼"}
@@ -1208,15 +1850,17 @@ export const KundliView: React.FC<KundliViewProps> = ({
                                   )}
                                 </div>
                                 <div className="text-[11px] text-amber-300/80 font-mono mt-1">
-                                  {antar.startDate} → {antar.endDate} ({antar.durationMonths} माह)
+                                  {antar.startDate} → {antar.endDate} (
+                                  {antar.durationMonths} माह)
                                 </div>
                               </div>
 
-                              {/* Nested Level 3: Pratyantardashas (प्रत्यन्तर्दशा) */}
+                              {/* Nested Level 3: Pratyantardashas */}
                               {isAntarExpanded && antar.pratyantardashas && (
                                 <div className="mt-3 pt-2.5 border-t border-amber-500/20 animate-fadeIn">
                                   <div className="text-[10px] font-bold text-amber-300 mb-2">
-                                    {maha.planetNameHi}-{antar.planetNameHi} के अन्तर्गत 9 प्रत्यन्तर्दशाएं (Level 3):
+                                    {maha.planetNameHi}-{antar.planetNameHi} के
+                                    अन्तर्गत 9 प्रत्यन्तर्दशाएं (Level 3):
                                   </div>
                                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
                                     {antar.pratyantardashas.map((prat) => (
@@ -1239,7 +1883,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                                           )}
                                         </div>
                                         <div className="text-[9px] text-amber-400/80 font-mono">
-                                          {prat.startDate} → {prat.endDate} ({prat.durationDays} दिन)
+                                          {prat.startDate} → {prat.endDate} (
+                                          {prat.durationDays} दिन)
                                         </div>
                                       </div>
                                     ))}
@@ -1259,142 +1904,35 @@ export const KundliView: React.FC<KundliViewProps> = ({
         </div>
       )}
 
-      {/* ================= TAB 5: VEDIC DOSHAS ANALYSIS ================= */}
-      {selectedTab === "doshas" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Manglik / Kuja Dosha Card */}
-          <div
-            className={`p-5 sm:p-6 rounded-2xl sm:rounded-3xl border shadow-xl space-y-3.5 ${
-              kundliData.doshas.manglik.isManglik
-                ? "bg-rose-950/30 border-rose-500/40"
-                : "bg-emerald-950/25 border-emerald-500/40"
-            }`}
-          >
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
-              <h3 className="text-base font-bold flex items-center gap-2">
-                <Flame
-                  className={`w-5 h-5 ${
-                    kundliData.doshas.manglik.isManglik ? "text-rose-400" : "text-emerald-400"
-                  }`}
-                />
-                <span className={kundliData.doshas.manglik.isManglik ? "text-rose-200 font-black" : "text-emerald-200 font-black"}>
-                  मांगलिक दोष (Kuja Dosha)
-                </span>
-              </h3>
-              <span
-                className={`text-xs px-2.5 py-1 rounded-full font-bold border ${
-                  kundliData.doshas.manglik.isManglik
-                    ? "bg-rose-900/60 text-rose-200 border-rose-400/40"
-                    : "bg-emerald-900/60 text-emerald-200 border-emerald-400/40"
-                }`}
-              >
-                {kundliData.doshas.manglik.isManglik
-                  ? "मांगलिक प्रभाव उपस्थित"
-                  : kundliData.doshas.manglik.isCancelled
-                  ? "दोष निष्प्रभावी (Cancelled)"
-                  : "मांगलिक दोष नहीं"}
-              </span>
-            </div>
-
-            <p className="text-xs text-amber-200/90 leading-relaxed">
-              {kundliData.doshas.manglik.descriptionHi}
-            </p>
-
-            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
-              <span className="font-bold text-amber-300 block">वैदिक उपाय व मार्गदर्शन:</span>
-              <p className="text-amber-200/80">{kundliData.doshas.manglik.remedyHi}</p>
-            </div>
-          </div>
-
-          {/* Kalsarpa Dosha Card */}
-          <div
-            className={`p-5 sm:p-6 rounded-2xl sm:rounded-3xl border shadow-xl space-y-3.5 ${
-              kundliData.doshas.kalsarpa.present
-                ? "bg-amber-950/40 border-amber-500/40"
-                : "bg-emerald-950/25 border-emerald-500/40"
-            }`}
-          >
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
-              <h3 className="text-base font-bold flex items-center gap-2">
-                <ShieldAlert
-                  className={`w-5 h-5 ${
-                    kundliData.doshas.kalsarpa.present ? "text-amber-400" : "text-emerald-400"
-                  }`}
-                />
-                <span className={kundliData.doshas.kalsarpa.present ? "text-amber-200 font-black" : "text-emerald-200 font-black"}>
-                  कालसर्प योग (Kalsarpa Analysis)
-                </span>
-              </h3>
-              <span
-                className={`text-xs px-2.5 py-1 rounded-full font-bold border ${
-                  kundliData.doshas.kalsarpa.present
-                    ? "bg-amber-900/60 text-amber-200 border-amber-400/40"
-                    : "bg-emerald-900/60 text-emerald-200 border-emerald-400/40"
-                }`}
-              >
-                {kundliData.doshas.kalsarpa.present ? "कालसर्प योग उपस्थित" : "कालसर्प योग नहीं"}
-              </span>
-            </div>
-
-            <p className="text-xs text-amber-200/90 leading-relaxed">
-              {kundliData.doshas.kalsarpa.descriptionHi}
-            </p>
-
-            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
-              <span className="font-bold text-amber-300 block">वैदिक उपाय व मार्गदर्शन:</span>
-              <p className="text-amber-200/80">{kundliData.doshas.kalsarpa.remedyHi}</p>
-            </div>
-          </div>
-
-          {/* Sade Sati & Dhaiya Card */}
-          <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-500/25 bg-stone-950/80 shadow-xl space-y-3.5">
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
-              <h3 className="text-base font-bold text-amber-200 flex items-center gap-2">
-                <Moon className="w-5 h-5 text-amber-400" />
-                शनि साढ़े साती एवं ढैय्या गोचर
-              </h3>
-              <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-900/50 text-amber-200 border border-amber-500/30">
-                {kundliData.doshas.sadeSati.statusLabelHi}
-              </span>
-            </div>
-
-            <p className="text-xs text-amber-200/90 leading-relaxed">
-              {kundliData.doshas.sadeSati.descriptionHi}
-            </p>
-
-            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
-              <span className="font-bold text-amber-300 block">शनि कृपा व शांति उपाय:</span>
-              <p className="text-amber-200/80">{kundliData.doshas.sadeSati.remedyHi}</p>
-            </div>
-          </div>
-
-          {/* Gandanta & Moola Nakshatra Card */}
-          <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-500/25 bg-stone-950/80 shadow-xl space-y-3.5">
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
-              <h3 className="text-base font-bold text-amber-200 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-amber-400" />
-                गण्डान्त व मूल नक्षत्र स्थिति
-              </h3>
-              <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-900/50 text-amber-200 border border-amber-500/30">
-                {kundliData.doshas.gandanta.isGandanta ? "गण्डान्त प्रभाव" : "गण्डान्त मुक्त"}
-              </span>
-            </div>
-
-            <p className="text-xs text-amber-200/90 leading-relaxed">
-              {kundliData.doshas.gandanta.descriptionHi}
-            </p>
-
-            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
-              <span className="font-bold text-amber-300 block">शांति उपाय:</span>
-              <p className="text-amber-200/80">{kundliData.doshas.gandanta.remedyHi}</p>
-            </div>
-          </div>
-        </div>
+      {/* ================= TAB 5: SHADBALA VIEW ================= */}
+      {selectedTab === "shadbala" && (
+        <ShadbalaView shadbala={kundliData.shadbala} />
       )}
 
-      {/* ================= TAB 6: AUSPICIOUS YOGAS ================= */}
+      {/* ================= TAB 6: JAIMINI JYOTISHA SYSTEM ================= */}
+      {selectedTab === "jaimini" && (
+        <JaiminiView jaimini={kundliData.jaimini} />
+      )}
+
+      {/* ================= TAB 7: ASHTAKAVARGA ================= */}
+      {selectedTab === "ashtakavarga" && (
+        <AshtakavargaView
+          planets={kundliData.planets}
+          lagnaSignIndex={kundliData.lagna.signIndex}
+        />
+      )}
+
+      {/* ================= TAB 8: KP ASTROLOGY CUSPS ================= */}
+      {selectedTab === "kp" && (
+        <KpAstrologyView
+          lagnaLongitude={kundliData.lagna.longitude}
+          planets={kundliData.planets}
+        />
+      )}
+
+      {/* ================= TAB 9: AUSPICIOUS YOGAS ================= */}
       {selectedTab === "yogas" && (
-        <div className="bg-stone-950/80 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-4">
+        <div className="bg-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-4 sm:p-6 shadow-xl space-y-4 animate-fadeIn">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-amber-500/20 pb-3 gap-2">
             <div>
               <h3 className="text-base sm:text-lg font-bold text-amber-200 flex items-center gap-2">
@@ -1437,7 +1975,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 const matchingRule = kundliData.ruleResults?.find(
                   (r) =>
                     r.nameEn.toLowerCase() === yoga.nameEn.toLowerCase() ||
-                    r.nameHi === yoga.nameHi,
+                    r.nameHi === yoga.nameHi
                 );
                 return (
                   <div
@@ -1504,105 +2042,174 @@ export const KundliView: React.FC<KundliViewProps> = ({
         </div>
       )}
 
-      {/* ================= TAB 7: AVAKAHADA CHAKRA & JANMA PANCHANGA ================= */}
-      {selectedTab === "avakahada" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Avakahada Chakra Card */}
-          <div className="bg-stone-950/80 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-5 sm:p-6 shadow-xl space-y-4">
-            <h3 className="text-base font-bold text-amber-200 flex items-center gap-2 border-b border-amber-500/20 pb-2.5">
-              <BookOpen className="w-5 h-5 text-amber-400" />
-              अवकहड़ा चक्र विवरण (Avakahada Chakra)
-            </h3>
-
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
-                <span className="text-amber-400 font-bold block text-[11px]">वर्ण (Varna)</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.varna.hi}</span>
-              </div>
-              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
-                <span className="text-amber-400 font-bold block text-[11px]">वश्य (Vashya)</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.vashya.hi}</span>
-              </div>
-              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
-                <span className="text-amber-400 font-bold block text-[11px]">योनि (Yoni)</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.yoni.hi}</span>
-              </div>
-              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
-                <span className="text-amber-400 font-bold block text-[11px]">गण (Gana)</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.gana.hi}</span>
-              </div>
-              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
-                <span className="text-amber-400 font-bold block text-[11px]">नाड़ी (Nadi)</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.nadi.hi}</span>
-              </div>
-              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
-                <span className="text-amber-400 font-bold block text-[11px]">तत्त्व (Tatva)</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.tatva.hi}</span>
-              </div>
-              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15 col-span-2">
-                <span className="text-amber-400 font-bold block text-[11px]">पाया (Paya)</span>
-                <span className="text-sm font-bold text-amber-100">
-                  {kundliData.avakahada.paya.hi} पाया ({kundliData.avakahada.paya.quality})
+      {/* ================= TAB 10: VEDIC DOSHAS ANALYSIS ================= */}
+      {selectedTab === "doshas" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
+          {/* Manglik / Kuja Dosha Card */}
+          <div
+            className={`p-5 sm:p-6 rounded-2xl sm:rounded-3xl border shadow-xl space-y-3.5 ${
+              kundliData.doshas.manglik.isManglik
+                ? "bg-rose-950/30 border-rose-500/40"
+                : "bg-emerald-950/25 border-emerald-500/40"
+            }`}
+          >
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+              <h3 className="text-base font-bold flex items-center gap-2">
+                <Flame
+                  className={`w-5 h-5 ${
+                    kundliData.doshas.manglik.isManglik
+                      ? "text-rose-400"
+                      : "text-emerald-400"
+                  }`}
+                />
+                <span
+                  className={
+                    kundliData.doshas.manglik.isManglik
+                      ? "text-rose-200 font-black"
+                      : "text-emerald-200 font-black"
+                  }
+                >
+                  मांगलिक दोष (Kuja Dosha)
                 </span>
-              </div>
+              </h3>
+              <span
+                className={`text-xs px-2.5 py-1 rounded-full font-bold border ${
+                  kundliData.doshas.manglik.isManglik
+                    ? "bg-rose-900/60 text-rose-200 border-rose-400/40"
+                    : "bg-emerald-900/60 text-emerald-200 border-emerald-400/40"
+                }`}
+              >
+                {kundliData.doshas.manglik.isManglik
+                  ? "मांगलिक प्रभाव उपस्थित"
+                  : kundliData.doshas.manglik.isCancelled
+                  ? "दोष निष्प्रभावी (Cancelled)"
+                  : "मांगलिक दोष नहीं"}
+              </span>
+            </div>
+
+            <p className="text-xs text-amber-200/90 leading-relaxed">
+              {kundliData.doshas.manglik.descriptionHi}
+            </p>
+
+            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
+              <span className="font-bold text-amber-300 block">
+                वैदिक उपाय व मार्गदर्शन:
+              </span>
+              <p className="text-amber-200/80">
+                {kundliData.doshas.manglik.remedyHi}
+              </p>
             </div>
           </div>
 
-          {/* Lucky Astrological Identifiers Card */}
-          <div className="bg-stone-950/80 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-5 sm:p-6 shadow-xl space-y-4">
-            <h3 className="text-base font-bold text-amber-200 flex items-center gap-2 border-b border-amber-500/20 pb-2.5">
-              <Sparkles className="w-5 h-5 text-amber-400" />
-              भाग्यशाली रत्न, रंग व इष्टदेव (Lucky Factors)
-            </h3>
+          {/* Kalsarpa Dosha Card */}
+          <div
+            className={`p-5 sm:p-6 rounded-2xl sm:rounded-3xl border shadow-xl space-y-3.5 ${
+              kundliData.doshas.kalsarpa.present
+                ? "bg-amber-950/40 border-amber-500/40"
+                : "bg-emerald-950/25 border-emerald-500/40"
+            }`}
+          >
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+              <h3 className="text-base font-bold flex items-center gap-2">
+                <ShieldAlert
+                  className={`w-5 h-5 ${
+                    kundliData.doshas.kalsarpa.present
+                      ? "text-amber-400"
+                      : "text-emerald-400"
+                  }`}
+                />
+                <span
+                  className={
+                    kundliData.doshas.kalsarpa.present
+                      ? "text-amber-200 font-black"
+                      : "text-emerald-200 font-black"
+                  }
+                >
+                  कालसर्प योग (Kalsarpa Analysis)
+                </span>
+              </h3>
+              <span
+                className={`text-xs px-2.5 py-1 rounded-full font-bold border ${
+                  kundliData.doshas.kalsarpa.present
+                    ? "bg-amber-900/60 text-amber-200 border-amber-400/40"
+                    : "bg-emerald-900/60 text-emerald-200 border-emerald-400/40"
+                }`}
+              >
+                {kundliData.doshas.kalsarpa.present
+                  ? "कालसर्प योग उपस्थित"
+                  : "कालसर्प योग नहीं"}
+              </span>
+            </div>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
-                <span className="text-amber-300 font-semibold">शुभ रत्न (Lucky Gemstone):</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.luckyGemstone.hi}</span>
-              </div>
+            <p className="text-xs text-amber-200/90 leading-relaxed">
+              {kundliData.doshas.kalsarpa.descriptionHi}
+            </p>
 
-              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
-                <span className="text-amber-300 font-semibold">शुभ रंग (Lucky Color):</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.luckyColor.hi}</span>
-              </div>
+            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
+              <span className="font-bold text-amber-300 block">
+                वैदिक उपाय व मार्गदर्शन:
+              </span>
+              <p className="text-amber-200/80">
+                {kundliData.doshas.kalsarpa.remedyHi}
+              </p>
+            </div>
+          </div>
 
-              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
-                <span className="text-amber-300 font-semibold">शुभ अंक (Lucky Number):</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.luckyNumber}</span>
-              </div>
+          {/* Sade Sati & Dhaiya Card */}
+          <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-500/25 bg-stone-950/90 shadow-xl space-y-3.5">
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+              <h3 className="text-base font-bold text-amber-200 flex items-center gap-2">
+                <Moon className="w-5 h-5 text-amber-400" />
+                शनि साढ़े साती एवं ढैय्या गोचर
+              </h3>
+              <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-900/50 text-amber-200 border border-amber-500/30">
+                {kundliData.doshas.sadeSati.statusLabelHi}
+              </span>
+            </div>
 
-              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
-                <span className="text-amber-300 font-semibold">इष्ट देव (Presiding Deity):</span>
-                <span className="text-sm font-bold text-amber-100">{kundliData.avakahada.luckyDeity.hi}</span>
-              </div>
+            <p className="text-xs text-amber-200/90 leading-relaxed">
+              {kundliData.doshas.sadeSati.descriptionHi}
+            </p>
 
-              <div className="p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
-                <span className="text-amber-300 font-semibold block mb-1.5">अनुकूल राशियां (Friendly Signs):</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {kundliData.avakahada.friendlyRasis.map((r, i) => (
-                    <span
-                      key={i}
-                      className="bg-amber-800/50 text-amber-200 px-2.5 py-0.5 rounded-lg border border-amber-500/30 text-xs font-medium"
-                    >
-                      {r} राशि
-                    </span>
-                  ))}
-                </div>
-              </div>
+            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
+              <span className="font-bold text-amber-300 block">
+                शनि कृपा व शांति उपाय:
+              </span>
+              <p className="text-amber-200/80">
+                {kundliData.doshas.sadeSati.remedyHi}
+              </p>
+            </div>
+          </div>
+
+          {/* Gandanta & Moola Nakshatra Card */}
+          <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-500/25 bg-stone-950/90 shadow-xl space-y-3.5">
+            <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+              <h3 className="text-base font-bold text-amber-200 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-amber-400" />
+                गण्डान्त व मूल नक्षत्र स्थिति
+              </h3>
+              <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-900/50 text-amber-200 border border-amber-500/30">
+                {kundliData.doshas.gandanta.isGandanta
+                  ? "गण्डान्त प्रभाव"
+                  : "गण्डान्त मुक्त"}
+              </span>
+            </div>
+
+            <p className="text-xs text-amber-200/90 leading-relaxed">
+              {kundliData.doshas.gandanta.descriptionHi}
+            </p>
+
+            <div className="bg-amber-950/60 p-3.5 rounded-xl border border-amber-500/20 text-xs space-y-1">
+              <span className="font-bold text-amber-300 block">शांति उपाय:</span>
+              <p className="text-amber-200/80">
+                {kundliData.doshas.gandanta.remedyHi}
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* ================= TAB 8: ASHTAKAVARGA ================= */}
-      {selectedTab === "ashtakavarga" && (
-        <AshtakavargaView
-          planets={kundliData.planets}
-          lagnaSignIndex={kundliData.lagna.signIndex}
-        />
-      )}
-
-      {/* ================= TAB 9: GUNA MILAN (MATCHMAKING) ================= */}
+      {/* ================= TAB 11: GUNA MILAN (MATCHMAKING) ================= */}
       {selectedTab === "gunaMilan" && (
         <GunaMilanView
           currentPersonName={kundliData.profile.name}
@@ -1617,7 +2224,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
         />
       )}
 
-      {/* ================= TAB 10: GOCHAR (PLANETARY TRANSITS) ================= */}
+      {/* ================= TAB 12: GOCHAR (PLANETARY TRANSITS) ================= */}
       {selectedTab === "gochar" && (
         <GocharView
           natalMoonSignIndex={kundliData.chandraLagna.signIndex}
@@ -1627,17 +2234,139 @@ export const KundliView: React.FC<KundliViewProps> = ({
         />
       )}
 
-      {/* ================= TAB 11: KP ASTROLOGY CUSPS ================= */}
-      {selectedTab === "kp" && (
-        <KpAstrologyView
-          lagnaLongitude={kundliData.lagna.longitude}
-          planets={kundliData.planets}
-        />
-      )}
+      {/* ================= TAB 13: AVAKAHADA CHAKRA & JANMA PANCHANGA ================= */}
+      {selectedTab === "avakahada" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fadeIn">
+          {/* Avakahada Chakra Card */}
+          <div className="bg-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-5 sm:p-6 shadow-xl space-y-4">
+            <h3 className="text-base font-bold text-amber-200 flex items-center gap-2 border-b border-amber-500/20 pb-2.5">
+              <BookOpen className="w-5 h-5 text-amber-400" />
+              अवकहड़ा चक्र विवरण (Avakahada Chakra)
+            </h3>
 
-      {/* ================= TAB 12: JAIMINI JYOTISHA SYSTEM ================= */}
-      {selectedTab === "jaimini" && (
-        <JaiminiView jaimini={kundliData.jaimini} />
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
+                <span className="text-amber-400 font-bold block text-[11px]">
+                  वर्ण (Varna)
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.varna.hi}
+                </span>
+              </div>
+              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
+                <span className="text-amber-400 font-bold block text-[11px]">
+                  वश्य (Vashya)
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.vashya.hi}
+                </span>
+              </div>
+              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
+                <span className="text-amber-400 font-bold block text-[11px]">
+                  योनि (Yoni)
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.yoni.hi}
+                </span>
+              </div>
+              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
+                <span className="text-amber-400 font-bold block text-[11px]">
+                  गण (Gana)
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.gana.hi}
+                </span>
+              </div>
+              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
+                <span className="text-amber-400 font-bold block text-[11px]">
+                  नाड़ी (Nadi)
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.nadi.hi}
+                </span>
+              </div>
+              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15">
+                <span className="text-amber-400 font-bold block text-[11px]">
+                  तत्त्व (Tatva)
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.tatva.hi}
+                </span>
+              </div>
+              <div className="bg-amber-950/40 p-3 rounded-xl border border-amber-500/15 col-span-2">
+                <span className="text-amber-400 font-bold block text-[11px]">
+                  पाया (Paya)
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.paya.hi} पाया (
+                  {kundliData.avakahada.paya.quality})
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Lucky Astrological Identifiers Card */}
+          <div className="bg-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/25 p-5 sm:p-6 shadow-xl space-y-4">
+            <h3 className="text-base font-bold text-amber-200 flex items-center gap-2 border-b border-amber-500/20 pb-2.5">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              भाग्यशाली रत्न, रंग व इष्टदेव (Lucky Factors)
+            </h3>
+
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
+                <span className="text-amber-300 font-semibold">
+                  शुभ रत्न (Lucky Gemstone):
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.luckyGemstone.hi}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
+                <span className="text-amber-300 font-semibold">
+                  शुभ रंग (Lucky Color):
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.luckyColor.hi}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
+                <span className="text-amber-300 font-semibold">
+                  शुभ अंक (Lucky Number):
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.luckyNumber}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
+                <span className="text-amber-300 font-semibold">
+                  इष्ट देव (Presiding Deity):
+                </span>
+                <span className="text-sm font-bold text-amber-100">
+                  {kundliData.avakahada.luckyDeity.hi}
+                </span>
+              </div>
+
+              <div className="p-3 bg-amber-950/40 rounded-xl border border-amber-500/15">
+                <span className="text-amber-300 font-semibold block mb-1.5">
+                  अनुकूल राशियां (Friendly Signs):
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {kundliData.avakahada.friendlyRasis.map((r, i) => (
+                    <span
+                      key={i}
+                      className="bg-amber-800/50 text-amber-200 px-2.5 py-0.5 rounded-lg border border-amber-500/30 text-xs font-medium"
+                    >
+                      {r} राशि
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -2,11 +2,11 @@ import { CanonicalBodyId } from "../astronomy/AstronomicalContext";
 import { RepositoryMetadata } from "../adapters/RepositoryMetadata";
 
 export type DashaSystemType =
-  | "vimshottari"  // 120-year cycle based on Moon's nakshatra (Universal standard)
-  | "ashtottari"   // 108-year cycle (Ardra to Revati conditional)
-  | "yogini"       // 36-year cycle (Mangala, Pingala, Dhanya, etc.)
-  | "chara"        // Jaimini sign-based progression
-  | "kaalchakra";  // Navamsha Pada based progression
+  | "vimshottari" // 120-year cycle based on Moon's nakshatra (Universal standard)
+  | "ashtottari" // 108-year cycle (Ardra to Revati conditional)
+  | "yogini" // 36-year cycle (Mangala, Pingala, Dhanya, etc.)
+  | "chara" // Jaimini sign-based progression
+  | "kaalchakra"; // Navamsha Pada based progression
 
 export interface DashaSpan {
   lord: CanonicalBodyId | string;

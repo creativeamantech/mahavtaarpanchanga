@@ -3,13 +3,13 @@ import { RepositoryMetadata } from "../adapters/RepositoryMetadata";
 
 export type RuleCategory =
   | "maha_purusha_yoga" // Ruchaka, Bhadra, Hamsa, Malavya, Sasa
-  | "raja_yoga"         // Kendra-Trikona lord associations
-  | "dhana_yoga"        // 2nd, 5th, 9th, 11th lord wealth formations
-  | "arishta_yoga"      // Afflictions, Kemadruma, Daridra, Balarishta
-  | "dosha"             // Manglik, Kalsarpa, Pitra Dosha, Gandanta
-  | "nabhasa_yoga"      // Ashraya, Dala, Akriti, Sankhya yogas
-  | "lunar_yoga"        // Sunapha, Anapha, Durdhara, Gajakesari, Amala
-  | "solar_yoga";       // Veshi, Vashi, Ubhayachari
+  | "raja_yoga" // Kendra-Trikona lord associations
+  | "dhana_yoga" // 2nd, 5th, 9th, 11th lord wealth formations
+  | "arishta_yoga" // Afflictions, Kemadruma, Daridra, Balarishta
+  | "dosha" // Manglik, Kalsarpa, Pitra Dosha, Gandanta
+  | "nabhasa_yoga" // Ashraya, Dala, Akriti, Sankhya yogas
+  | "lunar_yoga" // Sunapha, Anapha, Durdhara, Gajakesari, Amala
+  | "solar_yoga"; // Veshi, Vashi, Ubhayachari
 
 export interface RuleEvaluationResult {
   ruleId: string;

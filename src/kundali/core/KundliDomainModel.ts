@@ -1,4 +1,8 @@
-import { AstronomicalContext, CanonicalBodyId, SiderealPosition } from "../astronomy/AstronomicalContext";
+import {
+  AstronomicalContext,
+  CanonicalBodyId,
+  SiderealPosition,
+} from "../astronomy/AstronomicalContext";
 import { AyanamshaSystemKey } from "../astronomy/AyanamshaProvider";
 
 /**
@@ -61,7 +65,16 @@ export interface GrahaState extends SiderealPosition {
   nameEn: string;
   nameHi: string;
   nameSa: string;
-  dignity: "exalted" | "moolatrikona" | "own" | "great_friend" | "friend" | "neutral" | "enemy" | "great_enemy" | "debilitated";
+  dignity:
+    | "exalted"
+    | "moolatrikona"
+    | "own"
+    | "great_friend"
+    | "friend"
+    | "neutral"
+    | "enemy"
+    | "great_enemy"
+    | "debilitated";
   combust: boolean;
   houseOccupied: number; // 1 to 12 from Lagna
   housesOwned: number[]; // 1 to 12

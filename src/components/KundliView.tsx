@@ -13,6 +13,7 @@ import { AshtakavargaView } from "./AshtakavargaView";
 import { GunaMilanView } from "./GunaMilanView";
 import { KpAstrologyView } from "./KpAstrologyView";
 import { GocharView } from "./GocharView";
+import { JaiminiView } from "./JaiminiView";
 import { CoordinateSelection } from "../types";
 import {
   Sparkles,
@@ -151,8 +152,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
     | "doshas"
     | "yogas"
     | "avakahada"
+    | "jaimini"
   >("chart");
   const [expandedMahadasha, setExpandedMahadasha] = useState<string | null>(null);
+  const [expandedAntardasha, setExpandedAntardasha] = useState<string | null>(null);
   const [yogaFilter, setYogaFilter] = useState<"all" | "auspicious" | "inauspicious">("all");
 
   // Saved Profiles in LocalStorage
@@ -703,6 +706,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
           { id: "doshas", label: "दोष विश्लेषण (Doshas)", icon: ShieldAlert },
           { id: "yogas", label: "शुभ राजयोग (Yogas)", icon: Award },
           { id: "avakahada", label: "अवकहड़ा चक्र (Avakahada)", icon: BookOpen },
+          { id: "jaimini", label: "जैमिनी पद्धति (Jaimini)", icon: Award },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = selectedTab === tab.id;
@@ -1110,6 +1114,9 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   {kundliData.vimshottari.currentAntardasha
                     ? ` / ${kundliData.vimshottari.currentAntardasha.planetNameHi} अन्तर्दशा`
                     : ""}
+                  {kundliData.vimshottari.canonicalTimeline?.currentPeriods.pratyantardasha
+                    ? ` / ${kundliData.vimshottari.canonicalTimeline.currentPeriods.pratyantardasha.lordNameHi} प्रत्यन्तर`
+                    : ""}
                 </span>
               </div>
             )}
@@ -1164,33 +1171,84 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   {isExpanded && (
                     <div className="p-4 pt-0 border-t border-amber-500/15 animate-fadeIn">
                       <div className="text-[11px] font-bold text-amber-400 mb-2.5">
-                        {maha.planetNameHi} महादशा के अन्तर्गत 9 अन्तर्दशाएं:
+                        {maha.planetNameHi} महादशा के अन्तर्गत 9 अन्तर्दशाएं (प्रत्यन्तर्दशा देखने हेतु क्लिक करें):
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
-                        {maha.antardashas.map((antar) => (
-                          <div
-                            key={antar.planet}
-                            className={`p-2.5 rounded-xl border flex flex-col justify-between ${
-                              antar.isCurrent
-                                ? "bg-amber-700/70 border-amber-300 font-bold text-amber-50 shadow-md"
-                                : "bg-amber-950/50 border-amber-500/15 text-amber-200/80"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-semibold">
-                                {maha.planetNameHi}-{antar.planetNameHi} ({antar.planet})
-                              </span>
-                              {antar.isCurrent && (
-                                <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.2 rounded font-bold">
-                                  सक्रिय
-                                </span>
+                        {maha.antardashas.map((antar) => {
+                          const antarKey = `${maha.planet}-${antar.planet}`;
+                          const isAntarExpanded = expandedAntardasha === antarKey;
+                          return (
+                            <div
+                              key={antar.planet}
+                              className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
+                                isAntarExpanded ? "col-span-full ring-1 ring-amber-400/60" : ""
+                              } ${
+                                antar.isCurrent
+                                  ? "bg-amber-700/70 border-amber-300 font-bold text-amber-50 shadow-md"
+                                  : "bg-amber-950/50 border-amber-500/15 text-amber-200/80"
+                              }`}
+                            >
+                              <div
+                                onClick={() => setExpandedAntardasha(isAntarExpanded ? null : antarKey)}
+                                className="cursor-pointer select-none"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="font-semibold flex items-center gap-1.5">
+                                    {maha.planetNameHi}-{antar.planetNameHi} ({antar.planet})
+                                    {antar.pratyantardashas && (
+                                      <span className="text-[9px] px-1 py-0.2 rounded bg-amber-900/60 text-amber-300 border border-amber-500/30">
+                                        9 प्रत्यन्तर {isAntarExpanded ? "▲" : "▼"}
+                                      </span>
+                                    )}
+                                  </span>
+                                  {antar.isCurrent && (
+                                    <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.2 rounded font-bold">
+                                      सक्रिय
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-[11px] text-amber-300/80 font-mono mt-1">
+                                  {antar.startDate} → {antar.endDate} ({antar.durationMonths} माह)
+                                </div>
+                              </div>
+
+                              {/* Nested Level 3: Pratyantardashas (प्रत्यन्तर्दशा) */}
+                              {isAntarExpanded && antar.pratyantardashas && (
+                                <div className="mt-3 pt-2.5 border-t border-amber-500/20 animate-fadeIn">
+                                  <div className="text-[10px] font-bold text-amber-300 mb-2">
+                                    {maha.planetNameHi}-{antar.planetNameHi} के अन्तर्गत 9 प्रत्यन्तर्दशाएं (Level 3):
+                                  </div>
+                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                                    {antar.pratyantardashas.map((prat) => (
+                                      <div
+                                        key={prat.planet}
+                                        className={`p-1.5 rounded-lg border text-[11px] ${
+                                          prat.isCurrent
+                                            ? "bg-emerald-950/80 border-emerald-400 text-emerald-100 font-bold"
+                                            : "bg-black/30 border-amber-500/10 text-amber-200/90"
+                                        }`}
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <span>
+                                            {prat.planetNameHi} ({prat.planet})
+                                          </span>
+                                          {prat.isCurrent && (
+                                            <span className="text-[8px] bg-emerald-700 text-emerald-100 px-1 rounded">
+                                              वर्तमान
+                                            </span>
+                                          )}
+                                        </div>
+                                        <div className="text-[9px] text-amber-400/80 font-mono">
+                                          {prat.startDate} → {prat.endDate} ({prat.durationDays} दिन)
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
                               )}
                             </div>
-                            <div className="text-[11px] text-amber-300/80 font-mono mt-1">
-                              {antar.startDate} → {antar.endDate} ({antar.durationMonths} माह)
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -1375,43 +1433,73 @@ export const KundliView: React.FC<KundliViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {kundliData.yogas
               .filter((y) => (yogaFilter === "all" ? true : y.type === yogaFilter))
-              .map((yoga, idx) => (
-                <div
-                  key={idx}
-                  className={`p-4 rounded-2xl border transition-all ${
-                    yoga.present
-                      ? yoga.type === "auspicious"
-                        ? "bg-emerald-950/30 border-emerald-500/40 shadow-sm"
-                        : "bg-rose-950/30 border-rose-500/40"
-                      : "bg-amber-950/30 border-amber-500/15 opacity-60"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {yoga.present ? (
-                        <CheckCircle2
-                          className={`w-4 h-4 ${
-                            yoga.type === "auspicious" ? "text-emerald-400" : "text-rose-400"
-                          }`}
-                        />
-                      ) : (
-                        <span className="w-2 h-2 rounded-full bg-amber-600/40"></span>
-                      )}
-                      <span className="font-bold text-amber-100 text-sm">{yoga.nameHi}</span>
+              .map((yoga, idx) => {
+                const matchingRule = kundliData.ruleResults?.find(
+                  (r) =>
+                    r.nameEn.toLowerCase() === yoga.nameEn.toLowerCase() ||
+                    r.nameHi === yoga.nameHi,
+                );
+                return (
+                  <div
+                    key={idx}
+                    className={`p-4 rounded-2xl border transition-all ${
+                      yoga.present
+                        ? yoga.type === "auspicious"
+                          ? "bg-emerald-950/30 border-emerald-500/40 shadow-sm"
+                          : "bg-rose-950/30 border-rose-500/40"
+                        : "bg-amber-950/30 border-amber-500/15 opacity-60"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {yoga.present ? (
+                          <CheckCircle2
+                            className={`w-4 h-4 ${
+                              yoga.type === "auspicious"
+                                ? "text-emerald-400"
+                                : "text-rose-400"
+                            }`}
+                          />
+                        ) : (
+                          <span className="w-2 h-2 rounded-full bg-amber-600/40"></span>
+                        )}
+                        <span className="font-bold text-amber-100 text-sm">
+                          {yoga.nameHi}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
+                          yoga.present
+                            ? "bg-emerald-900/60 text-emerald-200 border border-emerald-400/40"
+                            : "bg-amber-900/30 text-amber-400/60"
+                        }`}
+                      >
+                        {yoga.present ? "सक्रिय (Present)" : "अनुपस्थित"}
+                      </span>
                     </div>
-                    <span
-                      className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
-                        yoga.present
-                          ? "bg-emerald-900/60 text-emerald-200 border border-emerald-400/40"
-                          : "bg-amber-900/30 text-amber-400/60"
-                      }`}
-                    >
-                      {yoga.present ? "सक्रिय (Present)" : "अनुपस्थित"}
-                    </span>
+                    <p className="text-xs text-amber-200/80 leading-relaxed">
+                      {yoga.descriptionHi}
+                    </p>
+                    {matchingRule && (
+                      <div className="mt-2.5 pt-2 border-t border-amber-500/15 flex flex-wrap items-center gap-2 text-[10px]">
+                        <span className="bg-amber-950/80 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30">
+                          {matchingRule.sourceReference}
+                        </span>
+                        {matchingRule.dashaActivation
+                          ?.isActivatedByCurrentMaha && (
+                          <span className="bg-emerald-950/80 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 font-bold">
+                            दशा सक्रिय (
+                            {matchingRule.dashaActivation.activeMahadashaLord})
+                          </span>
+                        )}
+                        <span className="text-amber-400/80 font-mono">
+                          बल: {(matchingRule.overallStrengthScore * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-amber-200/80 leading-relaxed">{yoga.descriptionHi}</p>
-                </div>
-              ))}
+                );
+              })}
           </div>
         </div>
       )}
@@ -1545,6 +1633,11 @@ export const KundliView: React.FC<KundliViewProps> = ({
           lagnaLongitude={kundliData.lagna.longitude}
           planets={kundliData.planets}
         />
+      )}
+
+      {/* ================= TAB 12: JAIMINI JYOTISHA SYSTEM ================= */}
+      {selectedTab === "jaimini" && (
+        <JaiminiView jaimini={kundliData.jaimini} />
       )}
     </div>
   );

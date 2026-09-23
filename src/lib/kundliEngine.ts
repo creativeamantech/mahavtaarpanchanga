@@ -10,6 +10,14 @@ import {
   VargaType,
 } from "../kundali/contracts/IVargaEngine";
 import { CanonicalBodyId } from "../kundali/astronomy/AstronomicalContext";
+import { ShadbalaEngine } from "../kundali/shadbala/ShadbalaEngine";
+import { CompleteShadbalaResult } from "../kundali/shadbala/ShadbalaTypes";
+import { VimshottariDashaEngine } from "../kundali/dasha/vimshottari/VimshottariDashaEngine";
+import { DashaTimeline } from "../kundali/dasha/types/DashaTypes";
+import { RuleEngine } from "../kundali/rules/RuleEngine";
+import { RuleResult } from "../kundali/rules/RuleTypes";
+import { JaiminiEngine } from "../kundali/jaimini/JaiminiEngine";
+import { JaiminiProfile } from "../kundali/jaimini/JaiminiTypes";
 
 export type KundliChartType =
   | "d1"
@@ -109,6 +117,17 @@ export interface AvakahadaDetails {
   luckyDeity: { en: string; hi: string };
 }
 
+export interface VimshottariPratyantardasha {
+  planet: PlanetId;
+  planetNameHi: string;
+  startDate: string;
+  endDate: string;
+  startMs: number;
+  endMs: number;
+  durationDays: number;
+  isCurrent: boolean;
+}
+
 export interface VimshottariAntardasha {
   planet: PlanetId;
   planetNameHi: string;
@@ -118,6 +137,7 @@ export interface VimshottariAntardasha {
   endMs: number;
   durationMonths: number;
   isCurrent: boolean;
+  pratyantardashas?: VimshottariPratyantardasha[];
 }
 
 export interface VimshottariMahadasha {
@@ -245,6 +265,7 @@ export interface FullKundliData {
   housesChalit: KundliHouse[];
   shodashavarga?: Record<VargaType, VargaChartResult>;
   vargaHouses?: Record<VargaType, KundliHouse[]>;
+  shadbala?: CompleteShadbalaResult;
   avakahada: AvakahadaDetails;
   vimshottari: {
     balanceAtBirth: {
@@ -256,9 +277,12 @@ export interface FullKundliData {
     dashas: VimshottariMahadasha[];
     currentMahadasha?: VimshottariMahadasha;
     currentAntardasha?: VimshottariAntardasha;
+    canonicalTimeline?: DashaTimeline;
   };
   doshas: DoshaAnalysis;
   yogas: YogaCombination[];
+  ruleResults?: RuleResult[];
+  jaimini?: JaiminiProfile;
 }
 
 export const ZODIAC_SIGNS = [
@@ -1083,86 +1107,55 @@ export function computeFullKundli(
     luckyDeity: { en: luckyMeta.deityEn, hi: luckyMeta.deityHi },
   };
 
-  // 5. Vimshottari Dasha Engine
-  const arcPerNak = 360 / 27; // 13.33333333°
-  const passedInNak = normalize360(moonObj.longitude) % arcPerNak;
-  const remInNak = Math.max(0, arcPerNak - passedInNak);
-  const remFraction = remInNak / arcPerNak;
+  // 5. Canonical Vimshottari Dasha Engine (Phase 4)
+  const vEngine = new VimshottariDashaEngine();
+  const canonicalTimeline = vEngine.calculateTimeline({
+    moonSiderealLonDeg: moonObj.longitude,
+    birthTimestampMs: ms,
+    depthLevels: 3,
+  });
 
-  const rawLordIndex = VIMSHOTTARI_LORDS.findIndex((l) => l.planet === moonNakMeta.lord);
-  const startLordIndex = rawLordIndex >= 0 ? rawLordIndex : 0;
-  const startLord = VIMSHOTTARI_LORDS[startLordIndex] || VIMSHOTTARI_LORDS[0];
-  const balanceYearsTotal = startLord.years * remFraction;
-  const balanceYears = Math.floor(balanceYearsTotal);
-  const balanceMonths = Math.floor((balanceYearsTotal - balanceYears) * 12);
-  const balanceDays = Math.round(((balanceYearsTotal - balanceYears) * 12 - balanceMonths) * 30);
+  const dashas: VimshottariMahadasha[] = canonicalTimeline.periods.map((maha) => {
+    const antardashas: VimshottariAntardasha[] = (maha.children ?? []).map((antar) => {
+      const pratyantardashas: VimshottariPratyantardasha[] = (antar.children ?? []).map((prat) => ({
+        planet: prat.lord as PlanetId,
+        planetNameHi: prat.lordNameHi,
+        startDate: prat.startDateIso,
+        endDate: prat.endDateIso,
+        startMs: prat.startTimestampMs,
+        endMs: prat.endTimestampMs,
+        durationDays: prat.durationDays,
+        isCurrent: !!prat.isCurrent,
+      }));
 
-  const dashas: VimshottariMahadasha[] = [];
-  let currentPointerMs = ms;
-  const nowMs = Date.now();
-  let activeMahadasha: VimshottariMahadasha | undefined;
-  let activeAntardasha: VimshottariAntardasha | undefined;
-
-  for (let i = 0; i < 9; i++) {
-    const lordObj = VIMSHOTTARI_LORDS[(startLordIndex + i) % 9] || VIMSHOTTARI_LORDS[0];
-    const durationYears = i === 0 ? balanceYearsTotal : lordObj.years;
-    const durationMs = durationYears * 365.2425 * 24 * 60 * 60 * 1000;
-    const dashaStartMs = currentPointerMs;
-    const dashaEndMs = currentPointerMs + durationMs;
-
-    const isCurrentMaha = nowMs >= dashaStartMs && nowMs < dashaEndMs;
-
-    // Calculate Antardashas within this Mahadasha
-    const antardashas: VimshottariAntardasha[] = [];
-    let subPointerMs = dashaStartMs;
-    const rawSubStart = VIMSHOTTARI_LORDS.findIndex((l) => l.planet === lordObj.planet);
-    const subLordStartIndex = rawSubStart >= 0 ? rawSubStart : 0;
-
-    for (let j = 0; j < 9; j++) {
-      const subLordObj = VIMSHOTTARI_LORDS[(subLordStartIndex + j) % 9] || VIMSHOTTARI_LORDS[0];
-      // Proportion = (MahadashaYears * SubLordYears) / 120
-      const subDurationYears = (durationYears * subLordObj.years) / 120;
-      const subDurationMs = subDurationYears * 365.2425 * 24 * 60 * 60 * 1000;
-      const subStartMs = subPointerMs;
-      const subEndMs = subPointerMs + subDurationMs;
-      const isCurrentSub = nowMs >= subStartMs && nowMs < subEndMs;
-
-      const subObj: VimshottariAntardasha = {
-        planet: subLordObj.planet,
-        planetNameHi: subLordObj.nameHi,
-        startDate: new Date(subStartMs).toISOString().split("T")[0],
-        endDate: new Date(subEndMs).toISOString().split("T")[0],
-        startMs: subStartMs,
-        endMs: subEndMs,
-        durationMonths: Math.round(subDurationYears * 12 * 10) / 10,
-        isCurrent: isCurrentSub,
+      return {
+        planet: antar.lord as PlanetId,
+        planetNameHi: antar.lordNameHi,
+        startDate: antar.startDateIso,
+        endDate: antar.endDateIso,
+        startMs: antar.startTimestampMs,
+        endMs: antar.endTimestampMs,
+        durationMonths: Math.round(((antar.endTimestampMs - antar.startTimestampMs) / (365.2425 * 86400 * 1000) * 12) * 10) / 10,
+        isCurrent: !!antar.isCurrent,
+        pratyantardashas,
       };
+    });
 
-      if (isCurrentSub) {
-        activeAntardasha = subObj;
-      }
-      antardashas.push(subObj);
-      subPointerMs = subEndMs;
-    }
-
-    const mahaObj: VimshottariMahadasha = {
-      planet: lordObj.planet,
-      planetNameHi: lordObj.nameHi,
-      startDate: new Date(dashaStartMs).toISOString().split("T")[0],
-      endDate: new Date(dashaEndMs).toISOString().split("T")[0],
-      startMs: dashaStartMs,
-      endMs: dashaEndMs,
-      durationYears: Math.round(durationYears * 10) / 10,
-      isCurrent: isCurrentMaha,
+    return {
+      planet: maha.lord as PlanetId,
+      planetNameHi: maha.lordNameHi,
+      startDate: maha.startDateIso,
+      endDate: maha.endDateIso,
+      startMs: maha.startTimestampMs,
+      endMs: maha.endTimestampMs,
+      durationYears: Math.round(((maha.endTimestampMs - maha.startTimestampMs) / (365.2425 * 86400 * 1000)) * 10) / 10,
+      isCurrent: !!maha.isCurrent,
       antardashas,
     };
+  });
 
-    if (isCurrentMaha) {
-      activeMahadasha = mahaObj;
-    }
-    dashas.push(mahaObj);
-    currentPointerMs = dashaEndMs;
-  }
+  const activeMahadasha = dashas.find((m) => m.isCurrent);
+  const activeAntardasha = activeMahadasha?.antardashas.find((a) => a.isCurrent);
 
   // 6. Dosha Calculations
   // Manglik Dosha: Mars in 1, 2, 4, 7, 8, 12 from Lagna or Moon
@@ -1476,6 +1469,97 @@ export function computeFullKundli(
     });
   }
 
+  // 8. Calculate Shadbala and Bhava Bala via ShadbalaEngine
+  let shadbala: CompleteShadbalaResult | undefined;
+  try {
+    const shadbalaEngine = new ShadbalaEngine();
+    const siderealLonsMap: Record<CanonicalBodyId, number> = {} as any;
+    planets.forEach((p) => {
+      siderealLonsMap[p.id as CanonicalBodyId] = p.longitude;
+    });
+    shadbala = shadbalaEngine.calculateDetailedShadbala(
+      siderealLonsMap,
+      siderealAsc,
+      ms,
+      safeLat,
+      safeLon,
+    );
+  } catch (err) {
+    console.warn("Shadbala calculation warning:", err);
+  }
+
+  // 9. Classical Vedic Rule & Yoga Engine (Phase 5)
+  let ruleResults: RuleResult[] = [];
+  try {
+    const ruleContext = RuleEngine.buildContextFromKundli(
+      planets,
+      housesD1,
+      lagnaSignIndex,
+      moonSignIndex,
+      shadbala,
+      canonicalTimeline,
+    );
+    const ruleEngine = new RuleEngine();
+    ruleResults = ruleEngine.evaluateAll(ruleContext);
+
+    // Merge newly validated classical yogas into yogas list if not already present
+    for (const r of ruleResults) {
+      if (r.status === "PRESENT" || r.status === "PARTIAL") {
+        const alreadyExists = yogas.some(
+          (y) =>
+            y.nameEn.toLowerCase() === r.nameEn.toLowerCase() ||
+            y.nameHi === r.nameHi,
+        );
+        if (!alreadyExists) {
+          yogas.push({
+            nameEn: r.nameEn,
+            nameHi: r.nameHi,
+            present: true,
+            type:
+              r.category.includes("Arishta") || r.category.includes("Dosha")
+                ? "inauspicious"
+                : "auspicious",
+            descriptionEn: r.descriptionEn,
+            descriptionHi: r.descriptionHi,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Rule engine evaluation warning:", err);
+  }
+
+  // 9. Classical Jaimini System Profile Calculation
+  let jaimini: JaiminiProfile | undefined;
+  try {
+    const jaiminiEngine = new JaiminiEngine();
+    jaimini = jaiminiEngine.calculateJaiminiProfile(
+      planets.map((p) => ({
+        id: p.id as CanonicalBodyId,
+        longitude: p.longitude,
+        signIndex: p.signIndex,
+        degreeInSign: p.degreeInSign,
+        speed: p.speed,
+        dignity: p.dignity,
+      })),
+      housesD1.map((h) => ({
+        houseNumber: h.houseNumber,
+        signIndex: h.signIndex,
+        lord: h.lordEn as CanonicalBodyId,
+        lordSignIndex: planets.find((p) => p.id === h.lordEn)?.signIndex ?? h.signIndex,
+      })),
+      lagnaSignIndex,
+      lagnaNavamshaSignIndex,
+      planets.map((p) => ({
+        id: p.id as CanonicalBodyId,
+        signIndex: p.signD9Index,
+      })),
+      ms,
+    );
+  } catch (err) {
+    console.warn("Jaimini engine evaluation warning:", err);
+  }
+
   return {
     profile: {
       name: personName,
@@ -1534,19 +1618,23 @@ export function computeFullKundli(
     housesChalit,
     shodashavarga,
     vargaHouses,
+    shadbala,
     avakahada,
     vimshottari: {
       balanceAtBirth: {
-        lord: startLord.planet,
-        years: balanceYears,
-        months: balanceMonths,
-        days: balanceDays,
+        lord: canonicalTimeline.balanceAtBirth.lord,
+        years: canonicalTimeline.balanceAtBirth.years,
+        months: canonicalTimeline.balanceAtBirth.months,
+        days: canonicalTimeline.balanceAtBirth.days,
       },
       dashas,
       currentMahadasha: activeMahadasha,
       currentAntardasha: activeAntardasha,
+      canonicalTimeline,
     },
     doshas,
     yogas,
+    ruleResults,
+    jaimini,
   };
 }

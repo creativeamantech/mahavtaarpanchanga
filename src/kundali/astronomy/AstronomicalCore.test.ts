@@ -23,7 +23,13 @@ describe("Phase 1 Canonical Architecture & Astronomical Core", () => {
 
   it("AstronomicalCore builds valid AstronomicalContext with exact ecliptic vectors", () => {
     const time = AstronomicalCore.createTimeContext(2026, 9, 22, 12, 0, 0, "Asia/Kolkata");
-    const loc = AstronomicalCore.createLocationContext(28.6139, 77.209, 0, "New Delhi", "Asia/Kolkata");
+    const loc = AstronomicalCore.createLocationContext(
+      28.6139,
+      77.209,
+      0,
+      "New Delhi",
+      "Asia/Kolkata",
+    );
     const context = AstronomicalCore.buildContext(time, loc, "lahiri");
 
     expect(context).toBeDefined();
@@ -51,9 +57,9 @@ describe("Phase 1 Canonical Architecture & Astronomical Core", () => {
     const invalidResult = KundliInputValidator.validate({
       year: 2026,
       month: 13, // invalid month
-      day: 32,   // invalid day
-      hour: 25,  // invalid hour
-      minute: 70,// invalid minute
+      day: 32, // invalid day
+      hour: 25, // invalid hour
+      minute: 70, // invalid minute
       latitude: 105, // invalid latitude
       longitude: 200, // invalid longitude
     });

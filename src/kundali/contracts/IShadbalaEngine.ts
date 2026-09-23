@@ -5,13 +5,13 @@ import { RepositoryMetadata } from "../adapters/RepositoryMetadata";
  * 1. Sthana Bala (Positional Strength)
  */
 export interface SthanaBalaBreakdown {
-  uchchaBala: number;      // Exaltation strength (max 60 virupas)
-  saptavargajaBala: number;// Strength from 7 divisional charts (max 45 virupas)
-  ojayugmarashiBala: number;// Odd/Even sign strength (15 virupas)
-  kendradiBala: number;    // Kendra (60), Panaphara (30), Apoklima (15)
-  drekkanaBala: number;    // Decanate strength (15 virupas)
+  uchchaBala: number; // Exaltation strength (max 60 virupas)
+  saptavargajaBala: number; // Strength from 7 divisional charts (max 45 virupas)
+  ojayugmarashiBala: number; // Odd/Even sign strength (15 virupas)
+  kendradiBala: number; // Kendra (60), Panaphara (30), Apoklima (15)
+  drekkanaBala: number; // Decanate strength (15 virupas)
   totalVirupas: number;
-  totalRupas: number;      // virupas / 60
+  totalRupas: number; // virupas / 60
 }
 
 /**
@@ -21,7 +21,7 @@ export interface SthanaBalaBreakdown {
  */
 export interface DigBalaBreakdown {
   directionalDistanceDeg: number;
-  totalVirupas: number;    // max 60 virupas
+  totalVirupas: number; // max 60 virupas
   totalRupas: number;
 }
 
@@ -29,15 +29,15 @@ export interface DigBalaBreakdown {
  * 3. Kala Bala (Temporal / Time Strength)
  */
 export interface KalaBalaBreakdown {
-  natonnataBala: number;   // Diurnal / Nocturnal strength
-  pakshaBala: number;      // Lunar fortnight strength (benefics vs malefics)
-  tribhagaBala: number;    // Three parts of day and night
-  varshaBala: number;      // Year lord strength (15 virupas)
-  masaBala: number;        // Month lord strength (30 virupas)
-  dinaBala: number;        // Day (Vara) lord strength (45 virupas)
-  horaBala: number;        // Planetary hour lord strength (60 virupas)
-  ayanaBala: number;       // Solstitial / Declination strength
-  yuddhaBala?: number;     // Planetary war bonus/penalty
+  natonnataBala: number; // Diurnal / Nocturnal strength
+  pakshaBala: number; // Lunar fortnight strength (benefics vs malefics)
+  tribhagaBala: number; // Three parts of day and night
+  varshaBala: number; // Year lord strength (15 virupas)
+  masaBala: number; // Month lord strength (30 virupas)
+  dinaBala: number; // Day (Vara) lord strength (45 virupas)
+  horaBala: number; // Planetary hour lord strength (60 virupas)
+  ayanaBala: number; // Solstitial / Declination strength
+  yuddhaBala?: number; // Planetary war bonus/penalty
   totalVirupas: number;
   totalRupas: number;
 }
@@ -46,8 +46,9 @@ export interface KalaBalaBreakdown {
  * 4. Cheshta Bala (Motional Strength - Retrogression, Stations, Fast Motion)
  */
 export interface CheshtaBalaBreakdown {
-  motionState: "vakra" | "anuvakra" | "vikala" | "manda" | "mandatara" | "sama" | "chara" | "atichara";
-  totalVirupas: number;    // max 60 virupas (Sun and Moon substitute with Ayana Bala)
+  motionState:
+    "vakra" | "anuvakra" | "vikala" | "manda" | "mandatara" | "sama" | "chara" | "atichara";
+  totalVirupas: number; // max 60 virupas (Sun and Moon substitute with Ayana Bala)
   totalRupas: number;
 }
 
@@ -96,7 +97,7 @@ export interface GrahaShadbala {
 export interface BhavaBala {
   houseNumber: number;
   bhavadhipatiBala: number; // House lord's Shadbala
-  bhavaDigBala: number;     // Directional strength of house
+  bhavaDigBala: number; // Directional strength of house
   bhavaDrishtiBala: number; // Aspect strength on house
   totalVirupas: number;
   totalRupas: number;

@@ -6,10 +6,7 @@ import {
   VARGA_DEFINITIONS,
   VargaEngine,
 } from "./VargaEngine";
-import {
-  calculateDashamshaSignIndex,
-  calculateNavamshaSignIndex,
-} from "../../lib/kundliEngine";
+import { calculateDashamshaSignIndex, calculateNavamshaSignIndex } from "../../lib/kundliEngine";
 import { CanonicalBodyId } from "../astronomy/AstronomicalContext";
 
 describe("Canonical Shodashavarga Engine (VargaEngine)", () => {
@@ -355,8 +352,7 @@ describe("Canonical Shodashavarga Engine (VargaEngine)", () => {
         expect(pos.houseNumber).toBeLessThanOrEqual(12);
 
         // Verification of house counting: house = (planetSign - lagnaSign + 12) % 12 + 1
-        const expectedHouse =
-          ((pos.signIndex - d9Chart.lagnaSignIndex + 12) % 12) + 1;
+        const expectedHouse = ((pos.signIndex - d9Chart.lagnaSignIndex + 12) % 12) + 1;
         expect(pos.houseNumber).toBe(expectedHouse);
       }
     });

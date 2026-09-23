@@ -130,7 +130,13 @@ export class AstronomicalCore {
       const speed = diff * 24.0;
 
       // Equatorial
-      const equ = Astronomy.Equator(Astronomy.Body.Sun, t.date, new Astronomy.Observer(0, 0, 0), true, true);
+      const equ = Astronomy.Equator(
+        Astronomy.Body.Sun,
+        t.date,
+        new Astronomy.Observer(0, 0, 0),
+        true,
+        true,
+      );
 
       return {
         id: "Sun",
@@ -156,7 +162,13 @@ export class AstronomicalCore {
       if (diff < -180) diff += 360;
       const speed = diff * 24.0;
 
-      const equ = Astronomy.Equator(Astronomy.Body.Moon, t.date, new Astronomy.Observer(0, 0, 0), true, true);
+      const equ = Astronomy.Equator(
+        Astronomy.Body.Moon,
+        t.date,
+        new Astronomy.Observer(0, 0, 0),
+        true,
+        true,
+      );
 
       return {
         id: "Moon",
@@ -245,7 +257,7 @@ export class AstronomicalCore {
     const gmstHours = Astronomy.SiderealTime(t);
     const ramcDegrees = normalize360(gmstHours * 15.0 + lon);
     const lastHours = ramcDegrees / 15.0;
-    
+
     // IAU standard formula for mean obliquity of ecliptic (Laskar / IAU 2000)
     const T = t.ut / 36525.0;
     const obliquityDegrees = 23.43929111 - ((46.815 + (0.00059 - 0.001813 * T) * T) * T) / 3600.0;
@@ -288,6 +300,52 @@ export class AstronomicalCore {
   }
 
   /**
+   * Calculates Sunrise and Sunset for a given date and location
+   */
+  public static calculateSunriseSunset(
+    date: Date,
+    latitude: number,
+    longitude: number,
+  ): { sunrise: Date; sunset: Date } {
+    const observer = new Astronomy.Observer(latitude, longitude, 0);
+    const localMidnightMs = new Date(date).setUTCHours(0, 0, 0, 0);
+    const midnightTime = Astronomy.MakeTime(new Date(localMidnightMs));
+
+    let tSunrise: Astronomy.AstroTime;
+    try {
+      tSunrise = Astronomy.SearchAltitude(
+        Astronomy.Body.Sun,
+        observer,
+        +1,
+        midnightTime,
+        1.0,
+        0.0,
+      )!;
+    } catch {
+      tSunrise = Astronomy.MakeTime(new Date(localMidnightMs + 6 * 3600000));
+    }
+
+    let tSunset: Astronomy.AstroTime;
+    try {
+      tSunset = Astronomy.SearchAltitude(
+        Astronomy.Body.Sun,
+        observer,
+        -1,
+        tSunrise.date,
+        1.0,
+        0.0,
+      )!;
+    } catch {
+      tSunset = Astronomy.MakeTime(new Date(tSunrise.date.getTime() + 12 * 3600000));
+    }
+
+    return {
+      sunrise: tSunrise.date,
+      sunset: tSunset.date,
+    };
+  }
+
+  /**
    * Builds Full Canonical Astronomical Context
    */
   public static buildContext(
@@ -299,8 +357,8 @@ export class AstronomicalCore {
     const provider = AyanamshaRegistry.get(ayanamsaKey);
     const ayanamsaDeg = provider.calculate(time.astroTime);
 
-    const positions: Record<CanonicalBodyId, PlanetaryPosition> = {} as any;
-    const siderealPositions: Record<CanonicalBodyId, SiderealPosition> = {} as any;
+    const positions = {} as Record<CanonicalBodyId, PlanetaryPosition>;
+    const siderealPositions = {} as Record<CanonicalBodyId, SiderealPosition>;
 
     for (const bodyId of bodies) {
       const pos = this.calculatePlanetaryPosition(bodyId, time.astroTime);

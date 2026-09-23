@@ -49,8 +49,10 @@ export class LahiriAyanamshaProvider implements IAyanamshaProvider {
     epoch: "J2000.0 (JD 2451545.0)",
     referencePlane: "Opposite Star Chitra (Alpha Virginis / Spica) at 180°",
     precisionArcsec: 0.1,
-    description: "Official Government of India standard by Calendar Reform Committee (N.C. Lahiri).",
-    citation: "Report of the Calendar Reform Committee, Govt of India (1955); Indian Astronomical Ephemeris.",
+    description:
+      "Official Government of India standard by Calendar Reform Committee (N.C. Lahiri).",
+    citation:
+      "Report of the Calendar Reform Committee, Govt of India (1955); Indian Astronomical Ephemeris.",
   };
 
   calculate(time: Astronomy.AstroTime): number {
@@ -73,7 +75,8 @@ export class RamanAyanamshaProvider implements IAyanamshaProvider {
     epoch: "397 CE",
     referencePlane: "Siddhantic sidereal zero point based on Raman tradition",
     precisionArcsec: 1.0,
-    description: "Traditional ayanamsha advocated by Prof. B.V. Raman, offset from Lahiri by ~1°28'.",
+    description:
+      "Traditional ayanamsha advocated by Prof. B.V. Raman, offset from Lahiri by ~1°28'.",
     citation: "Dr. B.V. Raman, 'A Manual of Hindu Astrology', Raman Publications, Bangalore.",
   };
 

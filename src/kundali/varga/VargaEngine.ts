@@ -355,9 +355,12 @@ export class VargaEngine implements IVargaEngine {
         const arcSpan = 30 / 9;
         partIndex = Math.min(8, Math.floor(degInSign / arcSpan));
         let startNavamsha = 0;
-        if (triplicity === 0) startNavamsha = 0; // Fire -> Aries (0)
-        else if (triplicity === 1) startNavamsha = 9; // Earth -> Capricorn (9)
-        else if (triplicity === 2) startNavamsha = 6; // Air -> Libra (6)
+        if (triplicity === 0)
+          startNavamsha = 0; // Fire -> Aries (0)
+        else if (triplicity === 1)
+          startNavamsha = 9; // Earth -> Capricorn (9)
+        else if (triplicity === 2)
+          startNavamsha = 6; // Air -> Libra (6)
         else startNavamsha = 3; // Water -> Cancer (3)
 
         destinationSignIndex = (startNavamsha + partIndex) % 12;
@@ -477,9 +480,12 @@ export class VargaEngine implements IVargaEngine {
         const arcSpan = 30 / 27;
         partIndex = Math.min(26, Math.floor(degInSign / arcSpan));
         let startSign = 0;
-        if (triplicity === 0) startSign = 0; // Aries
-        else if (triplicity === 1) startSign = 3; // Cancer
-        else if (triplicity === 2) startSign = 6; // Libra
+        if (triplicity === 0)
+          startSign = 0; // Aries
+        else if (triplicity === 1)
+          startSign = 3; // Cancer
+        else if (triplicity === 2)
+          startSign = 6; // Libra
         else startSign = 9; // Capricorn
 
         destinationSignIndex = (startSign + partIndex) % 12;

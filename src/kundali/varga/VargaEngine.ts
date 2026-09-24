@@ -656,7 +656,7 @@ export class VargaEngine implements IVargaEngine {
     const lagnaSignIndex = lagnaPos.destinationSignIndex;
 
     const planets = {} as Record<CanonicalBodyId, VargaPlanetPosition>;
-    const vargaLordNames: Record<CanonicalBodyId, string> = {};
+    const vargaLordNames: Record<string, string> = {};
 
     for (const bodyId of CLASSICAL_NAVAGRAHA) {
       const lon = planetSiderealLons[bodyId];

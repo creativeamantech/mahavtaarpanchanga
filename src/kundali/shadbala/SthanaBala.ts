@@ -6,7 +6,7 @@ import { VargaType } from "../contracts/IVargaEngine";
 /**
  * Deep Exaltation Longitudes in Sidereal Zodiac (BPHS Ch. 3 & Ch. 27)
  */
-export const DEEP_EXALTATION_DEG: Record<CanonicalBodyId, number> = {
+export const DEEP_EXALTATION_DEG: Record<string, number> = {
   Sun: 10.0, // Aries 10°
   Moon: 33.0, // Taurus 3°
   Mars: 298.0, // Capricorn 28°
@@ -40,7 +40,7 @@ export const SIGN_LORDS: CanonicalBodyId[] = [
  * Naisargika (Natural) Planetary Relationships (BPHS Ch. 3, v. 55-60)
  * 1 = Friend, 0 = Neutral, -1 = Enemy
  */
-export const NAISARGIKA_RELATIONSHIPS: Record<CanonicalBodyId, Record<CanonicalBodyId, number>> = {
+export const NAISARGIKA_RELATIONSHIPS: Record<string, Record<string, number>> = {
   Sun: {
     Sun: 1,
     Moon: 1,
@@ -197,7 +197,7 @@ export function calculateUchchaBala(planet: CanonicalBodyId, siderealLonDeg: num
 export function calculateSaptavargajaBala(
   planet: CanonicalBodyId,
   natalLonDeg: number,
-  allPlanetNatalLons: Record<CanonicalBodyId, number>,
+  allPlanetNatalLons: Record<string, number>,
 ): number {
   if (planet === "Rahu" || planet === "Ketu") return 0;
 
@@ -207,7 +207,7 @@ export function calculateSaptavargajaBala(
   // Determine Tatkalika (Temporary) Relationships in D1
   // Planets in 2, 3, 4, 10, 11, 12 from planet are Tatkalika Mitra (+1)
   // Planets in 1, 5, 6, 7, 8, 9 are Tatkalika Shatru (-1)
-  const tatkalikaMap: Partial<Record<CanonicalBodyId, number>> = {};
+  const tatkalikaMap: Partial<Record<string, number>> = {};
   for (const otherPlanet of Object.keys(allPlanetNatalLons) as CanonicalBodyId[]) {
     if (otherPlanet === planet || otherPlanet === "Rahu" || otherPlanet === "Ketu") {
       tatkalikaMap[otherPlanet] = 0;
@@ -335,7 +335,7 @@ export function calculateSthanaBala(
   planet: CanonicalBodyId,
   siderealLonDeg: number,
   houseNumber: number,
-  allPlanetNatalLons: Record<CanonicalBodyId, number>,
+  allPlanetNatalLons: Record<string, number>,
 ): SthanaBalaBreakdown {
   const uchcha = calculateUchchaBala(planet, siderealLonDeg);
   const saptavargaja = calculateSaptavargajaBala(planet, siderealLonDeg, allPlanetNatalLons);

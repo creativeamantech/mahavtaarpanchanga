@@ -142,7 +142,7 @@ export class AstronomicalCore {
         id: "Sun",
         tropicalLongitude: normalize360(sunPos.elon),
         tropicalLatitude: 0,
-        distanceAU: sunPos.dist_au || 1.0,
+        distanceAU: (sunPos as unknown as { dist_au?: number }).dist_au || 1.0,
         speedDegPerDay: speed,
         isRetrograde: false,
         rightAscensionDeg: equ.ra * 15.0,

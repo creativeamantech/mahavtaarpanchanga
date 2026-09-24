@@ -135,6 +135,8 @@ export interface GrahaShadbalaDetailed {
   strengthRatio: number; // totalRupas / requiredRupas (>= 1.0 indicates strong)
   isAdequate: boolean; // totalVirupas >= requiredVirupas
   rank: number; // 1 (strongest) to 7 (weakest)
+  totalShadbalaRupa?: number;
+  shadbalaRatio?: number;
 }
 
 /**
@@ -150,6 +152,7 @@ export interface BhavaBalaDetailed {
   totalVirupas: number;
   totalRupas: number;
   rank: number; // 1 to 12
+  totalBhavaBalaRupa?: number;
   source: string;
 }
 
@@ -160,6 +163,8 @@ export interface CompleteShadbalaResult {
   metadata: RepositoryMetadata;
   planets: Record<CanonicalBodyId, GrahaShadbalaDetailed>;
   bhavas: BhavaBalaDetailed[];
+  planetaryShadbala?: Record<CanonicalBodyId, GrahaShadbalaDetailed>;
+  bhavaBala?: BhavaBalaDetailed[];
   strongestPlanet: CanonicalBodyId;
   weakestPlanet: CanonicalBodyId;
   strongestHouse: number;

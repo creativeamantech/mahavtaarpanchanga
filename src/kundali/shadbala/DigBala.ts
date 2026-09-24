@@ -8,7 +8,7 @@ import { DigBalaBreakdown } from "./ShadbalaTypes";
  * Saturn: 7th house (West / 7th Cusp)
  * Sun, Mars: 10th house (South / 10th Cusp)
  */
-export const DIG_BALA_REFERENCE_HOUSES: Record<CanonicalBodyId, number> = {
+export const DIG_BALA_REFERENCE_HOUSES: Record<string, number> = {
   Jupiter: 1,
   Mercury: 1,
   Moon: 4,

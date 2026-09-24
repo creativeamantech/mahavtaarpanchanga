@@ -22,7 +22,7 @@ interface ShadbalaViewProps {
   shadbala?: CompleteShadbalaResult;
 }
 
-const PLANET_NAMES: Record<CanonicalBodyId, { hi: string; en: string; symbol: string }> = {
+const PLANET_NAMES: Record<string, { hi: string; en: string; symbol: string }> = {
   Sun: { hi: "सूर्य (Sun)", en: "Sun", symbol: "☉" },
   Moon: { hi: "चन्द्र (Moon)", en: "Moon", symbol: "☽" },
   Mars: { hi: "मंगल (Mars)", en: "Mars", symbol: "♂" },

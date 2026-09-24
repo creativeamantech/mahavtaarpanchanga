@@ -16,6 +16,7 @@ export interface RepositoryMetadata {
   /** Primary astrological treatise referenced by this code (e.g. BPHS, Phaladeepika) */
   key?: string;
   nameEn?: string;
+  author?: string;
   nameHi?: string;
   nameSa?: string;
   sourceText?: string;

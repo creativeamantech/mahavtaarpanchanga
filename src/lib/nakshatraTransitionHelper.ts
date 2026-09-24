@@ -823,16 +823,16 @@ export function getUpcomingNakshatraTransitions(
   return data.planet_transitions.upcomingEvents
     .filter((e) => e.type === "nakshatra")
     .map((e) => {
-      const p = e.planet;
+      const p = e.planetName || e.planetId;
       return {
         planet: p,
         planetHi: PLANET_HI_MAP[p] || p,
-        fromNakshatra: e.from,
-        toNakshatra: e.to,
-        exactDate: e.date,
-        exactTime: e.time ? formatSimple12hTime(e.time, true) : e.time,
-        timestamp: e.timestamp,
-        relativeFormatted: e.isToday ? "Today (आज)" : e.date,
+        fromNakshatra: e.fromName || e.fromValue,
+        toNakshatra: e.toName || e.toValue,
+        exactDate: e.dateStr,
+        exactTime: e.timeStr,
+        timestamp: new Date(e.timestamp).getTime(),
+        relativeFormatted: e.isToday ? "Today (आज)" : e.dateStr,
       };
     });
 }

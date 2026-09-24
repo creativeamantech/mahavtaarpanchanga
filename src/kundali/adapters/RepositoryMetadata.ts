@@ -4,15 +4,15 @@
  */
 export interface RepositoryMetadata {
   /** Canonical name of the upstream source */
-  repositoryName: string;
+  repositoryName?: string;
   /** Git URL or published package handle */
-  repositoryUrl: string;
+  repositoryUrl?: string;
   /** Commit SHA or semver version verified during audit */
-  commitOrVersion: string;
+  commitOrVersion?: string;
   /** License type (e.g. MIT, GPL-3.0, Apache-2.0) */
-  license: string;
+  license?: string;
   /** Exact module/file path in the upstream repository */
-  sourceFilePath: string;
+  sourceFilePath?: string;
   /** Primary astrological treatise referenced by this code (e.g. BPHS, Phaladeepika) */
   key?: string;
   nameEn?: string;
@@ -27,7 +27,7 @@ export interface RepositoryMetadata {
   /** Specific chapter & verse numbers (e.g. BPHS Ch. 3, Shloka 12-15) */
   shlokaReference?: string;
   /** Explanation of mathematical adaptations or TypeScript translations */
-  adaptationNotes: string;
+  adaptationNotes?: string;
 }
 
 /**

@@ -1493,7 +1493,7 @@ export function computeFullKundli(
   try {
     const ruleContext = RuleEngine.buildContextFromKundli(
       planets,
-      housesD1 as { houseNumber: number; signIndex: number; lord: string; planetsPresent?: string[] }[],
+      housesD1 as unknown as { houseNumber: number; signIndex: number; lord: string; planetsPresent?: string[] }[],
       lagnaSignIndex,
       moonSignIndex,
       shadbala,

@@ -40,7 +40,7 @@ export const SIGN_LORDS: CanonicalBodyId[] = [
  * Naisargika (Natural) Planetary Relationships (BPHS Ch. 3, v. 55-60)
  * 1 = Friend, 0 = Neutral, -1 = Enemy
  */
-export const NAISARGIKA_RELATIONSHIPS: Record<CanonicalBodyId, Record<string, number>> = {
+export const NAISARGIKA_RELATIONSHIPS: Record<string, Record<string, number>> = {
   Sun: {
     Sun: 1,
     Moon: 1,

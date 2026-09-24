@@ -4,7 +4,7 @@ import { CheshtaBalaBreakdown, PlanetaryMotionState } from "./ShadbalaTypes";
 /**
  * Classical Mean Daily Velocities (Degrees / Day)
  */
-export const MEAN_DAILY_SPEEDS: Record<CanonicalBodyId, number> = {
+export const MEAN_DAILY_SPEEDS: Record<string, number> = {
   Sun: 0.9856,
   Moon: 13.1764,
   Mars: 0.524,

@@ -469,7 +469,7 @@ function getPlanetTropicalLon(body: string, t: Astronomy.AstroTime): number {
   try {
     if (body === "sun") {
       const sunPos = Astronomy.SunPosition(t);
-      return sunPos ? normalize360(sunPos.elong) : 0;
+      return sunPos ? normalize360((sunPos as unknown as { elong?: number }).elong ?? 0) : 0;
     }
     if (body === "moon") {
       const moonGeo = Astronomy.GeoVector(Astronomy.Body.Moon, t, false);
@@ -1376,7 +1376,7 @@ export function computeFullKundli(
   yogas.push({
     nameEn: "Budhaditya Yoga",
     nameHi: "बुधादित्य योग",
-    present: isBudhaditya,
+    present: !!isBudhaditya,
     type: "auspicious",
     descriptionEn: isBudhaditya
       ? `Sun and Mercury are conjoined in ${ZODIAC_SIGNS[sunObj.signIndex].en}, conferring sharp intellect, eloquence, analytical prowess, and administrative acumen.`
@@ -1552,7 +1552,7 @@ export function computeFullKundli(
       lagnaNavamshaSignIndex,
       planets.map((p) => ({
         id: p.id as CanonicalBodyId,
-        signIndex: p.signD9Index,
+        signIndex: (p as unknown as { signD9Index?: number }).signD9Index ?? p.signIndex,
       })),
       ms,
     );

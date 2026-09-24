@@ -662,7 +662,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                     </span>
 
                     {/* Dedicated Nadi Badge for Hora & Hora-Tattva */}
-                    {(ev.type === "hora" || ev.type === "hora-tattva") && ev.metadata?.nadi && (
+                    {(ev.type === "hora" || ev.type === "hora-tattva") && !!ev.metadata?.nadi && (
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border flex items-center gap-1 shadow-2xs ${
                           ev.metadata.nadi === "ida"
@@ -826,7 +826,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                         </div>
 
                         {/* Parent Nadi */}
-                        {ev.metadata?.nadi && (
+                        {!!ev.metadata?.nadi && (
                           <div
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-medium ${
                               ev.metadata.nadi === "ida"
@@ -878,7 +878,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                 {isExpanded && (
                   <div className="mt-3 pt-3 border-t border-stone-100 dark:border-slate-800 space-y-3 animate-in fade-in duration-150">
                     {/* Dedicated Nadi & Swara Guidance for Hora */}
-                    {ev.type === "hora" && ev.metadata?.nadi && (
+                    {ev.type === "hora" && !!ev.metadata?.nadi && (
                       <div
                         className={`p-3 rounded-lg border text-xs space-y-2.5 ${
                           ev.metadata.nadi === "ida"

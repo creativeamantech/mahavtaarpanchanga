@@ -1645,7 +1645,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                     : data?.date || new Date().toLocaleDateString()}
                 </span>
                 <span>•</span>
-                <span>अयन: {data?.ayana || "Drik"} ({data?.ayanamsa_name || "Lahiri"})</span>
+                <span>अयन: {data?.ayana || "Drik"} ({data?.ayanamsa_key || "Lahiri"})</span>
               </div>
             </div>
 

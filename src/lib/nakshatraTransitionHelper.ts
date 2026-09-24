@@ -31,7 +31,7 @@ export interface NakshatraStaticMeta {
   yoniHi: string;
   nadi: "Adi" | "Madhya" | "Antya";
   nadiHi: string;
-  varna: "Brahmin" | "Kshatriya" | "Vaishya" | "Shudra";
+  varna: string;
   varnaHi: string;
   symbol: string;
   symbolHi: string;

@@ -14,6 +14,8 @@ export interface RepositoryMetadata {
   /** Exact module/file path in the upstream repository */
   sourceFilePath: string;
   /** Primary astrological treatise referenced by this code (e.g. BPHS, Phaladeepika) */
+  key?: string;
+  sourceText?: string;
   classicalTextReference?: string;
   /** Specific chapter & verse numbers (e.g. BPHS Ch. 3, Shloka 12-15) */
   shlokaReference?: string;

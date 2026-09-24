@@ -4,7 +4,7 @@ import { CompleteShadbalaResult, GrahaShadbalaDetailed } from "./ShadbalaTypes";
 /**
  * Standard BPHS Required Strengths
  */
-export const BPHS_REQUIRED_RUPAS: Record<CanonicalBodyId, number> = {
+export const BPHS_REQUIRED_RUPAS: Record<string, number> = {
   Sun: 6.5, // 390 Virupas
   Moon: 6.0, // 360 Virupas
   Mars: 5.0, // 300 Virupas

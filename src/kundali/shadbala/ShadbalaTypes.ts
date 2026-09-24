@@ -160,6 +160,8 @@ export interface CompleteShadbalaResult {
   metadata: RepositoryMetadata;
   planets: Record<CanonicalBodyId, GrahaShadbalaDetailed>;
   bhavas: BhavaBalaDetailed[];
+  planetaryShadbala?: Record<CanonicalBodyId, GrahaShadbalaDetailed>;
+  bhavaBala?: BhavaBalaDetailed[];
   strongestPlanet: CanonicalBodyId;
   weakestPlanet: CanonicalBodyId;
   strongestHouse: number;

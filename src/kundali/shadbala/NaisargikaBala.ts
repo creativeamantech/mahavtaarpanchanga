@@ -9,7 +9,7 @@ import { NaisargikaBalaBreakdown } from "./ShadbalaTypes";
  * Mercury (25.71428), Mars (17.14285), Saturn (8.57142) Virupas.
  */
 export const NAISARGIKA_BALA_TABLE: Record<
-  CanonicalBodyId,
+  string,
   {
     rankIndex: number;
     fractionalValue: string;

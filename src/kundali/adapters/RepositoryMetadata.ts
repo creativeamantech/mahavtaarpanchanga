@@ -17,6 +17,7 @@ export interface RepositoryMetadata {
   key?: string;
   nameEn?: string;
   author?: string;
+  version?: string;
   nameHi?: string;
   nameSa?: string;
   sourceText?: string;

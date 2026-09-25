@@ -49,8 +49,11 @@ export default defineConfig({
             },
           ],
         },
+        injectRegister: null,
         workbox: {
-          globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2,json}"],
+          globPatterns: ["**/*.{js,css,ico,png,svg,woff,woff2}"],
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -98,8 +101,7 @@ export default defineConfig({
           ],
         },
         devOptions: {
-          enabled: true, // Enables service worker in development / AI Studio preview
-          type: "module",
+          enabled: false,
         },
       }),
     ],

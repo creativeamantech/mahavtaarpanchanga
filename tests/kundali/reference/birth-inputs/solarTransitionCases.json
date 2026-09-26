@@ -1,0 +1,86 @@
+[
+  {
+    "id": "SOLAR_SUNRISE_UJJAIN",
+    "category": "SUNRISE_BOUNDARY",
+    "birthDate": "2024-03-21",
+    "birthTime": "06:33:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 23.1765,
+    "longitude": 75.7885,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "sunNearHorizon": true,
+      "sunHouse": 1,
+      "event": "Equinox Sunrise at Ujjain"
+    },
+    "source": "Astronomy Engine Altitude Search (altitude = 0° / -0.833° refraction)",
+    "sourceVersion": "Astronomy Engine 2.1.19",
+    "convention": "Geometric / Apparent Sunrise",
+    "tolerance": { "degrees": 0.5 },
+    "notes": "Vernal Equinox sunrise chart testing 1st house Sun placement"
+  },
+  {
+    "id": "SOLAR_SUNSET_DELHI",
+    "category": "SUNSET_BOUNDARY",
+    "birthDate": "2024-06-21",
+    "birthTime": "19:22:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "sunNearDescendant": true,
+      "sunHouse": 7,
+      "event": "Summer Solstice Sunset at Delhi"
+    },
+    "source": "Astronomy Engine SearchAltitude",
+    "sourceVersion": "Astronomy Engine 2.1.19",
+    "convention": "Apparent Sunset",
+    "tolerance": { "degrees": 0.5 },
+    "notes": "Summer solstice sunset chart testing 7th house Sun placement"
+  },
+  {
+    "id": "SOLAR_MIDNIGHT_VARANASI",
+    "category": "MIDNIGHT",
+    "birthDate": "2024-12-31",
+    "birthTime": "00:00:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 25.3176,
+    "longitude": 82.9739,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "sunNearNadir": true,
+      "sunHouse": 4,
+      "event": "Midnight New Year boundary"
+    },
+    "source": "Local Standard Time Midnight",
+    "sourceVersion": "ISO-8601 Calendar Transition",
+    "convention": "00:00:00 LST",
+    "tolerance": { "degrees": 2.0 },
+    "notes": "Testing midnight calendar rollover and 4th house solar nadir"
+  },
+  {
+    "id": "SOLAR_NOON_MUMBAI",
+    "category": "NOON",
+    "birthDate": "2024-09-22",
+    "birthTime": "12:35:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 19.076,
+    "longitude": 72.8777,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "sunNearMidheaven": true,
+      "sunHouse": 10,
+      "event": "Autumn Equinox Local Solar Noon"
+    },
+    "source": "Equation of Time & Local Solar Meridian Passage",
+    "sourceVersion": "IAU Solar Noon Reference",
+    "convention": "Local solar zenith / meridian culmination",
+    "tolerance": { "degrees": 2.0 },
+    "notes": "Local solar noon transit testing 10th house Sun placement"
+  }
+]

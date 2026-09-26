@@ -1,0 +1,84 @@
+[
+  {
+    "id": "TEMP_DST_US_SPRING_FORWARD",
+    "category": "DST_TRANSITIONS",
+    "birthDate": "2024-03-10",
+    "birthTime": "03:15:00",
+    "timezone": "America/New_York",
+    "latitude": 40.7128,
+    "longitude": -74.006,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "utcOffsetHours": -4,
+      "utcIso": "2024-03-10T07:15:00.000Z",
+      "dstActive": true
+    },
+    "source": "IANA Timezone Database (tzdata)",
+    "sourceVersion": "tzdb-2024a",
+    "convention": "EDT Transition (UTC-4)",
+    "tolerance": { "milliseconds": 0 },
+    "notes": "US Eastern spring forward jump across 2:00 -> 3:00"
+  },
+  {
+    "id": "TEMP_DST_US_FALL_BACK",
+    "category": "DST_TRANSITIONS",
+    "birthDate": "2024-11-03",
+    "birthTime": "01:30:00",
+    "timezone": "America/New_York",
+    "latitude": 40.7128,
+    "longitude": -74.006,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "utcOffsetHours": -5,
+      "dstActive": false
+    },
+    "source": "IANA Timezone Database",
+    "sourceVersion": "tzdb-2024a",
+    "convention": "EST Return (UTC-5)",
+    "tolerance": { "milliseconds": 0 },
+    "notes": "US Eastern fall back transition"
+  },
+  {
+    "id": "TEMP_TZ_NEPAL_45MIN",
+    "category": "TIMEZONE_TRANSITIONS",
+    "birthDate": "2024-05-01",
+    "birthTime": "12:00:00",
+    "timezone": "Asia/Kathmandu",
+    "latitude": 27.7172,
+    "longitude": 85.324,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "utcOffsetHours": 5.75,
+      "utcOffsetMinutes": 345,
+      "utcIso": "2024-05-01T06:15:00.000Z"
+    },
+    "source": "Nepal Standard Time (NPT UTC+05:45)",
+    "sourceVersion": "IANA Asia/Kathmandu",
+    "convention": "45-Minute Fractional Timezone",
+    "tolerance": { "milliseconds": 0 },
+    "notes": "Testing non-half-hour 45-minute fractional timezone"
+  },
+  {
+    "id": "TEMP_TZ_CHATHAM_45MIN",
+    "category": "TIMEZONE_TRANSITIONS",
+    "birthDate": "2024-01-15",
+    "birthTime": "14:00:00",
+    "timezone": "Pacific/Chatham",
+    "latitude": -43.9536,
+    "longitude": -176.5497,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "utcOffsetHours": 13.75,
+      "isSouthernHemisphere": true
+    },
+    "source": "Chatham Islands Standard / Daylight Time",
+    "sourceVersion": "IANA Pacific/Chatham",
+    "convention": "+12:45 / +13:45 extreme fractional zone",
+    "tolerance": { "milliseconds": 0 },
+    "notes": "Extreme fractional timezone near International Date Line"
+  }
+]

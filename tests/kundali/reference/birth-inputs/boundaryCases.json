@@ -1,0 +1,89 @@
+[
+  {
+    "id": "BOUND_NAK_ASHWINI_BHARANI",
+    "category": "EXACT_NAKSHATRA_BOUNDARY",
+    "birthDate": "2024-04-14",
+    "birthTime": "12:00:00",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "boundaryLongitude": 13.333333333333334,
+      "leftNakshatra": "Ashwini",
+      "rightNakshatra": "Bharani",
+      "boundaryDms": "13° 20' 00\""
+    },
+    "source": "Classical Nakshatra Definition (360° / 27 = 13°20')",
+    "sourceVersion": "Surya Siddhanta / BPHS Adhyaya 3",
+    "convention": "Exact 800 arcminute boundary",
+    "tolerance": { "arcseconds": 0.01 },
+    "notes": "Exact junction between 1st and 2nd nakshatra"
+  },
+  {
+    "id": "BOUND_PADA_001",
+    "category": "EXACT_PADA_BOUNDARY",
+    "birthDate": "2024-04-14",
+    "birthTime": "12:00:00",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "boundaryLongitude": 3.3333333333333335,
+      "leftPada": 1,
+      "rightPada": 2,
+      "boundaryDms": "03° 20' 00\""
+    },
+    "source": "Pada Division (13°20' / 4 = 3°20')",
+    "sourceVersion": "BPHS Navamsha Definition",
+    "convention": "Exact 200 arcminute navamsha/pada boundary",
+    "tolerance": { "arcseconds": 0.01 },
+    "notes": "Exact junction between Pada 1 and Pada 2"
+  },
+  {
+    "id": "BOUND_RASHI_ARIES_TAURUS",
+    "category": "EXACT_RASHI_BOUNDARY",
+    "birthDate": "2024-04-14",
+    "birthTime": "12:00:00",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "boundaryLongitude": 30.0,
+      "leftRashiIndex": 0,
+      "rightRashiIndex": 1,
+      "boundaryDms": "30° 00' 00\""
+    },
+    "source": "Standard 30° Zodiacal Arc",
+    "sourceVersion": "Classical Jyotisha / IAU Ecliptic Division",
+    "convention": "Exact 30-degree boundary crossing",
+    "tolerance": { "arcseconds": 0.001 },
+    "notes": "Aries to Taurus transition boundary"
+  },
+  {
+    "id": "BOUND_VARGA_D60_BOUNDARY",
+    "category": "VARGA_BOUNDARY",
+    "birthDate": "2024-04-14",
+    "birthTime": "12:00:00",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "boundaryArc": 0.5,
+      "shashtiamshaSpanArcmin": 30,
+      "boundaryDms": "00° 30' 00\""
+    },
+    "source": "BPHS Shashtiamsha Arc Definition",
+    "sourceVersion": "BPHS Adhyaya 6 Shloka 33-41",
+    "convention": "Exact 30 arcminute Shashtiamsha partition",
+    "tolerance": { "arcseconds": 0.001 },
+    "notes": "D60 boundary test: 0.5° intervals"
+  }
+]

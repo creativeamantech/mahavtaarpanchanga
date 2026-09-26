@@ -1,0 +1,65 @@
+[
+  {
+    "id": "LAT_HIGH_TRONDHEIM",
+    "category": "HIGH_LATITUDE",
+    "birthDate": "2024-06-21",
+    "birthTime": "12:00:00",
+    "timezone": "Europe/Oslo",
+    "latitude": 63.4305,
+    "longitude": 10.3951,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "latitudeDeg": 63.4305,
+      "ascendantCalculable": true,
+      "region": "Sub-Arctic Scandinavia"
+    },
+    "source": "High Latitude Ascendant Trigonometric Validation",
+    "sourceVersion": "IAU Standard Ascendant Equation",
+    "convention": "Strict Spherical Trigonometry Ascendant",
+    "tolerance": { "degrees": 0.5 },
+    "notes": "Testing ascendant calculation stability at 63.4° North"
+  },
+  {
+    "id": "LAT_HIGH_FAIRBANKS",
+    "category": "HIGH_LATITUDE",
+    "birthDate": "2024-12-21",
+    "birthTime": "15:00:00",
+    "timezone": "America/Anchorage",
+    "latitude": 64.8378,
+    "longitude": -147.7164,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "latitudeDeg": 64.8378,
+      "ascendantCalculable": true,
+      "region": "Alaska Sub-Arctic"
+    },
+    "source": "High Latitude Ascendant Stability Envelope",
+    "sourceVersion": "Astronomy Engine Observer Matrix",
+    "convention": "Sub-Arctic Ascendant Calculation",
+    "tolerance": { "degrees": 0.5 },
+    "notes": "Testing winter solstice near-sunset at 64.8° North"
+  },
+  {
+    "id": "LAT_POLAR_BORDER_TROMSO",
+    "category": "NEAR_POLAR_CONDITIONS",
+    "birthDate": "2024-06-21",
+    "birthTime": "00:00:00",
+    "timezone": "Europe/Oslo",
+    "latitude": 69.6492,
+    "longitude": 18.9553,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "latitudeDeg": 69.6492,
+      "isMidnightSun": true,
+      "region": "Arctic Circle Norway"
+    },
+    "source": "Arctic Astronomical Reference",
+    "sourceVersion": "Meeus Arctic Phenomena",
+    "convention": "Circumpolar / Midnight Sun Ascendant Continuity",
+    "tolerance": { "degrees": 1.0 },
+    "notes": "Near-polar midnight sun condition at 69.6° North"
+  }
+]

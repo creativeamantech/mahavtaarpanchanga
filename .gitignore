@@ -30,3 +30,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Scratch & patch scripts
+patch*.cjs
+patch*.js
+fix*.cjs
+fix*.js
+revert*.cjs
+remove*.cjs
+simplify*.cjs
+update_normalizer*.cjs
+update_normalizer*.js
+test*.cjs
+test*.js
+test_*.ts
+tmp_*.txt
+PHASE_1_VERIFICATION.md
+

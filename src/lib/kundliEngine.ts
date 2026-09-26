@@ -469,7 +469,7 @@ function getPlanetTropicalLon(body: string, t: Astronomy.AstroTime): number {
   try {
     if (body === "sun") {
       const sunPos = Astronomy.SunPosition(t);
-      return sunPos ? normalize360((sunPos as unknown as { elong?: number }).elong ?? 0) : 0;
+      return sunPos ? normalize360(sunPos.elon ?? (sunPos as unknown as { elong?: number }).elong ?? 0) : 0;
     }
     if (body === "moon") {
       const moonGeo = Astronomy.GeoVector(Astronomy.Body.Moon, t, false);
@@ -1637,4 +1637,37 @@ export function computeFullKundli(
     ruleResults,
     jaimini,
   };
+}
+
+/**
+ * Canonical helper for object-based Kundli calculations
+ */
+export function calculateKundliData(params: {
+  name?: string;
+  gender?: string;
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second?: number;
+  latitude: number;
+  longitude: number;
+  cityName?: string;
+  timezone?: string;
+  ayanamsaKey?: CoordinateSelection;
+}): FullKundliData {
+  const dateStr = `${params.year}-${String(params.month).padStart(2, "0")}-${String(params.day).padStart(2, "0")}`;
+  const timeStr = `${String(params.hour).padStart(2, "0")}:${String(params.minute).padStart(2, "0")}:${String(params.second ?? 0).padStart(2, "0")}`;
+  return computeFullKundli(
+    dateStr,
+    timeStr,
+    params.latitude,
+    params.longitude,
+    params.timezone || "Asia/Kolkata",
+    params.cityName || "Custom Location",
+    params.ayanamsaKey || "citra",
+    params.name || "Jātaka (जातक)",
+    params.gender,
+  );
 }

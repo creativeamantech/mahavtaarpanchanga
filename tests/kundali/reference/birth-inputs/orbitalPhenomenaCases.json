@@ -1,0 +1,90 @@
+[
+  {
+    "id": "ORB_RETRO_STATION_MERCURY",
+    "category": "RETROGRADE_STATIONS",
+    "birthDate": "2024-04-01",
+    "birthTime": "22:15:00",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "targetBody": "Mercury",
+      "speedNearZero": true,
+      "event": "Mercury Stationary Turning Retrograde in Aries"
+    },
+    "source": "NASA JPL Horizons / Astronomy Engine Speed Delta",
+    "sourceVersion": "Horizons 2024",
+    "convention": "Stationary Point (Daily Motion < 0.05°/day)",
+    "tolerance": { "degrees": 0.05 },
+    "notes": "Testing planetary stationary point where speed crosses zero"
+  },
+  {
+    "id": "ORB_CONJUNCTION_GREAT_2020",
+    "category": "PLANETARY_CONJUNCTIONS",
+    "birthDate": "2020-12-21",
+    "birthTime": "18:20:00",
+    "timezone": "UTC",
+    "latitude": 51.4769,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "body1": "Jupiter",
+      "body2": "Saturn",
+      "angularSeparationDegMax": 0.15,
+      "signIndex": 9,
+      "event": "Great Conjunction of Jupiter and Saturn in Capricorn"
+    },
+    "source": "Great Conjunction December 2020 Astronomical Observation",
+    "sourceVersion": "IAU / Royal Astronomical Society",
+    "convention": "Ultra-tight planetary conjunction (< 6 arcminutes)",
+    "tolerance": { "degrees": 0.05 },
+    "notes": "Historical Great Conjunction: Jupiter and Saturn within 0.1° in Capricorn"
+  },
+  {
+    "id": "ORB_PLANETARY_WAR_MARS_VENUS",
+    "category": "PLANETARY_WAR",
+    "birthDate": "2022-03-12",
+    "birthTime": "12:00:00",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "combatant1": "Mars",
+      "combatant2": "Venus",
+      "isGrahaYuddha": true,
+      "separationDegreesMax": 1.0,
+      "signIndex": 9
+    },
+    "source": "Surya Siddhanta / BPHS Planetary War (Graha Yuddha) Rules",
+    "sourceVersion": "BPHS Graha Yuddha Definition (< 1° separation)",
+    "convention": "Classical 1-degree Graha Yuddha threshold (Tara Grahas)",
+    "tolerance": { "degrees": 0.1 },
+    "notes": "Mars-Venus war in Capricorn: distance less than 1 degree"
+  },
+  {
+    "id": "ORB_NODAL_AXIS_RAHU_KETU",
+    "category": "RAHU_KETU_BOUNDARY",
+    "birthDate": "2024-01-01",
+    "birthTime": "00:00:00",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "rahuKetuAxisDifferenceDeg": 180.0,
+      "speedIsNegative": true,
+      "toleranceDeg": 0.000001
+    },
+    "source": "Mean Lunar Node Analytical Definition",
+    "sourceVersion": "Astronomical Algorithms (Meeus Ch 22)",
+    "convention": "Mean Node Exact 180° Anti-Podal Conservation",
+    "tolerance": { "degrees": 0.000001 },
+    "notes": "Verifying Rahu and Ketu are precisely 180° opposite at all times"
+  }
+]

@@ -1,0 +1,112 @@
+[
+  {
+    "id": "IN_DELHI_001",
+    "category": "ORDINARY_INDIAN_BIRTH",
+    "birthDate": "1990-05-15",
+    "birthTime": "14:30:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "lagnaSignIndex": 5,
+      "sunSignIndex": 1,
+      "moonSignIndex": 9,
+      "ayanamsaDegApprox": 23.719
+    },
+    "source": "Positional Astronomy Centre / Lahiri Ephemeris Reference",
+    "sourceVersion": "IAE-1990",
+    "convention": "Whole-sign Drik Ganita Chitrapaksha",
+    "tolerance": { "degrees": 0.05 },
+    "notes": "Standard Capital Delhi chart with mid-day ascendant Virgo"
+  },
+  {
+    "id": "IN_UJJAIN_002",
+    "category": "ORDINARY_INDIAN_BIRTH",
+    "birthDate": "1985-10-24",
+    "birthTime": "06:15:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 23.1765,
+    "longitude": 75.7885,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "lagnaSignIndex": 6,
+      "sunSignIndex": 6,
+      "moonSignIndex": 10,
+      "ayanamsaDegApprox": 23.655
+    },
+    "source": "Ujjain Prime Meridian Reference / Dongre Panchang",
+    "sourceVersion": "1985-UJJ",
+    "convention": "Avanti / Ujjain Zero Meridian Drik",
+    "tolerance": { "degrees": 0.05 },
+    "notes": "Classical zero meridian Ujjain birth at sunrise, Sun in Libra"
+  },
+  {
+    "id": "IN_CHENNAI_003",
+    "category": "ORDINARY_INDIAN_BIRTH",
+    "birthDate": "2000-01-01",
+    "birthTime": "00:01:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 13.0827,
+    "longitude": 80.2707,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "lagnaSignIndex": 5,
+      "sunSignIndex": 8,
+      "moonSignIndex": 6,
+      "ayanamsaDegApprox": 23.857
+    },
+    "source": "J2000 Benchmark / Swiss Ephemeris Cross-Verification",
+    "sourceVersion": "Sweph 2.10",
+    "convention": "Chitrapaksha J2000.0 Epoch",
+    "tolerance": { "degrees": 0.02 },
+    "notes": "Y2K stroke of midnight birth in Southern coastal India"
+  },
+  {
+    "id": "IN_MUMBAI_004",
+    "category": "ORDINARY_INDIAN_BIRTH",
+    "birthDate": "2015-08-15",
+    "birthTime": "18:45:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 19.076,
+    "longitude": 72.8777,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "lagnaSignIndex": 10,
+      "sunSignIndex": 3,
+      "moonSignIndex": 4,
+      "ayanamsaDegApprox": 24.078
+    },
+    "source": "Mahavtaar Reference Baseline",
+    "sourceVersion": "2015-IAE",
+    "convention": "Standard Drik Ganita",
+    "tolerance": { "degrees": 0.05 },
+    "notes": "Western India sunset-adjacent Aquarius ascendant"
+  },
+  {
+    "id": "IN_VARANASI_005",
+    "category": "ORDINARY_INDIAN_BIRTH",
+    "birthDate": "1972-11-20",
+    "birthTime": "11:11:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 25.3176,
+    "longitude": 82.9739,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "lagnaSignIndex": 9,
+      "sunSignIndex": 7,
+      "moonSignIndex": 1,
+      "ayanamsaDegApprox": 23.473
+    },
+    "source": "Kashi Vishwanath Panchang / Chowkhamba Tables",
+    "sourceVersion": "Kashi-1972",
+    "convention": "Traditional Sanskrit University Kashi Drik",
+    "tolerance": { "degrees": 0.05 },
+    "notes": "Eastern UP Varanasi sacred center chart"
+  }
+]

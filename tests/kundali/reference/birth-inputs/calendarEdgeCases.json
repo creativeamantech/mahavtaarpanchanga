@@ -1,0 +1,108 @@
+[
+  {
+    "id": "CAL_LEAP_CENTURY_2000",
+    "category": "LEAP_YEARS",
+    "birthDate": "2000-02-29",
+    "birthTime": "12:00:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "isLeapDay": true,
+      "julianDayApprox": 2451604.0,
+      "ayanamsaDegApprox": 23.858
+    },
+    "source": "Gregorian 400-Year Century Leap Rule",
+    "sourceVersion": "Astronomical Algorithms (Meeus Ch 7)",
+    "convention": "Proleptic Gregorian Calendar",
+    "tolerance": { "degrees": 0.01 },
+    "notes": "Century leap year 2000 Feb 29 verification"
+  },
+  {
+    "id": "CAL_LEAP_QUAD_2024",
+    "category": "LEAP_YEARS",
+    "birthDate": "2024-02-29",
+    "birthTime": "23:59:59",
+    "timezone": "UTC",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "isLeapDay": true,
+      "julianDayApprox": 2460369.5
+    },
+    "source": "Standard Quadrennial Leap Rule",
+    "sourceVersion": "ISO-8601",
+    "convention": "Standard Gregorian Leap Year",
+    "tolerance": { "degrees": 0.01 },
+    "notes": "Quadrennial leap year 2024 Feb 29 terminal second"
+  },
+  {
+    "id": "CAL_HIST_INDIA_INDEPENDENCE",
+    "category": "HISTORICAL_DATES",
+    "birthDate": "1947-08-15",
+    "birthTime": "00:00:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "lagnaSignIndex": 1,
+      "sunSignIndex": 3,
+      "moonSignIndex": 3,
+      "rahuSignIndex": 1,
+      "ayanamsaDegApprox": 23.118
+    },
+    "source": "Dr. B.V. Raman / Indian Astrological Ephemeris Historical Archive",
+    "sourceVersion": "Notable Horoscopes (Dr. B.V. Raman)",
+    "convention": "Independence Horoscope of Bharat (Midnight Taurus Lagna)",
+    "tolerance": { "degrees": 0.1 },
+    "notes": "Canonical Independence of India chart, midnight Taurus Ascendant with 5 planets in Cancer"
+  },
+  {
+    "id": "CAL_HIST_SWAMI_VIVEKANANDA",
+    "category": "HISTORICAL_DATES",
+    "birthDate": "1863-01-12",
+    "birthTime": "06:33:00",
+    "timezone": "Asia/Kolkata",
+    "latitude": 22.5726,
+    "longitude": 88.3639,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "lagnaSignIndex": 8,
+      "sunSignIndex": 8,
+      "moonSignIndex": 5,
+      "ayanamsaDegApprox": 21.942
+    },
+    "source": "Notable Horoscopes (Dr. B.V. Raman)",
+    "sourceVersion": "Notable Horoscopes Case 34",
+    "convention": "Kolkata Sunrise Sagittarius Lagna",
+    "tolerance": { "degrees": 0.2 },
+    "notes": "Swami Vivekananda birth chart, 1863 pre-modern date verification"
+  },
+  {
+    "id": "CAL_OLD_EPOCH_1800",
+    "category": "VERY_OLD_DATES",
+    "birthDate": "1800-01-01",
+    "birthTime": "12:00:00",
+    "timezone": "UTC",
+    "latitude": 51.4769,
+    "longitude": 0.0,
+    "ayanamsha": "lahiri",
+    "houseSystem": "whole_sign",
+    "expected": {
+      "julianDayApprox": 2378496.0,
+      "ayanamsaDegApprox": 21.065
+    },
+    "source": "Meeus Ephemeris Range / VSOP87 Validity Envelope",
+    "sourceVersion": "IAU-1976 / Meeus Astronomical Formulae",
+    "convention": "Centennial Ephemeris Boundary",
+    "tolerance": { "degrees": 0.1 },
+    "notes": "Testing lower boundary of modern planetary secular polynomials"
+  }
+]

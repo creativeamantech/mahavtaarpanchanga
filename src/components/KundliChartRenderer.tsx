@@ -156,26 +156,26 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
       : "w-full max-w-[440px]";
 
   return (
-    <div className="bg-gradient-to-b from-stone-950/90 via-amber-950/40 to-stone-950/90 rounded-2xl sm:rounded-3xl border border-amber-500/30 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
+    <div className="bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-700 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
       {/* Chart Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-amber-500/20 gap-2.5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-zinc-700 gap-2.5">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-            <h3 className="text-base sm:text-xl font-black text-amber-100 tracking-tight">
+            <h3 className="text-base sm:text-xl font-bold text-white tracking-tight">
               {chartTitle}
             </h3>
           </div>
-          <p className="text-xs text-amber-300/80 mt-0.5">{chartSubtitle}</p>
+          <p className="text-xs text-zinc-400 mt-0.5">{chartSubtitle}</p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap text-xs">
-          <span className="bg-amber-900/50 text-amber-200 border border-amber-500/30 px-3 py-1 rounded-lg font-medium flex items-center gap-1.5 shadow-xs">
+          <span className="bg-zinc-800 text-zinc-200 border border-zinc-600 px-3 py-1.5 rounded-xl font-medium flex items-center gap-1.5 shadow-xs">
             <Compass className="w-3.5 h-3.5 text-amber-400" />
             {chartStyle === "north" ? "उत्तर भारतीय (Diamond)" : "दक्षिण भारतीय (Square)"}
           </span>
           {showDegrees && (
-            <span className="bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 px-2.5 py-1 rounded-lg text-[11px] font-medium hidden sm:inline-block">
+            <span className="bg-emerald-950 text-emerald-300 border border-emerald-700 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold hidden sm:inline-block">
               डिग्री दृश्य सक्रिय
             </span>
           )}
@@ -195,39 +195,39 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                 style={{ filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.6))" }}
               >
                 <defs>
-                  {/* Rich Royal Vedic Background */}
+                  {/* High Contrast Deep Zinc Background */}
                   <linearGradient id="northBgGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#1c0f08" />
-                    <stop offset="45%" stopColor="#2c160a" />
-                    <stop offset="100%" stopColor="#140a05" />
+                    <stop offset="0%" stopColor="#09090b" />
+                    <stop offset="50%" stopColor="#18181b" />
+                    <stop offset="100%" stopColor="#09090b" />
                   </linearGradient>
 
                   {/* Kendra (Vishnu Sthan) Houses Glow */}
                   <linearGradient id="kendraGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#b45309" stopOpacity="0.16" />
-                    <stop offset="100%" stopColor="#78350f" stopOpacity="0.08" />
+                    <stop offset="0%" stopColor="#d97706" stopOpacity="0.22" />
+                    <stop offset="100%" stopColor="#b45309" stopOpacity="0.08" />
                   </linearGradient>
 
                   {/* Trikona (Lakshmi Sthan) Houses Glow */}
                   <linearGradient id="trikonaGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#d97706" stopOpacity="0.14" />
-                    <stop offset="100%" stopColor="#92400e" stopOpacity="0.06" />
+                    <stop offset="0%" stopColor="#059669" stopOpacity="0.20" />
+                    <stop offset="100%" stopColor="#047857" stopOpacity="0.06" />
                   </linearGradient>
 
                   {/* Selected / Hovered House Gradient */}
                   <linearGradient id="activeHouseGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.45" />
-                    <stop offset="100%" stopColor="#b45309" stopOpacity="0.3" />
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.50" />
+                    <stop offset="100%" stopColor="#d97706" stopOpacity="0.28" />
                   </linearGradient>
 
                   <linearGradient id="hoverHouseGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#d97706" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#78350f" stopOpacity="0.18" />
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.30" />
+                    <stop offset="100%" stopColor="#b45309" stopOpacity="0.16" />
                   </linearGradient>
                 </defs>
 
                 {/* Main Outer Background */}
-                <rect width="400" height="400" fill="url(#northBgGrad)" rx="14" />
+                <rect width="400" height="400" fill="url(#northBgGrad)" rx="16" />
 
                 {/* 12 House Polygons */}
                 {northHousePolygons.map((poly, idx) => {
@@ -263,7 +263,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                         points={poly.points}
                         fill={fillUrl}
                         stroke={isSelected ? "#f59e0b" : "transparent"}
-                        strokeWidth={isSelected ? "2" : "0"}
+                        strokeWidth={isSelected ? "2.5" : "0"}
                         className="transition-colors duration-150"
                       />
 
@@ -272,10 +272,10 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                         cx={poly.signPos.x}
                         cy={poly.signPos.y}
                         r="10"
-                        fill="#2b170c"
-                        stroke="#b45309"
+                        fill="#27272a"
+                        stroke="#71717a"
                         strokeWidth="1"
-                        className="opacity-90"
+                        className="opacity-95"
                       />
                       <text
                         x={poly.signPos.x}
@@ -299,14 +299,14 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                             width="68"
                             height="18"
                             rx="9"
-                            fill="#78350f"
+                            fill="#b45309"
                             stroke="#fbbf24"
-                            strokeWidth="1"
+                            strokeWidth="1.2"
                           />
                           <text
                             x={poly.center.x}
                             y={poly.center.y - 28}
-                            fill="#fef3c7"
+                            fill="#ffffff"
                             fontSize="9.5"
                             fontWeight="bold"
                             textAnchor="middle"
@@ -337,7 +337,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                             const posY = yStart + pIdx * rowHeight;
 
                             // Color coding per dignity
-                            let planetColor = "#fef08a"; // Default yellow-gold
+                            let planetColor = "#ffffff"; // Crisp white default
                             let dignityBadge = "";
                             if (planet.dignity === "exalted") {
                               planetColor = "#34d399"; // Emerald Exalted
@@ -350,7 +350,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                               dignityBadge = "★";
                             }
 
-                            // Degree text format (e.g. 14°22')
+                            // Degree text format (e.g. 14°)
                             const degStr = showDegrees
                               ? `${planet.degreeInSign.toFixed(0)}°`
                               : "";
@@ -365,7 +365,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                                   fill={planetColor}
                                   fontSize={count > 3 ? "10" : "11"}
                                   fontWeight="700"
-                                  className="filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+                                  className="filter drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
                                 >
                                   {planet.nameHi}
                                   {planet.isRetrograde ? "(व)" : ""}
@@ -421,17 +421,17 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
               >
                 <defs>
                   <linearGradient id="southBgGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#1c0f08" />
-                    <stop offset="50%" stopColor="#2b160a" />
-                    <stop offset="100%" stopColor="#140a05" />
+                    <stop offset="0%" stopColor="#09090b" />
+                    <stop offset="50%" stopColor="#18181b" />
+                    <stop offset="100%" stopColor="#09090b" />
                   </linearGradient>
                   <linearGradient id="southActive" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#b45309" stopOpacity="0.2" />
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.40" />
+                    <stop offset="100%" stopColor="#d97706" stopOpacity="0.20" />
                   </linearGradient>
                 </defs>
 
-                <rect width="400" height="400" fill="url(#southBgGrad)" rx="14" />
+                <rect width="400" height="400" fill="url(#southBgGrad)" rx="16" />
 
                 {/* 12 Rasi Cells */}
                 {southGridCells.map((cell) => {
@@ -584,11 +584,11 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                   y="100"
                   width="200"
                   height="200"
-                  fill="#170c06"
+                  fill="#18181b"
                   stroke="#d97706"
                   strokeWidth="2"
                 />
-                <circle cx="200" cy="200" r="70" fill="none" stroke="#78350f" strokeWidth="1" strokeDasharray="3 3" />
+                <circle cx="200" cy="200" r="70" fill="none" stroke="#52525b" strokeWidth="1" strokeDasharray="3 3" />
                 <text
                   x="200"
                   y="180"
@@ -604,7 +604,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                   x="200"
                   y="204"
                   textAnchor="middle"
-                  fill="#fde68a"
+                  fill="#ffffff"
                   fontSize="12"
                   fontWeight="600"
                 >
@@ -614,7 +614,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                   x="200"
                   y="226"
                   textAnchor="middle"
-                  fill="#d97706"
+                  fill="#fbbf24"
                   fontSize="10"
                   className="font-mono"
                 >
@@ -627,7 +627,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                   y="2"
                   width="396"
                   height="396"
-                  rx="14"
+                  rx="16"
                   fill="none"
                   stroke="#f59e0b"
                   strokeWidth="2.5"
@@ -637,13 +637,13 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
           </div>
 
           {/* Quick Chart Legends Underneath */}
-          <div className="mt-3 flex items-center justify-center gap-3 sm:gap-4 flex-wrap text-[11px] text-amber-200/90 font-medium">
+          <div className="mt-3 flex items-center justify-center gap-3 sm:gap-4 flex-wrap text-[11px] text-zinc-300 font-medium">
             <div className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
               <span>उच्च (Exalted ↑)</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-400"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-red-400"></span>
               <span>नीच (Debilitated ↓)</span>
             </div>
             <div className="flex items-center gap-1">
@@ -651,11 +651,11 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
               <span>स्वराशि (Own ★)</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-amber-300 font-bold">(व)</span>
+              <span className="text-orange-400 font-bold">(व)</span>
               <span>वक्री (Retrograde)</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-amber-300 font-bold">*</span>
+              <span className="text-red-400 font-bold">*</span>
               <span>अस्त (Combust)</span>
             </div>
           </div>
@@ -663,15 +663,15 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
 
         {/* Right Side: Interactive House Inspector Card */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-stone-900/90 border border-amber-500/30 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3.5">
-            <div className="flex items-center justify-between border-b border-amber-500/20 pb-3">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3.5">
+            <div className="flex items-center justify-between border-b border-zinc-700 pb-3">
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4 text-amber-400" />
-                <h4 className="text-sm sm:text-base font-bold text-amber-100">
+                <h4 className="text-sm sm:text-base font-bold text-white">
                   भाव सूक्ष्म विश्लेषक (House Inspector)
                 </h4>
               </div>
-              <span className="bg-amber-800/60 text-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold border border-amber-400/40">
+              <span className="bg-zinc-800 text-amber-400 px-2.5 py-0.5 rounded-full text-xs font-bold border border-zinc-600">
                 {inspectedHouse.houseNumber}म भाव
               </span>
             </div>
@@ -679,26 +679,26 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
             {/* Inspected House Summary */}
             <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-amber-300 font-semibold">भाव नाम (Sanskrit):</span>
-                <span className="text-amber-100 font-bold text-sm">
+                <span className="text-zinc-400 font-semibold">भाव नाम (Sanskrit):</span>
+                <span className="text-white font-bold text-sm">
                   {inspectedHouse.nameSanskrit} ({inspectedHouse.houseNumber}th House)
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-amber-300 font-semibold">राशि व भावेश (Sign & Lord):</span>
-                <span className="text-amber-200 font-bold">
+                <span className="text-zinc-400 font-semibold">राशि व भावेश (Sign & Lord):</span>
+                <span className="text-amber-400 font-bold">
                   {inspectedHouse.signNameHi} (स्वामी: {inspectedHouse.lordHi})
                 </span>
               </div>
 
-              <div className="p-2.5 bg-amber-950/50 rounded-xl border border-amber-500/15 text-amber-200/90 leading-relaxed text-[11px] sm:text-xs">
+              <div className="p-3 bg-zinc-800 rounded-xl border border-zinc-700 text-zinc-300 leading-relaxed text-[11px] sm:text-xs">
                 {inspectedHouse.significanceHi}
               </div>
 
               {/* Occupant Planets in Inspected House */}
-              <div className="pt-2 border-t border-amber-500/15 space-y-1.5">
-                <span className="text-amber-300 font-semibold block">
+              <div className="pt-2 border-t border-zinc-700 space-y-1.5">
+                <span className="text-zinc-300 font-semibold block">
                   स्थित ग्रह ({inspectedHouse.planets.length}):
                 </span>
                 {inspectedHouse.planets.length > 0 ? (
@@ -706,23 +706,23 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                     {inspectedHouse.planets.map((p) => (
                       <div
                         key={p.id}
-                        className="flex items-center justify-between p-2 rounded-lg bg-stone-950/80 border border-amber-500/20 text-xs"
+                        className="flex items-center justify-between p-2 rounded-xl bg-zinc-800 border border-zinc-700 text-xs"
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-amber-400 font-bold">{p.symbol}</span>
-                          <span className="font-bold text-amber-100">{p.nameHi}</span>
+                          <span className="font-bold text-white">{p.nameHi}</span>
                           {p.isRetrograde && (
-                            <span className="text-[10px] bg-amber-800 text-amber-200 px-1 rounded">वक्री</span>
+                            <span className="text-[10px] bg-orange-950 text-orange-300 px-1 rounded border border-orange-800">वक्री</span>
                           )}
                           {p.isCombust && (
-                            <span className="text-[10px] bg-rose-900 text-rose-200 px-1 rounded">अस्त</span>
+                            <span className="text-[10px] bg-red-950 text-red-300 px-1 rounded border border-red-800">अस्त</span>
                           )}
                         </div>
                         <div className="text-right">
-                          <span className="font-mono text-amber-200 font-semibold">
+                          <span className="font-mono text-amber-300 font-semibold">
                             {p.degreeInSign.toFixed(2)}°
                           </span>
-                          <span className="text-[10px] text-amber-400/80 block">
+                          <span className="text-[10px] text-zinc-400 block">
                             {p.nakshatraNameHi} (पाद {p.pada})
                           </span>
                         </div>
@@ -730,15 +730,15 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                     ))}
                   </div>
                 ) : (
-                  <div className="text-xs text-amber-400/60 italic p-2 bg-stone-950/40 rounded-lg border border-amber-500/10">
+                  <div className="text-xs text-zinc-500 italic p-2 bg-zinc-800/60 rounded-xl border border-zinc-700">
                     इस भाव में कोई ग्रह प्रत्यक्ष रूप से स्थित नहीं है।
                   </div>
                 )}
               </div>
 
               {/* Aspecting Planets (दृष्टि प्रभाव) */}
-              <div className="pt-2 border-t border-amber-500/15 space-y-1">
-                <span className="text-amber-300 font-semibold block">
+              <div className="pt-2 border-t border-zinc-700 space-y-1">
+                <span className="text-zinc-300 font-semibold block">
                   दृष्टि डालने वाले ग्रह ({inspectedHouse.aspectingPlanets.length}):
                 </span>
                 {inspectedHouse.aspectingPlanets.length > 0 ? (
@@ -746,14 +746,14 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                     {inspectedHouse.aspectingPlanets.map((p) => (
                       <span
                         key={p.id}
-                        className="bg-amber-900/40 text-amber-200 border border-amber-500/30 px-2 py-0.5 rounded text-[11px] font-medium"
+                        className="bg-zinc-800 text-zinc-200 border border-zinc-600 px-2 py-0.5 rounded-lg text-[11px] font-medium"
                       >
                         {p.nameHi} ({p.nameEn})
                       </span>
                     ))}
                   </div>
                 ) : (
-                  <span className="text-[11px] text-amber-400/60 italic">
+                  <span className="text-[11px] text-zinc-500 italic">
                     किसी भी प्रत्यक्ष ग्रह की पूर्ण दृष्टि नहीं है।
                   </span>
                 )}
@@ -761,9 +761,9 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
             </div>
 
             {/* Click to inspect prompt */}
-            <div className="pt-2 text-[11px] text-amber-300/60 flex items-center justify-between">
+            <div className="pt-2 text-[11px] text-zinc-400 flex items-center justify-between border-t border-zinc-700">
               <span>चार्ट में किसी भी भाव पर क्लिक करें</span>
-              <span className="text-amber-400 font-mono">1 - 12 भाव</span>
+              <span className="text-amber-400 font-mono font-bold">1 - 12 भाव</span>
             </div>
           </div>
         </div>

@@ -1,0 +1,42 @@
+{
+  "snapshotId": "reference-v1",
+  "engineVersion": "1.0.0-phase7",
+  "generatedAt": "2026-09-26T00:00:00Z",
+  "sourceVersions": {
+    "astronomyEngine": "2.1.19",
+    "bphsVargaVersion": "2.0.0-parashara",
+    "shadbalaVersion": "1.0.0-parashara",
+    "vimshottariVersion": "1.0.0-parashara"
+  },
+  "ayanamsha": "lahiri",
+  "convention": "drik_ganita",
+  "goldenAnchors": [
+    {
+      "name": "J2000 Canonical Epoch",
+      "date": "2000-01-01T12:00:00Z",
+      "ayanamsaDeg": 23.857092,
+      "sunTropicalLon": 280.3686,
+      "sunSiderealLon": 256.5115,
+      "moonTropicalLon": 219.1245,
+      "moonSiderealLon": 195.2674
+    },
+    {
+      "name": "Indian Independence Epoch",
+      "date": "1947-08-14T18:30:00Z",
+      "ayanamsaDeg": 23.1180,
+      "sunTropicalLon": 141.4920,
+      "sunSiderealLon": 118.3740,
+      "moonTropicalLon": 113.8240,
+      "moonSiderealLon": 90.7060
+    },
+    {
+      "name": "Spring Equinox 2024",
+      "date": "2024-03-20T03:06:00Z",
+      "ayanamsaDeg": 24.1950,
+      "sunTropicalLon": 0.0,
+      "sunSiderealLon": 335.8050,
+      "moonTropicalLon": 128.5410,
+      "moonSiderealLon": 104.3460
+    }
+  ]
+}

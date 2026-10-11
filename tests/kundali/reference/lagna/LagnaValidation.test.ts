@@ -9,12 +9,7 @@ describe("Reference Corpus — Lagna (Ascendant) & House Cusp Validation Suite",
   describe("1. Canonical Ascendant Anchor Verification", () => {
     it("calculates accurate Ascendant for Ujjain (Prime Meridian of Classical India)", () => {
       // Ujjain: 23.1765° N, 75.7885° E
-      const lagna = AstronomicalCore.calculateLagna(
-        J2000_TIME,
-        23.1765,
-        75.7885,
-        AYANAMSA_J2000,
-      );
+      const lagna = AstronomicalCore.calculateLagna(J2000_TIME, 23.1765, 75.7885, AYANAMSA_J2000);
 
       expect(lagna.tropicalAscendant).toBeGreaterThanOrEqual(0);
       expect(lagna.tropicalAscendant).toBeLessThan(360);

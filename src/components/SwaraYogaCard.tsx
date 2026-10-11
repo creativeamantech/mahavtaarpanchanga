@@ -28,6 +28,7 @@ import {
   Droplets,
   Layers,
   ArrowRight,
+  Calendar,
 } from "lucide-react";
 
 import type { AppTheme } from "../types";
@@ -36,9 +37,15 @@ interface SwaraYogaCardProps {
   theme?: AppTheme;
   data: PanchangaResponse;
   lang: Language;
+  onOpenCalendarSync?: () => void;
 }
 
-export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme }) => {
+export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({
+  data,
+  lang,
+  theme,
+  onOpenCalendarSync,
+}) => {
   const isNight = theme === "nightSky";
   const [showTable, setShowTable] = useState(false);
   const [tableFilter, setTableFilter] = useState<"all" | "shukla" | "krishna">("all");
@@ -79,13 +86,22 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
 
   const sunriseDetails = SWARA_DETAILS[swaraData.sunriseSwara || "ida"];
   const sunsetDetails = SWARA_DETAILS[swaraData.sunsetSwara || "pingala"];
-  const moonriseDetails = (swaraData.moonriseSwara && SWARA_DETAILS[swaraData.moonriseSwara]) ? SWARA_DETAILS[swaraData.moonriseSwara] : sunriseDetails;
-  const moonsetDetails = (swaraData.moonsetSwara && SWARA_DETAILS[swaraData.moonsetSwara]) ? SWARA_DETAILS[swaraData.moonsetSwara] : sunsetDetails;
+  const moonriseDetails =
+    swaraData.moonriseSwara && SWARA_DETAILS[swaraData.moonriseSwara]
+      ? SWARA_DETAILS[swaraData.moonriseSwara]
+      : sunriseDetails;
+  const moonsetDetails =
+    swaraData.moonsetSwara && SWARA_DETAILS[swaraData.moonsetSwara]
+      ? SWARA_DETAILS[swaraData.moonsetSwara]
+      : sunsetDetails;
 
   const horaState = resolveCurrentHora(Date.now(), data);
   const activeHora = horaState?.hora || null;
   const activeHoraTattva = horaState?.activeTattva || null;
-  const activeNadi = (activeHora?.nadi || swaraData.currentActiveSwara || swaraData.sunriseSwara || "ida") as SwaraNadi;
+  const activeNadi = (activeHora?.nadi ||
+    swaraData.currentActiveSwara ||
+    swaraData.sunriseSwara ||
+    "ida") as SwaraNadi;
   const activeDetails = SWARA_DETAILS[activeNadi] || sunriseDetails;
 
   const primaryNakNum = data.nakshatra?.[0]?.number || 1;
@@ -138,6 +154,18 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
           </div>
 
           <div className="flex items-center space-x-2">
+            {onOpenCalendarSync && (
+              <button
+                type="button"
+                onClick={onOpenCalendarSync}
+                className="inline-flex items-center space-x-1.5 rounded-xl border border-cyan-300 dark:border-cyan-700 bg-cyan-50 dark:bg-cyan-950/60 px-3 py-1.5 text-xs font-bold text-cyan-900 dark:text-cyan-200 hover:bg-cyan-100 transition-colors shadow-2xs cursor-pointer"
+                title={lang === "hi" ? "गूगल कैलेंडर में स्वर काल सिंक करें" : "Sync Swara Events to Google Calendar"}
+              >
+                <Calendar className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
+                <span>{lang === "hi" ? "कैलेंडर सिंक" : "Sync Swara"}</span>
+              </button>
+            )}
+
             <button
               onClick={() => setShowTable(!showTable)}
               className="inline-flex items-center space-x-1.5 rounded-xl border border-amber-300 bg-white/90 px-3 py-1.5 text-xs font-bold text-amber-900 hover:bg-amber-100/70 transition-colors shadow-2xs"
@@ -1000,12 +1028,14 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({ data, lang, theme 
                       </span>
                     </div>
                     <ul className="space-y-1.5 text-xs text-emerald-950 font-sans">
-                      {activeDetails.auspiciousWorks[lang].slice(0, 5).map((w: string, idx: number) => (
-                        <li key={idx} className="flex items-start space-x-1.5">
-                          <span className="text-emerald-700 font-bold">•</span>
-                          <span>{w}</span>
-                        </li>
-                      ))}
+                      {activeDetails.auspiciousWorks[lang]
+                        .slice(0, 5)
+                        .map((w: string, idx: number) => (
+                          <li key={idx} className="flex items-start space-x-1.5">
+                            <span className="text-emerald-700 font-bold">•</span>
+                            <span>{w}</span>
+                          </li>
+                        ))}
                     </ul>
                   </div>
 

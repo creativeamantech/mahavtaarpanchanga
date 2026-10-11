@@ -65,7 +65,7 @@ export function computeGochara(
   natalLagnaSignIndex: number,
   transitDate: Date = new Date(),
   latitude = 28.6139,
-  longitude = 77.209
+  longitude = 77.209,
 ): GocharaReport {
   // Approximate Lahiri Ayanamsa for transit date
   const year = transitDate.getUTCFullYear();
@@ -84,13 +84,20 @@ export function computeGochara(
   ];
 
   // Calculate planetary positions
-  const transitPositions: { id: string; nameEn: string; nameHi: string; signIndex: number; degree: number; isRetro: boolean }[] = [];
+  const transitPositions: {
+    id: string;
+    nameEn: string;
+    nameHi: string;
+    signIndex: number;
+    degree: number;
+    isRetro: boolean;
+  }[] = [];
 
   bodies.forEach((b) => {
     const equ_now = Astronomy.Equator(b.body, transitDate, observer, true, true);
     const ecl = Astronomy.Ecliptic(equ_now.vec);
     const tropicalDeg = ecl.elon;
-    const siderealDeg = ((tropicalDeg - ayanamsaDeg) % 360 + 360) % 360;
+    const siderealDeg = (((tropicalDeg - ayanamsaDeg) % 360) + 360) % 360;
     const signIndex = Math.floor(siderealDeg / 30);
     const degree = siderealDeg % 30;
 
@@ -112,11 +119,12 @@ export function computeGochara(
 
   // Calculate Rahu/Ketu Mean Node
   const astroTime = Astronomy.MakeTime(transitDate);
-  const ut = astroTime && typeof astroTime.ut === "number" && !isNaN(astroTime.ut) ? astroTime.ut : 0;
+  const ut =
+    astroTime && typeof astroTime.ut === "number" && !isNaN(astroTime.ut) ? astroTime.ut : 0;
   const T = ut / 36525.0;
   let tropicalRahu = 125.04452 - 1934.136261 * T + 0.0020708 * T * T + (T * T * T) / 450000;
   tropicalRahu = ((tropicalRahu % 360) + 360) % 360;
-  const siderealRahu = ((tropicalRahu - ayanamsaDeg) % 360 + 360) % 360;
+  const siderealRahu = (((tropicalRahu - ayanamsaDeg) % 360) + 360) % 360;
   const rahuSign = Math.floor(siderealRahu / 30);
   const ketuSign = (rahuSign + 6) % 12;
 
@@ -155,7 +163,8 @@ export function computeGochara(
       if (obstructingHouse) {
         const obstructingSign = (natalMoonSignIndex + (obstructingHouse - 1)) % 12;
         const obstacle = transitPositions.find(
-          (other) => other.id !== tp.id && other.id !== "Sun" && other.signIndex === obstructingSign
+          (other) =>
+            other.id !== tp.id && other.id !== "Sun" && other.signIndex === obstructingSign,
         );
         if (obstacle) {
           hasVedha = true;
@@ -164,8 +173,16 @@ export function computeGochara(
       }
     }
 
-    let verdictHi = isFavorable ? (hasVedha ? "शुभ (वेध प्रभावित)" : "शुभ एवं फलदायी") : "सामान्य / संघर्षपूर्ण";
-    let verdictEn = isFavorable ? (hasVedha ? "Benefic (Obstructed by Vedha)" : "Favorable & Benefic") : "Challenging / Inauspicious";
+    const verdictHi = isFavorable
+      ? hasVedha
+        ? "शुभ (वेध प्रभावित)"
+        : "शुभ एवं फलदायी"
+      : "सामान्य / संघर्षपूर्ण";
+    const verdictEn = isFavorable
+      ? hasVedha
+        ? "Benefic (Obstructed by Vedha)"
+        : "Favorable & Benefic"
+      : "Challenging / Inauspicious";
 
     let predictionHi = "";
     let predictionEn = "";
@@ -224,7 +241,7 @@ export function computeGochara(
   // Sade Sati Live Transit Evaluation
   const saturnTransit = transitPositions.find((p) => p.id === "Saturn");
   const saturnSign = saturnTransit ? saturnTransit.signIndex : 10;
-  const diffMoonSaturn = ((saturnSign - natalMoonSignIndex + 12) % 12);
+  const diffMoonSaturn = (saturnSign - natalMoonSignIndex + 12) % 12;
 
   let inSadeSati = false;
   let phase = "none";
@@ -235,17 +252,20 @@ export function computeGochara(
     inSadeSati = true;
     phase = "rising";
     phaseHi = "प्रथम चरण (उदय मान)";
-    descHi = "शनि जन्म चन्द्रमा से १२वें भाव में गोचररत हैं। आर्थिक योजना और व्यय पर नियंत्रण रखें।";
+    descHi =
+      "शनि जन्म चन्द्रमा से १२वें भाव में गोचररत हैं। आर्थिक योजना और व्यय पर नियंत्रण रखें।";
   } else if (diffMoonSaturn === 0) {
     inSadeSati = true;
     phase = "peak";
     phaseHi = "द्वितीय चरण (शिखर काल)";
-    descHi = "शनि जन्म चन्द्रमा पर गोचररत हैं। मानसिक धैर्य, ध्यान एवं हनुमान चालीसा का पाठ हितकर है।";
+    descHi =
+      "शनि जन्म चन्द्रमा पर गोचररत हैं। मानसिक धैर्य, ध्यान एवं हनुमान चालीसा का पाठ हितकर है।";
   } else if (diffMoonSaturn === 1) {
     inSadeSati = true;
     phase = "setting";
     phaseHi = "तृतीय चरण (अस्त मान)";
-    descHi = "शनि जन्म चन्द्रमा से द्वितीय भाव में गोचररत हैं। वाणी संयम व संचित धन सुरक्षा आवश्यक है।";
+    descHi =
+      "शनि जन्म चन्द्रमा से द्वितीय भाव में गोचररत हैं। वाणी संयम व संचित धन सुरक्षा आवश्यक है।";
   } else if (diffMoonSaturn === 3) {
     phase = "kantaka";
     phaseHi = "कंटक शनि (चतुर्थ ढैय्या)";

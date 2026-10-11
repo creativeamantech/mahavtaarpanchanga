@@ -23,20 +23,20 @@
     {
       "name": "Indian Independence Epoch",
       "date": "1947-08-14T18:30:00Z",
-      "ayanamsaDeg": 23.1180,
-      "sunTropicalLon": 141.4920,
-      "sunSiderealLon": 118.3740,
-      "moonTropicalLon": 113.8240,
-      "moonSiderealLon": 90.7060
+      "ayanamsaDeg": 23.118,
+      "sunTropicalLon": 141.492,
+      "sunSiderealLon": 118.374,
+      "moonTropicalLon": 113.824,
+      "moonSiderealLon": 90.706
     },
     {
       "name": "Spring Equinox 2024",
       "date": "2024-03-20T03:06:00Z",
-      "ayanamsaDeg": 24.1950,
+      "ayanamsaDeg": 24.195,
       "sunTropicalLon": 0.0,
-      "sunSiderealLon": 335.8050,
-      "moonTropicalLon": 128.5410,
-      "moonSiderealLon": 104.3460
+      "sunSiderealLon": 335.805,
+      "moonTropicalLon": 128.541,
+      "moonSiderealLon": 104.346
     }
   ]
 }

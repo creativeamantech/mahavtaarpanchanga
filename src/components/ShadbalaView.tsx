@@ -1,16 +1,7 @@
 import React, { useState } from "react";
-import {
-  CompleteShadbalaResult,
-  GrahaShadbalaDetailed,
-} from "../kundali/shadbala/ShadbalaTypes";
+import { CompleteShadbalaResult, GrahaShadbalaDetailed } from "../kundali/shadbala/ShadbalaTypes";
 import { CanonicalBodyId } from "../kundali/astronomy/AstronomicalContext";
-import {
-  Award,
-  BarChart3,
-  CheckCircle2,
-  Layers,
-  Zap,
-} from "lucide-react";
+import { Award, BarChart3, CheckCircle2, Layers, Zap } from "lucide-react";
 
 interface ShadbalaViewProps {
   shadbala?: CompleteShadbalaResult;
@@ -71,7 +62,7 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
   }
 
   const sortedByRank: GrahaShadbalaDetailed[] = Object.values(shadbala.planets).sort(
-    (a, b) => a.rank - b.rank
+    (a, b) => a.rank - b.rank,
   );
 
   const activePlanetData = shadbala.planets[selectedPlanet] || sortedByRank[0];
@@ -89,7 +80,8 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
             ग्रह षड्बल एवं द्वादश भावबल विश्लेषण
           </h3>
           <p className="text-xs text-zinc-400 mt-0.5">
-            स्थान बल, दिग् बल, काल बल, चेष्टा बल, नैसर्गिक बल एवं दृग् बल का सम्पूर्ण वैज्ञानिक विश्लेषण
+            स्थान बल, दिग् बल, काल बल, चेष्टा बल, नैसर्गिक बल एवं दृग् बल का सम्पूर्ण वैज्ञानिक
+            विश्लेषण
           </p>
         </div>
 
@@ -165,8 +157,8 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
                           p.rank === 1
                             ? "bg-amber-600 text-white border-amber-500"
                             : p.rank <= 3
-                            ? "bg-zinc-700 text-amber-300 border-zinc-600"
-                            : "bg-zinc-800 text-zinc-400 border-zinc-700"
+                              ? "bg-zinc-700 text-amber-300 border-zinc-600"
+                              : "bg-zinc-800 text-zinc-400 border-zinc-700"
                         }`}
                       >
                         Rank #{p.rank}
@@ -207,10 +199,10 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
                           p.strengthRatio >= 1.2
                             ? "bg-emerald-400"
                             : p.strengthRatio >= 1.0
-                            ? "bg-teal-400"
-                            : p.strengthRatio >= 0.8
-                            ? "bg-amber-400"
-                            : "bg-red-400"
+                              ? "bg-teal-400"
+                              : p.strengthRatio >= 0.8
+                                ? "bg-amber-400"
+                                : "bg-red-400"
                         }`}
                         style={{ width: `${Math.min(p.strengthRatio * 80, 100)}%` }}
                       ></div>
@@ -245,7 +237,9 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
                       {PLANET_NAMES[activePlanetData.planet].hi} — षड्बल विवरण
                     </h4>
                     <span className="text-xs text-zinc-400">
-                      रैंक: #{activePlanetData.rank} • कुल बल: {activePlanetData.totalVirupas.toFixed(1)} विरूपा ({activePlanetData.totalRupas.toFixed(2)} रूप)
+                      रैंक: #{activePlanetData.rank} • कुल बल:{" "}
+                      {activePlanetData.totalVirupas.toFixed(1)} विरूपा (
+                      {activePlanetData.totalRupas.toFixed(2)} रूप)
                     </span>
                   </div>
                 </div>
@@ -395,9 +389,7 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
                     <td className="p-3 font-mono font-bold text-white text-sm">
                       {p.totalRupas.toFixed(2)}
                     </td>
-                    <td className="p-3 font-mono text-zinc-400">
-                      {p.requiredRupas.toFixed(2)}
-                    </td>
+                    <td className="p-3 font-mono text-zinc-400">{p.requiredRupas.toFixed(2)}</td>
                     <td className="p-3">
                       <div className="flex items-center gap-1.5">
                         <span
@@ -427,8 +419,8 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
             <span className="font-bold text-amber-400 block mb-1">
               इष्ट फल एवं कष्ट फल का शास्त्रीय नियम:
             </span>
-            इष्ट फल शुभ कर्मों और मनोकामना सिद्धि की सामर्थ्य को प्रकट करता है, जबकि कष्ट फल जीवन में आने वाले
-            अवरोधों व संघर्ष को दर्शाता है। दोनों का योग सामान्यतः 60 विरूपा होता है।
+            इष्ट फल शुभ कर्मों और मनोकामना सिद्धि की सामर्थ्य को प्रकट करता है, जबकि कष्ट फल जीवन
+            में आने वाले अवरोधों व संघर्ष को दर्शाता है। दोनों का योग सामान्यतः 60 विरूपा होता है।
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -456,7 +448,9 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
                     <div>
                       <div className="flex justify-between font-semibold mb-1">
                         <span className="text-emerald-400">इष्ट फल (Auspicious Fruit):</span>
-                        <span className="font-mono text-emerald-300 font-bold">{ishta.toFixed(2)} / 60</span>
+                        <span className="font-mono text-emerald-300 font-bold">
+                          {ishta.toFixed(2)} / 60
+                        </span>
                       </div>
                       <div className="w-full bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-700">
                         <div
@@ -470,7 +464,9 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
                     <div>
                       <div className="flex justify-between font-semibold mb-1">
                         <span className="text-red-400">कष्ट फल (Inauspicious Fruit):</span>
-                        <span className="font-mono text-red-300 font-bold">{kashta.toFixed(2)} / 60</span>
+                        <span className="font-mono text-red-300 font-bold">
+                          {kashta.toFixed(2)} / 60
+                        </span>
                       </div>
                       <div className="w-full bg-zinc-950 rounded-full h-2 overflow-hidden border border-zinc-700">
                         <div
@@ -520,20 +516,27 @@ export const ShadbalaView: React.FC<ShadbalaViewProps> = ({ shadbala }) => {
                   <div className="flex justify-between">
                     <span className="text-zinc-400">राशि व भावेश:</span>
                     <span className="font-semibold text-white">
-                      {ZODIAC_NAMES_HI[bhava.signIndex]?.split(" ")[0]} (स्वामी: {PLANET_NAMES[bhava.signLord]?.hi?.split(" ")[0]})
+                      {ZODIAC_NAMES_HI[bhava.signIndex]?.split(" ")[0]} (स्वामी:{" "}
+                      {PLANET_NAMES[bhava.signLord]?.hi?.split(" ")[0]})
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-400">भावाधिपति बल:</span>
-                    <span className="font-mono text-zinc-200">{bhava.bhavadhipatiBala.toFixed(1)} विरूपा</span>
+                    <span className="font-mono text-zinc-200">
+                      {bhava.bhavadhipatiBala.toFixed(1)} विरूपा
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-400">भाव दिग्बल:</span>
-                    <span className="font-mono text-zinc-200">{bhava.bhavaDigBala.toFixed(1)} विरूपा</span>
+                    <span className="font-mono text-zinc-200">
+                      {bhava.bhavaDigBala.toFixed(1)} विरूपा
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-zinc-400">भाव दृष्टि बल:</span>
-                    <span className="font-mono text-zinc-200">{bhava.bhavaDrishtiBala.toFixed(1)} विरूपा</span>
+                    <span className="font-mono text-zinc-200">
+                      {bhava.bhavaDrishtiBala.toFixed(1)} विरूपा
+                    </span>
                   </div>
                 </div>
 

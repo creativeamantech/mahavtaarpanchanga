@@ -8,10 +8,7 @@ interface KpAstrologyViewProps {
   planets: KundliPlanet[];
 }
 
-export const KpAstrologyView: React.FC<KpAstrologyViewProps> = ({
-  lagnaLongitude,
-  planets,
-}) => {
+export const KpAstrologyView: React.FC<KpAstrologyViewProps> = ({ lagnaLongitude, planets }) => {
   const kpData = computeKPAstrology(lagnaLongitude, planets);
 
   return (
@@ -26,7 +23,8 @@ export const KpAstrologyView: React.FC<KpAstrologyViewProps> = ({
             </h3>
           </div>
           <p className="text-xs text-zinc-400">
-            द्वादश भाव संधि (Cusps), राशि स्वामी, नक्षत्र स्वामी (Star Lord) एवं उप-स्वामी (Sub-Lord) सारणी
+            द्वादश भाव संधि (Cusps), राशि स्वामी, नक्षत्र स्वामी (Star Lord) एवं उप-स्वामी
+            (Sub-Lord) सारणी
           </p>
         </div>
 
@@ -43,7 +41,10 @@ export const KpAstrologyView: React.FC<KpAstrologyViewProps> = ({
         </h4>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
           {kpData.rulingPlanets.map((rp, idx) => (
-            <div key={idx} className="p-2.5 bg-zinc-800 rounded-xl border border-zinc-700 text-center">
+            <div
+              key={idx}
+              className="p-2.5 bg-zinc-800 rounded-xl border border-zinc-700 text-center"
+            >
               <span className="text-[10px] text-zinc-400 block truncate">{rp.factorHi}</span>
               <span className="text-sm font-bold text-white block mt-0.5">{rp.planetHi}</span>
             </div>

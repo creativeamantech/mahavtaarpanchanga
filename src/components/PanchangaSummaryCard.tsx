@@ -1,7 +1,8 @@
 import React from "react";
-import { Sun, Moon, Clock, Compass, Sparkles, Wind } from "lucide-react";
+import { Sun, Moon, Clock, Compass, Sparkles, Wind, FileSpreadsheet } from "lucide-react";
 import type { PanchangaResponse, AppTheme } from "../types";
 import { computeSwaraYoga } from "../swaraYoga";
+import { exportDailyPanchangaToExcel } from "../services/excelExportService";
 import {
   type Language,
   translations,
@@ -101,6 +102,15 @@ export const PanchangaSummaryCard: React.FC<PanchangaSummaryCardProps> = ({
             >
               {localizedVaara}
             </span>
+
+            <button
+              onClick={() => exportDailyPanchangaToExcel(data, lang)}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+              title="Export Panchanga to Excel"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span>{lang === "hi" ? "एक्सेल" : "Excel"}</span>
+            </button>
           </div>
         </div>
 

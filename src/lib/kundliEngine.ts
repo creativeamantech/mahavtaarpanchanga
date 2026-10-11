@@ -5,10 +5,7 @@ import {
   VARGA_DEFINITIONS,
   VargaEngine,
 } from "../kundali/varga/VargaEngine";
-import {
-  VargaChartResult,
-  VargaType,
-} from "../kundali/contracts/IVargaEngine";
+import { VargaChartResult, VargaType } from "../kundali/contracts/IVargaEngine";
 import { CanonicalBodyId } from "../kundali/astronomy/AstronomicalContext";
 import { ShadbalaEngine } from "../kundali/shadbala/ShadbalaEngine";
 import { CompleteShadbalaResult } from "../kundali/shadbala/ShadbalaTypes";
@@ -76,7 +73,16 @@ export interface KundliPlanet {
   speed: number;
   isRetrograde: boolean;
   isCombust: boolean;
-  dignity: "exalted" | "moolatrikona" | "own" | "great_friend" | "friend" | "neutral" | "enemy" | "great_enemy" | "debilitated";
+  dignity:
+    | "exalted"
+    | "moolatrikona"
+    | "own"
+    | "great_friend"
+    | "friend"
+    | "neutral"
+    | "enemy"
+    | "great_enemy"
+    | "debilitated";
   dignityLabelEn: string;
   dignityLabelHi: string;
   jaiminiKaraka?: string;
@@ -294,40 +300,263 @@ export const ZODIAC_SIGNS = [
   { id: "virgo", en: "Virgo", hi: "कन्या", sa: "Kanyā", lord: "Mercury", element: "earth" },
   { id: "libra", en: "Libra", hi: "तुला", sa: "Tulā", lord: "Venus", element: "air" },
   { id: "scorpio", en: "Scorpio", hi: "वृश्चिक", sa: "Vṛścika", lord: "Mars", element: "water" },
-  { id: "sagittarius", en: "Sagittarius", hi: "धनु", sa: "Dhanu", lord: "Jupiter", element: "fire" },
+  {
+    id: "sagittarius",
+    en: "Sagittarius",
+    hi: "धनु",
+    sa: "Dhanu",
+    lord: "Jupiter",
+    element: "fire",
+  },
   { id: "capricorn", en: "Capricorn", hi: "मकर", sa: "Makara", lord: "Saturn", element: "earth" },
   { id: "aquarius", en: "Aquarius", hi: "कुम्भ", sa: "Kumbha", lord: "Saturn", element: "air" },
   { id: "pisces", en: "Pisces", hi: "मीन", sa: "Mīna", lord: "Jupiter", element: "water" },
 ];
 
 export const NAKSHATRAS_LIST = [
-  { num: 1, en: "Ashwini", hi: "अश्विनी", lord: "Ketu", yoni: "Ashwa (Horse)", gana: "Deva", nadi: "Adi" },
-  { num: 2, en: "Bharani", hi: "भरणी", lord: "Venus", yoni: "Gaja (Elephant)", gana: "Manushya", nadi: "Madhya" },
-  { num: 3, en: "Krittika", hi: "कृत्तिका", lord: "Sun", yoni: "Mesha (Sheep)", gana: "Rakshasa", nadi: "Antya" },
-  { num: 4, en: "Rohini", hi: "रोहिणी", lord: "Moon", yoni: "Sarpa (Serpent)", gana: "Manushya", nadi: "Antya" },
-  { num: 5, en: "Mrigashirsha", hi: "मृगशिरा", lord: "Mars", yoni: "Sarpa (Serpent)", gana: "Deva", nadi: "Madhya" },
-  { num: 6, en: "Ardra", hi: "आर्द्रा", lord: "Rahu", yoni: "Shwan (Dog)", gana: "Manushya", nadi: "Adi" },
-  { num: 7, en: "Punarvasu", hi: "पुनर्वसु", lord: "Jupiter", yoni: "Marjara (Cat)", gana: "Deva", nadi: "Adi" },
-  { num: 8, en: "Pushya", hi: "पुष्य", lord: "Saturn", yoni: "Mesha (Goat)", gana: "Deva", nadi: "Madhya" },
-  { num: 9, en: "Ashlesha", hi: "आश्लेषा", lord: "Mercury", yoni: "Marjara (Cat)", gana: "Rakshasa", nadi: "Antya" },
-  { num: 10, en: "Magha", hi: "मघा", lord: "Ketu", yoni: "Mushaka (Rat)", gana: "Rakshasa", nadi: "Antya" },
-  { num: 11, en: "Purva Phalguni", hi: "पूर्वाफाल्गुनी", lord: "Venus", yoni: "Mushaka (Rat)", gana: "Manushya", nadi: "Madhya" },
-  { num: 12, en: "Uttara Phalguni", hi: "उत्तराफाल्गुनी", lord: "Sun", yoni: "Gau (Cow)", gana: "Manushya", nadi: "Adi" },
-  { num: 13, en: "Hasta", hi: "हस्त", lord: "Moon", yoni: "Mahisha (Buffalo)", gana: "Deva", nadi: "Adi" },
-  { num: 14, en: "Chitra", hi: "चित्रा", lord: "Mars", yoni: "Vyaghra (Tiger)", gana: "Rakshasa", nadi: "Madhya" },
-  { num: 15, en: "Swati", hi: "स्वाति", lord: "Rahu", yoni: "Mahisha (Buffalo)", gana: "Deva", nadi: "Antya" },
-  { num: 16, en: "Vishakha", hi: "विशाखा", lord: "Jupiter", yoni: "Vyaghra (Tiger)", gana: "Rakshasa", nadi: "Antya" },
-  { num: 17, en: "Anuradha", hi: "अनुराधा", lord: "Saturn", yoni: "Mriga (Deer)", gana: "Deva", nadi: "Madhya" },
-  { num: 18, en: "Jyeshtha", hi: "ज्येष्ठा", lord: "Mercury", yoni: "Mriga (Deer)", gana: "Rakshasa", nadi: "Adi" },
-  { num: 19, en: "Moola", hi: "मूल", lord: "Ketu", yoni: "Shwan (Dog)", gana: "Rakshasa", nadi: "Adi" },
-  { num: 20, en: "Purva Ashadha", hi: "पूर्वाषाढ़ा", lord: "Venus", yoni: "Vanara (Monkey)", gana: "Manushya", nadi: "Madhya" },
-  { num: 21, en: "Uttara Ashadha", hi: "उत्तराषाढ़ा", lord: "Sun", yoni: "Nakula (Mongoose)", gana: "Manushya", nadi: "Antya" },
-  { num: 22, en: "Shravana", hi: "श्रवण", lord: "Moon", yoni: "Vanara (Monkey)", gana: "Deva", nadi: "Antya" },
-  { num: 23, en: "Dhanishta", hi: "धनिष्ठा", lord: "Mars", yoni: "Simha (Lion)", gana: "Rakshasa", nadi: "Madhya" },
-  { num: 24, en: "Shatabhisha", hi: "शतभिषा", lord: "Rahu", yoni: "Ashwa (Horse)", gana: "Rakshasa", nadi: "Adi" },
-  { num: 25, en: "Purva Bhadrapada", hi: "पूर्वभाद्रपद", lord: "Jupiter", yoni: "Simha (Lion)", gana: "Manushya", nadi: "Adi" },
-  { num: 26, en: "Uttara Bhadrapada", hi: "उत्तरभाद्रपद", lord: "Saturn", yoni: "Gau (Cow)", gana: "Manushya", nadi: "Madhya" },
-  { num: 27, en: "Revati", hi: "रेवती", lord: "Mercury", yoni: "Gaja (Elephant)", gana: "Deva", nadi: "Antya" },
+  {
+    num: 1,
+    en: "Ashwini",
+    hi: "अश्विनी",
+    lord: "Ketu",
+    yoni: "Ashwa (Horse)",
+    gana: "Deva",
+    nadi: "Adi",
+  },
+  {
+    num: 2,
+    en: "Bharani",
+    hi: "भरणी",
+    lord: "Venus",
+    yoni: "Gaja (Elephant)",
+    gana: "Manushya",
+    nadi: "Madhya",
+  },
+  {
+    num: 3,
+    en: "Krittika",
+    hi: "कृत्तिका",
+    lord: "Sun",
+    yoni: "Mesha (Sheep)",
+    gana: "Rakshasa",
+    nadi: "Antya",
+  },
+  {
+    num: 4,
+    en: "Rohini",
+    hi: "रोहिणी",
+    lord: "Moon",
+    yoni: "Sarpa (Serpent)",
+    gana: "Manushya",
+    nadi: "Antya",
+  },
+  {
+    num: 5,
+    en: "Mrigashirsha",
+    hi: "मृगशिरा",
+    lord: "Mars",
+    yoni: "Sarpa (Serpent)",
+    gana: "Deva",
+    nadi: "Madhya",
+  },
+  {
+    num: 6,
+    en: "Ardra",
+    hi: "आर्द्रा",
+    lord: "Rahu",
+    yoni: "Shwan (Dog)",
+    gana: "Manushya",
+    nadi: "Adi",
+  },
+  {
+    num: 7,
+    en: "Punarvasu",
+    hi: "पुनर्वसु",
+    lord: "Jupiter",
+    yoni: "Marjara (Cat)",
+    gana: "Deva",
+    nadi: "Adi",
+  },
+  {
+    num: 8,
+    en: "Pushya",
+    hi: "पुष्य",
+    lord: "Saturn",
+    yoni: "Mesha (Goat)",
+    gana: "Deva",
+    nadi: "Madhya",
+  },
+  {
+    num: 9,
+    en: "Ashlesha",
+    hi: "आश्लेषा",
+    lord: "Mercury",
+    yoni: "Marjara (Cat)",
+    gana: "Rakshasa",
+    nadi: "Antya",
+  },
+  {
+    num: 10,
+    en: "Magha",
+    hi: "मघा",
+    lord: "Ketu",
+    yoni: "Mushaka (Rat)",
+    gana: "Rakshasa",
+    nadi: "Antya",
+  },
+  {
+    num: 11,
+    en: "Purva Phalguni",
+    hi: "पूर्वाफाल्गुनी",
+    lord: "Venus",
+    yoni: "Mushaka (Rat)",
+    gana: "Manushya",
+    nadi: "Madhya",
+  },
+  {
+    num: 12,
+    en: "Uttara Phalguni",
+    hi: "उत्तराफाल्गुनी",
+    lord: "Sun",
+    yoni: "Gau (Cow)",
+    gana: "Manushya",
+    nadi: "Adi",
+  },
+  {
+    num: 13,
+    en: "Hasta",
+    hi: "हस्त",
+    lord: "Moon",
+    yoni: "Mahisha (Buffalo)",
+    gana: "Deva",
+    nadi: "Adi",
+  },
+  {
+    num: 14,
+    en: "Chitra",
+    hi: "चित्रा",
+    lord: "Mars",
+    yoni: "Vyaghra (Tiger)",
+    gana: "Rakshasa",
+    nadi: "Madhya",
+  },
+  {
+    num: 15,
+    en: "Swati",
+    hi: "स्वाति",
+    lord: "Rahu",
+    yoni: "Mahisha (Buffalo)",
+    gana: "Deva",
+    nadi: "Antya",
+  },
+  {
+    num: 16,
+    en: "Vishakha",
+    hi: "विशाखा",
+    lord: "Jupiter",
+    yoni: "Vyaghra (Tiger)",
+    gana: "Rakshasa",
+    nadi: "Antya",
+  },
+  {
+    num: 17,
+    en: "Anuradha",
+    hi: "अनुराधा",
+    lord: "Saturn",
+    yoni: "Mriga (Deer)",
+    gana: "Deva",
+    nadi: "Madhya",
+  },
+  {
+    num: 18,
+    en: "Jyeshtha",
+    hi: "ज्येष्ठा",
+    lord: "Mercury",
+    yoni: "Mriga (Deer)",
+    gana: "Rakshasa",
+    nadi: "Adi",
+  },
+  {
+    num: 19,
+    en: "Moola",
+    hi: "मूल",
+    lord: "Ketu",
+    yoni: "Shwan (Dog)",
+    gana: "Rakshasa",
+    nadi: "Adi",
+  },
+  {
+    num: 20,
+    en: "Purva Ashadha",
+    hi: "पूर्वाषाढ़ा",
+    lord: "Venus",
+    yoni: "Vanara (Monkey)",
+    gana: "Manushya",
+    nadi: "Madhya",
+  },
+  {
+    num: 21,
+    en: "Uttara Ashadha",
+    hi: "उत्तराषाढ़ा",
+    lord: "Sun",
+    yoni: "Nakula (Mongoose)",
+    gana: "Manushya",
+    nadi: "Antya",
+  },
+  {
+    num: 22,
+    en: "Shravana",
+    hi: "श्रवण",
+    lord: "Moon",
+    yoni: "Vanara (Monkey)",
+    gana: "Deva",
+    nadi: "Antya",
+  },
+  {
+    num: 23,
+    en: "Dhanishta",
+    hi: "धनिष्ठा",
+    lord: "Mars",
+    yoni: "Simha (Lion)",
+    gana: "Rakshasa",
+    nadi: "Madhya",
+  },
+  {
+    num: 24,
+    en: "Shatabhisha",
+    hi: "शतभिषा",
+    lord: "Rahu",
+    yoni: "Ashwa (Horse)",
+    gana: "Rakshasa",
+    nadi: "Adi",
+  },
+  {
+    num: 25,
+    en: "Purva Bhadrapada",
+    hi: "पूर्वभाद्रपद",
+    lord: "Jupiter",
+    yoni: "Simha (Lion)",
+    gana: "Manushya",
+    nadi: "Adi",
+  },
+  {
+    num: 26,
+    en: "Uttara Bhadrapada",
+    hi: "उत्तरभाद्रपद",
+    lord: "Saturn",
+    yoni: "Gau (Cow)",
+    gana: "Manushya",
+    nadi: "Madhya",
+  },
+  {
+    num: 27,
+    en: "Revati",
+    hi: "रेवती",
+    lord: "Mercury",
+    yoni: "Gaja (Elephant)",
+    gana: "Deva",
+    nadi: "Antya",
+  },
 ];
 
 export const VIMSHOTTARI_LORDS: { planet: PlanetId; years: number; nameHi: string }[] = [
@@ -342,22 +571,113 @@ export const VIMSHOTTARI_LORDS: { planet: PlanetId; years: number; nameHi: strin
   { planet: "Mercury", years: 17, nameHi: "बुध" },
 ];
 
-const PLANET_META: Record<
+export const PLANET_META: Record<
   PlanetId,
-  { nameEn: string; nameHi: string; nameSa: string; symbol: string; isBenefic: boolean; astroId?: string }
+  {
+    nameEn: string;
+    nameHi: string;
+    nameSa: string;
+    symbol: string;
+    isBenefic: boolean;
+    astroId?: string;
+  }
 > = {
-  Sun: { nameEn: "Sun", nameHi: "सूर्य", nameSa: "Sūrya", symbol: "☉", isBenefic: false, astroId: "sun" },
-  Moon: { nameEn: "Moon", nameHi: "चन्द्र", nameSa: "Candra", symbol: "☽", isBenefic: true, astroId: "moon" },
-  Mars: { nameEn: "Mars", nameHi: "मंगल", nameSa: "Maṅgala", symbol: "♂", isBenefic: false, astroId: "mars" },
-  Mercury: { nameEn: "Mercury", nameHi: "बुध", nameSa: "Budha", symbol: "☿", isBenefic: true, astroId: "mercury" },
-  Jupiter: { nameEn: "Jupiter", nameHi: "गुरु", nameSa: "Guru", symbol: "♃", isBenefic: true, astroId: "jupiter" },
-  Venus: { nameEn: "Venus", nameHi: "शुक्र", nameSa: "Śukra", symbol: "♀", isBenefic: true, astroId: "venus" },
-  Saturn: { nameEn: "Saturn", nameHi: "शनि", nameSa: "Śani", symbol: "♄", isBenefic: false, astroId: "saturn" },
-  Rahu: { nameEn: "Rahu", nameHi: "राहु", nameSa: "Rāhu", symbol: "☊", isBenefic: false, astroId: "rahu" },
-  Ketu: { nameEn: "Ketu", nameHi: "केतु", nameSa: "Ketu", symbol: "☋", isBenefic: false, astroId: "ketu" },
-  Uranus: { nameEn: "Uranus", nameHi: "अरुण", nameSa: "Harṣala", symbol: "♅", isBenefic: false, astroId: "uranus" },
-  Neptune: { nameEn: "Neptune", nameHi: "वरुण", nameSa: "Varuṇa", symbol: "♆", isBenefic: true, astroId: "neptune" },
-  Pluto: { nameEn: "Pluto", nameHi: "यम", nameSa: "Yama", symbol: "♇", isBenefic: false, astroId: "pluto" },
+  Sun: {
+    nameEn: "Sun",
+    nameHi: "सूर्य",
+    nameSa: "Sūrya",
+    symbol: "☉",
+    isBenefic: false,
+    astroId: "sun",
+  },
+  Moon: {
+    nameEn: "Moon",
+    nameHi: "चन्द्र",
+    nameSa: "Candra",
+    symbol: "☽",
+    isBenefic: true,
+    astroId: "moon",
+  },
+  Mars: {
+    nameEn: "Mars",
+    nameHi: "मंगल",
+    nameSa: "Maṅgala",
+    symbol: "♂",
+    isBenefic: false,
+    astroId: "mars",
+  },
+  Mercury: {
+    nameEn: "Mercury",
+    nameHi: "बुध",
+    nameSa: "Budha",
+    symbol: "☿",
+    isBenefic: true,
+    astroId: "mercury",
+  },
+  Jupiter: {
+    nameEn: "Jupiter",
+    nameHi: "गुरु",
+    nameSa: "Guru",
+    symbol: "♃",
+    isBenefic: true,
+    astroId: "jupiter",
+  },
+  Venus: {
+    nameEn: "Venus",
+    nameHi: "शुक्र",
+    nameSa: "Śukra",
+    symbol: "♀",
+    isBenefic: true,
+    astroId: "venus",
+  },
+  Saturn: {
+    nameEn: "Saturn",
+    nameHi: "शनि",
+    nameSa: "Śani",
+    symbol: "♄",
+    isBenefic: false,
+    astroId: "saturn",
+  },
+  Rahu: {
+    nameEn: "Rahu",
+    nameHi: "राहु",
+    nameSa: "Rāhu",
+    symbol: "☊",
+    isBenefic: false,
+    astroId: "rahu",
+  },
+  Ketu: {
+    nameEn: "Ketu",
+    nameHi: "केतु",
+    nameSa: "Ketu",
+    symbol: "☋",
+    isBenefic: false,
+    astroId: "ketu",
+  },
+  Uranus: {
+    nameEn: "Uranus",
+    nameHi: "अरुण",
+    nameSa: "Harṣala",
+    symbol: "♅",
+    isBenefic: false,
+    astroId: "uranus",
+  },
+  Neptune: {
+    nameEn: "Neptune",
+    nameHi: "वरुण",
+    nameSa: "Varuṇa",
+    symbol: "♆",
+    isBenefic: true,
+    astroId: "neptune",
+  },
+  Pluto: {
+    nameEn: "Pluto",
+    nameHi: "यम",
+    nameSa: "Yama",
+    symbol: "♇",
+    isBenefic: false,
+    astroId: "pluto",
+  },
 };
 
 export const HOUSE_NAMES: {
@@ -383,18 +703,54 @@ export const HOUSE_SIGNIFICANCE: {
   en: string;
   hi: string;
 }[] = [
-  { en: "Self, Physical Body, Personality, Vitality, Outlook", hi: "आत्म, शारीरिक गठन, स्वभाव, आरोग्य, जीवन-दृष्टिकोण" },
-  { en: "Wealth, Accumulated Assets, Speech, Family, Food Habits", hi: "धन, पैतृक संपत्ति, वाणी, कुटुम्ब, भोजन की आदतें" },
-  { en: "Courage, Siblings, Short Travels, Communication, Hobbies", hi: "पराक्रम, छोटे भाई-बहन, लघु यात्राएं, सम्प्रेषण, कला-कौशल" },
-  { en: "Mother, Vehicles, Real Estate, Domestic Peace, Happiness", hi: "माता, वाहन, भूमि-भवन, मानसिक शांति, गृह-सुख" },
-  { en: "Intellect, Children, Creativity, Past Karma, Higher Learning", hi: "बुद्धि, संतान, रचनात्मकता, पूर्वजन्म पुण्य, उच्च ज्ञान" },
-  { en: "Health, Debts, Enemies, Daily Work, Obstacles, Litigation", hi: "रोग, ऋण, शत्रु, दैनिक श्रम, बाधाएं, प्रतिस्पर्धा" },
-  { en: "Spouse, Marriage, Business Partnerships, Public Relations", hi: "जीवनसाथी, विवाह, व्यावसायिक साझेदारी, जनसम्पर्क" },
-  { en: "Longevity, Transformation, Occult, Sudden Gains/Losses, Research", hi: "दीर्घायु, गुप्त ज्ञान, आकस्मिक घटनाएं, पैतृक धन, शोध" },
-  { en: "Fortune, Dharma, Father, Guru, Long Pilgrimages, Higher Faith", hi: "भाग्य, धर्म, पिता, गुरु कृपा, तीर्थ यात्राएं, सद्बुद्धि" },
-  { en: "Career, Profession, Social Status, Authority, Achievements", hi: "आजीविका, व्यवसाय, मान-प्रतिष्ठा, सत्ता, कीर्ति" },
-  { en: "Gains, Income, Elder Siblings, Desires Fulfillment, Friends", hi: "समृद्धि, आय के स्रोत, बड़े भाई-बहन, मनोकामना सिद्धि, मित्र" },
-  { en: "Expenditures, Foreign Travel, Isolation, Spiritual Liberation", hi: "व्यय, विदेश यात्रा, एकांतवास, निद्रा सुख, मोक्ष" },
+  {
+    en: "Self, Physical Body, Personality, Vitality, Outlook",
+    hi: "आत्म, शारीरिक गठन, स्वभाव, आरोग्य, जीवन-दृष्टिकोण",
+  },
+  {
+    en: "Wealth, Accumulated Assets, Speech, Family, Food Habits",
+    hi: "धन, पैतृक संपत्ति, वाणी, कुटुम्ब, भोजन की आदतें",
+  },
+  {
+    en: "Courage, Siblings, Short Travels, Communication, Hobbies",
+    hi: "पराक्रम, छोटे भाई-बहन, लघु यात्राएं, सम्प्रेषण, कला-कौशल",
+  },
+  {
+    en: "Mother, Vehicles, Real Estate, Domestic Peace, Happiness",
+    hi: "माता, वाहन, भूमि-भवन, मानसिक शांति, गृह-सुख",
+  },
+  {
+    en: "Intellect, Children, Creativity, Past Karma, Higher Learning",
+    hi: "बुद्धि, संतान, रचनात्मकता, पूर्वजन्म पुण्य, उच्च ज्ञान",
+  },
+  {
+    en: "Health, Debts, Enemies, Daily Work, Obstacles, Litigation",
+    hi: "रोग, ऋण, शत्रु, दैनिक श्रम, बाधाएं, प्रतिस्पर्धा",
+  },
+  {
+    en: "Spouse, Marriage, Business Partnerships, Public Relations",
+    hi: "जीवनसाथी, विवाह, व्यावसायिक साझेदारी, जनसम्पर्क",
+  },
+  {
+    en: "Longevity, Transformation, Occult, Sudden Gains/Losses, Research",
+    hi: "दीर्घायु, गुप्त ज्ञान, आकस्मिक घटनाएं, पैतृक धन, शोध",
+  },
+  {
+    en: "Fortune, Dharma, Father, Guru, Long Pilgrimages, Higher Faith",
+    hi: "भाग्य, धर्म, पिता, गुरु कृपा, तीर्थ यात्राएं, सद्बुद्धि",
+  },
+  {
+    en: "Career, Profession, Social Status, Authority, Achievements",
+    hi: "आजीविका, व्यवसाय, मान-प्रतिष्ठा, सत्ता, कीर्ति",
+  },
+  {
+    en: "Gains, Income, Elder Siblings, Desires Fulfillment, Friends",
+    hi: "समृद्धि, आय के स्रोत, बड़े भाई-बहन, मनोकामना सिद्धि, मित्र",
+  },
+  {
+    en: "Expenditures, Foreign Travel, Isolation, Spiritual Liberation",
+    hi: "व्यय, विदेश यात्रा, एकांतवास, निद्रा सुख, मोक्ष",
+  },
 ];
 
 function normalize360(deg: number): number {
@@ -469,7 +825,9 @@ function getPlanetTropicalLon(body: string, t: Astronomy.AstroTime): number {
   try {
     if (body === "sun") {
       const sunPos = Astronomy.SunPosition(t);
-      return sunPos ? normalize360(sunPos.elon ?? (sunPos as unknown as { elong?: number }).elong ?? 0) : 0;
+      return sunPos
+        ? normalize360(sunPos.elon ?? (sunPos as unknown as { elong?: number }).elong ?? 0)
+        : 0;
     }
     if (body === "moon") {
       const moonGeo = Astronomy.GeoVector(Astronomy.Body.Moon, t, false);
@@ -580,85 +938,126 @@ export function getPlanetDignity(
 
   if (planetId === "Sun") {
     if (signIndex === 0) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if (signIndex === 6) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 4 && degInSign <= 20) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if (signIndex === 6)
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 4 && degInSign <= 20)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
     if (signIndex === 4) return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
-    if ([0, 3, 8, 11].includes(signIndex)) return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
-    if ([2, 5].includes(signIndex)) return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
+    if ([0, 3, 8, 11].includes(signIndex))
+      return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
+    if ([2, 5].includes(signIndex))
+      return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
     return { dignity: "enemy", labelEn: "Inimical (Shatru)", labelHi: "शत्रु" };
   }
 
   if (planetId === "Moon") {
-    if (signIndex === 1 && degInSign <= 3) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if (signIndex === 7) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 1) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if (signIndex === 1 && degInSign <= 3)
+      return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
+    if (signIndex === 7)
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 1)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
     if (signIndex === 3) return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
-    if ([0, 4].includes(signIndex)) return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
+    if ([0, 4].includes(signIndex))
+      return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
     return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
   }
 
   if (planetId === "Mars") {
     if (signIndex === 9) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if (signIndex === 3) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 0 && degInSign <= 12) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
-    if ([0, 7].includes(signIndex)) return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
-    if ([3, 4, 8, 11].includes(signIndex)) return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
-    if ([1, 6, 9, 10].includes(signIndex)) return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
+    if (signIndex === 3)
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 0 && degInSign <= 12)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if ([0, 7].includes(signIndex))
+      return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
+    if ([3, 4, 8, 11].includes(signIndex))
+      return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
+    if ([1, 6, 9, 10].includes(signIndex))
+      return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
     return { dignity: "enemy", labelEn: "Inimical (Shatru)", labelHi: "शत्रु" };
   }
 
   if (planetId === "Mercury") {
-    if (signIndex === 5 && degInSign <= 15) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if (signIndex === 11) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 5 && degInSign <= 20) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
-    if ([2, 5].includes(signIndex)) return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
-    if ([4, 6].includes(signIndex)) return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
-    if ([0, 7, 8, 9, 10].includes(signIndex)) return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
+    if (signIndex === 5 && degInSign <= 15)
+      return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
+    if (signIndex === 11)
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 5 && degInSign <= 20)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if ([2, 5].includes(signIndex))
+      return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
+    if ([4, 6].includes(signIndex))
+      return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
+    if ([0, 7, 8, 9, 10].includes(signIndex))
+      return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
     return { dignity: "enemy", labelEn: "Inimical (Shatru)", labelHi: "शत्रु" };
   }
 
   if (planetId === "Jupiter") {
     if (signIndex === 3) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if (signIndex === 9) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 8 && degInSign <= 10) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
-    if ([8, 11].includes(signIndex)) return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
-    if ([0, 4, 7].includes(signIndex)) return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
-    if ([9, 10].includes(signIndex)) return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
+    if (signIndex === 9)
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 8 && degInSign <= 10)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if ([8, 11].includes(signIndex))
+      return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
+    if ([0, 4, 7].includes(signIndex))
+      return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
+    if ([9, 10].includes(signIndex))
+      return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
     return { dignity: "enemy", labelEn: "Inimical (Shatru)", labelHi: "शत्रु" };
   }
 
   if (planetId === "Venus") {
-    if (signIndex === 11) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if (signIndex === 5) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 6 && degInSign <= 15) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
-    if ([1, 6].includes(signIndex)) return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
-    if ([2, 9, 10].includes(signIndex)) return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
-    if ([7, 8, 11].includes(signIndex)) return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
+    if (signIndex === 11)
+      return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
+    if (signIndex === 5)
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 6 && degInSign <= 15)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if ([1, 6].includes(signIndex))
+      return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
+    if ([2, 9, 10].includes(signIndex))
+      return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
+    if ([7, 8, 11].includes(signIndex))
+      return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
     return { dignity: "enemy", labelEn: "Inimical (Shatru)", labelHi: "शत्रु" };
   }
 
   if (planetId === "Saturn") {
     if (signIndex === 6) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if (signIndex === 0) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 10 && degInSign <= 20) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
-    if ([9, 10].includes(signIndex)) return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
-    if ([2, 5, 6].includes(signIndex)) return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
-    if ([8, 11].includes(signIndex)) return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
+    if (signIndex === 0)
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 10 && degInSign <= 20)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if ([9, 10].includes(signIndex))
+      return { dignity: "own", labelEn: "Own Sign (Sva)", labelHi: "स्वराशि" };
+    if ([2, 5, 6].includes(signIndex))
+      return { dignity: "friend", labelEn: "Friendly (Mitra)", labelHi: "मित्र" };
+    if ([8, 11].includes(signIndex))
+      return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
     return { dignity: "enemy", labelEn: "Inimical (Shatru)", labelHi: "शत्रु" };
   }
 
   if (planetId === "Rahu") {
-    if ([1, 2].includes(signIndex)) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if ([7, 8].includes(signIndex)) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 10) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if ([1, 2].includes(signIndex))
+      return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
+    if ([7, 8].includes(signIndex))
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 10)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
     if (signIndex === 5) return { dignity: "own", labelEn: "Own (Sva)", labelHi: "स्वराशि" };
     return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
   }
 
   if (planetId === "Ketu") {
-    if ([7, 8].includes(signIndex)) return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
-    if ([1, 2].includes(signIndex)) return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
-    if (signIndex === 8) return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
+    if ([7, 8].includes(signIndex))
+      return { dignity: "exalted", labelEn: "Exalted (Uchha)", labelHi: "उच्च" };
+    if ([1, 2].includes(signIndex))
+      return { dignity: "debilitated", labelEn: "Debilitated (Neecha)", labelHi: "नीच" };
+    if (signIndex === 8)
+      return { dignity: "moolatrikona", labelEn: "Moolatrikona", labelHi: "मूलत्रिकोण" };
     if (signIndex === 11) return { dignity: "own", labelEn: "Own (Sva)", labelHi: "स्वराशि" };
     return { dignity: "neutral", labelEn: "Neutral (Sama)", labelHi: "सम" };
   }
@@ -677,7 +1076,10 @@ export function computeFullKundli(
   personName: string = "Jātaka (जातक)",
   gender?: string,
 ): FullKundliData {
-  const safeDateStr = birthDateStr && birthDateStr.includes("-") ? birthDateStr : new Date().toISOString().split("T")[0];
+  const safeDateStr =
+    birthDateStr && birthDateStr.includes("-")
+      ? birthDateStr
+      : new Date().toISOString().split("T")[0];
   const dateParts = safeDateStr.split("-").map((n) => parseInt(n, 10));
   const year = isNaN(dateParts[0]) ? 2000 : dateParts[0];
   const month = isNaN(dateParts[1]) || dateParts[1] < 1 || dateParts[1] > 12 ? 1 : dateParts[1];
@@ -696,7 +1098,7 @@ export function computeFullKundli(
   // Convert local wall clock time in timezone to UTC milliseconds safely
   let ms = Date.UTC(year, month - 1, day, hour, minute, second);
   try {
-    let formatter = new Intl.DateTimeFormat("en-US", {
+    const formatter = new Intl.DateTimeFormat("en-US", {
       timeZone: safeTz,
       year: "numeric",
       month: "numeric",
@@ -783,7 +1185,11 @@ export function computeFullKundli(
     // Retrograde detection
     let isRetrograde = false;
     let speed = 1.0;
-    if (["Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Uranus", "Neptune", "Pluto"].includes(pDef.id)) {
+    if (
+      ["Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Uranus", "Neptune", "Pluto"].includes(
+        pDef.id,
+      )
+    ) {
       const prevAstroTime = Astronomy.MakeTime(new Date(ms - 1000 * 60 * 60 * 2)); // 2 hrs ago
       const prevTrop = getPlanetTropicalLon(pDef.astroKey, prevAstroTime);
       let diff = tropLon - prevTrop;
@@ -796,11 +1202,11 @@ export function computeFullKundli(
       speed = -0.053;
     }
 
-    const { dignity, labelEn: dignityLabelEn, labelHi: dignityLabelHi } = getPlanetDignity(
-      pDef.id,
-      signIndex,
-      degInSign,
-    );
+    const {
+      dignity,
+      labelEn: dignityLabelEn,
+      labelHi: dignityLabelHi,
+    } = getPlanetDignity(pDef.id, signIndex, degInSign);
 
     // Calculate Houses
     const houseD1 = ((signIndex - lagnaSignIndex + 12) % 12) + 1;
@@ -909,7 +1315,9 @@ export function computeFullKundli(
       } else if (chartType === "chandra") {
         occupyingPlanets = planets.filter((p) => p.houseChandra === h);
       } else if (chartType === "surya") {
-        occupyingPlanets = planets.filter((p) => ((p.signIndex - sunSignIndex + 12) % 12) + 1 === h);
+        occupyingPlanets = planets.filter(
+          (p) => ((p.signIndex - sunSignIndex + 12) % 12) + 1 === h,
+        );
       } else if (chartType === "d10") {
         occupyingPlanets = planets.filter((p) => {
           const d10Sign = calculateDashamshaSignIndex(p.longitude);
@@ -917,7 +1325,8 @@ export function computeFullKundli(
         });
       } else if (chartType === "chalit") {
         occupyingPlanets = planets.filter((p) => {
-          const chalitHouse = (Math.floor(normalize360(p.longitude - siderealAsc + 15) / 30) % 12) + 1;
+          const chalitHouse =
+            (Math.floor(normalize360(p.longitude - siderealAsc + 15) / 30) % 12) + 1;
           return chalitHouse === h;
         });
       }
@@ -939,7 +1348,10 @@ export function computeFullKundli(
         // Mars 4th and 8th
         if (p.id === "Mars" && (distFromPlanet === 4 || distFromPlanet === 8)) hasAspect = true;
         // Jupiter & Rahu/Ketu 5th and 9th
-        if (["Jupiter", "Rahu", "Ketu"].includes(p.id) && (distFromPlanet === 5 || distFromPlanet === 9))
+        if (
+          ["Jupiter", "Rahu", "Ketu"].includes(p.id) &&
+          (distFromPlanet === 5 || distFromPlanet === 9)
+        )
           hasAspect = true;
         // Saturn 3rd and 10th
         if (p.id === "Saturn" && (distFromPlanet === 3 || distFromPlanet === 10)) hasAspect = true;
@@ -1007,7 +1419,10 @@ export function computeFullKundli(
         let hasAspect = false;
         if (distFromPlanet === 7) hasAspect = true;
         if (p.id === "Mars" && (distFromPlanet === 4 || distFromPlanet === 8)) hasAspect = true;
-        if (["Jupiter", "Rahu", "Ketu"].includes(p.id) && (distFromPlanet === 5 || distFromPlanet === 9))
+        if (
+          ["Jupiter", "Rahu", "Ketu"].includes(p.id) &&
+          (distFromPlanet === 5 || distFromPlanet === 9)
+        )
           hasAspect = true;
         if (p.id === "Saturn" && (distFromPlanet === 3 || distFromPlanet === 10)) hasAspect = true;
         if (hasAspect && !occupyingPlanets.some((op) => op.id === p.id)) {
@@ -1046,9 +1461,16 @@ export function computeFullKundli(
 
   // Vashya from Moon sign
   let vashya = { en: "Manava (Human)", hi: "मानव / द्विपद" };
-  if ([0, 1].includes(moonSignIndex) || (moonSignIndex === 8 && moonObj.degreeInSign >= 15) || (moonSignIndex === 9 && moonObj.degreeInSign < 15)) {
+  if (
+    [0, 1].includes(moonSignIndex) ||
+    (moonSignIndex === 8 && moonObj.degreeInSign >= 15) ||
+    (moonSignIndex === 9 && moonObj.degreeInSign < 15)
+  ) {
     vashya = { en: "Chatushpada (Quadruped)", hi: "चतुष्पाद" };
-  } else if ([3, 11].includes(moonSignIndex) || (moonSignIndex === 9 && moonObj.degreeInSign >= 15)) {
+  } else if (
+    [3, 11].includes(moonSignIndex) ||
+    (moonSignIndex === 9 && moonObj.degreeInSign >= 15)
+  ) {
     vashya = { en: "Jalachara (Water)", hi: "जलचर" };
   } else if (moonSignIndex === 7) {
     vashya = { en: "Keeta (Insect)", hi: "कीट" };
@@ -1069,19 +1491,89 @@ export function computeFullKundli(
   // 4, 8, 12 -> Loha (Iron - Hard work)
   const moonHouse = moonObj.houseD1;
   let paya = { en: "Tamra (Copper)", hi: "ताम्र", quality: "Auspicious & Steady Growth" };
-  if ([1, 6, 11].includes(moonHouse)) paya = { en: "Swarna (Gold)", hi: "स्वर्ण", quality: "Demands Vigilance & Perseverance" };
-  else if ([2, 5, 9].includes(moonHouse)) paya = { en: "Rajata (Silver)", hi: "रजत", quality: "Highly Auspicious & Wealth Bestowing" };
-  else if ([4, 8, 12].includes(moonHouse)) paya = { en: "Loha (Iron)", hi: "लौह", quality: "Calls for Diligence & Patience" };
+  if ([1, 6, 11].includes(moonHouse))
+    paya = { en: "Swarna (Gold)", hi: "स्वर्ण", quality: "Demands Vigilance & Perseverance" };
+  else if ([2, 5, 9].includes(moonHouse))
+    paya = { en: "Rajata (Silver)", hi: "रजत", quality: "Highly Auspicious & Wealth Bestowing" };
+  else if ([4, 8, 12].includes(moonHouse))
+    paya = { en: "Loha (Iron)", hi: "लौह", quality: "Calls for Diligence & Patience" };
 
   // Lucky Stones & Colors based on Moon Lord and Lagna Lord
-  const gemMap: Record<string, { en: string; hi: string; colorEn: string; colorHi: string; num: number; deityEn: string; deityHi: string }> = {
-    Sun: { en: "Ruby (Manikya)", hi: "माणिक्य (Ruby)", colorEn: "Saffron / Ruby Red", colorHi: "केसरिया / लाल", num: 1, deityEn: "Lord Shiva / Surya", deityHi: "भगवान शिव / सूर्य देव" },
-    Moon: { en: "Pearl (Moti)", hi: "मोती (Pearl)", colorEn: "Pearl White / Cream", colorHi: "दूधिया श्वेत / क्रीम", num: 2, deityEn: "Goddess Parvati", deityHi: "माँ पार्वती / गौरी" },
-    Mars: { en: "Red Coral (Moonga)", hi: "मूँगा (Coral)", colorEn: "Crimson Red / Coral", colorHi: "सिंदूरी लाल", num: 9, deityEn: "Lord Kartikeya / Hanuman", deityHi: "श्री हनुमान / कार्तिकेय" },
-    Mercury: { en: "Emerald (Panna)", hi: "पन्ना (Emerald)", colorEn: "Emerald Green", colorHi: "पन्ना हरा", num: 5, deityEn: "Lord Vishnu", deityHi: "भगवान श्री हरि विष्णु" },
-    Jupiter: { en: "Yellow Sapphire (Pukhraj)", hi: "पुखराज (Yellow Sapphire)", colorEn: "Golden Yellow", colorHi: "पीला / स्वर्णिम", num: 3, deityEn: "Lord Brahma / Brihaspati", deityHi: "भगवान बृहस्पति / ब्रह्मा" },
-    Venus: { en: "Diamond / White Sapphire (Heera)", hi: "हीरा / ओपल", colorEn: "Sparkling White / Light Pink", colorHi: "चमकीला श्वेत / गुलाबी", num: 6, deityEn: "Goddess Lakshmi", deityHi: "माँ महालक्ष्मी" },
-    Saturn: { en: "Blue Sapphire (Neelam)", hi: "नीलम (Blue Sapphire)", colorEn: "Midnight Navy / Black", colorHi: "गहरा नीला / श्यामल", num: 8, deityEn: "Lord Shani / Bhairava", deityHi: "भगवान शनिदेव / भैरव" },
+  const gemMap: Record<
+    string,
+    {
+      en: string;
+      hi: string;
+      colorEn: string;
+      colorHi: string;
+      num: number;
+      deityEn: string;
+      deityHi: string;
+    }
+  > = {
+    Sun: {
+      en: "Ruby (Manikya)",
+      hi: "माणिक्य (Ruby)",
+      colorEn: "Saffron / Ruby Red",
+      colorHi: "केसरिया / लाल",
+      num: 1,
+      deityEn: "Lord Shiva / Surya",
+      deityHi: "भगवान शिव / सूर्य देव",
+    },
+    Moon: {
+      en: "Pearl (Moti)",
+      hi: "मोती (Pearl)",
+      colorEn: "Pearl White / Cream",
+      colorHi: "दूधिया श्वेत / क्रीम",
+      num: 2,
+      deityEn: "Goddess Parvati",
+      deityHi: "माँ पार्वती / गौरी",
+    },
+    Mars: {
+      en: "Red Coral (Moonga)",
+      hi: "मूँगा (Coral)",
+      colorEn: "Crimson Red / Coral",
+      colorHi: "सिंदूरी लाल",
+      num: 9,
+      deityEn: "Lord Kartikeya / Hanuman",
+      deityHi: "श्री हनुमान / कार्तिकेय",
+    },
+    Mercury: {
+      en: "Emerald (Panna)",
+      hi: "पन्ना (Emerald)",
+      colorEn: "Emerald Green",
+      colorHi: "पन्ना हरा",
+      num: 5,
+      deityEn: "Lord Vishnu",
+      deityHi: "भगवान श्री हरि विष्णु",
+    },
+    Jupiter: {
+      en: "Yellow Sapphire (Pukhraj)",
+      hi: "पुखराज (Yellow Sapphire)",
+      colorEn: "Golden Yellow",
+      colorHi: "पीला / स्वर्णिम",
+      num: 3,
+      deityEn: "Lord Brahma / Brihaspati",
+      deityHi: "भगवान बृहस्पति / ब्रह्मा",
+    },
+    Venus: {
+      en: "Diamond / White Sapphire (Heera)",
+      hi: "हीरा / ओपल",
+      colorEn: "Sparkling White / Light Pink",
+      colorHi: "चमकीला श्वेत / गुलाबी",
+      num: 6,
+      deityEn: "Goddess Lakshmi",
+      deityHi: "माँ महालक्ष्मी",
+    },
+    Saturn: {
+      en: "Blue Sapphire (Neelam)",
+      hi: "नीलम (Blue Sapphire)",
+      colorEn: "Midnight Navy / Black",
+      colorHi: "गहरा नीला / श्यामल",
+      num: 8,
+      deityEn: "Lord Shani / Bhairava",
+      deityHi: "भगवान शनिदेव / भैरव",
+    },
   };
 
   const luckyMeta = gemMap[moonNakMeta.lord] || gemMap["Jupiter"];
@@ -1090,11 +1582,21 @@ export function computeFullKundli(
     varna,
     vashya,
     yoni: { en: moonNakMeta.yoni, hi: moonNakMeta.yoni, animal: moonNakMeta.yoni.split(" ")[0] },
-    gana: { en: moonNakMeta.gana, hi: moonNakMeta.gana === "Deva" ? "देव" : moonNakMeta.gana === "Manushya" ? "मनुष्य" : "राक्षस" },
-    nadi: { en: moonNakMeta.nadi, hi: moonNakMeta.nadi === "Adi" ? "आदि" : moonNakMeta.nadi === "Madhya" ? "मध्य" : "अन्त्य" },
+    gana: {
+      en: moonNakMeta.gana,
+      hi:
+        moonNakMeta.gana === "Deva" ? "देव" : moonNakMeta.gana === "Manushya" ? "मनुष्य" : "राक्षस",
+    },
+    nadi: {
+      en: moonNakMeta.nadi,
+      hi: moonNakMeta.nadi === "Adi" ? "आदि" : moonNakMeta.nadi === "Madhya" ? "मध्य" : "अन्त्य",
+    },
     tatva,
     paya,
-    rasiLord: { en: (ZODIAC_SIGNS[moonSignIndex] || ZODIAC_SIGNS[0]).lord, hi: (ZODIAC_SIGNS[moonSignIndex] || ZODIAC_SIGNS[0]).lord },
+    rasiLord: {
+      en: (ZODIAC_SIGNS[moonSignIndex] || ZODIAC_SIGNS[0]).lord,
+      hi: (ZODIAC_SIGNS[moonSignIndex] || ZODIAC_SIGNS[0]).lord,
+    },
     nakshatraLord: { en: moonNakMeta.lord, hi: moonNakMeta.lord },
     friendlyRasis: [
       (ZODIAC_SIGNS[(moonSignIndex + 4) % 12] || ZODIAC_SIGNS[0]).hi,
@@ -1135,7 +1637,10 @@ export function computeFullKundli(
         endDate: antar.endDateIso,
         startMs: antar.startTimestampMs,
         endMs: antar.endTimestampMs,
-        durationMonths: Math.round(((antar.endTimestampMs - antar.startTimestampMs) / (365.2425 * 86400 * 1000) * 12) * 10) / 10,
+        durationMonths:
+          Math.round(
+            ((antar.endTimestampMs - antar.startTimestampMs) / (365.2425 * 86400 * 1000)) * 12 * 10,
+          ) / 10,
         isCurrent: !!antar.isCurrent,
         pratyantardashas,
       };
@@ -1148,7 +1653,10 @@ export function computeFullKundli(
       endDate: maha.endDateIso,
       startMs: maha.startTimestampMs,
       endMs: maha.endTimestampMs,
-      durationYears: Math.round(((maha.endTimestampMs - maha.startTimestampMs) / (365.2425 * 86400 * 1000)) * 10) / 10,
+      durationYears:
+        Math.round(
+          ((maha.endTimestampMs - maha.startTimestampMs) / (365.2425 * 86400 * 1000)) * 10,
+        ) / 10,
       isCurrent: !!maha.isCurrent,
       antardashas,
     };
@@ -1175,8 +1683,10 @@ export function computeFullKundli(
   if (fromLagna || fromMoon) {
     if (marsObj.signIndex === 0 && marsHouseLagna === 1) {
       isManglikCancelled = true;
-      cancellationReasonEn = "Mars is in own sign Aries in the 1st House (Ruchaka / Sva-rasi cancellation)";
-      cancellationReasonHi = "मंगल प्रथम भाव में अपनी स्वराशि मेष में स्थित है (रुचक / स्वराशि अपवाद)";
+      cancellationReasonEn =
+        "Mars is in own sign Aries in the 1st House (Ruchaka / Sva-rasi cancellation)";
+      cancellationReasonHi =
+        "मंगल प्रथम भाव में अपनी स्वराशि मेष में स्थित है (रुचक / स्वराशि अपवाद)";
     } else if (marsObj.signIndex === 7 && marsHouseLagna === 4) {
       isManglikCancelled = true;
       cancellationReasonEn = "Mars is in own sign Scorpio in the 4th House";
@@ -1239,7 +1749,9 @@ export function computeFullKundli(
   // Current Saturn longitude using nowMs
   const nowAstro = Astronomy.MakeTime(new Date());
   const nowSaturnTrop = getPlanetTropicalLon("saturn", nowAstro);
-  const nowSaturnSid = normalize360(nowSaturnTrop - calculateAyanamsaDegrees(nowAstro, ayanamsaKey));
+  const nowSaturnSid = normalize360(
+    nowSaturnTrop - calculateAyanamsaDegrees(nowAstro, ayanamsaKey),
+  );
   const nowSaturnSign = Math.floor(nowSaturnSid / 30);
 
   const saturnHouseFromMoon = ((nowSaturnSign - moonSignIndex + 12) % 12) + 1;
@@ -1302,15 +1814,17 @@ export function computeFullKundli(
       descriptionEn: isManglik
         ? `Mars is situated in House ${marsHouseLagna} from Lagna and House ${marsHouseMoon} from Moon, indicating Kuja Dosha.`
         : isManglikCancelled
-        ? `Kuja Dosha formed by Mars placement is cancelled by classical Vedic rules: ${cancellationReasonEn}.`
-        : "Mars is favorably placed in non-Manglik houses.",
+          ? `Kuja Dosha formed by Mars placement is cancelled by classical Vedic rules: ${cancellationReasonEn}.`
+          : "Mars is favorably placed in non-Manglik houses.",
       descriptionHi: isManglik
         ? `मंगल लग्न से ${marsHouseLagna}वें भाव एवं चन्द्र से ${marsHouseMoon}वें भाव में स्थित है, जिससे मांगलिक प्रभाव बनता है।`
         : isManglikCancelled
-        ? `मांगलिक स्थिति शास्त्रोक्त नियम के अनुसार निष्प्रभावी है: ${cancellationReasonHi}।`
-        : "मंगल शुभ व अनुकूल भाव में स्थित है (मांगलिक दोष नहीं है)।",
-      remedyEn: "Chanting Hanuman Chalisa, offering red flowers on Tuesday, and practicing mutual patience.",
-      remedyHi: "मंगलवार को श्री हनुमान चालीसा का पाठ, लाल चंदन का तिलक, एवं मंगल गायत्री मन्त्र का जप शुभ फलदायी है।",
+          ? `मांगलिक स्थिति शास्त्रोक्त नियम के अनुसार निष्प्रभावी है: ${cancellationReasonHi}।`
+          : "मंगल शुभ व अनुकूल भाव में स्थित है (मांगलिक दोष नहीं है)।",
+      remedyEn:
+        "Chanting Hanuman Chalisa, offering red flowers on Tuesday, and practicing mutual patience.",
+      remedyHi:
+        "मंगलवार को श्री हनुमान चालीसा का पाठ, लाल चंदन का तिलक, एवं मंगल गायत्री मन्त्र का जप शुभ फलदायी है।",
     },
     kalsarpa: {
       present: kalsarpaPresent,
@@ -1322,8 +1836,10 @@ export function computeFullKundli(
       descriptionHi: kalsarpaPresent
         ? `सभी सातों मुख्य ग्रह राहु-केतु अक्ष के एक ओर स्थित हैं (${kalsarpaType.hi})।`
         : "ग्रह राहु और केतु के दोनों ओर संतुलित रूप से वितरित हैं (कालसर्प दोष अनुपस्थित है)।",
-      remedyEn: "Maha Mrityunjaya Japa, Shiva Abhishek with water & milk on Mondays, worship of Lord Subramanya/Naga Devata.",
-      remedyHi: "महामृत्युंजय मन्त्र का नित्य जप, सोमवार को शिवलिंग पर जल-दूध का अभिषेक, व नाग पंचमी पर शांति पूजा।",
+      remedyEn:
+        "Maha Mrityunjaya Japa, Shiva Abhishek with water & milk on Mondays, worship of Lord Subramanya/Naga Devata.",
+      remedyHi:
+        "महामृत्युंजय मन्त्र का नित्य जप, सोमवार को शिवलिंग पर जल-दूध का अभिषेक, व नाग पंचमी पर शांति पूजा।",
     },
     sadeSati: {
       status: sadeSatiStatus,
@@ -1333,8 +1849,10 @@ export function computeFullKundli(
       natalMoonSign: ZODIAC_SIGNS[moonSignIndex].hi,
       descriptionEn: `Transiting Saturn is currently in ${ZODIAC_SIGNS[nowSaturnSign].en} (${saturnHouseFromMoon}th from Natal Moon in ${ZODIAC_SIGNS[moonSignIndex].en}).`,
       descriptionHi: `गोचर शनिदेव वर्तमान में ${ZODIAC_SIGNS[nowSaturnSign].hi} राशि में संचरण कर रहे हैं (जन्म चन्द्र ${ZODIAC_SIGNS[moonSignIndex].hi} से ${saturnHouseFromMoon}वें भाव में)।`,
-      remedyEn: "Chanting Shani Gayatri or Hanuman Chalisa, lighting mustard oil lamp under Peepal tree on Saturdays, serving the needy.",
-      remedyHi: "शनिवार को पीपल के वृक्ष के नीचे सरसों के तेल का दीपक, दशरथकृत शनि स्तोत्र का पाठ, एवं असहायों की सेवा।",
+      remedyEn:
+        "Chanting Shani Gayatri or Hanuman Chalisa, lighting mustard oil lamp under Peepal tree on Saturdays, serving the needy.",
+      remedyHi:
+        "शनिवार को पीपल के वृक्ष के नीचे सरसों के तेल का दीपक, दशरथकृत शनि स्तोत्र का पाठ, एवं असहायों की सेवा।",
     },
     gandanta: {
       isGandanta,
@@ -1345,7 +1863,8 @@ export function computeFullKundli(
       descriptionHi: isGandanta
         ? `चन्द्रमा जल व अग्नि राशि के संधिकाल पर स्थित है (${gandantaType})।`
         : "चन्द्रमा गंडान्त संधि से मुक्त शुभ क्षेत्र में स्थित है।",
-      remedyEn: "Mula Shanti Havana on birth nakshatra day with 27 tree leaves & donation to Brahmins.",
+      remedyEn:
+        "Mula Shanti Havana on birth nakshatra day with 27 tree leaves & donation to Brahmins.",
       remedyHi: "जन्म नक्षत्र की आवृति पर मूल शांति पूजा, पंचपल्लव कलश स्नान एवं गौ-दान।",
     },
   };
@@ -1388,28 +1907,34 @@ export function computeFullKundli(
 
   // Ruchaka / Pancha Mahapurusha Yogas
   const isRuchaka =
-    marsObj.dignity === "exalted" || (marsObj.dignity === "own" && [1, 4, 7, 10].includes(marsObj.houseD1));
+    marsObj.dignity === "exalted" ||
+    (marsObj.dignity === "own" && [1, 4, 7, 10].includes(marsObj.houseD1));
   if (isRuchaka) {
     yogas.push({
       nameEn: "Ruchaka Mahapurusha Yoga",
       nameHi: "रुचक महापुरुष योग",
       present: true,
       type: "auspicious",
-      descriptionEn: "Mars is in own/exalted sign in a Kendra house, bestowing courage, leadership, victory, and commanding presence.",
-      descriptionHi: "मंगल केंद्र भाव में स्वराशि/उच्च का होकर स्थित है, जो अदम्य साहस, नेतृत्व शक्ति एवं विजय प्रदान करता है।",
+      descriptionEn:
+        "Mars is in own/exalted sign in a Kendra house, bestowing courage, leadership, victory, and commanding presence.",
+      descriptionHi:
+        "मंगल केंद्र भाव में स्वराशि/उच्च का होकर स्थित है, जो अदम्य साहस, नेतृत्व शक्ति एवं विजय प्रदान करता है।",
     });
   }
 
   const isHamsa =
-    jupObj.dignity === "exalted" || (jupObj.dignity === "own" && [1, 4, 7, 10].includes(jupObj.houseD1));
+    jupObj.dignity === "exalted" ||
+    (jupObj.dignity === "own" && [1, 4, 7, 10].includes(jupObj.houseD1));
   if (isHamsa) {
     yogas.push({
       nameEn: "Hamsa Mahapurusha Yoga",
       nameHi: "हंस महापुरुष योग",
       present: true,
       type: "auspicious",
-      descriptionEn: "Jupiter is exalted or in own sign in Kendra, bestowing righteousness, spiritual nobility, and universal veneration.",
-      descriptionHi: "गुरु केंद्र भाव में स्वराशि/उच्च का होकर स्थित है, जो साधु स्वभाव, धर्मपरायणता एवं पूज्यनीय स्थान प्रदान करता है।",
+      descriptionEn:
+        "Jupiter is exalted or in own sign in Kendra, bestowing righteousness, spiritual nobility, and universal veneration.",
+      descriptionHi:
+        "गुरु केंद्र भाव में स्वराशि/उच्च का होकर स्थित है, जो साधु स्वभाव, धर्मपरायणता एवं पूज्यनीय स्थान प्रदान करता है।",
     });
   }
 
@@ -1423,8 +1948,10 @@ export function computeFullKundli(
       nameHi: "मालव्य महापुरुष योग",
       present: true,
       type: "auspicious",
-      descriptionEn: "Venus is exalted/own sign in Kendra, conferring aesthetic brilliance, material luxuries, attractive persona, and conjugal bliss.",
-      descriptionHi: "शुक्र केंद्र भाव में स्वराशि/उच्च का है, जो ऐश्वर्य, कलात्मक प्रतिभा एवं वैवाहिक सुख प्रदान करता है।",
+      descriptionEn:
+        "Venus is exalted/own sign in Kendra, conferring aesthetic brilliance, material luxuries, attractive persona, and conjugal bliss.",
+      descriptionHi:
+        "शुक्र केंद्र भाव में स्वराशि/उच्च का है, जो ऐश्वर्य, कलात्मक प्रतिभा एवं वैवाहिक सुख प्रदान करता है।",
     });
   }
 
@@ -1438,8 +1965,10 @@ export function computeFullKundli(
       nameHi: "शश महापुरुष योग",
       present: true,
       type: "auspicious",
-      descriptionEn: "Saturn is exalted/own sign in Kendra, granting perseverance, organizational mastery, mass popularity, and authority.",
-      descriptionHi: "शनि केंद्र में उच्च/स्वराशि होकर स्थित है, जो अनुशासन, जनप्रियता एवं दीर्घकालीन अधिकार प्रदान करता है।",
+      descriptionEn:
+        "Saturn is exalted/own sign in Kendra, granting perseverance, organizational mastery, mass popularity, and authority.",
+      descriptionHi:
+        "शनि केंद्र में उच्च/स्वराशि होकर स्थित है, जो अनुशासन, जनप्रियता एवं दीर्घकालीन अधिकार प्रदान करता है।",
     });
   }
 
@@ -1451,8 +1980,10 @@ export function computeFullKundli(
       nameHi: "चन्द्र-मंगल योग",
       present: true,
       type: "auspicious",
-      descriptionEn: "Moon and Mars are conjoined, indicating financial enterprise, quick thinking, and resourcefulness.",
-      descriptionHi: "चन्द्रमा और मंगल की युति धन उपार्जन, उद्यमशीलता एवं त्वरित निर्णय क्षमता को दर्शाती है।",
+      descriptionEn:
+        "Moon and Mars are conjoined, indicating financial enterprise, quick thinking, and resourcefulness.",
+      descriptionHi:
+        "चन्द्रमा और मंगल की युति धन उपार्जन, उद्यमशीलता एवं त्वरित निर्णय क्षमता को दर्शाती है।",
     });
   }
 
@@ -1464,8 +1995,10 @@ export function computeFullKundli(
       nameHi: "गुरु-चांडाल योग",
       present: true,
       type: "inauspicious",
-      descriptionEn: "Jupiter and Rahu are in the same sign, advising caution in spiritual choices and guidance from authentic gurus.",
-      descriptionHi: "बृहस्पति और राहु की युति है; गुरुजनों के प्रति निष्ठा एवं विष्णु सहस्रनाम पाठ हितकर है।",
+      descriptionEn:
+        "Jupiter and Rahu are in the same sign, advising caution in spiritual choices and guidance from authentic gurus.",
+      descriptionHi:
+        "बृहस्पति और राहु की युति है; गुरुजनों के प्रति निष्ठा एवं विष्णु सहस्रनाम पाठ हितकर है।",
     });
   }
 
@@ -1493,7 +2026,12 @@ export function computeFullKundli(
   try {
     const ruleContext = RuleEngine.buildContextFromKundli(
       planets,
-      housesD1 as unknown as { houseNumber: number; signIndex: number; lord: string; planetsPresent?: string[] }[],
+      housesD1 as unknown as {
+        houseNumber: number;
+        signIndex: number;
+        lord: string;
+        planetsPresent?: string[];
+      }[],
       lagnaSignIndex,
       moonSignIndex,
       shadbala,
@@ -1506,9 +2044,7 @@ export function computeFullKundli(
     for (const r of ruleResults) {
       if (r.status === "PRESENT" || r.status === "PARTIAL") {
         const alreadyExists = yogas.some(
-          (y) =>
-            y.nameEn.toLowerCase() === r.nameEn.toLowerCase() ||
-            y.nameHi === r.nameHi,
+          (y) => y.nameEn.toLowerCase() === r.nameEn.toLowerCase() || y.nameHi === r.nameHi,
         );
         if (!alreadyExists) {
           yogas.push({

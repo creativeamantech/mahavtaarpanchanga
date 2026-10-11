@@ -5,6 +5,7 @@
 In computational astrology, dates are frequently corrupted when developers apply local calendar date objects without normalizing to UTC. Daylight saving time (DST) shifts and local timezone offsets can introduce arbitrary 1-hour or 30-minute shifts that break Dasha boundary continuity.
 
 ### The Canonical Rule:
+
 **All temporal boundaries in the Mahavtaar Kundali Engine are stored and compared as UTC epoch milliseconds (`number`).**
 
 - `birthTimestampMs`: Derived from the native's birth date, time, and longitude/timezone offset.
@@ -18,20 +19,24 @@ In computational astrology, dates are frequently corrupted when developers apply
 The length of a "year" in Dasha calculations has been debated among classical commentators. The Mahavtaar Engine explicitly declares and parameterizes this convention:
 
 ### 1. Gregorian Solar Year (`gregorian_solar`) — Default
+
 - **Definition**: 1 mean tropical/civil year on the modern Gregorian calendar.
 - **Duration**: $365.2425$ days $= 31,556,952,000$ milliseconds.
 - **Application**: Standard across modern Ephemeris-driven Panchangas and matching the verified baseline in `kundliEngine.ts`.
 
 ### 2. Savana Year (`savana`) — Classical Purva Parashari
+
 - **Definition**: 360 civil solar days (12 months of 30 days each).
 - **Duration**: $360.0$ days $= 31,104,000,000$ milliseconds.
 - **Scripture**: Discussed in Surya Siddhanta and some commentaries on BPHS.
 
 ### 3. Sidereal Solar Year (`sidereal_solar`)
+
 - **Definition**: Exact duration of the Earth's sidereal orbit around the Sun.
 - **Duration**: $365.256363$ days $= 31,558,149,763$ milliseconds.
 
 ### 4. Lunar Year (`chandra`)
+
 - **Definition**: 12 Tithis $\times$ 30 lunar days $\approx 354.367$ days.
 
 ---

@@ -57,10 +57,18 @@ export interface GunaMilanResult {
 
 // 1. Varna Matrix: Cancer, Scorpio, Pisces (Brahmin=4); Aries, Leo, Sagittarius (Kshatriya=3); Taurus, Virgo, Capricorn (Vaishya=2); Gemini, Libra, Aquarius (Shudra=1)
 const RASI_VARNA_SCORE: Record<number, number> = {
-  3: 4, 7: 4, 11: 4, // Water
-  0: 3, 4: 3, 8: 3,  // Fire
-  1: 2, 5: 2, 9: 2,  // Earth
-  2: 1, 6: 1, 10: 1, // Air
+  3: 4,
+  7: 4,
+  11: 4, // Water
+  0: 3,
+  4: 3,
+  8: 3, // Fire
+  1: 2,
+  5: 2,
+  9: 2, // Earth
+  2: 1,
+  6: 1,
+  10: 1, // Air
 };
 
 // 2. Vashya Groups
@@ -126,13 +134,69 @@ function getYoniScore(y1: number, y2: number): number {
 
 // 5. Planetary Relationship (Graha Maitri) Matrix
 const PLANETARY_FRIENDSHIP: Record<string, Record<string, "friend" | "neutral" | "enemy">> = {
-  Sun: { Sun: "friend", Moon: "friend", Mars: "friend", Mercury: "neutral", Jupiter: "friend", Venus: "enemy", Saturn: "enemy" },
-  Moon: { Sun: "friend", Moon: "friend", Mars: "neutral", Mercury: "friend", Jupiter: "neutral", Venus: "neutral", Saturn: "neutral" },
-  Mars: { Sun: "friend", Moon: "friend", Mars: "friend", Mercury: "enemy", Jupiter: "friend", Venus: "neutral", Saturn: "neutral" },
-  Mercury: { Sun: "friend", Moon: "enemy", Mars: "neutral", Mercury: "friend", Jupiter: "neutral", Venus: "friend", Saturn: "neutral" },
-  Jupiter: { Sun: "friend", Moon: "friend", Mars: "friend", Mercury: "enemy", Jupiter: "friend", Venus: "enemy", Saturn: "neutral" },
-  Venus: { Sun: "enemy", Moon: "enemy", Mars: "neutral", Mercury: "friend", Jupiter: "neutral", Venus: "friend", Saturn: "friend" },
-  Saturn: { Sun: "enemy", Moon: "enemy", Mars: "enemy", Mercury: "friend", Jupiter: "neutral", Venus: "friend", Saturn: "friend" },
+  Sun: {
+    Sun: "friend",
+    Moon: "friend",
+    Mars: "friend",
+    Mercury: "neutral",
+    Jupiter: "friend",
+    Venus: "enemy",
+    Saturn: "enemy",
+  },
+  Moon: {
+    Sun: "friend",
+    Moon: "friend",
+    Mars: "neutral",
+    Mercury: "friend",
+    Jupiter: "neutral",
+    Venus: "neutral",
+    Saturn: "neutral",
+  },
+  Mars: {
+    Sun: "friend",
+    Moon: "friend",
+    Mars: "friend",
+    Mercury: "enemy",
+    Jupiter: "friend",
+    Venus: "neutral",
+    Saturn: "neutral",
+  },
+  Mercury: {
+    Sun: "friend",
+    Moon: "enemy",
+    Mars: "neutral",
+    Mercury: "friend",
+    Jupiter: "neutral",
+    Venus: "friend",
+    Saturn: "neutral",
+  },
+  Jupiter: {
+    Sun: "friend",
+    Moon: "friend",
+    Mars: "friend",
+    Mercury: "enemy",
+    Jupiter: "friend",
+    Venus: "enemy",
+    Saturn: "neutral",
+  },
+  Venus: {
+    Sun: "enemy",
+    Moon: "enemy",
+    Mars: "neutral",
+    Mercury: "friend",
+    Jupiter: "neutral",
+    Venus: "friend",
+    Saturn: "friend",
+  },
+  Saturn: {
+    Sun: "enemy",
+    Moon: "enemy",
+    Mars: "enemy",
+    Mercury: "friend",
+    Jupiter: "neutral",
+    Venus: "friend",
+    Saturn: "friend",
+  },
 };
 
 function getGrahaMaitriScore(lord1: string, lord2: string): number {
@@ -141,18 +205,44 @@ function getGrahaMaitriScore(lord1: string, lord2: string): number {
   const rel2 = PLANETARY_FRIENDSHIP[lord2]?.[lord1] || "neutral";
 
   if (rel1 === "friend" && rel2 === "friend") return 5;
-  if ((rel1 === "friend" && rel2 === "neutral") || (rel1 === "neutral" && rel2 === "friend")) return 4;
+  if ((rel1 === "friend" && rel2 === "neutral") || (rel1 === "neutral" && rel2 === "friend"))
+    return 4;
   if (rel1 === "neutral" && rel2 === "neutral") return 3;
   if ((rel1 === "friend" && rel2 === "enemy") || (rel1 === "enemy" && rel2 === "friend")) return 1;
-  if ((rel1 === "neutral" && rel2 === "enemy") || (rel1 === "enemy" && rel2 === "neutral")) return 0.5;
+  if ((rel1 === "neutral" && rel2 === "enemy") || (rel1 === "enemy" && rel2 === "neutral"))
+    return 0.5;
   return 0;
 }
 
 // 6. Gana Mapping (Deva=0, Manushya=1, Rakshasa=2)
 const GANA_MAP: number[] = [
-  0, 1, 2, 1, 0, 1, 0, 0, 2, // 1-9
-  2, 1, 1, 0, 2, 0, 2, 0, 2, // 10-18
-  2, 1, 1, 0, 2, 2, 1, 1, 0, // 19-27
+  0,
+  1,
+  2,
+  1,
+  0,
+  1,
+  0,
+  0,
+  2, // 1-9
+  2,
+  1,
+  1,
+  0,
+  2,
+  0,
+  2,
+  0,
+  2, // 10-18
+  2,
+  1,
+  1,
+  0,
+  2,
+  2,
+  1,
+  1,
+  0, // 19-27
 ];
 
 function getGanaScore(boyGana: number, girlGana: number): number {
@@ -168,14 +258,50 @@ function getGanaScore(boyGana: number, girlGana: number): number {
 
 // 8. Nadi Mapping (Adi=0, Madhya=1, Antya=2)
 const NADI_MAP: number[] = [
-  0, 1, 2, 2, 1, 0, 0, 1, 2, // 1-9
-  0, 1, 2, 2, 1, 0, 0, 1, 2, // 10-18
-  0, 1, 2, 2, 1, 0, 0, 1, 2, // 19-27
+  0,
+  1,
+  2,
+  2,
+  1,
+  0,
+  0,
+  1,
+  2, // 1-9
+  0,
+  1,
+  2,
+  2,
+  1,
+  0,
+  0,
+  1,
+  2, // 10-18
+  0,
+  1,
+  2,
+  2,
+  1,
+  0,
+  0,
+  1,
+  2, // 19-27
 ];
 
 export function computeGunaMilan(
-  boy: { name?: string; nakshatraNum: number; pada?: number; rasiIndex: number; isManglik?: boolean },
-  girl: { name?: string; nakshatraNum: number; pada?: number; rasiIndex: number; isManglik?: boolean }
+  boy: {
+    name?: string;
+    nakshatraNum: number;
+    pada?: number;
+    rasiIndex: number;
+    isManglik?: boolean;
+  },
+  girl: {
+    name?: string;
+    nakshatraNum: number;
+    pada?: number;
+    rasiIndex: number;
+    isManglik?: boolean;
+  },
 ): GunaMilanResult {
   const boyName = boy.name || "वर (Groom)";
   const girlName = girl.name || "कन्या (Bride)";
@@ -251,8 +377,8 @@ export function computeGunaMilan(
       taraScore >= 3
         ? "तारा मिलान पूर्णतः शुभ है। आरोग्य, दीर्घायु एवं भाग्य में वृद्धि होगी।"
         : taraScore >= 1.5
-        ? "मध्यम तारा मिलान। एक पक्ष के लिए अत्यधिक शुभ है।"
-        : "तारा दोष उपस्थित। महामृत्युंजय जप श्रेयस्कर रहेगा।",
+          ? "मध्यम तारा मिलान। एक पक्ष के लिए अत्यधिक शुभ है।"
+          : "तारा दोष उपस्थित। महामृत्युंजय जप श्रेयस्कर रहेगा।",
     descriptionEn: "Health, longevity and destiny alignment.",
   };
 
@@ -272,8 +398,8 @@ export function computeGunaMilan(
       yoniScore >= 3
         ? "शारीरिक व मानसिक अनुकूलता तथा वैवाहिक सुख उत्तम है।"
         : yoniScore >= 1
-        ? "सामान्य योनि सामंजस्य।"
-        : "परस्पर शत्रु योनि है; वैवाहिक समझ में धैर्य रखें।",
+          ? "सामान्य योनि सामंजस्य।"
+          : "परस्पर शत्रु योनि है; वैवाहिक समझ में धैर्य रखें।",
     descriptionEn: "Physical and psychological compatibility.",
   };
 
@@ -293,8 +419,8 @@ export function computeGunaMilan(
       grahaMaitriScore >= 4
         ? "राशि स्वामियों में मित्रता है। विचारों में मधुरता व सहयोग बना रहेगा।"
         : grahaMaitriScore >= 2.5
-        ? "मध्यम राशि मित्रता।"
-        : "राशि स्वामियों में वैमनस्यता है। नियमित संवाद आवश्यक है।",
+          ? "मध्यम राशि मित्रता।"
+          : "राशि स्वामियों में वैमनस्यता है। नियमित संवाद आवश्यक है।",
     descriptionEn: "Mental compatibility and friendship of Moon lords.",
   };
 
@@ -314,8 +440,8 @@ export function computeGunaMilan(
       ganaScore >= 5
         ? "दोनों के स्वभाव व दृष्टिकोण में उत्तम मेल है।"
         : ganaScore >= 3
-        ? "मध्यम गण मिलान।"
-        : "गण दोष उपस्थित। स्वभाव में भिन्नता रहेगी।",
+          ? "मध्यम गण मिलान।"
+          : "गण दोष उपस्थित। स्वभाव में भिन्नता रहेगी।",
     descriptionEn: "Temperament, behavior and attitude.",
   };
 
@@ -333,7 +459,8 @@ export function computeGunaMilan(
     if (boyLord === girlLord || PLANETARY_FRIENDSHIP[boyLord]?.[girlLord] === "friend") {
       bhakootCancelled = true;
       bhakootScore = 7;
-      bhakootCancelReason = "राशि स्वामी एक ही अथवा परस्पर मित्र होने के कारण भकूट दोष निष्प्रभावी (निरस्त) है।";
+      bhakootCancelReason =
+        "राशि स्वामी एक ही अथवा परस्पर मित्र होने के कारण भकूट दोष निष्प्रभावी (निरस्त) है।";
     } else {
       bhakootScore = 0;
     }
@@ -437,7 +564,8 @@ export function computeGunaMilan(
 
   if (boyManglik && !girlManglik) {
     manglikCompatible = false;
-    manglikDescHi = "वर मांगलिक है जबकि कन्या मांगलिक नहीं है; मांगलिक दोष निवारण कुंभ विवाह या मंगल शांति आवश्यक है।";
+    manglikDescHi =
+      "वर मांगलिक है जबकि कन्या मांगलिक नहीं है; मांगलिक दोष निवारण कुंभ विवाह या मंगल शांति आवश्यक है।";
   } else if (!boyManglik && girlManglik) {
     manglikCompatible = false;
     manglikDescHi = "कन्या मांगलिक है जबकि वर मांगलिक नहीं है; मंगल शांति विधान आवश्यक है।";
@@ -449,11 +577,14 @@ export function computeGunaMilan(
     manglikDescHi = "दोनों ही मांगलिक दोष से मुक्त हैं।";
   }
 
-  let remedyAdviceHi = "दाम्पत्य जीवन में सुख-शांति हेतु गौरी-शंकर रुद्राक्ष धारण करना व शिव-पार्वती की आराधना करना शुभकारी है।";
+  let remedyAdviceHi =
+    "दाम्पत्य जीवन में सुख-शांति हेतु गौरी-शंकर रुद्राक्ष धारण करना व शिव-पार्वती की आराधना करना शुभकारी है।";
   if (nadiDosha && !nadiCancelled) {
-    remedyAdviceHi = "नाड़ी दोष शांति हेतु महामृत्युंजय मंत्र का सवा लाख जप अथवा विधिपूर्वक स्वर्ण-दान व रुद्राभिषेक कराएं।";
+    remedyAdviceHi =
+      "नाड़ी दोष शांति हेतु महामृत्युंजय मंत्र का सवा लाख जप अथवा विधिपूर्वक स्वर्ण-दान व रुद्राभिषेक कराएं।";
   } else if (bhakootDosha && !bhakootCancelled) {
-    remedyAdviceHi = "भकूट दोष शांति हेतु विष्णु सहस्रनाम का पाठ व गुरुवार को चने की दाल-गुड़ का दान करें।";
+    remedyAdviceHi =
+      "भकूट दोष शांति हेतु विष्णु सहस्रनाम का पाठ व गुरुवार को चने की दाल-गुड़ का दान करें।";
   }
 
   return {

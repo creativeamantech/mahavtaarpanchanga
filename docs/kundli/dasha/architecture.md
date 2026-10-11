@@ -21,7 +21,9 @@ The Mahavtaar Dasha computational subsystem is built around four guiding princip
 ## 2. Core Contracts & Types
 
 ### `IDashaSystemAdapter`
+
 Located in `src/kundali/dasha/contracts/IDashaSystemAdapter.ts`:
+
 ```typescript
 export interface IDashaSystemAdapter {
   readonly systemType: DashaSystem;
@@ -36,7 +38,9 @@ export interface IDashaSystemAdapter {
 ```
 
 ### `DashaEngine` Registry
+
 Located in `src/kundali/dasha/DashaEngine.ts`:
+
 - Acts as a unified facade for multi-system registration and retrieval.
 - Implements legacy `IDashaEngine` contract for backward compatibility.
 - Exposes `DashaEngine.registerAdapter()` for adding non-Vimshottari systems without touching legacy consumers.

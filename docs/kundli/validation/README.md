@@ -1,16 +1,20 @@
 # Mahavtaar Kundali — Reference Corpus & Verification Documentation
+
 **Phase 7: Precision, Determinism & Regression Certification**
 
 ## Executive Summary
+
 This directory contains the formal certification, cross-engine validation matrix, discrepancy analysis, and precision budget for Mahavtaar Kundali.
 
 Mahavtaar Kundali is grounded in Drik Ganita (observational spherical astronomy) unified with classical Maharishi Parashara and Sage Jaimini principles. The purpose of this phase is not to proclaim infallibility or declare any single external software "the only truth", but to rigorously establish:
+
 1. Exact areas of agreement with Swiss Ephemeris, Astronomy Engine, and the Calendar Reform Committee.
 2. Identifiable sources of variation (ephemeris, coordinate frames, ayanamsha, algorithms, rounding).
 3. Measurable tolerances and error budgets.
 4. Absolute numerical and representation-level determinism.
 
 ## Documentation Index
+
 - [Reference Corpus Architecture](reference-corpus.md): 20 test case categories (A to T), schemas, and machine-readable corpora.
 - [Precision Budget](precision-budget.md): Input, internal, and output precision definitions across all 6 core engines.
 - [Astronomical Validation Report](astronomy-report.md): Multi-engine ephemeris comparison for Navagrahas.
@@ -26,7 +30,9 @@ Mahavtaar Kundali is grounded in Drik Ganita (observational spherical astronomy)
 - [Discrepancy Taxonomy & Classification](discrepancies.md): 13-category root-cause taxonomy.
 
 ## Certification Language Standard
+
 In compliance with strict engineering integrity, Mahavtaar Kundali avoids marketing superlatives ("100% accurate", "astronomically perfect"). All comparisons are classified strictly as:
+
 - `MATCH`: Differences below machine epsilon or identical integer mappings.
 - `WITHIN_TOLERANCE`: Deviations within the established precision budget.
 - `CONVENTION_DIFFERENCE`: Well-documented divergence due to classical school/tradition.

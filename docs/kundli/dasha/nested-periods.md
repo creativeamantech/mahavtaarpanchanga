@@ -7,22 +7,26 @@ Classical Vedic astrology employs recursive fractional proportionality to subdiv
 Let $Y_{\text{cycle}} = 120$ years.
 
 ### Level 2: Antardasha / Bhukti (अन्तर्दशा / भुक्ति)
+
 Every Mahadasha is partitioned into 9 sub-periods, beginning with the ruler of the Mahadasha itself (स्वदशा) and progressing in cyclic order.
 If the parent Mahadasha has duration $D_1$ (in years or ms), the duration of sub-period $j$ governed by Graha with cycle duration $y_j$ is:
 $$D_2(j) = D_1 \times \frac{y_j}{Y_{\text{cycle}}} = D_1 \times \frac{y_j}{120}$$
 
-*Example*: In Jupiter Mahadasha ($y_{\text{Jup}} = 16\text{ yrs}$), the first Antardasha is Jupiter-Jupiter:
+_Example_: In Jupiter Mahadasha ($y_{\text{Jup}} = 16\text{ yrs}$), the first Antardasha is Jupiter-Jupiter:
 $$D_2(\text{Jup}) = 16 \times \frac{16}{120} = 2.1333\text{ years} = 2\text{ yrs } 1\text{ mo } 18\text{ days}$$
 
 ### Level 3: Pratyantardasha (प्रत्यन्तर्दशा)
+
 Every Antardasha is partitioned into 9 third-tier periods, starting with the ruler of the Antardasha itself:
 $$D_3(k) = D_2 \times \frac{y_k}{120}$$
 
 ### Level 4: Sookshma Dasha (सूक्ष्मदशा)
+
 Every Pratyantardasha is subdivided into 9 micro-periods, starting with the ruler of the Pratyantardasha:
 $$D_4(l) = D_3 \times \frac{y_l}{120}$$
 
 ### Level 5: Prana Dasha (प्राणदशा)
+
 Every Sookshma Dasha is subdivided into 9 atomic periods, starting with the ruler of the Sookshma Dasha:
 $$D_5(m) = D_4 \times \frac{y_m}{120}$$
 
@@ -74,6 +78,7 @@ function allocateNestedSpans(
 ```
 
 ### Properties of this Guarantee:
+
 1. Every child's end timestamp matches the next sibling's start timestamp identically.
 2. The initial child's start timestamp equals the parent's start timestamp.
 3. The final (9th) child's end timestamp equals the parent's end timestamp.

@@ -422,21 +422,72 @@ const ENGLISH_ALIASES: Record<string, string> = {
 // Transliterate Devanagari string to approximate Latin English phonetic string
 function transliterateDevanagari(text: string): string {
   const consonants: Record<string, string> = {
-    क: "k", ख: "kh", ग: "g", घ: "gh", ङ: "ng",
-    च: "ch", छ: "chh", ज: "j", झ: "jh", ञ: "ny",
-    ट: "t", ठ: "th", ड: "d", ढ: "dh", ण: "n",
-    त: "t", थ: "th", द: "d", ध: "dh", न: "n",
-    प: "p", फ: "ph", ब: "b", भ: "bh", म: "m",
-    य: "y", र: "r", ल: "l", व: "v", श: "sh", ष: "sh", स: "s", ह: "h",
-    क्ष: "ksh", त्र: "tr", ज्ञ: "gy",
+    क: "k",
+    ख: "kh",
+    ग: "g",
+    घ: "gh",
+    ङ: "ng",
+    च: "ch",
+    छ: "chh",
+    ज: "j",
+    झ: "jh",
+    ञ: "ny",
+    ट: "t",
+    ठ: "th",
+    ड: "d",
+    ढ: "dh",
+    ण: "n",
+    त: "t",
+    थ: "th",
+    द: "d",
+    ध: "dh",
+    न: "n",
+    प: "p",
+    फ: "ph",
+    ब: "b",
+    भ: "bh",
+    म: "m",
+    य: "y",
+    र: "r",
+    ल: "l",
+    व: "v",
+    श: "sh",
+    ष: "sh",
+    स: "s",
+    ह: "h",
+    क्ष: "ksh",
+    त्र: "tr",
+    ज्ञ: "gy",
   };
   const vowels: Record<string, string> = {
-    अ: "a", आ: "a", इ: "i", ई: "i", उ: "u", ऊ: "u", ऋ: "ri",
-    ए: "e", ऐ: "ai", ओ: "o", औ: "au", अं: "an", अः: "ah",
+    अ: "a",
+    आ: "a",
+    इ: "i",
+    ई: "i",
+    उ: "u",
+    ऊ: "u",
+    ऋ: "ri",
+    ए: "e",
+    ऐ: "ai",
+    ओ: "o",
+    औ: "au",
+    अं: "an",
+    अः: "ah",
   };
   const matras: Record<string, string> = {
-    "ा": "a", "ि": "i", "ी": "i", "ु": "u", "ू": "u", "ृ": "ri",
-    "े": "e", "ै": "ai", "ो": "o", "ौ": "au", "ं": "n", "ँ": "n", "़": "",
+    "ा": "a",
+    "ि": "i",
+    "ी": "i",
+    "ु": "u",
+    "ू": "u",
+    "ृ": "ri",
+    "े": "e",
+    "ै": "ai",
+    "ो": "o",
+    "ौ": "au",
+    "ं": "n",
+    "ँ": "n",
+    "़": "",
   };
 
   let res = "";
@@ -525,7 +576,8 @@ export function searchCities(query: string, limit: number = 25): CityLocation[] 
     } else if (queryTokens.length > 1) {
       // Multi-token match (e.g. "Delhi IN", "Jaipur India")
       const allTokensMatch = queryTokens.every(
-        (tok) => keyLower.includes(tok) || (tok === "india" && isIndia) || (tok === "in" && isIndia),
+        (tok) =>
+          keyLower.includes(tok) || (tok === "india" && isIndia) || (tok === "in" && isIndia),
       );
       if (allTokensMatch) {
         matchScore = 600;
@@ -606,6 +658,32 @@ export function findNearestCity(
 }
 
 export function resolveCity(cityName: string): CityLocation {
+  if (!cityName) {
+    return {
+      name: "Bengaluru, IN",
+      country: "IN",
+      latitude: 12.9716,
+      longitude: 77.5946,
+      timezone: "Asia/Kolkata",
+    };
+  }
+
+  // 0. Check if cityName string embeds numeric coordinates, e.g. "GPS (28.612°, 77.208°)", "28.612, 77.208"
+  const coordMatch = cityName.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+  if (coordMatch) {
+    const lat = parseFloat(coordMatch[1]);
+    const lon = parseFloat(coordMatch[2]);
+    if (!isNaN(lat) && !isNaN(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180) {
+      return {
+        name: cityName,
+        country: "",
+        latitude: lat,
+        longitude: lon,
+        timezone: "Asia/Kolkata",
+      };
+    }
+  }
+
   const direct = citiesData[cityName];
   if (direct) {
     return {

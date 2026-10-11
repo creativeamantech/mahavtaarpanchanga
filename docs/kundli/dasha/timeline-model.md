@@ -5,39 +5,43 @@
 Located in `src/kundali/dasha/types/DashaTypes.ts`:
 
 ### `DashaPeriod`
+
 The fundamental atomic representation of a temporal planetary span:
+
 ```typescript
 export interface DashaPeriod {
-  readonly id: string;               // e.g., "Jupiter-Saturn-Mercury"
-  readonly level: DashaLevel;        // 1=Mahadasha .. 5=Prana
-  readonly lord: string;             // Canonical planet or rashi name
-  readonly lordNameHi: string;       // Devanagari Hindi designation
-  readonly lordNameSa: string;       // Classical Sanskrit designation
+  readonly id: string; // e.g., "Jupiter-Saturn-Mercury"
+  readonly level: DashaLevel; // 1=Mahadasha .. 5=Prana
+  readonly lord: string; // Canonical planet or rashi name
+  readonly lordNameHi: string; // Devanagari Hindi designation
+  readonly lordNameSa: string; // Classical Sanskrit designation
   readonly startTimestampMs: number; // Absolute UTC epoch millisecond
-  readonly endTimestampMs: number;   // Absolute UTC epoch millisecond
-  readonly startDateIso: string;     // YYYY-MM-DD UTC
-  readonly endDateIso: string;       // YYYY-MM-DD UTC
-  readonly durationYears: number;    // Proportional fractional years
-  readonly durationDays: number;     // Approximate calendar days
-  readonly isCurrent?: boolean;      // True if evaluation timestamp is in span
+  readonly endTimestampMs: number; // Absolute UTC epoch millisecond
+  readonly startDateIso: string; // YYYY-MM-DD UTC
+  readonly endDateIso: string; // YYYY-MM-DD UTC
+  readonly durationYears: number; // Proportional fractional years
+  readonly durationDays: number; // Approximate calendar days
+  readonly isCurrent?: boolean; // True if evaluation timestamp is in span
   readonly children?: DashaPeriod[]; // Sub-periods (e.g. Antardashas)
 }
 ```
 
 ### `BirthDashaBalance` (दशा भुक्त / भोग्य शेष)
+
 Details the exact fractional state of the birth nakshatra:
+
 ```typescript
 export interface BirthDashaBalance {
   readonly lord: string;
   readonly lordNameHi: string;
   readonly lordNameSa: string;
-  readonly nakshatraIndex: number;     // 0 to 26
+  readonly nakshatraIndex: number; // 0 to 26
   readonly nakshatraNameEn: string;
   readonly nakshatraNameHi: string;
-  readonly pada: number;              // 1 to 4
-  readonly passedArcDeg: number;      // Degrees traversed in Nakshatra
-  readonly remainingArcDeg: number;   // Degrees remaining to traverse
-  readonly elapsedFraction: number;   // Passed / 13°20'
+  readonly pada: number; // 1 to 4
+  readonly passedArcDeg: number; // Degrees traversed in Nakshatra
+  readonly remainingArcDeg: number; // Degrees remaining to traverse
+  readonly elapsedFraction: number; // Passed / 13°20'
   readonly remainingFraction: number; // Remaining / 13°20'
   readonly remainingYearsTotal: number;
   readonly years: number;
@@ -47,7 +51,9 @@ export interface BirthDashaBalance {
 ```
 
 ### `DashaTimeline`
+
 The comprehensive container returned by an engine calculation:
+
 ```typescript
 export interface DashaTimeline {
   readonly system: DashaSystem;

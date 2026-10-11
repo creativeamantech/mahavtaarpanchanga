@@ -110,7 +110,7 @@ function formatDMS(degWithinSign: number): string {
 
 export function computeKPAstrology(
   lagnaLongitude: number,
-  planets: KundliPlanet[]
+  planets: KundliPlanet[],
 ): {
   cusps: KPCusp[];
   planetSignifications: KPPlanetSignification[];
@@ -160,7 +160,9 @@ export function computeKPAstrology(
     const houseOccupied = p.houseD1;
     const housesOwned = planetHouseOwnership[p.id] || [];
 
-    const starLordHouseOccupied = planetHousePlacement[starLord] ? [planetHousePlacement[starLord]] : [];
+    const starLordHouseOccupied = planetHousePlacement[starLord]
+      ? [planetHousePlacement[starLord]]
+      : [];
     const starLordHousesOwned = planetHouseOwnership[starLord] || [];
 
     return {
@@ -186,12 +188,42 @@ export function computeKPAstrology(
   const moonLords = moonObj ? getKPLords(moonObj.longitude) : lagnaLords;
 
   const rulingPlanets = [
-    { factor: "Lagna Sign Lord", factorHi: "लग्न राशि स्वामी", planet: lagnaLords.signLord, planetHi: lagnaLords.signLord },
-    { factor: "Lagna Star Lord", factorHi: "लग्न नक्षत्र स्वामी", planet: lagnaLords.starLord, planetHi: lagnaLords.starLord },
-    { factor: "Lagna Sub Lord", factorHi: "लग्न उप-स्वामी (Sub-Lord)", planet: lagnaLords.subLord, planetHi: lagnaLords.subLord },
-    { factor: "Moon Sign Lord", factorHi: "चन्द्र राशि स्वामी", planet: moonLords.signLord, planetHi: moonLords.signLord },
-    { factor: "Moon Star Lord", factorHi: "चन्द्र नक्षत्र स्वामी", planet: moonLords.starLord, planetHi: moonLords.starLord },
-    { factor: "Moon Sub Lord", factorHi: "चन्द्र उप-स्वामी (Sub-Lord)", planet: moonLords.subLord, planetHi: moonLords.subLord },
+    {
+      factor: "Lagna Sign Lord",
+      factorHi: "लग्न राशि स्वामी",
+      planet: lagnaLords.signLord,
+      planetHi: lagnaLords.signLord,
+    },
+    {
+      factor: "Lagna Star Lord",
+      factorHi: "लग्न नक्षत्र स्वामी",
+      planet: lagnaLords.starLord,
+      planetHi: lagnaLords.starLord,
+    },
+    {
+      factor: "Lagna Sub Lord",
+      factorHi: "लग्न उप-स्वामी (Sub-Lord)",
+      planet: lagnaLords.subLord,
+      planetHi: lagnaLords.subLord,
+    },
+    {
+      factor: "Moon Sign Lord",
+      factorHi: "चन्द्र राशि स्वामी",
+      planet: moonLords.signLord,
+      planetHi: moonLords.signLord,
+    },
+    {
+      factor: "Moon Star Lord",
+      factorHi: "चन्द्र नक्षत्र स्वामी",
+      planet: moonLords.starLord,
+      planetHi: moonLords.starLord,
+    },
+    {
+      factor: "Moon Sub Lord",
+      factorHi: "चन्द्र उप-स्वामी (Sub-Lord)",
+      planet: moonLords.subLord,
+      planetHi: moonLords.subLord,
+    },
   ];
 
   return {

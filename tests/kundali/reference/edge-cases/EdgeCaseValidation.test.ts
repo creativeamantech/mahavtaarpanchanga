@@ -34,15 +34,7 @@ describe("Reference Corpus — Edge Cases & Numerical Robustness Suite", () => {
 
   describe("3. Calendar Leap Year & Century Rollover Edge Cases", () => {
     it("safely processes Leap Year 2000 (Feb 29) century leap", () => {
-      const tc = AstronomicalCore.createTimeContext(
-        2000,
-        2,
-        29,
-        12,
-        0,
-        0,
-        "UTC",
-      );
+      const tc = AstronomicalCore.createTimeContext(2000, 2, 29, 12, 0, 0, "UTC");
 
       const d = new Date(tc.utcMs);
       expect(d.getUTCFullYear()).toBe(2000);
@@ -52,15 +44,7 @@ describe("Reference Corpus — Edge Cases & Numerical Robustness Suite", () => {
     });
 
     it("safely handles 1900 non-leap century transition", () => {
-      const tc = AstronomicalCore.createTimeContext(
-        1900,
-        2,
-        28,
-        23,
-        59,
-        59,
-        "UTC",
-      );
+      const tc = AstronomicalCore.createTimeContext(1900, 2, 28, 23, 59, 59, "UTC");
 
       const d = new Date(tc.utcMs);
       expect(d.getUTCFullYear()).toBe(1900);

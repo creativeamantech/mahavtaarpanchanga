@@ -4,15 +4,8 @@
 // ================================================================================
 
 import type { PanchangaResponse, Segment, PlanetTransitionEvent } from "../types";
-import {
-  calculateNavtara,
-  generateNavtaraTable,
-  type NavtaraResult,
-} from "./navtaraEngine";
-import {
-  generateComprehensiveVedicAnalysis,
-  NAKSHATRA_DATA,
-} from "./vedicAstrologyEngine";
+import { calculateNavtara, generateNavtaraTable, type NavtaraResult } from "./navtaraEngine";
+import { generateComprehensiveVedicAnalysis, NAKSHATRA_DATA } from "./vedicAstrologyEngine";
 
 export interface NakshatraStaticMeta {
   index: number;
@@ -735,7 +728,7 @@ export function getActiveNakshatraChangeInfo(
   const currentMeta =
     ALL_27_NAKSHATRAS.find((n) => n.index === currentNumber) || ALL_27_NAKSHATRAS[0];
 
-  const nextNumber = nextSegment?.number || ((currentNumber % 27) + 1);
+  const nextNumber = nextSegment?.number || (currentNumber % 27) + 1;
   const nextMeta =
     ALL_27_NAKSHATRAS.find((n) => n.index === nextNumber) || ALL_27_NAKSHATRAS[nextNumber - 1];
 
@@ -772,7 +765,9 @@ export function getActiveNakshatraChangeInfo(
     currentNumber,
     currentNameEn: currentMeta.nameEn,
     currentNameHi: currentMeta.nameHi,
-    startsFormatted: activeSegment.starts ? formatSimple12hTime(activeSegment.starts, true) : "सूर्योदय से",
+    startsFormatted: activeSegment.starts
+      ? formatSimple12hTime(activeSegment.starts, true)
+      : "सूर्योदय से",
     endsFormatted: activeSegment.ends ? formatSimple12hTime(activeSegment.ends, true) : null,
     startTimeMs,
     endTimeMs,
@@ -978,8 +973,10 @@ export const PADA_EXPLANATIONS: Record<number, PadaInfo> = {
       "The first quarter represents Dharma and the Fire element. It bestows an enterprising, pioneering mindset with natural leadership, courage, and the capacity to initiate breakthrough projects independently.",
     keyStrengthsHi: ["प्रबल नेतृत्व क्षमता", "साहसी एवं स्पष्टवादी", "नवाचार व नई पहल"],
     keyStrengthsEn: ["Natural Leadership", "Bold & Decisive", "Pioneering Spirit"],
-    recommendedActivitiesHi: "नई परियोजनाएं प्रारंभ करना, महत्वपूर्ण अनुबंध, नेतृत्व संभालना एवं स्वतंत्र निर्णय।",
-    recommendedActivitiesEn: "Launching new initiatives, leadership responsibilities, and decisive strategic starts.",
+    recommendedActivitiesHi:
+      "नई परियोजनाएं प्रारंभ करना, महत्वपूर्ण अनुबंध, नेतृत्व संभालना एवं स्वतंत्र निर्णय।",
+    recommendedActivitiesEn:
+      "Launching new initiatives, leadership responsibilities, and decisive strategic starts.",
   },
   2: {
     pada: 2,
@@ -993,15 +990,18 @@ export const PADA_EXPLANATIONS: Record<number, PadaInfo> = {
     navamshaSignGroup: "Taurus, Virgo, Capricorn Navamsha",
     navamshaSignGroupHi: "वृषभ, कन्या, मकर नवांश (पृथ्वी त्रिकोण)",
     shortSummaryHi: "व्यावहारिक सोच, वित्तीय मजबूती, धैर्य और ठोस परिणाम।",
-    shortSummaryEn: "Represents material grounding, tangible progress, financial prudence, and patient growth.",
+    shortSummaryEn:
+      "Represents material grounding, tangible progress, financial prudence, and patient growth.",
     detailedMeaningHi:
       "प्रत्येक नक्षत्र का दूसरा पद 'अर्थ' पुरुषार्थ और 'पृथ्वी तत्व' से संचालित होता है। यह जातक को व्यावहारिक, यथार्थवादी, योजनाबद्ध और धन संचय में कुशल बनाता है। यह विचारों को ठोस जमीन पर उतारकर वास्तविक परिणाम देता है।",
     detailedMeaningEn:
       "The second quarter represents Artha and the Earth element. It grounds abstract aspirations into physical manifestations, ensuring practical execution, disciplined wealth preservation, and methodical growth.",
     keyStrengthsHi: ["योजनाबद्ध कार्यशैली", "वित्तीय विवेक व बचत", "धैर्यवान एवं भरोसेमंद"],
     keyStrengthsEn: ["Methodical Execution", "Financial Prudence", "Patient & Reliable"],
-    recommendedActivitiesHi: "दीर्घकालिक निवेश, वित्तीय योजना, संपत्ति खरीद-बिक्री एवं ठोस व्यावहारिक कार्य।",
-    recommendedActivitiesEn: "Long-term investments, budgeting, property matters, and systematic asset creation.",
+    recommendedActivitiesHi:
+      "दीर्घकालिक निवेश, वित्तीय योजना, संपत्ति खरीद-बिक्री एवं ठोस व्यावहारिक कार्य।",
+    recommendedActivitiesEn:
+      "Long-term investments, budgeting, property matters, and systematic asset creation.",
   },
   3: {
     pada: 3,
@@ -1015,15 +1015,18 @@ export const PADA_EXPLANATIONS: Record<number, PadaInfo> = {
     navamshaSignGroup: "Gemini, Libra, Aquarius Navamsha",
     navamshaSignGroupHi: "मिथुन, तुला, कुंभ नवांश (वायु त्रिकोण)",
     shortSummaryHi: "बौद्धिक संवाद, कलात्मक रुचि, मित्रता और सामाजिक संबंध।",
-    shortSummaryEn: "Represents intellectual exchange, artistic aesthetics, networking, and social harmony.",
+    shortSummaryEn:
+      "Represents intellectual exchange, artistic aesthetics, networking, and social harmony.",
     detailedMeaningHi:
       "प्रत्येक नक्षत्र का तीसरा पद 'काम' पुरुषार्थ और 'वायु तत्व' से संचालित होता है। यह जातक को प्रभावशाली वक्ता, कलाप्रेमी, मिलनसार और सामाजिक रूप से जागरूक बनाता है। ऐसे जातक ज्ञान के आदान-प्रदान और लोगों से जुड़ने में निपुण होते हैं।",
     detailedMeaningEn:
       "The third quarter represents Kama and the Air element. It awakens intellectual curiosity, aesthetic expression, diplomacy, networking, and cooperative endeavors across society.",
     keyStrengthsHi: ["प्रभावशाली संवाद", "सृजनात्मक एवं कलात्मक", "सामाजिक संबंध निर्माण"],
     keyStrengthsEn: ["Expressive Communication", "Artistic Sensitivity", "Diplomatic Networking"],
-    recommendedActivitiesHi: "साझेदारी, व्यापारिक बातचीत, जनसंपर्क, कला, मीडिया, अध्ययन व लेखन कार्य।",
-    recommendedActivitiesEn: "Partnership negotiations, creative writing, public relations, and intellectual pursuits.",
+    recommendedActivitiesHi:
+      "साझेदारी, व्यापारिक बातचीत, जनसंपर्क, कला, मीडिया, अध्ययन व लेखन कार्य।",
+    recommendedActivitiesEn:
+      "Partnership negotiations, creative writing, public relations, and intellectual pursuits.",
   },
   4: {
     pada: 4,
@@ -1037,15 +1040,18 @@ export const PADA_EXPLANATIONS: Record<number, PadaInfo> = {
     navamshaSignGroup: "Cancer, Scorpio, Pisces Navamsha",
     navamshaSignGroupHi: "कर्क, वृश्चिक, मीन नवांश (जल त्रिकोण)",
     shortSummaryHi: "आध्यात्मिक शांति, अंतर्मन का ज्ञान, करुणा और कार्यों की पूर्णाहुति।",
-    shortSummaryEn: "Represents spiritual wisdom, compassionate healing, introspection, and peaceful closure.",
+    shortSummaryEn:
+      "Represents spiritual wisdom, compassionate healing, introspection, and peaceful closure.",
     detailedMeaningHi:
       "प्रत्येक नक्षत्र का चौथा पद 'मोक्ष' पुरुषार्थ और 'जल तत्व' से संचालित होता है। यह जातक को संवेदनशील, दयालु, रहस्यवादी और गहरे आध्यात्मिक ज्ञान का धनी बनाता है। यह कार्यों के संपूर्ण समापन, शांति और मुक्ति का कारक है।",
     detailedMeaningEn:
       "The fourth quarter represents Moksha and the Water element. It provides emotional depth, spiritual intuition, healing capability, and the serene capacity to bring complicated cycles to full harmonious completion.",
     keyStrengthsHi: ["गहरी अंतर्दृष्टि", "दया एवं परोपकार", "आध्यात्मिक शांति"],
     keyStrengthsEn: ["Spiritual Intuition", "Compassionate Empathy", "Inner Peace & Closure"],
-    recommendedActivitiesHi: "ध्यान, योग, आत्ममंथन, पुराने कार्यों का समापन, दान-पुण्य एवं आध्यात्मिक साधना।",
-    recommendedActivitiesEn: "Meditation, charitable giving, concluding open projects, and inner spiritual rejuvenation.",
+    recommendedActivitiesHi:
+      "ध्यान, योग, आत्ममंथन, पुराने कार्यों का समापन, दान-पुण्य एवं आध्यात्मिक साधना।",
+    recommendedActivitiesEn:
+      "Meditation, charitable giving, concluding open projects, and inner spiritual rejuvenation.",
   },
 };
 
@@ -1065,7 +1071,7 @@ export const PADA_EXPLANATIONS: Record<number, PadaInfo> = {
 export function formatSimple12hTime(
   timeStr: string | null | undefined,
   isHindi: boolean = true,
-  includeDayPart: boolean = true
+  includeDayPart: boolean = true,
 ): string {
   if (!timeStr) return "";
   const str = String(timeStr).trim();
@@ -1096,8 +1102,10 @@ export function formatSimple12hTime(
     const ampm = isPM ? "PM" : "AM";
 
     if (!includeDayPart) {
-      return isNextDay 
-        ? (isHindi ? `${hh}:${mm} ${ampm} (अगले दिन)` : `${hh}:${mm} ${ampm} (Next day)`)
+      return isNextDay
+        ? isHindi
+          ? `${hh}:${mm} ${ampm} (अगले दिन)`
+          : `${hh}:${mm} ${ampm} (Next day)`
         : `${hh}:${mm} ${ampm}`;
     }
 
@@ -1109,13 +1117,9 @@ export function formatSimple12hTime(
       else if (rawH < 20) period = "शाम";
       else period = "रात";
 
-      return isNextDay
-        ? `अगली सुबह ${hh}:${mm} ${ampm}`
-        : `${period} ${hh}:${mm} ${ampm}`;
+      return isNextDay ? `अगली सुबह ${hh}:${mm} ${ampm}` : `${period} ${hh}:${mm} ${ampm}`;
     } else {
-      return isNextDay
-        ? `${hh}:${mm} ${ampm} (Next day)`
-        : `${hh}:${mm} ${ampm}`;
+      return isNextDay ? `${hh}:${mm} ${ampm} (Next day)` : `${hh}:${mm} ${ampm}`;
     }
   }
 
@@ -1349,7 +1353,12 @@ export function computeMonthlyNavtaraReport(
   cityName: string = "New Delhi, IN",
   monthDays: any[] = [],
   userFeedbacks: Record<string, DailyUserFeedback> = {},
-  rangeConfig?: { isDateRange?: boolean; dateRangeLabel?: string; fromDate?: string; toDate?: string },
+  rangeConfig?: {
+    isDateRange?: boolean;
+    dateRangeLabel?: string;
+    fromDate?: string;
+    toDate?: string;
+  },
 ): MonthlyNavtaraReportData {
   const birthMeta =
     ALL_27_NAKSHATRAS.find((n) => n.index === birthNakshatraIndex) || ALL_27_NAKSHATRAS[0];
@@ -1370,9 +1379,10 @@ export function computeMonthlyNavtaraReport(
     let nakNum = d.nakshatra_number;
     if (!nakNum || nakNum < 1 || nakNum > 27) {
       const match = ALL_27_NAKSHATRAS.find(
-        (n) => n.nameEn.toLowerCase() === (d.nakshatra || "").toLowerCase() ||
-               n.nameSa.toLowerCase() === (d.nakshatra || "").toLowerCase() ||
-               n.nameHi === d.nakshatra
+        (n) =>
+          n.nameEn.toLowerCase() === (d.nakshatra || "").toLowerCase() ||
+          n.nameSa.toLowerCase() === (d.nakshatra || "").toLowerCase() ||
+          n.nameHi === d.nakshatra,
       );
       nakNum = match ? match.index : 1;
     }
@@ -1383,9 +1393,10 @@ export function computeMonthlyNavtaraReport(
     let nextNum = d.next_nakshatra_number;
     if (!nextNum && d.next_nakshatra) {
       const nMatch = ALL_27_NAKSHATRAS.find(
-        (n) => n.nameEn.toLowerCase() === (d.next_nakshatra || "").toLowerCase() ||
-               n.nameSa.toLowerCase() === (d.next_nakshatra || "").toLowerCase() ||
-               n.nameHi === d.next_nakshatra
+        (n) =>
+          n.nameEn.toLowerCase() === (d.next_nakshatra || "").toLowerCase() ||
+          n.nameSa.toLowerCase() === (d.next_nakshatra || "").toLowerCase() ||
+          n.nameHi === d.next_nakshatra,
       );
       nextNum = nMatch ? nMatch.index : (nakNum % 27) + 1;
     }
@@ -1397,23 +1408,26 @@ export function computeMonthlyNavtaraReport(
     const formattedTithiEnds = d.tithi_ends ? formatSimple12hTime(d.tithi_ends, true) : null;
 
     const hasDistinctTaraChange =
-      !!nextTara &&
-      !!formattedNakEnds &&
-      nextTara.tara_number !== currentTara.tara_number;
+      !!nextTara && !!formattedNakEnds && nextTara.tara_number !== currentTara.tara_number;
 
     const currentIsAuspicious =
       currentTara.nature.includes("Auspicious") || currentTara.tara_score >= 80;
     const currentIsCaution =
       currentTara.nature.includes("Inauspicious") || currentTara.tara_score <= 40;
 
-    const nextIsAuspicious =
-      nextTara ? (nextTara.nature.includes("Auspicious") || nextTara.tara_score >= 80) : false;
-    const nextIsCaution =
-      nextTara ? (nextTara.nature.includes("Inauspicious") || nextTara.tara_score <= 40) : false;
+    const nextIsAuspicious = nextTara
+      ? nextTara.nature.includes("Auspicious") || nextTara.tara_score >= 80
+      : false;
+    const nextIsCaution = nextTara
+      ? nextTara.nature.includes("Inauspicious") || nextTara.tara_score <= 40
+      : false;
 
     // Determine category
     let category: MonthlyNavtaraDayItem["dayNatureCategory"] = "neutral";
-    if (hasDistinctTaraChange && ((currentIsCaution && nextIsAuspicious) || (currentIsAuspicious && nextIsCaution))) {
+    if (
+      hasDistinctTaraChange &&
+      ((currentIsCaution && nextIsAuspicious) || (currentIsAuspicious && nextIsCaution))
+    ) {
       category = "mixed";
       mixedCount++;
     } else if (currentIsAuspicious) {
@@ -1431,23 +1445,41 @@ export function computeMonthlyNavtaraReport(
     const getTaraBriefAdvice = (t: NavtaraResult, isHi: boolean): string => {
       switch (t.tara_number) {
         case 1:
-          return isHi ? "जन्म तारा (स्वास्थ्य व शांति पर ध्यान दें, जोखिम टालें)" : "Janma Tara (Focus on health, avoid risks)";
+          return isHi
+            ? "जन्म तारा (स्वास्थ्य व शांति पर ध्यान दें, जोखिम टालें)"
+            : "Janma Tara (Focus on health, avoid risks)";
         case 2:
-          return isHi ? "सम्पत् तारा (अति शुभ, धन लाभ व निवेश हेतु श्रेष्ठ)" : "Sampat Tara (Highly Auspicious for wealth & deals)";
+          return isHi
+            ? "सम्पत् तारा (अति शुभ, धन लाभ व निवेश हेतु श्रेष्ठ)"
+            : "Sampat Tara (Highly Auspicious for wealth & deals)";
         case 3:
-          return isHi ? "विपत् तारा (सतर्कता, विवाद व यात्रा से बचें)" : "Vipat Tara (Caution, avoid disputes & risky travels)";
+          return isHi
+            ? "विपत् तारा (सतर्कता, विवाद व यात्रा से बचें)"
+            : "Vipat Tara (Caution, avoid disputes & risky travels)";
         case 4:
-          return isHi ? "क्षेम तारा (शुभ, सुख-समृद्धि व मांगलिक कार्य)" : "Kshema Tara (Auspicious for family wellbeing & peace)";
+          return isHi
+            ? "क्षेम तारा (शुभ, सुख-समृद्धि व मांगलिक कार्य)"
+            : "Kshema Tara (Auspicious for family wellbeing & peace)";
         case 5:
-          return isHi ? "प्रत्यरि तारा (बाधा की संभावना, धैर्य रखें)" : "Pratyari Tara (Obstacles possible, maintain patience)";
+          return isHi
+            ? "प्रत्यरि तारा (बाधा की संभावना, धैर्य रखें)"
+            : "Pratyari Tara (Obstacles possible, maintain patience)";
         case 6:
-          return isHi ? "साधक तारा (अति शुभ, कार्य सिद्धि व पदोन्नति)" : "Sadhaka Tara (Highly Auspicious for success & goals)";
+          return isHi
+            ? "साधक तारा (अति शुभ, कार्य सिद्धि व पदोन्नति)"
+            : "Sadhaka Tara (Highly Auspicious for success & goals)";
         case 7:
-          return isHi ? "वध तारा (कठिन समय, नए व जोखिम भरे कार्य टालें)" : "Vadha Tara (Severe caution, postpone vital tasks)";
+          return isHi
+            ? "वध तारा (कठिन समय, नए व जोखिम भरे कार्य टालें)"
+            : "Vadha Tara (Severe caution, postpone vital tasks)";
         case 8:
-          return isHi ? "मित्र तारा (शुभ, सहयोग व आनंददायक परिणाम)" : "Mitra Tara (Auspicious for cooperation & joy)";
+          return isHi
+            ? "मित्र तारा (शुभ, सहयोग व आनंददायक परिणाम)"
+            : "Mitra Tara (Auspicious for cooperation & joy)";
         case 9:
-          return isHi ? "अति-मित्र तारा (परम शुभ, बड़े अनुबंध व विजय)" : "Ati-Mitra Tara (Supreme Auspicious, breakthroughs)";
+          return isHi
+            ? "अति-मित्र तारा (परम शुभ, बड़े अनुबंध व विजय)"
+            : "Ati-Mitra Tara (Supreme Auspicious, breakthroughs)";
         default:
           return isHi ? "सामान्य दिनचर्या" : "Standard routine";
       }
@@ -1463,39 +1495,56 @@ export function computeMonthlyNavtaraReport(
       switch (currentTara.tara_number) {
         case 1: // Janma
           recHi = "जन्म तारा: स्वास्थ्य एवं मानसिक शांति पर ध्यान दें, जोखिम भरे व नए कार्य टालें।";
-          recEn = "Janma Tara: Focus on health, well-being, and internal harmony; avoid high risks.";
+          recEn =
+            "Janma Tara: Focus on health, well-being, and internal harmony; avoid high risks.";
           break;
         case 2: // Sampat
-          recHi = "सम्पत् तारा (अति शुभ): धन लाभ, व्यापारिक सौदे, निवेश एवं खरीदारी के लिए श्रेष्ठ दिन।";
-          recEn = "Sampat Tara (Highly Auspicious): Best for financial gains, purchases, and investments.";
+          recHi =
+            "सम्पत् तारा (अति शुभ): धन लाभ, व्यापारिक सौदे, निवेश एवं खरीदारी के लिए श्रेष्ठ दिन।";
+          recEn =
+            "Sampat Tara (Highly Auspicious): Best for financial gains, purchases, and investments.";
           break;
         case 3: // Vipat
-          recHi = "विपत् तारा (सावधानी): अनचाहे विवाद, यात्रा व कानूनी कार्यों में सतर्क रहें। गायत्री मंत्र जपें।";
-          recEn = "Vipat Tara (Caution): Avoid disputes, hazardous travels, and conflicts. Chant Gayatri mantra.";
+          recHi =
+            "विपत् तारा (सावधानी): अनचाहे विवाद, यात्रा व कानूनी कार्यों में सतर्क रहें। गायत्री मंत्र जपें।";
+          recEn =
+            "Vipat Tara (Caution): Avoid disputes, hazardous travels, and conflicts. Chant Gayatri mantra.";
           break;
         case 4: // Kshema
-          recHi = "क्षेम तारा (अति शुभ): सुख-समृद्धि, पारिवारिक मांगलिक कार्य, यात्रा एवं आरोग्य लाभ।";
-          recEn = "Kshema Tara (Auspicious): Favorable for family celebrations, pleasant travels, and health.";
+          recHi =
+            "क्षेम तारा (अति शुभ): सुख-समृद्धि, पारिवारिक मांगलिक कार्य, यात्रा एवं आरोग्य लाभ।";
+          recEn =
+            "Kshema Tara (Auspicious): Favorable for family celebrations, pleasant travels, and health.";
           break;
         case 5: // Pratyari
-          recHi = "प्रत्यरि तारा (बाधा): कार्य में विलंब या विरोध की संभावना; धैर्य रखें व वाद-विवाद से बचें।";
-          recEn = "Pratyari Tara (Obstacles): Potential hurdles or opposition; maintain patience and diplomacy.";
+          recHi =
+            "प्रत्यरि तारा (बाधा): कार्य में विलंब या विरोध की संभावना; धैर्य रखें व वाद-विवाद से बचें।";
+          recEn =
+            "Pratyari Tara (Obstacles): Potential hurdles or opposition; maintain patience and diplomacy.";
           break;
         case 6: // Sadhaka
-          recHi = "साधक तारा (अति शुभ): संकल्प सिद्धि, परीक्षा, साक्षात्कार, पदोन्नति एवं सफलता के अवसर।";
-          recEn = "Sadhaka Tara (Highly Auspicious): Excellent for achievements, exams, interviews, and goal realization.";
+          recHi =
+            "साधक तारा (अति शुभ): संकल्प सिद्धि, परीक्षा, साक्षात्कार, पदोन्नति एवं सफलता के अवसर।";
+          recEn =
+            "Sadhaka Tara (Highly Auspicious): Excellent for achievements, exams, interviews, and goal realization.";
           break;
         case 7: // Naidhana / Vadha
-          recHi = "वध / निधन तारा (कष्टप्रद): नए अनुबंध व साहसिक कार्य न करें। महामृत्युंजय मंत्र का जप श्रेयस्कर है।";
-          recEn = "Vadha Tara (Severe Caution): Postpone vital commitments; perform spiritual shanti or japa.";
+          recHi =
+            "वध / निधन तारा (कष्टप्रद): नए अनुबंध व साहसिक कार्य न करें। महामृत्युंजय मंत्र का जप श्रेयस्कर है।";
+          recEn =
+            "Vadha Tara (Severe Caution): Postpone vital commitments; perform spiritual shanti or japa.";
           break;
         case 8: // Mitra
-          recHi = "मित्र तारा (शुभ): मित्रों व सहयोगियों का सहयोग, व्यापार विस्तार, सुखद बैठकें व आनंद।";
-          recEn = "Mitra Tara (Auspicious): Cooperative ventures, friendship, pleasant meetings, and joyous outcomes.";
+          recHi =
+            "मित्र तारा (शुभ): मित्रों व सहयोगियों का सहयोग, व्यापार विस्तार, सुखद बैठकें व आनंद।";
+          recEn =
+            "Mitra Tara (Auspicious): Cooperative ventures, friendship, pleasant meetings, and joyous outcomes.";
           break;
         case 9: // Ati-Mitra
-          recHi = "अति-मित्र तारा (परम शुभ): बड़े लाभ, सम्मान, दीर्घकालिक अनुबंध व महत्वपूर्ण कार्य निर्विघ्न संपन्न होंगे।";
-          recEn = "Ati-Mitra Tara (Supreme Auspicious): Major breakthroughs, prestige, long-term deals, and triumph.";
+          recHi =
+            "अति-मित्र तारा (परम शुभ): बड़े लाभ, सम्मान, दीर्घकालिक अनुबंध व महत्वपूर्ण कार्य निर्विघ्न संपन्न होंगे।";
+          recEn =
+            "Ati-Mitra Tara (Supreme Auspicious): Major breakthroughs, prestige, long-term deals, and triumph.";
           break;
         default:
           recHi = "सामान्य दिनचर्या का पालन करें।";
@@ -1575,7 +1624,8 @@ export function computeMonthlyNavtaraReport(
       cautionCount,
       mixedCount,
       feedbackCount,
-      averageFeedbackRating: feedbackCount > 0 ? parseFloat((feedbackSum / feedbackCount).toFixed(1)) : 0,
+      averageFeedbackRating:
+        feedbackCount > 0 ? parseFloat((feedbackSum / feedbackCount).toFixed(1)) : 0,
       matchedAuspiciousCount,
     },
     keyTransitions,

@@ -504,6 +504,37 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             {notifPrefs.enabled && (
               <div className="space-y-4 pl-2 sm:pl-4 border-l-2 border-amber-100">
+                {/* Exact Timing / Advance Notification Option */}
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">
+                    {lang === "hi"
+                      ? "अधिसूचना समय (Exact Timing / Notification Alert Time)"
+                      : "Notification Alert Timing"}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: 0, labelHi: "सटीक समय पर (0 मि)", labelEn: "Exact Time (0 min)" },
+                      { value: 5, labelHi: "5 मिनट पहले", labelEn: "5 min before" },
+                      { value: 10, labelHi: "10 मिनट पहले", labelEn: "10 min before" },
+                      { value: 15, labelHi: "15 मिनट पहले", labelEn: "15 min before" },
+                      { value: 30, labelHi: "30 मिनट पहले", labelEn: "30 min before" },
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setNotifPrefs({ ...notifPrefs, advanceMinutes: opt.value })}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                          (notifPrefs.advanceMinutes ?? 0) === opt.value
+                            ? "bg-amber-600 text-white shadow-sm"
+                            : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                        }`}
+                      >
+                        {lang === "hi" ? opt.labelHi : opt.labelEn}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Custom Tune Selection */}
                 <div>
                   <span className="block text-[10px] font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari">
@@ -588,13 +619,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={notifPrefs.horaTattvaStarts}
+                        checked={notifPrefs.horaTattvaStarts || notifPrefs.swaraTattvaChanges}
                         onChange={(e) =>
-                          setNotifPrefs({ ...notifPrefs, horaTattvaStarts: e.target.checked })
+                          setNotifPrefs({
+                            ...notifPrefs,
+                            horaTattvaStarts: e.target.checked,
+                            swaraTattvaChanges: e.target.checked,
+                          })
                         }
                         className="rounded text-amber-600 focus:ring-amber-600"
                       />
-                      <span className="text-xs font-medium text-stone-700">Tattva (Elements)</span>
+                      <span className="text-xs font-medium text-stone-700">
+                        {lang === "hi"
+                          ? "तत्त्व अलार्म (Tatwa Alerts)"
+                          : "Tattva Alerts (Elements)"}
+                      </span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input

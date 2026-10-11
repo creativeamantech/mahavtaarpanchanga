@@ -7,9 +7,10 @@ import {
   resolveCurrentHora,
   CurrentHoraData,
 } from "../horaEngine";
-import { Sun, Moon, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Sun, Moon, Clock, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
 import { PanchangaResponse } from "../types";
 import { Language } from "../i18n";
+import { exportHorasToExcel } from "../services/excelExportService";
 
 export function VedicHorasView({
   panchangaData,
@@ -334,8 +335,8 @@ export function VedicHorasView({
                         hora.nadi === "ida"
                           ? "bg-sky-50/80 border-sky-200 text-sky-900"
                           : hora.nadi === "pingala"
-                          ? "bg-orange-50/80 border-orange-200 text-orange-900"
-                          : "bg-purple-50/80 border-purple-200 text-purple-900"
+                            ? "bg-orange-50/80 border-orange-200 text-orange-900"
+                            : "bg-purple-50/80 border-purple-200 text-purple-900"
                       }`}
                     >
                       <div className="flex items-center gap-1.5 font-bold">
@@ -345,12 +346,12 @@ export function VedicHorasView({
                               ? "🔵 चन्द्र नाड़ी (इड़ा स्वर - बायाँ नासिका छिद्र)"
                               : "🔵 Lunar Nadi (Ida Swara - Left Nostril)"
                             : hora.nadi === "pingala"
-                            ? lang === "hi"
-                              ? "🔴 सूर्य नाड़ी (पिंगला स्वर - दायाँ नासिका छिद्र)"
-                              : "🔴 Solar Nadi (Pingala Swara - Right Nostril)"
-                            : lang === "hi"
-                            ? "🟣 सुषुम्ना नाड़ी (मध्यम स्वर)"
-                            : "🟣 Sushumna Nadi"}
+                              ? lang === "hi"
+                                ? "🔴 सूर्य नाड़ी (पिंगला स्वर - दायाँ नासिका छिद्र)"
+                                : "🔴 Solar Nadi (Pingala Swara - Right Nostril)"
+                              : lang === "hi"
+                                ? "🟣 सुषुम्ना नाड़ी (मध्यम स्वर)"
+                                : "🟣 Sushumna Nadi"}
                         </span>
                       </div>
                       <div className="text-[11px] opacity-85">
@@ -359,12 +360,12 @@ export function VedicHorasView({
                             ? "शीतल व सौम्य · विद्या, अध्ययन, व्यापार व शांति कर्म हेतु शुभ"
                             : "Cooling & receptive · Ideal for study, spiritual work & calm actions"
                           : hora.nadi === "pingala"
-                          ? lang === "hi"
-                            ? "उष्ण व तेजस्वी · व्यायाम, भोजन, प्रतियोगिता व परिश्रम हेतु श्रेष्ठ"
-                            : "Heating & active · Ideal for meals, workouts & dynamic efforts"
-                          : lang === "hi"
-                          ? "ध्यान व समाधि योग"
-                          : "Meditation & stillness"}
+                            ? lang === "hi"
+                              ? "उष्ण व तेजस्वी · व्यायाम, भोजन, प्रतियोगिता व परिश्रम हेतु श्रेष्ठ"
+                              : "Heating & active · Ideal for meals, workouts & dynamic efforts"
+                            : lang === "hi"
+                              ? "ध्यान व समाधि योग"
+                              : "Meditation & stillness"}
                       </div>
                     </div>
 
@@ -405,6 +406,124 @@ export function VedicHorasView({
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* SCREEN 3: Hora, Nadi, Tattva & Planet Master Reference Table */}
+      <div className="glass-card rounded-[2rem] p-6 shadow-sm transition-all border border-stone-200/80 bg-white">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 className="text-base font-bold text-stone-900">
+              {lang === "hi"
+                ? "ग्रह, होरा, नाड़ी एवं तत्त्व मुख्य तालिका"
+                : "Hora, Nadi, Tattva & Planet Master Table"}
+            </h3>
+            <p className="text-xs text-stone-500">
+              {lang === "hi"
+                ? "शास्त्रीय ग्रह स्वामी, संबद्ध नाड़ी (इड़ा/पिंगला/सुषुम्ना) एवं पञ्च तत्त्व समय अवधि"
+                : "Classical planetary rulers, matched nadis (Ida/Pingala/Sushumna) & element sub-durations"}
+            </p>
+          </div>
+          <button
+            onClick={() => exportHorasToExcel(dailyHoras, panchangaData.date, lang)}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all shrink-0 cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>{lang === "hi" ? "एक्सेल डाउनलोड (.xlsx)" : "Export Excel (.xlsx)"}</span>
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-stone-200 bg-stone-50 text-stone-700 font-bold">
+                <th className="p-2.5">
+                  {lang === "hi" ? "ग्रह (Planet)" : "Planet (Graha)"}
+                </th>
+                <th className="p-2.5">
+                  {lang === "hi" ? "नाड़ी (Swara Nadi)" : "Nadi (Swara)"}
+                </th>
+                <th className="p-2.5">
+                  {lang === "hi" ? "नासिका प्रवाह" : "Nostril Flow"}
+                </th>
+                <th className="p-2.5">
+                  {lang === "hi" ? "मुख्य तत्त्व" : "Primary Tattva"}
+                </th>
+                <th className="p-2.5">
+                  {lang === "hi" ? "अवधि (६० मि)" : "Duration in 60m"}
+                </th>
+                <th className="p-2.5">
+                  {lang === "hi" ? "प्रकृति एवं कार्य" : "Nature & Activities"}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100 text-stone-700">
+              <tr className="hover:bg-stone-50/60">
+                <td className="p-2.5 font-bold text-amber-700">☀️ Sun (सूर्य)</td>
+                <td className="p-2.5 font-bold text-orange-600">Pingala (सूर्य नाड़ी)</td>
+                <td className="p-2.5">Right (दायाँ)</td>
+                <td className="p-2.5 font-semibold text-red-600">Agni (अग्नि)</td>
+                <td className="p-2.5 font-mono">12 mins</td>
+                <td className="p-2.5">Leadership, authority, health & vitality</td>
+              </tr>
+              <tr className="hover:bg-stone-50/60">
+                <td className="p-2.5 font-bold text-sky-700">🌙 Moon (चन्द्र)</td>
+                <td className="p-2.5 font-bold text-sky-600">Ida (चन्द्र नाड़ी)</td>
+                <td className="p-2.5">Left (बायाँ)</td>
+                <td className="p-2.5 font-semibold text-blue-600">Jala (जल)</td>
+                <td className="p-2.5 font-mono">16 mins</td>
+                <td className="p-2.5">Public relations, calm works, mother & emotions</td>
+              </tr>
+              <tr className="hover:bg-stone-50/60">
+                <td className="p-2.5 font-bold text-red-700">♂️ Mars (मंगल)</td>
+                <td className="p-2.5 font-bold text-orange-600">Pingala (सूर्य नाड़ी)</td>
+                <td className="p-2.5">Right (दायाँ)</td>
+                <td className="p-2.5 font-semibold text-red-600">Agni (अग्नि)</td>
+                <td className="p-2.5 font-mono">12 mins</td>
+                <td className="p-2.5">Courage, technical work, exercise & physical vigor</td>
+              </tr>
+              <tr className="hover:bg-stone-50/60">
+                <td className="p-2.5 font-bold text-emerald-700">☿ Mercury (बुध)</td>
+                <td className="p-2.5 font-bold text-sky-600">Ida (चन्द्र नाड़ी)</td>
+                <td className="p-2.5">Left (बायाँ)</td>
+                <td className="p-2.5 font-semibold text-amber-700">Prithvi (पृथ्वी)</td>
+                <td className="p-2.5 font-mono">20 mins</td>
+                <td className="p-2.5">Commerce, writing, analytics & communication</td>
+              </tr>
+              <tr className="hover:bg-stone-50/60">
+                <td className="p-2.5 font-bold text-yellow-700">♃ Jupiter (गुरु)</td>
+                <td className="p-2.5 font-bold text-sky-600">Ida (चन्द्र नाड़ी)</td>
+                <td className="p-2.5">Left (बायाँ)</td>
+                <td className="p-2.5 font-semibold text-purple-700">Akasha (आकाश)</td>
+                <td className="p-2.5 font-mono">4 mins</td>
+                <td className="p-2.5">Wisdom, education, wealth & spiritual growth</td>
+              </tr>
+              <tr className="hover:bg-stone-50/60">
+                <td className="p-2.5 font-bold text-pink-700">♀️ Venus (शुक्र)</td>
+                <td className="p-2.5 font-bold text-sky-600">Ida (चन्द्र नाड़ी)</td>
+                <td className="p-2.5">Left (बायाँ)</td>
+                <td className="p-2.5 font-semibold text-blue-600">Jala (जल)</td>
+                <td className="p-2.5 font-mono">16 mins</td>
+                <td className="p-2.5">Arts, romance, luxury, diplomatic agreements</td>
+              </tr>
+              <tr className="hover:bg-stone-50/60">
+                <td className="p-2.5 font-bold text-indigo-800">♄ Saturn (शनि)</td>
+                <td className="p-2.5 font-bold text-orange-600">Pingala (सूर्य नाड़ी)</td>
+                <td className="p-2.5">Right (दायाँ)</td>
+                <td className="p-2.5 font-semibold text-emerald-700">Vayu (वायु)</td>
+                <td className="p-2.5 font-mono">8 mins</td>
+                <td className="p-2.5">Discipline, physical labor, dealing with elders</td>
+              </tr>
+              <tr className="hover:bg-purple-50/50 bg-purple-50/20">
+                <td className="p-2.5 font-bold text-purple-800">🧘 Rahu / Ketu</td>
+                <td className="p-2.5 font-bold text-purple-700">Sushumna (सुषुम्ना)</td>
+                <td className="p-2.5">Both (उभय)</td>
+                <td className="p-2.5 font-semibold text-purple-700">Ether / Sandhi</td>
+                <td className="p-2.5 font-mono">Transition</td>
+                <td className="p-2.5">Meditation, Mantra Japa & Spiritual Liberation</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

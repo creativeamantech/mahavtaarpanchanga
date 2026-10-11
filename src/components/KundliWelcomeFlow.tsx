@@ -182,7 +182,10 @@ export const KundliWelcomeFlow: React.FC<KundliWelcomeFlowProps> = ({
                 <span className="flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-amber-400" /> जन्म नगर (City):
                 </span>
-                <span className="text-[11px] text-amber-400 hover:text-amber-300 underline cursor-pointer" onClick={onOpenCityModal}>
+                <span
+                  className="text-[11px] text-amber-400 hover:text-amber-300 underline cursor-pointer"
+                  onClick={onOpenCityModal}
+                >
                   स्थान बदलें / GPS
                 </span>
               </label>

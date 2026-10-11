@@ -10,12 +10,28 @@ export interface PlanetBAV {
 
 export interface AshtakavargaData {
   savBySign: number[]; // 12 signs (index 0 = Aries, 11 = Pisces)
-  savByHouse: { houseNumber: number; signIndex: number; signNameHi: string; bindus: number; strength: "high" | "good" | "medium" | "low" }[];
+  savByHouse: {
+    houseNumber: number;
+    signIndex: number;
+    signNameHi: string;
+    bindus: number;
+    strength: "high" | "good" | "medium" | "low";
+  }[];
   bavByPlanet: PlanetBAV[];
   totalSAV: number;
   trikonaShodhitaSAV: number[];
   ekadhipatyaShodhitaSAV: number[];
-  kakshyaTable: { signIndex: number; signNameHi: string; kakshyas: { planet: string; lordHi: string; startDeg: number; endDeg: number; hasBindu: boolean }[] }[];
+  kakshyaTable: {
+    signIndex: number;
+    signNameHi: string;
+    kakshyas: {
+      planet: string;
+      lordHi: string;
+      startDeg: number;
+      endDeg: number;
+      hasBindu: boolean;
+    }[];
+  }[];
 }
 
 // Benefic house positions for each planet from 8 contributors (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Ascendant)
@@ -108,7 +124,7 @@ const PLANET_NAMES_HI: Record<string, string> = {
 
 export function computeAshtakavarga(
   planets: KundliPlanet[],
-  lagnaSignIndex: number
+  lagnaSignIndex: number,
 ): AshtakavargaData {
   // Map planet sign indices
   const donorSignMap: Record<string, number> = {

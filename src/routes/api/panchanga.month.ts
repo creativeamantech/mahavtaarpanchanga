@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/panchanga/month")({
   server: {
     handlers: {
       GET: async ({ request }) => {
-        const { initPanchangaEngine, computePanchanga } =
+        const { initPanchangaEngine, computePanchanga, computePanchangaCustom } =
           await import("../../lib/panchangaEngine.server");
         initPanchangaEngine();
         const url = new URL(request.url);
@@ -16,6 +16,29 @@ export const Route = createFileRoute("/api/panchanga/month")({
           const month = parseInt(q.get("month") || "", 10) || new Date().getMonth() + 1;
           const monthSystem = (q.get("month_system") || "amanta") as MonthSystem;
           const ayanamsa = (q.get("ayanamsa") || "citra") as CoordinateSelection;
+          const latRaw = q.get("lat");
+          const lonRaw = q.get("lon");
+          const tz = q.get("tz") || "Asia/Kolkata";
+
+          const lat = latRaw ? parseFloat(latRaw) : null;
+          const lon = lonRaw ? parseFloat(lonRaw) : null;
+          const hasCustomCoords =
+            lat !== null && lon !== null && !Number.isNaN(lat) && !Number.isNaN(lon);
+
+          const computeDay = (dateStr: string) => {
+            if (hasCustomCoords) {
+              return computePanchangaCustom(
+                lat!,
+                lon!,
+                tz,
+                dateStr,
+                monthSystem,
+                ayanamsa,
+                city || `Custom (${lat!.toFixed(3)}°, ${lon!.toFixed(3)}°)`,
+              );
+            }
+            return computePanchanga(city, dateStr, monthSystem, ayanamsa);
+          };
 
           const fromParam = q.get("from") || q.get("start_date");
           const toParam = q.get("to") || q.get("end_date");
@@ -57,7 +80,7 @@ export const Route = createFileRoute("/api/panchanga/month")({
               const dateStr = `${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}/${y}`;
 
               try {
-                const p = computePanchanga(city, dateStr, monthSystem, ayanamsa);
+                const p = computeDay(dateStr);
                 days.push({
                   day: d,
                   month: m,
@@ -118,7 +141,7 @@ export const Route = createFileRoute("/api/panchanga/month")({
               "0",
             )}/${year}`;
             try {
-              const p = computePanchanga(city, dateStr, monthSystem, ayanamsa);
+              const p = computeDay(dateStr);
               days.push({
                 day: d,
                 month,
@@ -159,7 +182,8 @@ export const Route = createFileRoute("/api/panchanga/month")({
             },
           );
         } catch (err: unknown) {
-          const message = err instanceof Error ? err.message : "Failed to compute monthly panchanga";
+          const message =
+            err instanceof Error ? err.message : "Failed to compute monthly panchanga";
           return Response.json(
             { error: message },
             {

@@ -272,8 +272,8 @@ export class AstronomicalCore {
     const cosEps = Math.cos(epsRad);
     const tanLat = Math.tan(latRad);
 
-    const y = -cosRAMC;
-    const x = sinRAMC * cosEps + tanLat * sinEps;
+    const y = cosRAMC;
+    const x = -(sinRAMC * cosEps + tanLat * sinEps);
     let ascRad = Math.atan2(y, x);
     if (ascRad < 0) ascRad += 2 * Math.PI;
     const tropAsc = normalize360((ascRad * 180.0) / Math.PI);

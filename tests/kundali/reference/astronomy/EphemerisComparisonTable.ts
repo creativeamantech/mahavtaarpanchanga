@@ -61,7 +61,8 @@ export const EPHEMERIS_COMPARISON_MATRIX: EngineComparisonRecord[] = [
     tolerance: 0.03, // 108 arcseconds
     classification: "EPHEMERIS_DIFFERENCE",
     status: "WITHIN_TOLERANCE",
-    notes: "Lunar position includes complex perturbations; delta is well within Jyotisha requirements",
+    notes:
+      "Lunar position includes complex perturbations; delta is well within Jyotisha requirements",
   },
   {
     engine: "Positional Astronomy Centre, Kolkata (Govt of India)",

@@ -8,7 +8,17 @@ import {
   ZODIAC_SIGNS,
 } from "../lib/kundliEngine";
 import { VargaType } from "../kundali/contracts/IVargaEngine";
-import { Sparkles, Info, Eye, Layers, Compass, ZoomIn, ZoomOut, Check, ChevronRight } from "lucide-react";
+import {
+  Sparkles,
+  Info,
+  Eye,
+  Layers,
+  Compass,
+  ZoomIn,
+  ZoomOut,
+  Check,
+  ChevronRight,
+} from "lucide-react";
 
 interface KundliChartRendererProps {
   kundliData: FullKundliData;
@@ -35,25 +45,82 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
 
   // Select the appropriate house layout based on active chart type
   const VARGA_TITLES: Record<string, { title: string; subtitle: string }> = {
-    d1: { title: "लग्न कुण्डली (D1 - Birth Chart)", subtitle: "मूल जन्म चक्र (Rasi Chart) - शारीरिक संरचना, स्वभाव, स्वास्थ्य एवं जीवन का आधार" },
-    d2: { title: "होरा कुण्डली (D2 - Hora)", subtitle: "धन, सम्पत्ति, राजकोष, पारिवारिक समृद्धि एवं वाणी का विचार" },
-    d3: { title: "द्रेष्काण कुण्डली (D3 - Drekkana)", subtitle: "भाई-बहन, पराक्रम, साहस, उद्यम एवं ऊर्जा का चक्र" },
-    d4: { title: "चतुर्थांश कुण्डली (D4 - Chaturthamsha)", subtitle: "भूमि, भवन, अचल सम्पत्ति, गृहसुख एवं भाग्य" },
-    d7: { title: "सप्तांश कुण्डली (D7 - Saptamsha)", subtitle: "सन्तान सुख, संतति, वंश वृद्धि एवं सृजनात्मक सामर्थ्य" },
-    d9: { title: "नवांश कुण्डली (D9 - Navamsha)", subtitle: "धर्म, भाग्य, जीवनसाथी, वैवाहिक सुख एवं उत्तरार्ध जीवन का सूक्ष्म चक्र" },
-    d10: { title: "दशांश कुण्डली (D10 - Dashamsha)", subtitle: "कार्यक्षेत्र, व्यवसाय, आजीविका, प्रसिद्धि एवं कर्मफल का सूक्ष्म विश्लेषण" },
-    d12: { title: "द्वादशांश कुण्डली (D12 - Dwadashamsha)", subtitle: "माता-पिता, कुल, पूर्वज एवं पितृ ऋण का विचार" },
-    d16: { title: "षोडशांश कुण्डली (D16 - Shodashamsha)", subtitle: "वाहन सुख, यात्राएं, मानसिक सुख-शान्ति एवं सुख-साधन" },
-    d20: { title: "विंशांश कुण्डली (D20 - Vimshamsha)", subtitle: "आध्यात्मिक साधना, उपासना, मन्त्र सिद्धि एवं धार्मिक निष्ठा" },
-    d24: { title: "चतुर्विंशांश कुण्डली (D24 - Chaturvimshamsha)", subtitle: "उच्च विद्या, ज्ञान, बुद्धि, कौशल एवं शैक्षणिक सिद्धि" },
-    d27: { title: "सप्तविंशांश कुण्डली (D27 - Saptavimshamsha / Bhamsa)", subtitle: "शारीरिक बल, आंतरिक सामर्थ्य, कमजोरी एवं सहनशक्ति" },
-    d30: { title: "त्रिंशांश कुण्डली (D30 - Trimshamsha)", subtitle: "अनिष्ट, अरिष्ट, रोग, गुप्त शत्रु एवं चारित्रिक बाधाएं" },
-    d40: { title: "खवेदांश कुण्डली (D40 - Khavedamsha)", subtitle: "शुभाशुभ फल, मातृकुल का प्रभाव एवं आकस्मिक घटनाएं" },
-    d45: { title: "अक्षवेदांश कुण्डली (D45 - Akshavedamsha)", subtitle: "आचरण, चरित्र की शुद्धि एवं सर्वविध मंगल-कल्याण" },
-    d60: { title: "षष्ट्यंश कुण्डली (D60 - Shashtiamsha)", subtitle: "सूक्ष्म प्रारब्ध, संचित कर्म एवं जीवन के समस्त गूढ़ फल" },
-    chandra: { title: "चन्द्र कुण्डली (Chandra Lagna)", subtitle: "मन, भावनाएं, मानसिक शांति, माता एवं जनसम्पर्क का विश्लेषण" },
-    surya: { title: "सूर्य कुण्डली (Surya Lagna)", subtitle: "आत्मबल, पिता, मान-सम्मान, प्रतिष्ठा एवं आत्मिक तेज का चक्र" },
-    chalit: { title: "भाव चलित कुण्डली (Bhava Chalita)", subtitle: "भाव-मध्य व भाव-संधि आधारित वास्तविक ग्रह स्थिति एवं भाव फल" },
+    d1: {
+      title: "लग्न कुण्डली (D1 - Birth Chart)",
+      subtitle: "मूल जन्म चक्र (Rasi Chart) - शारीरिक संरचना, स्वभाव, स्वास्थ्य एवं जीवन का आधार",
+    },
+    d2: {
+      title: "होरा कुण्डली (D2 - Hora)",
+      subtitle: "धन, सम्पत्ति, राजकोष, पारिवारिक समृद्धि एवं वाणी का विचार",
+    },
+    d3: {
+      title: "द्रेष्काण कुण्डली (D3 - Drekkana)",
+      subtitle: "भाई-बहन, पराक्रम, साहस, उद्यम एवं ऊर्जा का चक्र",
+    },
+    d4: {
+      title: "चतुर्थांश कुण्डली (D4 - Chaturthamsha)",
+      subtitle: "भूमि, भवन, अचल सम्पत्ति, गृहसुख एवं भाग्य",
+    },
+    d7: {
+      title: "सप्तांश कुण्डली (D7 - Saptamsha)",
+      subtitle: "सन्तान सुख, संतति, वंश वृद्धि एवं सृजनात्मक सामर्थ्य",
+    },
+    d9: {
+      title: "नवांश कुण्डली (D9 - Navamsha)",
+      subtitle: "धर्म, भाग्य, जीवनसाथी, वैवाहिक सुख एवं उत्तरार्ध जीवन का सूक्ष्म चक्र",
+    },
+    d10: {
+      title: "दशांश कुण्डली (D10 - Dashamsha)",
+      subtitle: "कार्यक्षेत्र, व्यवसाय, आजीविका, प्रसिद्धि एवं कर्मफल का सूक्ष्म विश्लेषण",
+    },
+    d12: {
+      title: "द्वादशांश कुण्डली (D12 - Dwadashamsha)",
+      subtitle: "माता-पिता, कुल, पूर्वज एवं पितृ ऋण का विचार",
+    },
+    d16: {
+      title: "षोडशांश कुण्डली (D16 - Shodashamsha)",
+      subtitle: "वाहन सुख, यात्राएं, मानसिक सुख-शान्ति एवं सुख-साधन",
+    },
+    d20: {
+      title: "विंशांश कुण्डली (D20 - Vimshamsha)",
+      subtitle: "आध्यात्मिक साधना, उपासना, मन्त्र सिद्धि एवं धार्मिक निष्ठा",
+    },
+    d24: {
+      title: "चतुर्विंशांश कुण्डली (D24 - Chaturvimshamsha)",
+      subtitle: "उच्च विद्या, ज्ञान, बुद्धि, कौशल एवं शैक्षणिक सिद्धि",
+    },
+    d27: {
+      title: "सप्तविंशांश कुण्डली (D27 - Saptavimshamsha / Bhamsa)",
+      subtitle: "शारीरिक बल, आंतरिक सामर्थ्य, कमजोरी एवं सहनशक्ति",
+    },
+    d30: {
+      title: "त्रिंशांश कुण्डली (D30 - Trimshamsha)",
+      subtitle: "अनिष्ट, अरिष्ट, रोग, गुप्त शत्रु एवं चारित्रिक बाधाएं",
+    },
+    d40: {
+      title: "खवेदांश कुण्डली (D40 - Khavedamsha)",
+      subtitle: "शुभाशुभ फल, मातृकुल का प्रभाव एवं आकस्मिक घटनाएं",
+    },
+    d45: {
+      title: "अक्षवेदांश कुण्डली (D45 - Akshavedamsha)",
+      subtitle: "आचरण, चरित्र की शुद्धि एवं सर्वविध मंगल-कल्याण",
+    },
+    d60: {
+      title: "षष्ट्यंश कुण्डली (D60 - Shashtiamsha)",
+      subtitle: "सूक्ष्म प्रारब्ध, संचित कर्म एवं जीवन के समस्त गूढ़ फल",
+    },
+    chandra: {
+      title: "चन्द्र कुण्डली (Chandra Lagna)",
+      subtitle: "मन, भावनाएं, मानसिक शांति, माता एवं जनसम्पर्क का विश्लेषण",
+    },
+    surya: {
+      title: "सूर्य कुण्डली (Surya Lagna)",
+      subtitle: "आत्मबल, पिता, मान-सम्मान, प्रतिष्ठा एवं आत्मिक तेज का चक्र",
+    },
+    chalit: {
+      title: "भाव चलित कुण्डली (Bhava Chalita)",
+      subtitle: "भाव-मध्य व भाव-संधि आधारित वास्तविक ग्रह स्थिति एवं भाव फल",
+    },
   };
 
   let currentHouses: KundliHouse[] = kundliData.housesD1;
@@ -106,29 +173,101 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
     isTrikona: boolean;
   }[] = [
     // House 1 (Kendra & Trikona)
-    { points: "200,0 300,100 200,200 100,100", center: { x: 200, y: 110 }, signPos: { x: 200, y: 32 }, isKendra: true, isTrikona: true },
+    {
+      points: "200,0 300,100 200,200 100,100",
+      center: { x: 200, y: 110 },
+      signPos: { x: 200, y: 32 },
+      isKendra: true,
+      isTrikona: true,
+    },
     // House 2
-    { points: "0,0 200,0 100,100", center: { x: 100, y: 48 }, signPos: { x: 50, y: 24 }, isKendra: false, isTrikona: false },
+    {
+      points: "0,0 200,0 100,100",
+      center: { x: 100, y: 48 },
+      signPos: { x: 50, y: 24 },
+      isKendra: false,
+      isTrikona: false,
+    },
     // House 3
-    { points: "0,0 100,100 0,200", center: { x: 48, y: 100 }, signPos: { x: 22, y: 55 }, isKendra: false, isTrikona: false },
+    {
+      points: "0,0 100,100 0,200",
+      center: { x: 48, y: 100 },
+      signPos: { x: 22, y: 55 },
+      isKendra: false,
+      isTrikona: false,
+    },
     // House 4 (Kendra)
-    { points: "0,200 100,100 200,200 100,300", center: { x: 105, y: 200 }, signPos: { x: 38, y: 200 }, isKendra: true, isTrikona: false },
+    {
+      points: "0,200 100,100 200,200 100,300",
+      center: { x: 105, y: 200 },
+      signPos: { x: 38, y: 200 },
+      isKendra: true,
+      isTrikona: false,
+    },
     // House 5 (Trikona)
-    { points: "0,200 100,300 0,400", center: { x: 48, y: 300 }, signPos: { x: 22, y: 345 }, isKendra: false, isTrikona: true },
+    {
+      points: "0,200 100,300 0,400",
+      center: { x: 48, y: 300 },
+      signPos: { x: 22, y: 345 },
+      isKendra: false,
+      isTrikona: true,
+    },
     // House 6
-    { points: "0,400 100,300 200,400", center: { x: 100, y: 352 }, signPos: { x: 50, y: 376 }, isKendra: false, isTrikona: false },
+    {
+      points: "0,400 100,300 200,400",
+      center: { x: 100, y: 352 },
+      signPos: { x: 50, y: 376 },
+      isKendra: false,
+      isTrikona: false,
+    },
     // House 7 (Kendra)
-    { points: "200,200 300,300 200,400 100,300", center: { x: 200, y: 290 }, signPos: { x: 200, y: 368 }, isKendra: true, isTrikona: false },
+    {
+      points: "200,200 300,300 200,400 100,300",
+      center: { x: 200, y: 290 },
+      signPos: { x: 200, y: 368 },
+      isKendra: true,
+      isTrikona: false,
+    },
     // House 8
-    { points: "200,400 300,300 400,400", center: { x: 300, y: 352 }, signPos: { x: 350, y: 376 }, isKendra: false, isTrikona: false },
+    {
+      points: "200,400 300,300 400,400",
+      center: { x: 300, y: 352 },
+      signPos: { x: 350, y: 376 },
+      isKendra: false,
+      isTrikona: false,
+    },
     // House 9 (Trikona)
-    { points: "400,400 300,300 400,200", center: { x: 352, y: 300 }, signPos: { x: 378, y: 345 }, isKendra: false, isTrikona: true },
+    {
+      points: "400,400 300,300 400,200",
+      center: { x: 352, y: 300 },
+      signPos: { x: 378, y: 345 },
+      isKendra: false,
+      isTrikona: true,
+    },
     // House 10 (Kendra)
-    { points: "200,200 300,100 400,200 300,300", center: { x: 295, y: 200 }, signPos: { x: 362, y: 200 }, isKendra: true, isTrikona: false },
+    {
+      points: "200,200 300,100 400,200 300,300",
+      center: { x: 295, y: 200 },
+      signPos: { x: 362, y: 200 },
+      isKendra: true,
+      isTrikona: false,
+    },
     // House 11
-    { points: "400,200 300,100 400,0", center: { x: 352, y: 100 }, signPos: { x: 378, y: 55 }, isKendra: false, isTrikona: false },
+    {
+      points: "400,200 300,100 400,0",
+      center: { x: 352, y: 100 },
+      signPos: { x: 378, y: 55 },
+      isKendra: false,
+      isTrikona: false,
+    },
     // House 12
-    { points: "400,0 300,100 200,0", center: { x: 300, y: 48 }, signPos: { x: 350, y: 24 }, isKendra: false, isTrikona: false },
+    {
+      points: "400,0 300,100 200,0",
+      center: { x: 300, y: 48 },
+      signPos: { x: 350, y: 24 },
+      isKendra: false,
+      isTrikona: false,
+    },
   ];
 
   // South Indian Grid coordinates (12 fixed rasis in clockwise grid)
@@ -152,8 +291,8 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
     chartSize === "large"
       ? "w-full max-w-[540px]"
       : chartSize === "compact"
-      ? "w-full max-w-[340px]"
-      : "w-full max-w-[440px]";
+        ? "w-full max-w-[340px]"
+        : "w-full max-w-[440px]";
 
   return (
     <div className="bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-700 p-4 sm:p-6 shadow-2xl backdrop-blur-md">
@@ -316,10 +455,10 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                             {activeChartType === "d9"
                               ? "नवांश लग्न"
                               : activeChartType === "chandra"
-                              ? "चन्द्र लग्न"
-                              : activeChartType === "surya"
-                              ? "सूर्य लग्न"
-                              : "लग्न (Asc)"}
+                                ? "चन्द्र लग्न"
+                                : activeChartType === "surya"
+                                  ? "सूर्य लग्न"
+                                  : "लग्न (Asc)"}
                           </text>
                         </g>
                       )}
@@ -351,9 +490,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                             }
 
                             // Degree text format (e.g. 14°)
-                            const degStr = showDegrees
-                              ? `${planet.degreeInSign.toFixed(0)}°`
-                              : "";
+                            const degStr = showDegrees ? `${planet.degreeInSign.toFixed(0)}°` : "";
 
                             return (
                               <g key={planet.id}>
@@ -461,10 +598,10 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                           isSelected
                             ? "url(#southActive)"
                             : isHovered
-                            ? "rgba(217, 119, 6, 0.25)"
-                            : isLagnaSign
-                            ? "rgba(180, 83, 9, 0.2)"
-                            : "transparent"
+                              ? "rgba(217, 119, 6, 0.25)"
+                              : isLagnaSign
+                                ? "rgba(180, 83, 9, 0.2)"
+                                : "transparent"
                         }
                         stroke="#d97706"
                         strokeWidth="1.2"
@@ -550,9 +687,7 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                               dignityBadge = "★";
                             }
 
-                            const degStr = showDegrees
-                              ? ` ${planet.degreeInSign.toFixed(0)}°`
-                              : "";
+                            const degStr = showDegrees ? ` ${planet.degreeInSign.toFixed(0)}°` : "";
 
                             return (
                               <text
@@ -588,7 +723,15 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                   stroke="#d97706"
                   strokeWidth="2"
                 />
-                <circle cx="200" cy="200" r="70" fill="none" stroke="#52525b" strokeWidth="1" strokeDasharray="3 3" />
+                <circle
+                  cx="200"
+                  cy="200"
+                  r="70"
+                  fill="none"
+                  stroke="#52525b"
+                  strokeWidth="1"
+                  strokeDasharray="3 3"
+                />
                 <text
                   x="200"
                   y="180"
@@ -712,10 +855,14 @@ export const KundliChartRenderer: React.FC<KundliChartRendererProps> = ({
                           <span className="text-amber-400 font-bold">{p.symbol}</span>
                           <span className="font-bold text-white">{p.nameHi}</span>
                           {p.isRetrograde && (
-                            <span className="text-[10px] bg-orange-950 text-orange-300 px-1 rounded border border-orange-800">वक्री</span>
+                            <span className="text-[10px] bg-orange-950 text-orange-300 px-1 rounded border border-orange-800">
+                              वक्री
+                            </span>
                           )}
                           {p.isCombust && (
-                            <span className="text-[10px] bg-red-950 text-red-300 px-1 rounded border border-red-800">अस्त</span>
+                            <span className="text-[10px] bg-red-950 text-red-300 px-1 rounded border border-red-800">
+                              अस्त
+                            </span>
                           )}
                         </div>
                         <div className="text-right">

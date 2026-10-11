@@ -1,14 +1,7 @@
 export type AppTheme = "parchment" | "nightSky";
 
 export type CoordinateSelection =
-  | "citra"
-  | "revati"
-  | "rohini"
-  | "pushya"
-  | "mula"
-  | "krishnamurti"
-  | "raman"
-  | "tropical";
+  "citra" | "revati" | "rohini" | "pushya" | "mula" | "krishnamurti" | "raman" | "tropical";
 
 export type MonthSystem = "amanta" | "purnimanta";
 

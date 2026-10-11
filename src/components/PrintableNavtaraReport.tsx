@@ -94,7 +94,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
   }, [data?.date]);
 
   const [selectedYear, setSelectedYear] = useState<number>(initialYear || currentDateParsed.year);
-  const [selectedMonth, setSelectedMonth] = useState<number>(initialMonth || currentDateParsed.month);
+  const [selectedMonth, setSelectedMonth] = useState<number>(
+    initialMonth || currentDateParsed.month,
+  );
   const cityName = propCityName || data?.city || "New Delhi, IN";
 
   // Helper to format Date as YYYY-MM-DD for HTML5 date inputs
@@ -184,7 +186,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       const y2 = p2[0] || selectedYear;
       const m2 = p2[1] || selectedMonth;
       const fbs1 = loadStoredNavtaraFeedbacks(personName, y1, m1);
-      const fbs2 = (y1 !== y2 || m1 !== m2) ? loadStoredNavtaraFeedbacks(personName, y2, m2) : {};
+      const fbs2 = y1 !== y2 || m1 !== m2 ? loadStoredNavtaraFeedbacks(personName, y2, m2) : {};
       setUserFeedbacks({ ...fbs1, ...fbs2 });
     } else {
       const fbs = loadStoredNavtaraFeedbacks(personName, selectedYear, selectedMonth);
@@ -194,7 +196,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
 
   // Fetch month or custom date range panchanga data
   useEffect(() => {
-    let isCancelled = false;
+    const isCancelled = false;
     async function fetchPeriodData() {
       setIsLoadingMonth(true);
       setLoadError(null);
@@ -210,6 +212,11 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
           url = `/api/panchanga/month?year=${selectedYear}&month=${selectedMonth}&city=${encodeURIComponent(
             cityName,
           )}&month_system=${monthSys}&ayanamsa=${ayan}`;
+        }
+        if (data?.location?.latitude && data?.location?.longitude) {
+          url += `&lat=${data.location.latitude}&lon=${data.location.longitude}&tz=${encodeURIComponent(
+            data.location.timezone || "Asia/Kolkata",
+          )}`;
         }
 
         const res = await fetch(url);
@@ -265,12 +272,22 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         const last = monthDays[monthDays.length - 1].date;
         return isHindi ? `${first} से ${last}` : `${first} to ${last}`;
       }
-      return isHindi ? `${customStartDate} से ${customEndDate}` : `${customStartDate} to ${customEndDate}`;
+      return isHindi
+        ? `${customStartDate} से ${customEndDate}`
+        : `${customStartDate} to ${customEndDate}`;
     }
     return isHindi
       ? `${getMonthNameHi(selectedMonth)} ${selectedYear}`
       : `${getMonthNameEn(selectedMonth)} ${selectedYear}`;
-  }, [dateSelectionMode, monthDays, customStartDate, customEndDate, selectedMonth, selectedYear, isHindi]);
+  }, [
+    dateSelectionMode,
+    monthDays,
+    customStartDate,
+    customEndDate,
+    selectedMonth,
+    selectedYear,
+    isHindi,
+  ]);
 
   // Monthly or Custom Date Range report data
   const monthlyReportData: MonthlyNavtaraReportData = useMemo(() => {
@@ -340,15 +357,21 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     setIsGeneratingPdf(true);
     setPdfError(null);
     setDownloadSuccessToast(null);
-    setGenerationStatus(reportLang === "hi" ? "दस्तावेज़ तैयार किया जा रहा है..." : "Preparing report document...");
+    setGenerationStatus(
+      reportLang === "hi" ? "दस्तावेज़ तैयार किया जा रहा है..." : "Preparing report document...",
+    );
 
     try {
       const sheet = document.getElementById("navtara-report-sheet");
       if (!sheet) {
-        throw new Error(reportLang === "hi" ? "रिपोर्ट शीट नहीं मिली।" : "Report element not found.");
+        throw new Error(
+          reportLang === "hi" ? "रिपोर्ट शीट नहीं मिली।" : "Report element not found.",
+        );
       }
 
-      setGenerationStatus(reportLang === "hi" ? "पेज रेंडर हो रहे हैं..." : "Rendering document pages...");
+      setGenerationStatus(
+        reportLang === "hi" ? "पेज रेंडर हो रहे हैं..." : "Rendering document pages...",
+      );
 
       // Wait a moment to ensure all styles and fonts are ready
       await new Promise((resolve) => setTimeout(resolve, 150));
@@ -362,7 +385,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         windowWidth: 1024,
       });
 
-      setGenerationStatus(reportLang === "hi" ? "PDF फ़ाइल बनाई जा रही है..." : "Building PDF file...");
+      setGenerationStatus(
+        reportLang === "hi" ? "PDF फ़ाइल बनाई जा रही है..." : "Building PDF file...",
+      );
 
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -380,20 +405,39 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       let position = 0;
 
       // First page
-      pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+      pdf.addImage(
+        canvas.toDataURL("image/jpeg", 0.92),
+        "JPEG",
+        0,
+        position,
+        imgWidth,
+        imgHeight,
+        undefined,
+        "FAST",
+      );
       heightLeft -= pageHeight;
 
       // Subsequent pages
       while (heightLeft > 0) {
         position -= pageHeight;
         pdf.addPage();
-        pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, position, imgWidth, imgHeight, undefined, "FAST");
+        pdf.addImage(
+          canvas.toDataURL("image/jpeg", 0.92),
+          "JPEG",
+          0,
+          position,
+          imgWidth,
+          imgHeight,
+          undefined,
+          "FAST",
+        );
         heightLeft -= pageHeight;
       }
 
-      const filePeriod = dateSelectionMode === "custom"
-        ? `${customStartDate}_to_${customEndDate}`
-        : `${getMonthNameEn(selectedMonth)}_${selectedYear}`;
+      const filePeriod =
+        dateSelectionMode === "custom"
+          ? `${customStartDate}_to_${customEndDate}`
+          : `${getMonthNameEn(selectedMonth)}_${selectedYear}`;
       const safeName = (personName || "User").replace(/[^a-zA-Z0-9_\u0900-\u097F]/g, "_");
       const filename = `Navtara_Report_${filePeriod}_${safeName}.pdf`;
 
@@ -402,7 +446,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       setDownloadSuccessToast(
         reportLang === "hi"
           ? `PDF सफलतापूर्वक डाउनलोड हो गई: ${filename}`
-          : `PDF successfully downloaded: ${filename}`
+          : `PDF successfully downloaded: ${filename}`,
       );
       setGenerationStatus("");
       setIsGeneratingPdf(false);
@@ -416,7 +460,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         err?.message ||
           (reportLang === "hi"
             ? "PDF बनाने में असमर्थ। कृपया 'HTML सेव करें' का उपयोग करें।"
-            : "Could not create PDF. Please try HTML download.")
+            : "Could not create PDF. Please try HTML download."),
       );
       setIsGeneratingPdf(false);
       setGenerationStatus("");
@@ -451,14 +495,16 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
 
       const isHi = reportLang === "hi";
       const sanitizedName = (personName || "native").trim().toLowerCase().replace(/\s+/g, "_");
-      const storageKey = dateSelectionMode === "custom"
-        ? `navtara_feedback_${sanitizedName}_${customStartDate}_${customEndDate}`
-        : `navtara_feedback_${sanitizedName}_${selectedYear}_${selectedMonth}`;
+      const storageKey =
+        dateSelectionMode === "custom"
+          ? `navtara_feedback_${sanitizedName}_${customStartDate}_${customEndDate}`
+          : `navtara_feedback_${sanitizedName}_${selectedYear}_${selectedMonth}`;
       const preloadedJson = JSON.stringify(userFeedbacks);
 
-      const filePeriod = dateSelectionMode === "custom"
-        ? `${customStartDate}_to_${customEndDate}`
-        : `${getMonthNameEn(selectedMonth)}_${selectedYear}`;
+      const filePeriod =
+        dateSelectionMode === "custom"
+          ? `${customStartDate}_to_${customEndDate}`
+          : `${getMonthNameEn(selectedMonth)}_${selectedYear}`;
 
       const fullHtml = `<!DOCTYPE html>
 <html lang="${isHi ? "hi" : "en"}">
@@ -902,7 +948,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       setDownloadSuccessToast(
         reportLang === "hi"
           ? "HTML रिपोर्ट डाउनलोड हो गई! इसे किसी भी ब्राउज़र में कभी भी खोलें।"
-          : "HTML report downloaded! Open anytime in any browser."
+          : "HTML report downloaded! Open anytime in any browser.",
       );
       setTimeout(() => setDownloadSuccessToast(null), 4000);
     } catch (err) {
@@ -927,7 +973,11 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     }
   };
 
-  const parseYearMonthFromDateStr = (dateStr: string, fallbackYear: number, fallbackMonth: number) => {
+  const parseYearMonthFromDateStr = (
+    dateStr: string,
+    fallbackYear: number,
+    fallbackMonth: number,
+  ) => {
     if (dateStr && dateStr.includes("/")) {
       const parts = dateStr.split("/").map(Number);
       if (parts.length === 3 && !isNaN(parts[1]) && !isNaN(parts[2])) {
@@ -938,14 +988,19 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
   };
 
   // Quick 1-click feedback options (🟢 शुभ, 🟡 सामान्य, 🔴 संभलकर)
-  const handleQuickFeedback = (dateStr: string, dayNum: number, rating: number, explicitNote?: string) => {
+  const handleQuickFeedback = (
+    dateStr: string,
+    dayNum: number,
+    rating: number,
+    explicitNote?: string,
+  ) => {
     const existing = userFeedbacks[dateStr];
-    let noteToSave = explicitNote !== undefined ? explicitNote : (existing?.note || "");
+    let noteToSave = explicitNote !== undefined ? explicitNote : existing?.note || "";
 
     // Read from any matching DOM input if user had typed without blurring
     if (explicitNote === undefined && typeof document !== "undefined") {
       const inputs = document.querySelectorAll<HTMLInputElement>(
-        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`
+        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`,
       );
       for (const inp of Array.from(inputs)) {
         if (inp && inp.value !== undefined && inp.value.trim().length > 0) {
@@ -955,7 +1010,11 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       }
     }
 
-    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(dateStr, selectedYear, selectedMonth);
+    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(
+      dateStr,
+      selectedYear,
+      selectedMonth,
+    );
     const updated = saveDailyNavtaraFeedback(personName, targetYear, targetMonth, {
       dateStr,
       day: dayNum,
@@ -968,7 +1027,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     // Synchronize note across all matching input elements in DOM
     if (typeof document !== "undefined") {
       const inputs = document.querySelectorAll<HTMLInputElement>(
-        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`
+        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`,
       );
       inputs.forEach((inp) => {
         inp.value = noteToSave.trim();
@@ -993,9 +1052,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
         ? rating >= 4
           ? "🟢 शुभ अनुभव सुरक्षित हुआ!"
           : rating === 3
-          ? "🟡 सामान्य अनुभव सुरक्षित हुआ!"
-          : "🔴 संभलकर अनुभव सुरक्षित हुआ!"
-        : "Day experience saved!"
+            ? "🟡 सामान्य अनुभव सुरक्षित हुआ!"
+            : "🔴 संभलकर अनुभव सुरक्षित हुआ!"
+        : "Day experience saved!",
     );
     setTimeout(() => setDownloadSuccessToast(null), 2000);
   };
@@ -1005,8 +1064,13 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     const existing = userFeedbacks[dateStr];
     // Retain chosen rating if present, or set to 0 if not selected yet
     const rating = existing?.rating !== undefined ? existing.rating : 0;
-    const feeling = existing?.feeling || (rating >= 4 ? "great" : rating === 3 ? "neutral" : "challenging");
-    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(dateStr, selectedYear, selectedMonth);
+    const feeling =
+      existing?.feeling || (rating >= 4 ? "great" : rating === 3 ? "neutral" : "challenging");
+    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(
+      dateStr,
+      selectedYear,
+      selectedMonth,
+    );
 
     const updated = saveDailyNavtaraFeedback(personName, targetYear, targetMonth, {
       dateStr,
@@ -1020,7 +1084,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
     // Synchronize note across all matching input elements in DOM
     if (typeof document !== "undefined") {
       const inputs = document.querySelectorAll<HTMLInputElement>(
-        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`
+        `[data-feedback-container][data-date="${dateStr}"] [data-note-input]`,
       );
       inputs.forEach((inp) => {
         inp.value = note.trim();
@@ -1040,14 +1104,16 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
       },
     }));
 
-    setDownloadSuccessToast(
-      isHindi ? "✓ अनुभव नोट सुरक्षित हुआ!" : "✓ Experience note saved!"
-    );
+    setDownloadSuccessToast(isHindi ? "✓ अनुभव नोट सुरक्षित हुआ!" : "✓ Experience note saved!");
     setTimeout(() => setDownloadSuccessToast(null), 2000);
   };
 
   const handleSaveFeedback = (dateStr: string, dayNum: number) => {
-    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(dateStr, selectedYear, selectedMonth);
+    const { year: targetYear, month: targetMonth } = parseYearMonthFromDateStr(
+      dateStr,
+      selectedYear,
+      selectedMonth,
+    );
     const updated = saveDailyNavtaraFeedback(personName, targetYear, targetMonth, {
       dateStr,
       day: dayNum,
@@ -1178,7 +1244,15 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                 ) : (
                   <Download className="mr-1.5 h-3.5 w-3.5" />
                 )}
-                <span>{isGeneratingPdf ? (isHindi ? "PDF बन रही है..." : "Building...") : (isHindi ? "डाउनलोड PDF" : "Download PDF")}</span>
+                <span>
+                  {isGeneratingPdf
+                    ? isHindi
+                      ? "PDF बन रही है..."
+                      : "Building..."
+                    : isHindi
+                      ? "डाउनलोड PDF"
+                      : "Download PDF"}
+                </span>
               </button>
 
               {/* Offline HTML Backup */}
@@ -1309,7 +1383,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                 {dateSelectionMode === "month" && (
                   <div className="flex items-center gap-1.5 bg-white px-2 py-0.5 rounded-lg border border-stone-300 shadow-xs">
                     <Calendar className="w-3.5 h-3.5 text-amber-800" />
-                    <span className="font-bold text-stone-700 text-[11px]">{isHindi ? "माह:" : "Month:"}</span>
+                    <span className="font-bold text-stone-700 text-[11px]">
+                      {isHindi ? "माह:" : "Month:"}
+                    </span>
                     <select
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(Number(e.target.value))}
@@ -1339,7 +1415,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                 {dateSelectionMode === "custom" && (
                   <div className="flex flex-wrap items-center gap-1.5">
                     <div className="flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-lg border border-stone-300 shadow-xs">
-                      <span className="text-[10px] font-bold text-stone-600">{isHindi ? "से:" : "From:"}</span>
+                      <span className="text-[10px] font-bold text-stone-600">
+                        {isHindi ? "से:" : "From:"}
+                      </span>
                       <input
                         type="date"
                         value={customStartDate}
@@ -1348,7 +1426,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                       />
                     </div>
                     <div className="flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-lg border border-stone-300 shadow-xs">
-                      <span className="text-[10px] font-bold text-stone-600">{isHindi ? "तक:" : "To:"}</span>
+                      <span className="text-[10px] font-bold text-stone-600">
+                        {isHindi ? "तक:" : "To:"}
+                      </span>
                       <input
                         type="date"
                         value={customEndDate}
@@ -1471,7 +1551,15 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
               ) : (
                 <Download className="w-3.5 h-3.5" />
               )}
-              <span>{isGeneratingPdf ? (isHindi ? "PDF बन रही है..." : "Generating...") : (isHindi ? "डाउनलोड PDF" : "Download PDF")}</span>
+              <span>
+                {isGeneratingPdf
+                  ? isHindi
+                    ? "PDF बन रही है..."
+                    : "Generating..."
+                  : isHindi
+                    ? "डाउनलोड PDF"
+                    : "Download PDF"}
+              </span>
             </button>
             <button
               type="button"
@@ -1536,14 +1624,17 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                   {isHindi ? "PDF रिपोर्ट तैयार हो रही है..." : "Generating PDF Report..."}
                 </h4>
                 <p className="text-xs text-stone-300 font-sans">
-                  {generationStatus || (isHindi ? "कृपया कुछ सेकंड प्रतीक्षा करें..." : "Please wait a moment...")}
+                  {generationStatus ||
+                    (isHindi ? "कृपया कुछ सेकंड प्रतीक्षा करें..." : "Please wait a moment...")}
                 </p>
               </div>
               <div className="w-full bg-stone-800 rounded-full h-1.5 overflow-hidden">
                 <div className="bg-amber-500 h-1.5 rounded-full animate-pulse w-3/4"></div>
               </div>
               <p className="text-[10px] text-stone-400">
-                {isHindi ? "उच्च गुणवत्ता वाले पेज रेंडर किए जा रहे हैं" : "Rendering high quality document"}
+                {isHindi
+                  ? "उच्च गुणवत्ता वाले पेज रेंडर किए जा रहे हैं"
+                  : "Rendering high quality document"}
               </p>
             </div>
           </div>
@@ -1555,7 +1646,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
             <div className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-amber-900" />
               <span className="font-bold text-amber-950 font-devanagari">
-                {isHindi ? `दिनांक ${editingDayDate} का अनुभव दर्ज करें:` : `Log Feedback for ${editingDayDate}:`}
+                {isHindi
+                  ? `दिनांक ${editingDayDate} का अनुभव दर्ज करें:`
+                  : `Log Feedback for ${editingDayDate}:`}
               </span>
             </div>
             <div className="flex items-center gap-2 flex-wrap flex-1 max-w-xl">
@@ -1571,9 +1664,7 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                   >
                     <Star
                       className={`w-4 h-4 ${
-                        star <= feedbackRating
-                          ? "text-amber-500 fill-amber-500"
-                          : "text-stone-300"
+                        star <= feedbackRating ? "text-amber-500 fill-amber-500" : "text-stone-300"
                       }`}
                     />
                   </button>
@@ -1645,7 +1736,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                     : data?.date || new Date().toLocaleDateString()}
                 </span>
                 <span>•</span>
-                <span>अयन: {data?.ayana || "Drik"} ({data?.ayanamsa_key || "Lahiri"})</span>
+                <span>
+                  अयन: {data?.ayana || "Drik"} ({data?.ayanamsa_key || "Lahiri"})
+                </span>
               </div>
             </div>
 
@@ -1759,17 +1852,17 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                   {isHindi ? (
                     <>
                       <strong>चरण (पद) क्या होता है?</strong> प्रत्येक नक्षत्र 13° 20' (अंश-कला) का
-                      होता है। इसे चार समान भागों में बांटा गया है, जिन्हें <strong>'चरण'</strong> या{" "}
-                      <strong>'पद'</strong> (प्रत्येक 3° 20') कहते हैं। कुल 27 नक्षत्र × 4 पद = 108
-                      चरण बनते हैं (इसीलिए जप माला में 108 मनके होते हैं)। प्रत्येक पद चार
+                      होता है। इसे चार समान भागों में बांटा गया है, जिन्हें <strong>'चरण'</strong>{" "}
+                      या <strong>'पद'</strong> (प्रत्येक 3° 20') कहते हैं। कुल 27 नक्षत्र × 4 पद =
+                      108 चरण बनते हैं (इसीलिए जप माला में 108 मनके होते हैं)। प्रत्येक पद चार
                       पुरुषार्थों (धर्म, अर्थ, काम, मोक्ष) और चार तत्वों से संचालित होता है:
                     </>
                   ) : (
                     <>
                       <strong>What is a Pada?</strong> Each 13°20' Nakshatra is divided into 4 equal
                       quarters of 3°20' each called Padas. 27 Nakshatras × 4 = 108 Padas across the
-                      zodiac. Each Pada corresponds to one of the four human pursuits (Dharma, Artha,
-                      Kama, Moksha) and a cosmic element:
+                      zodiac. Each Pada corresponds to one of the four human pursuits (Dharma,
+                      Artha, Kama, Moksha) and a cosmic element:
                     </>
                   )}
                 </p>
@@ -1837,290 +1930,313 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
             {reportMode === "monthly" && (
               <>
                 <div className="space-y-3.5 print-no-break">
-                {/* Monthly Calendar Header */}
-                <div className="flex items-center justify-between border-b border-amber-900/30 pb-1.5">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-amber-800" />
-                    <h2 className="text-sm font-bold uppercase tracking-wider text-amber-950 font-devanagari">
-                      {isHindi
-                        ? `मासिक नवतारा कैलेंडर डैशबोर्ड (${getMonthNameHi(selectedMonth)} ${selectedYear})`
-                        : `Monthly Navtara Calendar Dashboard (${getMonthNameEn(selectedMonth)} ${selectedYear})`}
-                    </h2>
-                  </div>
-                  <span className="text-[10px] font-semibold text-stone-600 font-devanagari">
-                    {isHindi
-                      ? `कुल ${monthlyReportData.stats.totalDays} दिन | संपूर्ण माह का पंचांग व नवतारा चक्र सारांश`
-                      : `Total ${monthlyReportData.stats.totalDays} Days | Date-wise Navtara Summary`}
-                  </span>
-                </div>
-
-                {/* 4 Categorized Calendar Cards with Exact Dates */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-                  {/* Auspicious Days Card */}
-                  <div className="p-2.5 rounded-xl border border-emerald-300 bg-emerald-50/60 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-bold text-emerald-900 font-devanagari flex items-center gap-1">
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
-                          {isHindi ? "अति शुभ दिन" : "Auspicious Days"}
-                        </span>
-                        <span className="text-base font-black text-emerald-950 font-mono">
-                          {categorizedDays.auspicious.length} {isHindi ? "दिन" : "Days"}
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-emerald-900 font-devanagari line-clamp-2">
-                        {isHindi
-                          ? "सम्पत्, क्षेम, साधक, मित्र व अति-मित्र — नए कार्य, आर्थिक लाभ व शुभ आरंभ हेतु"
-                          : "Best for milestones, prosperity & auspicious ventures"}
-                      </div>
-                    </div>
-                    <div className="mt-2 pt-1.5 border-t border-emerald-200/80">
-                      <span className="text-[9px] font-bold uppercase text-emerald-800 block">
-                        {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
-                      </span>
-                      <div className="text-[11px] font-mono font-bold text-emerald-950 break-words leading-tight mt-0.5">
-                        {categorizedDays.auspicious.length > 0
-                          ? categorizedDays.auspicious.map((d) => d.day).join(", ")
-                          : isHindi
-                            ? "कोई नहीं"
-                            : "None"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mixed / Transition Days Card */}
-                  <div className="p-2.5 rounded-xl border border-amber-300 bg-amber-50/70 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-bold text-amber-900 font-devanagari flex items-center gap-1">
-                          <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
-                          {isHindi ? "मिश्रित / गोचर दिन" : "Transition Days"}
-                        </span>
-                        <span className="text-base font-black text-amber-950 font-mono">
-                          {categorizedDays.mixed.length} {isHindi ? "दिन" : "Days"}
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-amber-900 font-devanagari line-clamp-2">
-                        {isHindi
-                          ? "नक्षत्र परिवर्तन दिन — परिवर्तन समय के बाद शुभ तारा सक्रिय (समय नीचे देखें)"
-                          : "Dual phases: prior Tara operates until transit time, new Tara begins after"}
-                      </div>
-                    </div>
-                    <div className="mt-2 pt-1.5 border-t border-amber-200/80">
-                      <span className="text-[9px] font-bold uppercase text-amber-800 block">
-                        {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
-                      </span>
-                      <div className="text-[11px] font-mono font-bold text-amber-950 break-words leading-tight mt-0.5">
-                        {categorizedDays.mixed.length > 0
-                          ? categorizedDays.mixed.map((d) => d.day).join(", ")
-                          : isHindi
-                            ? "कोई नहीं"
-                            : "None"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Caution Days Card */}
-                  <div className="p-2.5 rounded-xl border border-rose-300 bg-rose-50/60 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-bold text-rose-900 font-devanagari flex items-center gap-1">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block" />
-                          {isHindi ? "सावधानी दिन" : "Caution Days"}
-                        </span>
-                        <span className="text-base font-black text-rose-950 font-mono">
-                          {categorizedDays.caution.length} {isHindi ? "दिन" : "Days"}
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-rose-900 font-devanagari line-clamp-2">
-                        {isHindi
-                          ? "विपत्, प्रत्यरि, वध तारा — जोखिम, विवाद व यात्रा टालें; शांति व मंत्र जप करें"
-                          : "Vipat, Pratyari, Vadha — avoid risks & dispute; perform japa & remedies"}
-                      </div>
-                    </div>
-                    <div className="mt-2 pt-1.5 border-t border-rose-200/80">
-                      <span className="text-[9px] font-bold uppercase text-rose-800 block">
-                        {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
-                      </span>
-                      <div className="text-[11px] font-mono font-bold text-rose-950 break-words leading-tight mt-0.5">
-                        {categorizedDays.caution.length > 0
-                          ? categorizedDays.caution.map((d) => d.day).join(", ")
-                          : isHindi
-                            ? "कोई नहीं"
-                            : "None"}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Neutral / Routine Days Card */}
-                  <div className="p-2.5 rounded-xl border border-stone-300 bg-stone-50 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-[11px] font-bold text-stone-800 font-devanagari flex items-center gap-1">
-                          <span className="w-2.5 h-2.5 rounded-full bg-stone-500 inline-block" />
-                          {isHindi ? "सामान्य / नित्य दिन" : "Routine Days"}
-                        </span>
-                        <span className="text-base font-black text-stone-900 font-mono">
-                          {categorizedDays.neutral.length} {isHindi ? "दिन" : "Days"}
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-stone-700 font-devanagari line-clamp-2">
-                        {isHindi
-                          ? "जन्म तारा आदि — सामान्य दिनचर्या, अध्ययन, नित्यकर्म व योजनाएं बनाने हेतु"
-                          : "Janma & regular routine — standard duties, learning & personal reflections"}
-                      </div>
-                    </div>
-                    <div className="mt-2 pt-1.5 border-t border-stone-200">
-                      <span className="text-[9px] font-bold uppercase text-stone-600 block">
-                        {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
-                      </span>
-                      <div className="text-[11px] font-mono font-bold text-stone-900 break-words leading-tight mt-0.5">
-                        {categorizedDays.neutral.length > 0
-                          ? categorizedDays.neutral.map((d) => d.day).join(", ")
-                          : isHindi
-                            ? "कोई नहीं"
-                            : "None"}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Visual Monthly Calendar Grid (7 Columns) */}
-                <div className="rounded-xl border border-stone-300 bg-white p-3 print-no-break shadow-xs">
-                  <div className="flex items-center justify-between mb-2">
+                  {/* Monthly Calendar Header */}
+                  <div className="flex items-center justify-between border-b border-amber-900/30 pb-1.5">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-amber-800" />
-                      <span className="text-xs font-bold text-stone-900 font-devanagari">
+                      <h2 className="text-sm font-bold uppercase tracking-wider text-amber-950 font-devanagari">
                         {isHindi
-                          ? `मासिक नवतारा कैलेंडर विहंगावलोकन (${getMonthNameHi(selectedMonth)} ${selectedYear})`
-                          : `Monthly Navtara Calendar Matrix (${getMonthNameEn(selectedMonth)} ${selectedYear})`}
-                      </span>
+                          ? `मासिक नवतारा कैलेंडर डैशबोर्ड (${getMonthNameHi(selectedMonth)} ${selectedYear})`
+                          : `Monthly Navtara Calendar Dashboard (${getMonthNameEn(selectedMonth)} ${selectedYear})`}
+                      </h2>
                     </div>
-                    <span className="text-[10px] text-stone-500 font-devanagari print:hidden">
+                    <span className="text-[10px] font-semibold text-stone-600 font-devanagari">
                       {isHindi
-                        ? "किसी भी तारीख पर क्लिक करें ➔ नीचे उस दिन के संपूर्ण विवरण व फीडबैक पर जाएं"
-                        : "Click any date to jump to its row in the journal below"}
+                        ? `कुल ${monthlyReportData.stats.totalDays} दिन | संपूर्ण माह का पंचांग व नवतारा चक्र सारांश`
+                        : `Total ${monthlyReportData.stats.totalDays} Days | Date-wise Navtara Summary`}
                     </span>
                   </div>
 
-                  {/* Weekday headers */}
-                  <div className="grid grid-cols-7 gap-1 text-center font-bold text-[10px] text-stone-600 border-b border-stone-200 pb-1.5 mb-1.5">
-                    {(isHindi ? WEEKDAYS_HI : WEEKDAYS_EN).map((w, idx) => (
-                      <div
-                        key={idx}
-                        className={idx === 0 ? "text-rose-700 font-black" : "text-stone-700"}
-                      >
-                        {w}
+                  {/* 4 Categorized Calendar Cards with Exact Dates */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    {/* Auspicious Days Card */}
+                    <div className="p-2.5 rounded-xl border border-emerald-300 bg-emerald-50/60 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[11px] font-bold text-emerald-900 font-devanagari flex items-center gap-1">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block" />
+                            {isHindi ? "अति शुभ दिन" : "Auspicious Days"}
+                          </span>
+                          <span className="text-base font-black text-emerald-950 font-mono">
+                            {categorizedDays.auspicious.length} {isHindi ? "दिन" : "Days"}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-emerald-900 font-devanagari line-clamp-2">
+                          {isHindi
+                            ? "सम्पत्, क्षेम, साधक, मित्र व अति-मित्र — नए कार्य, आर्थिक लाभ व शुभ आरंभ हेतु"
+                            : "Best for milestones, prosperity & auspicious ventures"}
+                        </div>
                       </div>
-                    ))}
+                      <div className="mt-2 pt-1.5 border-t border-emerald-200/80">
+                        <span className="text-[9px] font-bold uppercase text-emerald-800 block">
+                          {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
+                        </span>
+                        <div className="text-[11px] font-mono font-bold text-emerald-950 break-words leading-tight mt-0.5">
+                          {categorizedDays.auspicious.length > 0
+                            ? categorizedDays.auspicious.map((d) => d.day).join(", ")
+                            : isHindi
+                              ? "कोई नहीं"
+                              : "None"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mixed / Transition Days Card */}
+                    <div className="p-2.5 rounded-xl border border-amber-300 bg-amber-50/70 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[11px] font-bold text-amber-900 font-devanagari flex items-center gap-1">
+                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
+                            {isHindi ? "मिश्रित / गोचर दिन" : "Transition Days"}
+                          </span>
+                          <span className="text-base font-black text-amber-950 font-mono">
+                            {categorizedDays.mixed.length} {isHindi ? "दिन" : "Days"}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-amber-900 font-devanagari line-clamp-2">
+                          {isHindi
+                            ? "नक्षत्र परिवर्तन दिन — परिवर्तन समय के बाद शुभ तारा सक्रिय (समय नीचे देखें)"
+                            : "Dual phases: prior Tara operates until transit time, new Tara begins after"}
+                        </div>
+                      </div>
+                      <div className="mt-2 pt-1.5 border-t border-amber-200/80">
+                        <span className="text-[9px] font-bold uppercase text-amber-800 block">
+                          {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
+                        </span>
+                        <div className="text-[11px] font-mono font-bold text-amber-950 break-words leading-tight mt-0.5">
+                          {categorizedDays.mixed.length > 0
+                            ? categorizedDays.mixed.map((d) => d.day).join(", ")
+                            : isHindi
+                              ? "कोई नहीं"
+                              : "None"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Caution Days Card */}
+                    <div className="p-2.5 rounded-xl border border-rose-300 bg-rose-50/60 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[11px] font-bold text-rose-900 font-devanagari flex items-center gap-1">
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-600 inline-block" />
+                            {isHindi ? "सावधानी दिन" : "Caution Days"}
+                          </span>
+                          <span className="text-base font-black text-rose-950 font-mono">
+                            {categorizedDays.caution.length} {isHindi ? "दिन" : "Days"}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-rose-900 font-devanagari line-clamp-2">
+                          {isHindi
+                            ? "विपत्, प्रत्यरि, वध तारा — जोखिम, विवाद व यात्रा टालें; शांति व मंत्र जप करें"
+                            : "Vipat, Pratyari, Vadha — avoid risks & dispute; perform japa & remedies"}
+                        </div>
+                      </div>
+                      <div className="mt-2 pt-1.5 border-t border-rose-200/80">
+                        <span className="text-[9px] font-bold uppercase text-rose-800 block">
+                          {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
+                        </span>
+                        <div className="text-[11px] font-mono font-bold text-rose-950 break-words leading-tight mt-0.5">
+                          {categorizedDays.caution.length > 0
+                            ? categorizedDays.caution.map((d) => d.day).join(", ")
+                            : isHindi
+                              ? "कोई नहीं"
+                              : "None"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Neutral / Routine Days Card */}
+                    <div className="p-2.5 rounded-xl border border-stone-300 bg-stone-50 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[11px] font-bold text-stone-800 font-devanagari flex items-center gap-1">
+                            <span className="w-2.5 h-2.5 rounded-full bg-stone-500 inline-block" />
+                            {isHindi ? "सामान्य / नित्य दिन" : "Routine Days"}
+                          </span>
+                          <span className="text-base font-black text-stone-900 font-mono">
+                            {categorizedDays.neutral.length} {isHindi ? "दिन" : "Days"}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-stone-700 font-devanagari line-clamp-2">
+                          {isHindi
+                            ? "जन्म तारा आदि — सामान्य दिनचर्या, अध्ययन, नित्यकर्म व योजनाएं बनाने हेतु"
+                            : "Janma & regular routine — standard duties, learning & personal reflections"}
+                        </div>
+                      </div>
+                      <div className="mt-2 pt-1.5 border-t border-stone-200">
+                        <span className="text-[9px] font-bold uppercase text-stone-600 block">
+                          {isHindi ? "कैलेंडर तारीखें:" : "Calendar Dates:"}
+                        </span>
+                        <div className="text-[11px] font-mono font-bold text-stone-900 break-words leading-tight mt-0.5">
+                          {categorizedDays.neutral.length > 0
+                            ? categorizedDays.neutral.map((d) => d.day).join(", ")
+                            : isHindi
+                              ? "कोई नहीं"
+                              : "None"}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Calendar day slots */}
-                  <div className="grid grid-cols-7 gap-1">
-                    {/* Leading empty days */}
-                    {Array.from({ length: firstDayWeekday }).map((_, i) => (
-                      <div
-                        key={`blank-${i}`}
-                        className="min-h-[46px] rounded-lg border border-dashed border-stone-200/50 bg-stone-50/20"
-                      />
-                    ))}
-
-                    {/* Active Month Days */}
-                    {monthlyReportData.days.map((d) => {
-                      const isTransition =
-                        !!d.nextTara &&
-                        !!d.nakshatraEnds &&
-                        d.nextTara.tara_number !== d.currentTara.tara_number;
-                      const cat = d.dayNatureCategory;
-
-                      let badgeClasses =
-                        "bg-stone-50 border-stone-200 text-stone-800 hover:bg-stone-100";
-                      let dotColor = "bg-stone-400";
-                      let taraLabel = d.currentTara.tara_name;
-
-                      if (cat === "auspicious") {
-                        badgeClasses =
-                          "bg-emerald-50/80 border-emerald-300 text-emerald-950 hover:bg-emerald-100";
-                        dotColor = "bg-emerald-600";
-                      } else if (cat === "caution") {
-                        badgeClasses =
-                          "bg-rose-50/80 border-rose-300 text-rose-950 hover:bg-rose-100";
-                        dotColor = "bg-rose-600";
-                      } else if (cat === "mixed") {
-                        badgeClasses =
-                          "bg-amber-50/90 border-amber-300 text-amber-950 hover:bg-amber-100";
-                        dotColor = "bg-amber-500";
-                        taraLabel = `${d.currentTara.tara_name.slice(0, 4)}➔${
-                          d.nextTara?.tara_name.slice(0, 4) || ""
-                        }`;
-                      }
-
-                      return (
-                        <button
-                          key={d.day}
-                          type="button"
-                          onClick={() => {
-                            const cardEl = document.getElementById(`day-card-${d.day}`);
-                            const rowEl = document.getElementById(`day-row-${d.day}`);
-                            const targetEl = (typeof window !== "undefined" && window.innerWidth < 768 && cardEl) ? cardEl : (rowEl || cardEl);
-                            if (targetEl) {
-                              targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
-                              targetEl.classList.add("ring-2", "ring-amber-500", "bg-amber-100/70");
-                              setTimeout(() => targetEl.classList.remove("ring-2", "ring-amber-500", "bg-amber-100/70"), 2000);
-                            }
-                          }}
-                          className={`p-1 sm:p-1.5 rounded-lg border text-left flex flex-col justify-between transition-all cursor-pointer min-h-[46px] sm:min-h-[50px] ${badgeClasses}`}
-                          title={`Day ${d.day}: ${d.currentTara.tara_name} Tara (${d.dayNatureCategory})`}
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <span className="font-mono font-black text-xs sm:text-sm">{d.day}</span>
-                            <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
-                          </div>
-                          <div className="text-[9px] font-devanagari font-bold truncate mt-0.5 leading-tight">
-                            {taraLabel}
-                          </div>
-                          {isTransition && d.nakshatraEnds ? (
-                            <div className="text-[8px] font-sans text-amber-900 truncate leading-none mt-0.5 font-semibold">
-                              ⏱️ {d.nakshatraEnds.split(" ")[0]}
-                            </div>
-                          ) : (
-                            <div className="text-[8px] font-sans text-stone-500 truncate leading-none mt-0.5">
-                              {cat === "auspicious" ? "शुभ" : cat === "caution" ? "संभलकर" : "नित्य"}
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Calendar Legend Bar */}
-                  <div className="mt-2.5 pt-2 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-600">
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1 font-devanagari">
-                        <span className="w-2.5 h-2.5 rounded-sm bg-emerald-100 border border-emerald-400" />
-                        {isHindi ? "अति शुभ दिन" : "Auspicious"}
-                      </span>
-                      <span className="flex items-center gap-1 font-devanagari">
-                        <span className="w-2.5 h-2.5 rounded-sm bg-amber-100 border border-amber-400" />
-                        {isHindi ? "मिश्रित / गोचर (समय बाद शुभ)" : "Transition (Auspicious after)"}
-                      </span>
-                      <span className="flex items-center gap-1 font-devanagari">
-                        <span className="w-2.5 h-2.5 rounded-sm bg-rose-100 border border-rose-400" />
-                        {isHindi ? "सावधानी दिन" : "Caution"}
-                      </span>
-                      <span className="flex items-center gap-1 font-devanagari">
-                        <span className="w-2.5 h-2.5 rounded-sm bg-stone-100 border border-stone-300" />
-                        {isHindi ? "सामान्य दिन" : "Routine"}
+                  {/* Visual Monthly Calendar Grid (7 Columns) */}
+                  <div className="rounded-xl border border-stone-300 bg-white p-3 print-no-break shadow-xs">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-amber-800" />
+                        <span className="text-xs font-bold text-stone-900 font-devanagari">
+                          {isHindi
+                            ? `मासिक नवतारा कैलेंडर विहंगावलोकन (${getMonthNameHi(selectedMonth)} ${selectedYear})`
+                            : `Monthly Navtara Calendar Matrix (${getMonthNameEn(selectedMonth)} ${selectedYear})`}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-stone-500 font-devanagari print:hidden">
+                        {isHindi
+                          ? "किसी भी तारीख पर क्लिक करें ➔ नीचे उस दिन के संपूर्ण विवरण व फीडबैक पर जाएं"
+                          : "Click any date to jump to its row in the journal below"}
                       </span>
                     </div>
-                    <span className="text-[9px] text-stone-500 font-devanagari">
-                      {isHindi
-                        ? "💡 दिन-वार तिथि, नक्षत्र मान व अनुभव दर्ज करने हेतु नीचे दी गई सारणी देखें।"
-                        : "Full date-by-date details and personal journal below."}
-                    </span>
+
+                    {/* Weekday headers */}
+                    <div className="grid grid-cols-7 gap-1 text-center font-bold text-[10px] text-stone-600 border-b border-stone-200 pb-1.5 mb-1.5">
+                      {(isHindi ? WEEKDAYS_HI : WEEKDAYS_EN).map((w, idx) => (
+                        <div
+                          key={idx}
+                          className={idx === 0 ? "text-rose-700 font-black" : "text-stone-700"}
+                        >
+                          {w}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Calendar day slots */}
+                    <div className="grid grid-cols-7 gap-1">
+                      {/* Leading empty days */}
+                      {Array.from({ length: firstDayWeekday }).map((_, i) => (
+                        <div
+                          key={`blank-${i}`}
+                          className="min-h-[46px] rounded-lg border border-dashed border-stone-200/50 bg-stone-50/20"
+                        />
+                      ))}
+
+                      {/* Active Month Days */}
+                      {monthlyReportData.days.map((d) => {
+                        const isTransition =
+                          !!d.nextTara &&
+                          !!d.nakshatraEnds &&
+                          d.nextTara.tara_number !== d.currentTara.tara_number;
+                        const cat = d.dayNatureCategory;
+
+                        let badgeClasses =
+                          "bg-stone-50 border-stone-200 text-stone-800 hover:bg-stone-100";
+                        let dotColor = "bg-stone-400";
+                        let taraLabel = d.currentTara.tara_name;
+
+                        if (cat === "auspicious") {
+                          badgeClasses =
+                            "bg-emerald-50/80 border-emerald-300 text-emerald-950 hover:bg-emerald-100";
+                          dotColor = "bg-emerald-600";
+                        } else if (cat === "caution") {
+                          badgeClasses =
+                            "bg-rose-50/80 border-rose-300 text-rose-950 hover:bg-rose-100";
+                          dotColor = "bg-rose-600";
+                        } else if (cat === "mixed") {
+                          badgeClasses =
+                            "bg-amber-50/90 border-amber-300 text-amber-950 hover:bg-amber-100";
+                          dotColor = "bg-amber-500";
+                          taraLabel = `${d.currentTara.tara_name.slice(0, 4)}➔${
+                            d.nextTara?.tara_name.slice(0, 4) || ""
+                          }`;
+                        }
+
+                        return (
+                          <button
+                            key={d.day}
+                            type="button"
+                            onClick={() => {
+                              const cardEl = document.getElementById(`day-card-${d.day}`);
+                              const rowEl = document.getElementById(`day-row-${d.day}`);
+                              const targetEl =
+                                typeof window !== "undefined" && window.innerWidth < 768 && cardEl
+                                  ? cardEl
+                                  : rowEl || cardEl;
+                              if (targetEl) {
+                                targetEl.scrollIntoView({ behavior: "smooth", block: "center" });
+                                targetEl.classList.add(
+                                  "ring-2",
+                                  "ring-amber-500",
+                                  "bg-amber-100/70",
+                                );
+                                setTimeout(
+                                  () =>
+                                    targetEl.classList.remove(
+                                      "ring-2",
+                                      "ring-amber-500",
+                                      "bg-amber-100/70",
+                                    ),
+                                  2000,
+                                );
+                              }
+                            }}
+                            className={`p-1 sm:p-1.5 rounded-lg border text-left flex flex-col justify-between transition-all cursor-pointer min-h-[46px] sm:min-h-[50px] ${badgeClasses}`}
+                            title={`Day ${d.day}: ${d.currentTara.tara_name} Tara (${d.dayNatureCategory})`}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <span className="font-mono font-black text-xs sm:text-sm">
+                                {d.day}
+                              </span>
+                              <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} />
+                            </div>
+                            <div className="text-[9px] font-devanagari font-bold truncate mt-0.5 leading-tight">
+                              {taraLabel}
+                            </div>
+                            {isTransition && d.nakshatraEnds ? (
+                              <div className="text-[8px] font-sans text-amber-900 truncate leading-none mt-0.5 font-semibold">
+                                ⏱️ {d.nakshatraEnds.split(" ")[0]}
+                              </div>
+                            ) : (
+                              <div className="text-[8px] font-sans text-stone-500 truncate leading-none mt-0.5">
+                                {cat === "auspicious"
+                                  ? "शुभ"
+                                  : cat === "caution"
+                                    ? "संभलकर"
+                                    : "नित्य"}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Calendar Legend Bar */}
+                    <div className="mt-2.5 pt-2 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-600">
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1 font-devanagari">
+                          <span className="w-2.5 h-2.5 rounded-sm bg-emerald-100 border border-emerald-400" />
+                          {isHindi ? "अति शुभ दिन" : "Auspicious"}
+                        </span>
+                        <span className="flex items-center gap-1 font-devanagari">
+                          <span className="w-2.5 h-2.5 rounded-sm bg-amber-100 border border-amber-400" />
+                          {isHindi
+                            ? "मिश्रित / गोचर (समय बाद शुभ)"
+                            : "Transition (Auspicious after)"}
+                        </span>
+                        <span className="flex items-center gap-1 font-devanagari">
+                          <span className="w-2.5 h-2.5 rounded-sm bg-rose-100 border border-rose-400" />
+                          {isHindi ? "सावधानी दिन" : "Caution"}
+                        </span>
+                        <span className="flex items-center gap-1 font-devanagari">
+                          <span className="w-2.5 h-2.5 rounded-sm bg-stone-100 border border-stone-300" />
+                          {isHindi ? "सामान्य दिन" : "Routine"}
+                        </span>
+                      </div>
+                      <span className="text-[9px] text-stone-500 font-devanagari">
+                        {isHindi
+                          ? "💡 दिन-वार तिथि, नक्षत्र मान व अनुभव दर्ज करने हेतु नीचे दी गई सारणी देखें।"
+                          : "Full date-by-date details and personal journal below."}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
                 {/* ================================================================= */}
                 {/* 5. FULL MONTHLY DAY-BY-DAY NAVTARA & FEEDBACK JOURNAL TABLE */}
@@ -2144,7 +2260,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
 
                   {isLoadingMonth ? (
                     <div className="p-8 text-center text-stone-500 text-xs">
-                      {isHindi ? "मासिक पंचांग व नवतारा चक्र लोड हो रहा है..." : "Computing monthly Navtara transits..."}
+                      {isHindi
+                        ? "मासिक पंचांग व नवतारा चक्र लोड हो रहा है..."
+                        : "Computing monthly Navtara transits..."}
                     </div>
                   ) : loadError ? (
                     <div className="p-4 text-center text-rose-700 text-xs bg-rose-50 border border-rose-200 rounded-lg">
@@ -2172,8 +2290,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                 item.dayNatureCategory === "caution"
                                   ? "border-rose-200 bg-rose-50/20"
                                   : item.dayNatureCategory === "mixed"
-                                  ? "border-amber-200 bg-amber-50/20"
-                                  : "border-stone-200"
+                                    ? "border-amber-200 bg-amber-50/20"
+                                    : "border-stone-200"
                               }`}
                             >
                               {/* Top Header: Day, Vaara, Tithi */}
@@ -2187,7 +2305,12 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                       {item.vaara} ({item.date})
                                     </div>
                                     <div className="text-[11px] text-stone-700 font-devanagari">
-                                      {item.tithi} {item.tithiEnds && <span className="text-stone-500 font-sans">⏱️ {item.tithiEnds} तक</span>}
+                                      {item.tithi}{" "}
+                                      {item.tithiEnds && (
+                                        <span className="text-stone-500 font-sans">
+                                          ⏱️ {item.tithiEnds} तक
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -2196,26 +2319,28 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                     item.dayNatureCategory === "auspicious"
                                       ? "bg-emerald-100 text-emerald-800 border-emerald-300"
                                       : item.dayNatureCategory === "caution"
-                                      ? "bg-rose-100 text-rose-800 border-rose-300"
-                                      : item.dayNatureCategory === "mixed"
-                                      ? "bg-amber-100 text-amber-900 border-amber-300"
-                                      : "bg-stone-100 text-stone-700 border-stone-300"
+                                        ? "bg-rose-100 text-rose-800 border-rose-300"
+                                        : item.dayNatureCategory === "mixed"
+                                          ? "bg-amber-100 text-amber-900 border-amber-300"
+                                          : "bg-stone-100 text-stone-700 border-stone-300"
                                   }`}
                                 >
                                   {item.dayNatureCategory === "auspicious"
                                     ? "🟢 अति शुभ"
                                     : item.dayNatureCategory === "caution"
-                                    ? "🔴 सावधानी"
-                                    : item.dayNatureCategory === "mixed"
-                                    ? "🟡 गोचर/मिश्रित"
-                                    : "⚪ सामान्य"}
+                                      ? "🔴 सावधानी"
+                                      : item.dayNatureCategory === "mixed"
+                                        ? "🟡 गोचर/मिश्रित"
+                                        : "⚪ सामान्य"}
                                 </span>
                               </div>
 
                               {/* Nakshatra & Tara Badges */}
                               <div className="py-2 space-y-1.5 border-b border-stone-100 text-xs">
                                 <div className="flex items-center justify-between text-[11px]">
-                                  <span className="text-stone-500 font-medium">{isHindi ? "नक्षत्र:" : "Nakshatra:"}</span>
+                                  <span className="text-stone-500 font-medium">
+                                    {isHindi ? "नक्षत्र:" : "Nakshatra:"}
+                                  </span>
                                   <span className="font-bold text-stone-900">
                                     {item.nakshatraNumber}. {item.nakshatraName}
                                     {item.nakshatraEnds && (
@@ -2228,29 +2353,57 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
 
                                 {/* Tara Display */}
                                 <div className="flex flex-wrap items-center justify-between gap-1">
-                                  <span className="text-stone-500 text-[11px] font-medium">{isHindi ? "जातक नवतारा:" : "Tara:"}</span>
+                                  <span className="text-stone-500 text-[11px] font-medium">
+                                    {isHindi ? "जातक नवतारा:" : "Tara:"}
+                                  </span>
                                   {isTransitionDay && item.nextTara ? (
                                     <div className="flex flex-col items-end gap-1">
-                                      <span className={`px-2 py-0.5 text-[9px] font-bold rounded border ${getTaraBadgeColor(item.currentTara.nature)}`}>
-                                        {item.nakshatraEnds} तक: {item.currentTara.tara_number}. {item.currentTara.tara_name} (
-                                        {item.currentTara.nature.includes("Auspicious") ? "शुभ" : item.currentTara.nature.includes("Inauspicious") ? "सावधानी" : "मध्यम"})
+                                      <span
+                                        className={`px-2 py-0.5 text-[9px] font-bold rounded border ${getTaraBadgeColor(item.currentTara.nature)}`}
+                                      >
+                                        {item.nakshatraEnds} तक: {item.currentTara.tara_number}.{" "}
+                                        {item.currentTara.tara_name} (
+                                        {item.currentTara.nature.includes("Auspicious")
+                                          ? "शुभ"
+                                          : item.currentTara.nature.includes("Inauspicious")
+                                            ? "सावधानी"
+                                            : "मध्यम"}
+                                        )
                                       </span>
-                                      <span className={`px-2 py-0.5 text-[9px] font-bold rounded border ${getTaraBadgeColor(item.nextTara.nature)}`}>
-                                        {item.nakshatraEnds} बाद: {item.nextTara.tara_number}. {item.nextTara.tara_name} (
-                                        {item.nextTara.nature.includes("Auspicious") ? "शुभ" : item.nextTara.nature.includes("Inauspicious") ? "सावधानी" : "मध्यम"})
+                                      <span
+                                        className={`px-2 py-0.5 text-[9px] font-bold rounded border ${getTaraBadgeColor(item.nextTara.nature)}`}
+                                      >
+                                        {item.nakshatraEnds} बाद: {item.nextTara.tara_number}.{" "}
+                                        {item.nextTara.tara_name} (
+                                        {item.nextTara.nature.includes("Auspicious")
+                                          ? "शुभ"
+                                          : item.nextTara.nature.includes("Inauspicious")
+                                            ? "सावधानी"
+                                            : "मध्यम"}
+                                        )
                                       </span>
                                     </div>
                                   ) : (
-                                    <span className={`px-2 py-0.5 text-[10px] font-bold rounded border ${getTaraBadgeColor(item.currentTara.nature)}`}>
-                                      {item.currentTara.tara_number}. {item.currentTara.tara_name} Tara (
-                                      {item.currentTara.nature.includes("Auspicious") ? "शुभ" : item.currentTara.nature.includes("Inauspicious") ? "सावधानी" : "मध्यम"})
+                                    <span
+                                      className={`px-2 py-0.5 text-[10px] font-bold rounded border ${getTaraBadgeColor(item.currentTara.nature)}`}
+                                    >
+                                      {item.currentTara.tara_number}. {item.currentTara.tara_name}{" "}
+                                      Tara (
+                                      {item.currentTara.nature.includes("Auspicious")
+                                        ? "शुभ"
+                                        : item.currentTara.nature.includes("Inauspicious")
+                                          ? "सावधानी"
+                                          : "मध्यम"}
+                                      )
                                     </span>
                                   )}
                                 </div>
 
                                 {/* Vedic Guidance */}
                                 <div className="text-[11px] text-stone-700 bg-stone-50 p-2 rounded-lg border border-stone-200/80 leading-relaxed mt-1">
-                                  <span className="font-bold text-amber-900 mr-1">📜 {isHindi ? "मार्गदर्शन:" : "Advice:"}</span>
+                                  <span className="font-bold text-amber-900 mr-1">
+                                    📜 {isHindi ? "मार्गदर्शन:" : "Advice:"}
+                                  </span>
                                   {isHindi ? item.recommendationHi : item.recommendationEn}
                                 </div>
                               </div>
@@ -2265,7 +2418,11 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                 <div className="flex items-center justify-between">
                                   <span className="text-[11px] font-bold text-amber-950 flex items-center gap-1.5 font-devanagari">
                                     <span>✍️</span>
-                                    <span>{isHindi ? "कैसा रहा दिन? (3 विकल्प चुनें या नोट लिखें):" : "How was the day? Choose or note:"}</span>
+                                    <span>
+                                      {isHindi
+                                        ? "कैसा रहा दिन? (3 विकल्प चुनें या नोट लिखें):"
+                                        : "How was the day? Choose or note:"}
+                                    </span>
                                   </span>
                                   <span
                                     data-saved-badge="true"
@@ -2289,14 +2446,16 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                         data-day={item.day}
                                         data-rating={opt.rating}
                                         data-feeling={opt.id}
-                                        onClick={() => handleQuickFeedback(item.date, item.day, opt.rating)}
+                                        onClick={() =>
+                                          handleQuickFeedback(item.date, item.day, opt.rating)
+                                        }
                                         className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 html-opt-btn ${
                                           isSelected
                                             ? opt.id === "great"
                                               ? "bg-emerald-600 text-white border-emerald-700 shadow-sm ring-2 ring-emerald-300 font-bold"
                                               : opt.id === "neutral"
-                                              ? "bg-amber-500 text-white border-amber-600 shadow-sm ring-2 ring-amber-200 font-bold"
-                                              : "bg-rose-600 text-white border-rose-700 shadow-sm ring-2 ring-rose-300 font-bold"
+                                                ? "bg-amber-500 text-white border-amber-600 shadow-sm ring-2 ring-amber-200 font-bold"
+                                                : "bg-rose-600 text-white border-rose-700 shadow-sm ring-2 ring-rose-300 font-bold"
                                             : "bg-white text-stone-700 border-stone-300 hover:bg-stone-50"
                                         }`}
                                       >
@@ -2318,11 +2477,21 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                     data-day={item.day}
                                     key={`m-note-${item.date}-${item.userFeedback?.note || ""}`}
                                     defaultValue={item.userFeedback?.note || ""}
-                                    placeholder={isHindi ? "दिन का अनुभव / मुख्य घटना लिखें..." : "Write day observations / note..."}
-                                    onBlur={(e) => handleUpdateNote(item.date, item.day, e.target.value)}
+                                    placeholder={
+                                      isHindi
+                                        ? "दिन का अनुभव / मुख्य घटना लिखें..."
+                                        : "Write day observations / note..."
+                                    }
+                                    onBlur={(e) =>
+                                      handleUpdateNote(item.date, item.day, e.target.value)
+                                    }
                                     onKeyDown={(e) => {
                                       if (e.key === "Enter") {
-                                        handleUpdateNote(item.date, item.day, (e.target as HTMLInputElement).value);
+                                        handleUpdateNote(
+                                          item.date,
+                                          item.day,
+                                          (e.target as HTMLInputElement).value,
+                                        );
                                         (e.target as HTMLInputElement).blur();
                                       }
                                     }}
@@ -2334,8 +2503,12 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                     data-date={item.date}
                                     data-day={item.day}
                                     onClick={(e) => {
-                                      const parent = (e.currentTarget as HTMLElement).closest('[data-feedback-container]');
-                                      const inp = parent?.querySelector('input[data-note-input]') as HTMLInputElement | null;
+                                      const parent = (e.currentTarget as HTMLElement).closest(
+                                        "[data-feedback-container]",
+                                      );
+                                      const inp = parent?.querySelector(
+                                        "input[data-note-input]",
+                                      ) as HTMLInputElement | null;
                                       handleUpdateNote(item.date, item.day, inp ? inp.value : "");
                                     }}
                                     className="px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs rounded-lg transition-all cursor-pointer whitespace-nowrap shadow-xs"
@@ -2392,13 +2565,15 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                     item.dayNatureCategory === "caution"
                                       ? "bg-rose-50/20"
                                       : item.dayNatureCategory === "mixed"
-                                      ? "bg-amber-50/25"
-                                      : ""
+                                        ? "bg-amber-50/25"
+                                        : ""
                                   }`}
                                 >
                                   {/* Date & Day */}
                                   <td className="p-2 border-r border-stone-200 text-center font-bold">
-                                    <div className="text-sm font-mono text-stone-900">{item.day}</div>
+                                    <div className="text-sm font-mono text-stone-900">
+                                      {item.day}
+                                    </div>
                                     <div className="text-[10px] text-stone-500 font-devanagari">
                                       {item.vaara.split(" ")[0] || item.date.split("/")[0]}
                                     </div>
@@ -2421,11 +2596,14 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                     </div>
                                     {item.nakshatraEnds && item.nextNakshatraName ? (
                                       <div className="text-[10px] text-amber-900 bg-amber-100/80 border border-amber-200 rounded px-1.5 py-0.5 font-sans mt-0.5 inline-block">
-                                        ⏱️ {item.nakshatraEnds} तक ➔ <strong>{item.nextNakshatraName}</strong>
+                                        ⏱️ {item.nakshatraEnds} तक ➔{" "}
+                                        <strong>{item.nextNakshatraName}</strong>
                                       </div>
                                     ) : (
                                       <div className="text-[9px] text-stone-500 font-sans mt-0.5">
-                                        {isHindi ? "दिनभर प्रभावी (अगले सूर्योदय तक)" : "Active whole day"}
+                                        {isHindi
+                                          ? "दिनभर प्रभावी (अगले सूर्योदय तक)"
+                                          : "Active whole day"}
                                       </div>
                                     )}
                                   </td>
@@ -2443,12 +2621,13 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                               item.currentTara.nature,
                                             )}`}
                                           >
-                                            {item.currentTara.tara_number}. {item.currentTara.tara_name} (
+                                            {item.currentTara.tara_number}.{" "}
+                                            {item.currentTara.tara_name} (
                                             {item.currentTara.nature.includes("Auspicious")
                                               ? "शुभ"
                                               : item.currentTara.nature.includes("Inauspicious")
-                                              ? "सावधानी"
-                                              : "मध्यम"}
+                                                ? "सावधानी"
+                                                : "मध्यम"}
                                             )
                                           </span>
                                         </div>
@@ -2465,8 +2644,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                             {item.nextTara.nature.includes("Auspicious")
                                               ? "शुभ"
                                               : item.nextTara.nature.includes("Inauspicious")
-                                              ? "सावधानी"
-                                              : "मध्यम"}
+                                                ? "सावधानी"
+                                                : "मध्यम"}
                                             )
                                           </span>
                                         </div>
@@ -2478,14 +2657,15 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                             item.currentTara.nature,
                                           )}`}
                                         >
-                                          {item.currentTara.tara_number}. {item.currentTara.tara_name} Tara
+                                          {item.currentTara.tara_number}.{" "}
+                                          {item.currentTara.tara_name} Tara
                                         </span>
                                         <span className="block text-[9px] text-stone-500 mt-0.5">
                                           {item.currentTara.nature.includes("Auspicious")
                                             ? "शुभ तारा"
                                             : item.currentTara.nature.includes("Inauspicious")
-                                            ? "सावधानी तारा"
-                                            : "मध्यम तारा"}
+                                              ? "सावधानी तारा"
+                                              : "मध्यम तारा"}
                                         </span>
                                       </div>
                                     )}
@@ -2508,7 +2688,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                       {/* 3 Quick Buttons: 🟢 शुभ (5★) | 🟡 सामान्य (3★) | 🔴 संभलकर (1★) */}
                                       <div className="flex items-center gap-1">
                                         {DAILY_FEEDBACK_OPTIONS.map((opt) => {
-                                          const isSelected = item.userFeedback?.rating === opt.rating;
+                                          const isSelected =
+                                            item.userFeedback?.rating === opt.rating;
                                           return (
                                             <button
                                               key={opt.id}
@@ -2518,21 +2699,29 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                               data-day={item.day}
                                               data-rating={opt.rating}
                                               data-feeling={opt.id}
-                                              onClick={() => handleQuickFeedback(item.date, item.day, opt.rating)}
-                                              title={isHindi ? `${opt.labelHi} (क्लिक करें)` : `${opt.labelEn} (Click to set)`}
+                                              onClick={() =>
+                                                handleQuickFeedback(item.date, item.day, opt.rating)
+                                              }
+                                              title={
+                                                isHindi
+                                                  ? `${opt.labelHi} (क्लिक करें)`
+                                                  : `${opt.labelEn} (Click to set)`
+                                              }
                                               className={`px-1.5 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer flex items-center gap-1 html-opt-btn ${
                                                 isSelected
                                                   ? opt.id === "great"
                                                     ? "bg-emerald-600 text-white border-emerald-700 shadow-xs ring-1 ring-emerald-400 scale-102 font-bold"
                                                     : opt.id === "neutral"
-                                                    ? "bg-amber-500 text-white border-amber-600 shadow-xs ring-1 ring-amber-300 scale-102 font-bold"
-                                                    : "bg-rose-600 text-white border-rose-700 shadow-xs ring-1 ring-rose-400 scale-102 font-bold"
+                                                      ? "bg-amber-500 text-white border-amber-600 shadow-xs ring-1 ring-amber-300 scale-102 font-bold"
+                                                      : "bg-rose-600 text-white border-rose-700 shadow-xs ring-1 ring-rose-400 scale-102 font-bold"
                                                   : "bg-white text-stone-700 border-stone-300 hover:bg-stone-100"
                                               }`}
                                             >
                                               <span>{opt.icon}</span>
                                               <span className="font-devanagari text-[9px] leading-none">
-                                                {isHindi ? opt.labelHi.split("/")[0].trim() : opt.labelEn}
+                                                {isHindi
+                                                  ? opt.labelHi.split("/")[0].trim()
+                                                  : opt.labelEn}
                                               </span>
                                             </button>
                                           );
@@ -2556,11 +2745,21 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                           data-day={item.day}
                                           key={`note-${item.date}-${item.userFeedback?.note || ""}`}
                                           defaultValue={item.userFeedback?.note || ""}
-                                          placeholder={isHindi ? "कैसा रहा दिन? अनुभव लिखें..." : "How was the day? Note..."}
-                                          onBlur={(e) => handleUpdateNote(item.date, item.day, e.target.value)}
+                                          placeholder={
+                                            isHindi
+                                              ? "कैसा रहा दिन? अनुभव लिखें..."
+                                              : "How was the day? Note..."
+                                          }
+                                          onBlur={(e) =>
+                                            handleUpdateNote(item.date, item.day, e.target.value)
+                                          }
                                           onKeyDown={(e) => {
                                             if (e.key === "Enter") {
-                                              handleUpdateNote(item.date, item.day, (e.target as HTMLInputElement).value);
+                                              handleUpdateNote(
+                                                item.date,
+                                                item.day,
+                                                (e.target as HTMLInputElement).value,
+                                              );
                                               (e.target as HTMLInputElement).blur();
                                             }
                                           }}
@@ -2572,9 +2771,17 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                                           data-date={item.date}
                                           data-day={item.day}
                                           onClick={(e) => {
-                                            const parent = (e.currentTarget as HTMLElement).closest('[data-feedback-container]');
-                                            const inp = parent?.querySelector('input[data-note-input]') as HTMLInputElement | null;
-                                            handleUpdateNote(item.date, item.day, inp ? inp.value : "");
+                                            const parent = (e.currentTarget as HTMLElement).closest(
+                                              "[data-feedback-container]",
+                                            );
+                                            const inp = parent?.querySelector(
+                                              "input[data-note-input]",
+                                            ) as HTMLInputElement | null;
+                                            handleUpdateNote(
+                                              item.date,
+                                              item.day,
+                                              inp ? inp.value : "",
+                                            );
                                           }}
                                           className="px-2 py-1 bg-amber-700 hover:bg-amber-800 text-white font-bold text-[10px] rounded transition-all cursor-pointer whitespace-nowrap shadow-xs"
                                         >
@@ -2585,15 +2792,23 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
 
                                     {/* PRINT VIEW (Rendered on paper / PDF export) */}
                                     <div className="hidden print:block">
-                                      {hasFeedback && includeFeedbackInPrint && !printableBlankJournal ? (
+                                      {hasFeedback &&
+                                      includeFeedbackInPrint &&
+                                      !printableBlankJournal ? (
                                         <div className="space-y-0.5 text-[10px]">
                                           <div className="font-bold flex items-center gap-1">
                                             {item.userFeedback!.rating >= 4 ? (
-                                              <span className="text-emerald-800">🟢 शुभ / अति उत्तम ({item.userFeedback!.rating}/5)</span>
+                                              <span className="text-emerald-800">
+                                                🟢 शुभ / अति उत्तम ({item.userFeedback!.rating}/5)
+                                              </span>
                                             ) : item.userFeedback!.rating === 3 ? (
-                                              <span className="text-amber-800">🟡 सामान्य / मध्यम (3/5)</span>
+                                              <span className="text-amber-800">
+                                                🟡 सामान्य / मध्यम (3/5)
+                                              </span>
                                             ) : (
-                                              <span className="text-rose-800">🔴 संभलकर / चुनौतीपूर्ण (1/5)</span>
+                                              <span className="text-rose-800">
+                                                🔴 संभलकर / चुनौतीपूर्ण (1/5)
+                                              </span>
                                             )}
                                           </div>
                                           {item.userFeedback!.note ? (
@@ -2644,7 +2859,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
                       <div className="bg-white p-3 rounded-lg border border-amber-200 space-y-1.5">
                         <span className="font-bold text-stone-900 block font-devanagari">
-                          1. {isHindi ? "फलकथन व अनुभव की तुलना:" : "Astrological Prediction Match:"}
+                          1.{" "}
+                          {isHindi ? "फलकथन व अनुभव की तुलना:" : "Astrological Prediction Match:"}
                         </span>
                         <p className="text-[11px] text-stone-600 leading-relaxed">
                           {isHindi
@@ -2657,7 +2873,10 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
 
                       <div className="bg-white p-3 rounded-lg border border-amber-200 space-y-1.5">
                         <span className="font-bold text-stone-900 block font-devanagari">
-                          2. {isHindi ? "किए गए प्रमुख उपाय व सीख:" : "Remedies Practiced & Learnings:"}
+                          2.{" "}
+                          {isHindi
+                            ? "किए गए प्रमुख उपाय व सीख:"
+                            : "Remedies Practiced & Learnings:"}
                         </span>
                         <p className="text-[11px] text-stone-600 leading-relaxed">
                           {isHindi
@@ -2774,7 +2993,9 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                       <div className="flex items-center gap-2">
                         <Compass className="w-4 h-4 text-amber-800" />
                         <h2 className="text-sm font-bold uppercase tracking-wider text-amber-950 font-devanagari">
-                          {isHindi ? "त्रिपर्याय नवतारा चक्र (सम्पूर्ण 27 नक्षत्र)" : "Tri-Paryaya Navtara Table (27 Stars)"}
+                          {isHindi
+                            ? "त्रिपर्याय नवतारा चक्र (सम्पूर्ण 27 नक्षत्र)"
+                            : "Tri-Paryaya Navtara Table (27 Stars)"}
                         </h2>
                       </div>
                     </div>
@@ -2942,8 +3163,8 @@ export const PrintableNavtaraReport: React.FC<PrintableNavtaraReportProps> = ({
                     ? "PDF बन रही है..."
                     : "Building..."
                   : isHindi
-                  ? "📥 डाउनलोड PDF"
-                  : "📥 Download PDF"}
+                    ? "📥 डाउनलोड PDF"
+                    : "📥 Download PDF"}
               </span>
             </button>
 

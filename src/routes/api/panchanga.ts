@@ -28,17 +28,18 @@ export const Route = createFileRoute("/api/panchanga")({
 
           const lat = latRaw ? parseFloat(latRaw) : null;
           const lon = lonRaw ? parseFloat(lonRaw) : null;
+          const effectiveTz = tz || "Asia/Kolkata";
 
           const result =
-            lat !== null && lon !== null && !Number.isNaN(lat) && !Number.isNaN(lon) && tz
+            lat !== null && lon !== null && !Number.isNaN(lat) && !Number.isNaN(lon)
               ? computePanchangaCustom(
                   lat,
                   lon,
-                  tz,
+                  effectiveTz,
                   targetDateStr,
                   monthSystem,
                   ayanamsa,
-                  city || "Custom Location",
+                  city || `Custom (${lat.toFixed(3)}°, ${lon.toFixed(3)}°)`,
                 )
               : computePanchanga(city || "Bengaluru, IN", targetDateStr, monthSystem, ayanamsa);
 

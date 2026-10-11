@@ -44,6 +44,7 @@ interface HeaderProps {
   onOpenLocation: () => void;
   onDetectDeviceLocation?: () => void;
   onOpenSettings: () => void;
+  onOpenCalendarSync?: () => void;
   onPrint: () => void;
   lang: Language;
   onLangChange: (lang: Language) => void;
@@ -63,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenLocation,
   onDetectDeviceLocation,
   onOpenSettings,
+  onOpenCalendarSync,
   onPrint,
   lang,
   onLangChange,
@@ -189,8 +191,8 @@ export const Header: React.FC<HeaderProps> = ({
                 activeView === "home"
                   ? "bg-amber-500 text-stone-950 border-amber-300 ring-2 ring-amber-400/50 shadow-md"
                   : isNight
-                  ? "bg-indigo-950/80 border-indigo-700/60 text-[#F0C96A] hover:bg-indigo-900"
-                  : "bg-white/10 border-white/15 text-[#F0C96A] hover:bg-white/20"
+                    ? "bg-indigo-950/80 border-indigo-700/60 text-[#F0C96A] hover:bg-indigo-900"
+                    : "bg-white/10 border-white/15 text-[#F0C96A] hover:bg-white/20"
               }`}
               title={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
               aria-label="Home Hub"
@@ -213,7 +215,9 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <span className="text-[11px] font-devanagari text-white/60 tracking-wider leading-none mt-0.5 flex items-center gap-1">
                 <span>महावतार पञ्चाङ्ग</span>
-                <span className="text-[9px] text-amber-400/80">• {lang === "hi" ? "होम" : "Home"}</span>
+                <span className="text-[9px] text-amber-400/80">
+                  • {lang === "hi" ? "होम" : "Home"}
+                </span>
               </span>
             </div>
 
@@ -308,6 +312,22 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </button>
 
+            {/* Google Calendar Sync Button */}
+            {onOpenCalendarSync && (
+              <button
+                type="button"
+                onClick={onOpenCalendarSync}
+                className="flex h-7 sm:h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-[#F0C96A] transition-colors shrink-0"
+                title={lang === "hi" ? "गूगल कैलेंडर दैनिक सिंक" : "Google Calendar Daily Sync"}
+                aria-label={lang === "hi" ? "गूगल कैलेंडर सिंक" : "Google Calendar Sync"}
+              >
+                <CalendarIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#F0C96A]" />
+                <span className="text-[10px] sm:text-xs font-semibold">
+                  {lang === "hi" ? "कैलेंडर सिंक" : "Calendar Sync"}
+                </span>
+              </button>
+            )}
+
             {/* Print Button */}
             <button
               type="button"
@@ -361,9 +381,17 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex flex-col items-center justify-center text-center px-2 cursor-pointer group">
             <div className="flex items-center gap-2">
               <span
-                onClick={() =>
-                  dateInputRef.current?.showPicker?.() || dateInputRef.current?.focus()
-                }
+                onClick={() => {
+                  try {
+                    dateInputRef.current?.showPicker?.();
+                  } catch {
+                    try {
+                      dateInputRef.current?.click?.();
+                    } catch {
+                      dateInputRef.current?.focus?.();
+                    }
+                  }
+                }}
                 className="text-xs sm:text-sm font-semibold text-white/95 tracking-wide group-hover:text-[#F0C96A] transition-colors flex items-center gap-1.5"
               >
                 <CalendarIcon className="w-3.5 h-3.5 text-[#F0C96A]/80 inline-block" />

@@ -99,7 +99,9 @@ export const JaiminiView: React.FC<JaiminiViewProps> = ({ jaimini }) => {
                     <td className="py-2.5 px-3 font-mono text-amber-300 font-semibold">
                       {k.degreeInSign.toFixed(2)}°
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-zinc-400 font-bold">#{k.rank}</td>
+                    <td className="py-2.5 px-3 text-right font-mono text-zinc-400 font-bold">
+                      #{k.rank}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -146,7 +148,8 @@ export const JaiminiView: React.FC<JaiminiViewProps> = ({ jaimini }) => {
                   </span>
                 </div>
                 <div className="text-xs text-zinc-400">
-                  लग्न से भाव: <span className="text-white font-mono font-bold">{p.finalPadaHouseNumber}</span>
+                  लग्न से भाव:{" "}
+                  <span className="text-white font-mono font-bold">{p.finalPadaHouseNumber}</span>
                 </div>
                 {p.isExceptionApplied && (
                   <div className="text-[11px] text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded-md border border-amber-800 mt-1 font-semibold">
@@ -177,14 +180,17 @@ export const JaiminiView: React.FC<JaiminiViewProps> = ({ jaimini }) => {
               <div className="text-lg font-bold text-amber-400">
                 {upapada.signNameHi} ({upapada.signNameEn})
               </div>
-              <div className="text-xs text-zinc-400">लग्न से भाव: <b className="text-white">{upapada.houseFromLagna}</b></div>
+              <div className="text-xs text-zinc-400">
+                लग्न से भाव: <b className="text-white">{upapada.houseFromLagna}</b>
+              </div>
             </div>
 
             <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-4 space-y-1">
               <span className="text-xs text-zinc-400">उपपद स्वामी (UL Lord)</span>
               <div className="text-lg font-bold text-white">{upapada.lord}</div>
               <div className="text-xs text-zinc-400">
-                स्वामी की स्थिति: लग्न से भाव <b className="text-white">{upapada.lordHouseFromLagna}</b>
+                स्वामी की स्थिति: लग्न से भाव{" "}
+                <b className="text-white">{upapada.lordHouseFromLagna}</b>
               </div>
             </div>
 
@@ -194,7 +200,10 @@ export const JaiminiView: React.FC<JaiminiViewProps> = ({ jaimini }) => {
                 {ZODIAC_SIGNS[upapada.secondFromUpapadaSignIndex]?.hi}
               </div>
               <div className="text-xs text-zinc-400">
-                ग्रह: <b className="text-zinc-200">{upapada.planetsInSecondFromUpapada.join(", ") || "कोई ग्रह नहीं (Empty)"}</b>
+                ग्रह:{" "}
+                <b className="text-zinc-200">
+                  {upapada.planetsInSecondFromUpapada.join(", ") || "कोई ग्रह नहीं (Empty)"}
+                </b>
               </div>
             </div>
           </div>
@@ -240,7 +249,10 @@ export const JaiminiView: React.FC<JaiminiViewProps> = ({ jaimini }) => {
               <span className="text-xs text-zinc-400">आत्मकारक ग्रह (AK)</span>
               <div className="text-lg font-bold text-white">{karakamsha.atmakarakaPlanet}</div>
               <div className="text-xs text-zinc-400">
-                D1 राशि: <b className="text-amber-400">{ZODIAC_SIGNS[karakamsha.atmakarakaD1SignIndex]?.hi}</b>
+                D1 राशि:{" "}
+                <b className="text-amber-400">
+                  {ZODIAC_SIGNS[karakamsha.atmakarakaD1SignIndex]?.hi}
+                </b>
               </div>
             </div>
 
@@ -341,7 +353,9 @@ export const JaiminiView: React.FC<JaiminiViewProps> = ({ jaimini }) => {
                     <td className="py-2.5 px-3 font-semibold text-white">
                       {p.signNameHi} ({p.signNameEn})
                     </td>
-                    <td className="py-2.5 px-3 font-mono text-amber-300 font-semibold">{p.durationYears} वर्ष</td>
+                    <td className="py-2.5 px-3 font-mono text-amber-300 font-semibold">
+                      {p.durationYears} वर्ष
+                    </td>
                     <td className="py-2.5 px-3 text-zinc-300 capitalize">
                       {p.direction === "direct" ? "प्रत्यक्ष (Direct)" : "अप्रत्यक्ष (Indirect)"}
                     </td>

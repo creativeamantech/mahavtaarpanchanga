@@ -66,6 +66,7 @@ interface TodayScheduleViewProps {
   currentDateStr: string;
   onSelectDate: (newDateStr: string) => void;
   onOpenSettings?: () => void;
+  onOpenCalendarSync?: () => void;
 }
 
 export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
@@ -75,6 +76,7 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
   currentDateStr,
   onSelectDate,
   onOpenSettings,
+  onOpenCalendarSync,
 }) => {
   const isNight = theme === "nightSky";
   const t = translations[lang];
@@ -342,6 +344,18 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
             >
               <ChevronRight className="w-4 h-4" />
             </button>
+
+            {onOpenCalendarSync && (
+              <button
+                type="button"
+                onClick={onOpenCalendarSync}
+                className="px-2.5 py-1.5 rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 text-amber-900 dark:text-amber-200 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
+                title={lang === "hi" ? "गूगल कैलेंडर में सिंक करें" : "Sync to Google Calendar"}
+              >
+                <Calendar className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <span className="hidden sm:inline">{lang === "hi" ? "कैलेंडर सिंक" : "Sync"}</span>
+              </button>
+            )}
 
             {schedule.isToday && (
               <button
@@ -668,8 +682,8 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                           ev.metadata.nadi === "ida"
                             ? "bg-sky-50 dark:bg-sky-950/70 text-sky-800 dark:text-sky-200 border-sky-300 dark:border-sky-700"
                             : ev.metadata.nadi === "pingala"
-                            ? "bg-orange-50 dark:bg-orange-950/70 text-orange-800 dark:text-orange-200 border-orange-300 dark:border-orange-700"
-                            : "bg-purple-50 dark:bg-purple-950/70 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-700"
+                              ? "bg-orange-50 dark:bg-orange-950/70 text-orange-800 dark:text-orange-200 border-orange-300 dark:border-orange-700"
+                              : "bg-purple-50 dark:bg-purple-950/70 text-purple-800 dark:text-purple-200 border-purple-300 dark:border-purple-700"
                         }`}
                       >
                         {ev.metadata.nadi === "ida" ? (
@@ -685,12 +699,12 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                               ? "चन्द्र नाड़ी (इड़ा · वाम)"
                               : "Ida Nadi (Lunar · Left)"
                             : ev.metadata.nadi === "pingala"
-                            ? lang === "hi"
-                              ? "सूर्य नाड़ी (पिंगला · दायाँ)"
-                              : "Pingala Nadi (Solar · Right)"
-                            : lang === "hi"
-                            ? "सुषुम्ना नाड़ी"
-                            : "Sushumna Nadi"}
+                              ? lang === "hi"
+                                ? "सूर्य नाड़ी (पिंगला · दायाँ)"
+                                : "Pingala Nadi (Solar · Right)"
+                              : lang === "hi"
+                                ? "सुषुम्ना नाड़ी"
+                                : "Sushumna Nadi"}
                         </span>
                       </span>
                     )}
@@ -754,11 +768,23 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                           </span>
                           <span className="font-bold">
                             {lang === "hi"
-                              ? String(ev.metadata?.rulerHi || GRAHA_NAMES_HI[String(ev.metadata?.ruler)] || ev.metadata?.ruler)
+                              ? String(
+                                  ev.metadata?.rulerHi ||
+                                    GRAHA_NAMES_HI[String(ev.metadata?.ruler)] ||
+                                    ev.metadata?.ruler,
+                                )
                               : String(ev.metadata?.ruler)}
                           </span>
                           <span className="text-[10px] text-stone-400 dark:text-slate-500 font-normal">
-                            ({ev.metadata?.isDay ? (lang === "hi" ? "दिन" : "Day") : (lang === "hi" ? "रात्रि" : "Night")})
+                            (
+                            {ev.metadata?.isDay
+                              ? lang === "hi"
+                                ? "दिन"
+                                : "Day"
+                              : lang === "hi"
+                                ? "रात्रि"
+                                : "Night"}
+                            )
                           </span>
                         </div>
 
@@ -768,8 +794,8 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             ev.metadata?.nadi === "ida"
                               ? "bg-sky-50 dark:bg-sky-950/40 border-sky-200/90 dark:border-sky-800/50 text-sky-900 dark:text-sky-200"
                               : ev.metadata?.nadi === "pingala"
-                              ? "bg-orange-50 dark:bg-orange-950/40 border-orange-200/90 dark:border-orange-800/50 text-orange-900 dark:text-orange-200"
-                              : "bg-purple-50 dark:bg-purple-950/40 border-purple-200/90 dark:border-purple-800/50 text-purple-900 dark:text-purple-200"
+                                ? "bg-orange-50 dark:bg-orange-950/40 border-orange-200/90 dark:border-orange-800/50 text-orange-900 dark:text-orange-200"
+                                : "bg-purple-50 dark:bg-purple-950/40 border-purple-200/90 dark:border-purple-800/50 text-purple-900 dark:text-purple-200"
                           }`}
                         >
                           <Wind className="w-3.5 h-3.5 shrink-0" />
@@ -778,10 +804,16 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                           </span>
                           <span className="font-bold">
                             {ev.metadata?.nadi === "ida"
-                              ? (lang === "hi" ? "चन्द्र नाड़ी (इड़ा · वाम स्वर)" : "Ida Nadi (Lunar · Left)")
+                              ? lang === "hi"
+                                ? "चन्द्र नाड़ी (इड़ा · वाम स्वर)"
+                                : "Ida Nadi (Lunar · Left)"
                               : ev.metadata?.nadi === "pingala"
-                              ? (lang === "hi" ? "सूर्य नाड़ी (पिंगला · दायाँ स्वर)" : "Pingala Nadi (Solar · Right)")
-                              : (lang === "hi" ? "सुषुम्ना नाड़ी (मध्यम स्वर)" : "Sushumna Nadi")}
+                                ? lang === "hi"
+                                  ? "सूर्य नाड़ी (पिंगला · दायाँ स्वर)"
+                                  : "Pingala Nadi (Solar · Right)"
+                                : lang === "hi"
+                                  ? "सुषुम्ना नाड़ी (मध्यम स्वर)"
+                                  : "Sushumna Nadi"}
                           </span>
                         </div>
 
@@ -792,7 +824,9 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             {lang === "hi" ? "तत्त्व:" : "Tattvas:"}
                           </span>
                           <span className="font-bold">
-                            {lang === "hi" ? "5 सूक्ष्म काल (आकाश ➔ जल)" : "5 Micro-Periods (Akasha ➔ Jala)"}
+                            {lang === "hi"
+                              ? "5 सूक्ष्म काल (आकाश ➔ जल)"
+                              : "5 Micro-Periods (Akasha ➔ Jala)"}
                           </span>
                         </div>
                       </div>
@@ -808,7 +842,15 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             {lang === "hi" ? "तत्त्व:" : "Tattva:"}
                           </span>
                           <span className="font-bold">
-                            {String(ev.metadata?.sanskrit)} ({lang === "hi" ? String(ev.metadata?.nameHi || TATTVA_NAMES_HI[String(ev.metadata?.name)] || ev.metadata?.name) : String(ev.metadata?.name)})
+                            {String(ev.metadata?.sanskrit)} (
+                            {lang === "hi"
+                              ? String(
+                                  ev.metadata?.nameHi ||
+                                    TATTVA_NAMES_HI[String(ev.metadata?.name)] ||
+                                    ev.metadata?.name,
+                                )
+                              : String(ev.metadata?.name)}
+                            )
                           </span>
                         </div>
 
@@ -840,8 +882,12 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             </span>
                             <span className="font-bold">
                               {ev.metadata.nadi === "ida"
-                                ? (lang === "hi" ? "चन्द्र नाड़ी (इड़ा स्वर)" : "Ida Nadi (Lunar · Left)")
-                                : (lang === "hi" ? "सूर्य नाड़ी (पिंगला स्वर)" : "Pingala Nadi (Solar · Right)")}
+                                ? lang === "hi"
+                                  ? "चन्द्र नाड़ी (इड़ा स्वर)"
+                                  : "Ida Nadi (Lunar · Left)"
+                                : lang === "hi"
+                                  ? "सूर्य नाड़ी (पिंगला स्वर)"
+                                  : "Pingala Nadi (Solar · Right)"}
                             </span>
                           </div>
                         )}
@@ -849,7 +895,10 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                     )}
                   </div>
 
-                  {(hasHoraTattvas || ev.type.startsWith("tithi-swara")) && (
+                  {(hasHoraTattvas ||
+                    ev.category === "swara" ||
+                    ev.type.startsWith("tithi-swara") ||
+                    ev.type.startsWith("nakshatra-swara")) && (
                     <button
                       type="button"
                       onClick={() => setExpandedEventId(isExpanded ? null : ev.id)}
@@ -884,8 +933,8 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                           ev.metadata.nadi === "ida"
                             ? "bg-sky-50/80 dark:bg-sky-950/30 border-sky-200/80 dark:border-sky-800/40"
                             : ev.metadata.nadi === "pingala"
-                            ? "bg-orange-50/80 dark:bg-orange-950/30 border-orange-200/80 dark:border-orange-800/40"
-                            : "bg-purple-50/80 dark:bg-purple-950/30 border-purple-200/80 dark:border-purple-800/40"
+                              ? "bg-orange-50/80 dark:bg-orange-950/30 border-orange-200/80 dark:border-orange-800/40"
+                              : "bg-purple-50/80 dark:bg-purple-950/30 border-purple-200/80 dark:border-purple-800/40"
                         }`}
                       >
                         <div className="flex items-center justify-between flex-wrap gap-2 border-b border-stone-200/70 dark:border-slate-700/60 pb-2">
@@ -905,8 +954,12 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             }`}
                           >
                             {ev.metadata.nadi === "ida"
-                              ? (lang === "hi" ? "इड़ा नाड़ी · वाम नासिका स्वर" : "Ida · Left Nostril")
-                              : (lang === "hi" ? "पिंगला नाड़ी · दक्षिण नासिका स्वर" : "Pingala · Right Nostril")}
+                              ? lang === "hi"
+                                ? "इड़ा नाड़ी · वाम नासिका स्वर"
+                                : "Ida · Left Nostril"
+                              : lang === "hi"
+                                ? "पिंगला नाड़ी · दक्षिण नासिका स्वर"
+                                : "Pingala · Right Nostril"}
                           </span>
                         </div>
 
@@ -917,12 +970,12 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             </strong>
                             <span>
                               {ev.metadata.nadi === "ida"
-                                ? (lang === "hi"
-                                    ? "शीतल, सौम्य, चन्द्र शक्ति व अमृत प्रभाव (बायाँ नासिका छिद्र सक्रिय रहना श्रेष्ठ)"
-                                    : "Cooling, calm, lunar energy (Left nostril active is ideal)")
-                                : (lang === "hi"
-                                    ? "उष्ण, तेज, सूर्य शक्ति व पराक्रमी प्रभाव (दायाँ नासिका छिद्र सक्रिय रहना श्रेष्ठ)"
-                                    : "Heating, dynamic, solar vitality (Right nostril active is ideal)")}
+                                ? lang === "hi"
+                                  ? "शीतल, सौम्य, चन्द्र शक्ति व अमृत प्रभाव (बायाँ नासिका छिद्र सक्रिय रहना श्रेष्ठ)"
+                                  : "Cooling, calm, lunar energy (Left nostril active is ideal)"
+                                : lang === "hi"
+                                  ? "उष्ण, तेज, सूर्य शक्ति व पराक्रमी प्रभाव (दायाँ नासिका छिद्र सक्रिय रहना श्रेष्ठ)"
+                                  : "Heating, dynamic, solar vitality (Right nostril active is ideal)"}
                             </span>
                           </div>
                           <div className="flex items-start gap-1.5">
@@ -931,12 +984,12 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             </strong>
                             <span>
                               {ev.metadata.nadi === "ida"
-                                ? (lang === "hi"
-                                    ? "विद्यारम्भ, अध्ययन, पूजन, गृहप्रवेश, शांति कर्म, नए वस्त्र, आभूषण, यात्रा"
-                                    : "Study, spiritual practices, peace work, trade, home entry, travel")
-                                : (lang === "hi"
-                                    ? "शारीरिक परिश्रम, व्यायाम, भोजन, प्रतियोगिता, शास्त्रार्थ, औषधि सेवन, यात्रा"
-                                    : "Physical workouts, meals, debate, competition, taking medicine, travel")}
+                                ? lang === "hi"
+                                  ? "विद्यारम्भ, अध्ययन, पूजन, गृहप्रवेश, शांति कर्म, नए वस्त्र, आभूषण, यात्रा"
+                                  : "Study, spiritual practices, peace work, trade, home entry, travel"
+                                : lang === "hi"
+                                  ? "शारीरिक परिश्रम, व्यायाम, भोजन, प्रतियोगिता, शास्त्रार्थ, औषधि सेवन, यात्रा"
+                                  : "Physical workouts, meals, debate, competition, taking medicine, travel"}
                             </span>
                           </div>
                         </div>
@@ -955,7 +1008,9 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             </span>
                           </div>
                           <span className="text-[10px] text-purple-600 dark:text-purple-400 font-normal">
-                            {lang === "hi" ? "होरा की 5 सूक्ष्म अवधियाँ" : "5 Micro-Periods of Hora"}
+                            {lang === "hi"
+                              ? "होरा की 5 सूक्ष्म अवधियाँ"
+                              : "5 Micro-Periods of Hora"}
                           </span>
                         </div>
                         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2">
@@ -1008,6 +1063,61 @@ export const TodayScheduleView: React.FC<TodayScheduleViewProps> = ({
                             {String(ev.metadata?.nadiLabel || ev.metadata?.nadi)}
                           </strong>
                         </span>
+                      </div>
+                    )}
+
+                    {ev.type.startsWith("nakshatra-swara") && (
+                      <div className="p-2.5 rounded-lg bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800/30 text-xs text-stone-700 dark:text-slate-300 flex items-center flex-wrap gap-2">
+                        <span className="flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                          <span className="uppercase text-[10px] font-bold text-purple-700 dark:text-purple-300">
+                            {lang === "hi" ? "नक्षत्र:" : "Nakshatra:"}
+                          </span>
+                          <strong className="text-purple-900 dark:text-purple-100">
+                            {String(ev.metadata?.nakshatraName)}
+                          </strong>
+                        </span>
+                        <span className="text-stone-300 dark:text-slate-600">|</span>
+                        <span className="flex items-center gap-1.5">
+                          <Wind className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span className="uppercase text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                            {lang === "hi" ? "सक्रिय नाड़ी:" : "Active Nadi:"}
+                          </span>
+                          <strong className="text-emerald-900 dark:text-emerald-100">
+                            {String(ev.metadata?.nadiLabel || ev.metadata?.nadi)}
+                          </strong>
+                        </span>
+                      </div>
+                    )}
+
+                    {ev.category === "swara" && !ev.type.startsWith("tithi-swara") && !ev.type.startsWith("nakshatra-swara") && (
+                      <div className="p-3 rounded-lg bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-100 dark:border-cyan-800/40 text-xs text-stone-700 dark:text-slate-300 space-y-2">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <Wind className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                            <span className="font-bold text-cyan-950 dark:text-cyan-200">
+                              {ev.metadata?.nadi === "ida"
+                                ? lang === "hi"
+                                  ? "इड़ा नाड़ी (चन्द्र स्वर · बायाँ नथुना)"
+                                  : "Ida Nadi (Lunar Swara · Left Nostril)"
+                                : lang === "hi"
+                                  ? "पिंगला नाड़ी (सूर्य स्वर · दायाँ नथुना)"
+                                  : "Pingala Nadi (Solar Swara · Right Nostril)"}
+                            </span>
+                          </div>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-900/50 text-cyan-800 dark:text-cyan-300 font-semibold">
+                            {ev.formattedRange}
+                          </span>
+                        </div>
+                        <p className="text-[11px] leading-relaxed text-stone-600 dark:text-slate-400">
+                          {ev.metadata?.nadi === "ida"
+                            ? lang === "hi"
+                              ? "शिवस्वरोदय मार्गदर्शन: शीतल व सौम्य प्रकृति। ध्यान, प्राणायाम, विद्यारंभ, यात्रा, शांति कार्य, जलपान एवं स्थायी शुभ कर्मों हेतु सर्वोत्तम।"
+                              : "Shiva Swarodaya Guidance: Cooling, steady lunar energy. Best for meditation, learning, peaceful matters, travel, hydration, and auspicious beginnings."
+                            : lang === "hi"
+                              ? "शिवस्वरोदय मार्गदर्शन: उष्ण व तेजस्वी प्रकृति। भोजन, व्यायाम, कठिन कार्य, वाद-विवाद, व्यापार, खेल एवं पराक्रम हेतु उत्तम।"
+                              : "Shiva Swarodaya Guidance: Warming, energetic solar energy. Best for meals, physical exertion, debates, enterprise, competitive tasks, and decisive actions."}
+                        </p>
                       </div>
                     )}
                   </div>

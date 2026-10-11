@@ -46,7 +46,7 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
       pada: girlPada,
       rasiIndex: girlRasi,
       isManglik: girlManglik,
-    }
+    },
   );
 
   return (
@@ -61,14 +61,17 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
             </h3>
           </div>
           <p className="text-xs text-zinc-400">
-            वैदिक ज्योतिष अनुसार वर्ण, वश्य, तारा, योनि, ग्रह मैत्री, गण, भकूट एवं नाड़ी का सम्पूर्ण विश्लेषण
+            वैदिक ज्योतिष अनुसार वर्ण, वश्य, तारा, योनि, ग्रह मैत्री, गण, भकूट एवं नाड़ी का सम्पूर्ण
+            विश्लेषण
           </p>
         </div>
 
         {/* Total Score Badge */}
         <div className="flex items-center gap-3 bg-zinc-800 px-4 py-2 rounded-xl border border-zinc-700 shadow-md">
           <div className="text-center">
-            <span className="text-[10px] text-zinc-400 block uppercase font-bold">कुल प्राप्त गुण</span>
+            <span className="text-[10px] text-zinc-400 block uppercase font-bold">
+              कुल प्राप्त गुण
+            </span>
             <span className="text-2xl font-black text-rose-400 font-mono">
               {result.totalObtainedScore} / 36
             </span>
@@ -76,7 +79,9 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
           <div className="h-8 w-px bg-zinc-700"></div>
           <div className="text-center">
             <span className="text-[10px] text-zinc-400 block uppercase font-bold">अनुकूलता</span>
-            <span className="text-lg font-black text-amber-400 font-mono">{result.percentage}%</span>
+            <span className="text-lg font-black text-amber-400 font-mono">
+              {result.percentage}%
+            </span>
           </div>
         </div>
       </div>
@@ -108,7 +113,9 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label className="text-zinc-300 font-semibold block mb-1">जन्म नक्षत्र (Nakshatra):</label>
+                <label className="text-zinc-300 font-semibold block mb-1">
+                  जन्म नक्षत्र (Nakshatra):
+                </label>
                 <select
                   value={boyNak}
                   onChange={(e) => setBoyNak(parseInt(e.target.value) || 1)}
@@ -129,17 +136,27 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
                   onChange={(e) => setBoyPada(parseInt(e.target.value) || 1)}
                   className="w-full bg-zinc-800 border border-zinc-600 rounded-xl px-2.5 py-2 text-white font-mono focus:outline-none focus:border-blue-500 min-h-[40px]"
                 >
-                  <option value={1} className="bg-zinc-900 text-white">पाद १</option>
-                  <option value={2} className="bg-zinc-900 text-white">पाद २</option>
-                  <option value={3} className="bg-zinc-900 text-white">पाद ३</option>
-                  <option value={4} className="bg-zinc-900 text-white">पाद ४</option>
+                  <option value={1} className="bg-zinc-900 text-white">
+                    पाद १
+                  </option>
+                  <option value={2} className="bg-zinc-900 text-white">
+                    पाद २
+                  </option>
+                  <option value={3} className="bg-zinc-900 text-white">
+                    पाद ३
+                  </option>
+                  <option value={4} className="bg-zinc-900 text-white">
+                    पाद ४
+                  </option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label className="text-zinc-300 font-semibold block mb-1">चन्द्र राशि (Moon Sign):</label>
+                <label className="text-zinc-300 font-semibold block mb-1">
+                  चन्द्र राशि (Moon Sign):
+                </label>
                 <select
                   value={boyRasi}
                   onChange={(e) => setBoyRasi(parseInt(e.target.value) || 0)}
@@ -161,7 +178,9 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
                     onChange={(e) => setBoyManglik(e.target.checked)}
                     className="rounded text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-zinc-200 font-semibold text-[11px]">मांगलिक दोष उपस्थित</span>
+                  <span className="text-zinc-200 font-semibold text-[11px]">
+                    मांगलिक दोष उपस्थित
+                  </span>
                 </label>
               </div>
             </div>
@@ -193,7 +212,9 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label className="text-zinc-300 font-semibold block mb-1">जन्म नक्षत्र (Nakshatra):</label>
+                <label className="text-zinc-300 font-semibold block mb-1">
+                  जन्म नक्षत्र (Nakshatra):
+                </label>
                 <select
                   value={girlNak}
                   onChange={(e) => setGirlNak(parseInt(e.target.value) || 1)}
@@ -214,17 +235,27 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
                   onChange={(e) => setGirlPada(parseInt(e.target.value) || 1)}
                   className="w-full bg-zinc-800 border border-zinc-600 rounded-xl px-2.5 py-2 text-white font-mono focus:outline-none focus:border-rose-500 min-h-[40px]"
                 >
-                  <option value={1} className="bg-zinc-900 text-white">पाद १</option>
-                  <option value={2} className="bg-zinc-900 text-white">पाद २</option>
-                  <option value={3} className="bg-zinc-900 text-white">पाद ३</option>
-                  <option value={4} className="bg-zinc-900 text-white">पाद ४</option>
+                  <option value={1} className="bg-zinc-900 text-white">
+                    पाद १
+                  </option>
+                  <option value={2} className="bg-zinc-900 text-white">
+                    पाद २
+                  </option>
+                  <option value={3} className="bg-zinc-900 text-white">
+                    पाद ३
+                  </option>
+                  <option value={4} className="bg-zinc-900 text-white">
+                    पाद ४
+                  </option>
                 </select>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label className="text-zinc-300 font-semibold block mb-1">चन्द्र राशि (Moon Sign):</label>
+                <label className="text-zinc-300 font-semibold block mb-1">
+                  चन्द्र राशि (Moon Sign):
+                </label>
                 <select
                   value={girlRasi}
                   onChange={(e) => setGirlRasi(parseInt(e.target.value) || 0)}
@@ -246,7 +277,9 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
                     onChange={(e) => setGirlManglik(e.target.checked)}
                     className="rounded text-rose-600 focus:ring-rose-500"
                   />
-                  <span className="text-zinc-200 font-semibold text-[11px]">मांगलिक दोष उपस्थित</span>
+                  <span className="text-zinc-200 font-semibold text-[11px]">
+                    मांगलिक दोष उपस्थित
+                  </span>
                 </label>
               </div>
             </div>
@@ -260,8 +293,8 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
           result.totalObtainedScore >= 21
             ? "bg-emerald-950 border border-emerald-700 text-emerald-100"
             : result.totalObtainedScore >= 18
-            ? "bg-zinc-900 border border-amber-600 text-white"
-            : "bg-red-950 border border-red-800 text-red-100"
+              ? "bg-zinc-900 border border-amber-600 text-white"
+              : "bg-red-950 border border-red-800 text-red-100"
         }`}
       >
         <div className="space-y-1.5">
@@ -296,8 +329,8 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
                   isFull
                     ? "bg-emerald-950/40 border-emerald-700"
                     : isZero
-                    ? "bg-red-950/40 border-red-800"
-                    : "bg-zinc-800 border-zinc-700"
+                      ? "bg-red-950/40 border-red-800"
+                      : "bg-zinc-800 border-zinc-700"
                 }`}
               >
                 <div>
@@ -308,8 +341,8 @@ export const GunaMilanView: React.FC<GunaMilanViewProps> = ({
                         isFull
                           ? "bg-emerald-900 text-emerald-200 border border-emerald-700"
                           : isZero
-                          ? "bg-red-900 text-red-200 border border-red-700"
-                          : "bg-zinc-700 text-zinc-200"
+                            ? "bg-red-900 text-red-200 border border-red-700"
+                            : "bg-zinc-700 text-zinc-200"
                       }`}
                     >
                       {koota.obtainedScore} / {koota.maxScore}

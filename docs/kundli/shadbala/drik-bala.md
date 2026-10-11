@@ -1,12 +1,15 @@
 # Drik Bala (Aspectual Strength) — Mathematical Specification
 
 ## 1. Classical Basis
+
 BPHS Adhyaya 27, Shlokas 30–33 defines Drik Bala (दृग्बल) as the net strength an aspected planet receives from other aspecting planets. Benefic aspects enhance a planet's strength ($+ \text{Drishti} / 4$), while malefic aspects diminish it ($- \text{Drishti} / 4$).
 
 ## 2. Classical Piecewise Linear Drishti Kendra Formula
+
 Let $\theta = (\lambda_{\text{aspected}} - \lambda_{\text{aspecting}} + 360^\circ) \pmod{360^\circ}$ be the forward angular distance between the two bodies.
 
 The raw Drishti value (in Virupas, max 60) is calculated as:
+
 1. $0^\circ \le \theta < 30^\circ$:
    $$\text{Drishti} = 0$$
 2. $30^\circ \le \theta < 60^\circ$:
@@ -25,11 +28,13 @@ The raw Drishti value (in Virupas, max 60) is calculated as:
    $$\text{Drishti} = 0$$
 
 ## 3. Special Aspects (Vishesha Drishti)
+
 - **Mars**: Special 4th ($90^\circ$) and 8th ($210^\circ$) aspects add $+15.0$ Virupas to the base drishti.
 - **Jupiter**: Special 5th ($120^\circ$) and 9th ($240^\circ$) aspects add $+30.0$ Virupas to the base drishti.
 - **Saturn**: Special 3rd ($60^\circ$) and 10th ($270^\circ$) aspects add $+45.0$ Virupas (or adjust to full 60).
 
 ## 4. Benefic vs. Malefic Multipliers
+
 - **Benefics**: Jupiter, Venus, waxing Moon, Mercury (when not associated with malefics).
   Each benefic contributes $+ \frac{\text{Drishti}}{4}$ Virupas.
 - **Malefics**: Sun, Mars, Saturn, waning Moon, afflicted Mercury.

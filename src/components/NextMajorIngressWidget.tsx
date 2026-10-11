@@ -80,10 +80,7 @@ export const NextMajorIngressWidget: React.FC<NextMajorIngressWidgetProps> = ({
 
   if (!nextMajorIngress) return null;
 
-  const planetName =
-    lang === "hi"
-      ? nextMajorIngress.sanskritName
-      : nextMajorIngress.planetName;
+  const planetName = lang === "hi" ? nextMajorIngress.sanskritName : nextMajorIngress.planetName;
 
   const fromRasi = getLocalizedRasi(nextMajorIngress.fromName, lang);
   const toRasi = getLocalizedRasi(nextMajorIngress.toName, lang);

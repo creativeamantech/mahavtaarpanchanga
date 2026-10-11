@@ -20,25 +20,143 @@ export interface KundliCityModalProps {
   onSelectCity: (city: { name: string; lat: number; lon: number; tz: string }) => void;
 }
 
-const PILGRIMAGE_CITIES: { name: string; country: string; lat: number; lon: number; tz: string; desc: string }[] = [
-  { name: "Varanasi (Kashi), India", country: "IN", lat: 25.3176, lon: 82.9739, tz: "Asia/Kolkata", desc: "काशी विश्वनाथ / मोक्ष नगरी" },
-  { name: "Ujjain (Mahakal), India", country: "IN", lat: 23.1765, lon: 75.7885, tz: "Asia/Kolkata", desc: "महाकालेश्वर / काल गणना केंद्र" },
-  { name: "Ayodhya, India", country: "IN", lat: 26.7922, lon: 82.1998, tz: "Asia/Kolkata", desc: "श्री राम जन्मभूमि" },
-  { name: "Haridwar, India", country: "IN", lat: 29.9457, lon: 78.1642, tz: "Asia/Kolkata", desc: "हर की पौड़ी / गंगा द्वार" },
-  { name: "Mathura / Vrindavan, India", country: "IN", lat: 27.4924, lon: 77.6737, tz: "Asia/Kolkata", desc: "श्री कृष्ण जन्मभूमि" },
-  { name: "Prayagraj (Allahabad), India", country: "IN", lat: 25.4358, lon: 81.8463, tz: "Asia/Kolkata", desc: "त्रिवेणी संगम / तीर्थराज" },
-  { name: "Tirupati, India", country: "IN", lat: 13.6288, lon: 79.4192, tz: "Asia/Kolkata", desc: "भगवान वेंकटेश्वर" },
-  { name: "Rameswaram, India", country: "IN", lat: 9.2876, lon: 79.3129, tz: "Asia/Kolkata", desc: "रामनाथस्वामी ज्योतिर्लिंग" },
-  { name: "Puri (Jagannath), India", country: "IN", lat: 19.8135, lon: 85.8312, tz: "Asia/Kolkata", desc: "श्री जगन्नाथ धाम" },
-  { name: "Kedarnath, India", country: "IN", lat: 30.7346, lon: 79.0669, tz: "Asia/Kolkata", desc: "केदारनाथ ज्योतिर्लिंग" },
-  { name: "Somnath, India", country: "IN", lat: 20.888, lon: 70.4012, tz: "Asia/Kolkata", desc: "प्रथम ज्योतिर्लिंग सोमनाथ" },
-  { name: "Badrinath, India", country: "IN", lat: 30.7433, lon: 79.4938, tz: "Asia/Kolkata", desc: "श्री बद्रीनाथ धाम" },
-  { name: "Dwarka, India", country: "IN", lat: 22.2442, lon: 68.9685, tz: "Asia/Kolkata", desc: "द्वारकाधीश धाम" },
-  { name: "Rishikesh, India", country: "IN", lat: 30.0869, lon: 78.2676, tz: "Asia/Kolkata", desc: "योग नगरी / गंगा तट" },
-  { name: "Nashik / Trimbakeshwar, India", country: "IN", lat: 19.9975, lon: 73.7898, tz: "Asia/Kolkata", desc: "त्र्यंबकेश्वर ज्योतिर्लिंग" },
+const PILGRIMAGE_CITIES: {
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+  tz: string;
+  desc: string;
+}[] = [
+  {
+    name: "Varanasi (Kashi), India",
+    country: "IN",
+    lat: 25.3176,
+    lon: 82.9739,
+    tz: "Asia/Kolkata",
+    desc: "काशी विश्वनाथ / मोक्ष नगरी",
+  },
+  {
+    name: "Ujjain (Mahakal), India",
+    country: "IN",
+    lat: 23.1765,
+    lon: 75.7885,
+    tz: "Asia/Kolkata",
+    desc: "महाकालेश्वर / काल गणना केंद्र",
+  },
+  {
+    name: "Ayodhya, India",
+    country: "IN",
+    lat: 26.7922,
+    lon: 82.1998,
+    tz: "Asia/Kolkata",
+    desc: "श्री राम जन्मभूमि",
+  },
+  {
+    name: "Haridwar, India",
+    country: "IN",
+    lat: 29.9457,
+    lon: 78.1642,
+    tz: "Asia/Kolkata",
+    desc: "हर की पौड़ी / गंगा द्वार",
+  },
+  {
+    name: "Mathura / Vrindavan, India",
+    country: "IN",
+    lat: 27.4924,
+    lon: 77.6737,
+    tz: "Asia/Kolkata",
+    desc: "श्री कृष्ण जन्मभूमि",
+  },
+  {
+    name: "Prayagraj (Allahabad), India",
+    country: "IN",
+    lat: 25.4358,
+    lon: 81.8463,
+    tz: "Asia/Kolkata",
+    desc: "त्रिवेणी संगम / तीर्थराज",
+  },
+  {
+    name: "Tirupati, India",
+    country: "IN",
+    lat: 13.6288,
+    lon: 79.4192,
+    tz: "Asia/Kolkata",
+    desc: "भगवान वेंकटेश्वर",
+  },
+  {
+    name: "Rameswaram, India",
+    country: "IN",
+    lat: 9.2876,
+    lon: 79.3129,
+    tz: "Asia/Kolkata",
+    desc: "रामनाथस्वामी ज्योतिर्लिंग",
+  },
+  {
+    name: "Puri (Jagannath), India",
+    country: "IN",
+    lat: 19.8135,
+    lon: 85.8312,
+    tz: "Asia/Kolkata",
+    desc: "श्री जगन्नाथ धाम",
+  },
+  {
+    name: "Kedarnath, India",
+    country: "IN",
+    lat: 30.7346,
+    lon: 79.0669,
+    tz: "Asia/Kolkata",
+    desc: "केदारनाथ ज्योतिर्लिंग",
+  },
+  {
+    name: "Somnath, India",
+    country: "IN",
+    lat: 20.888,
+    lon: 70.4012,
+    tz: "Asia/Kolkata",
+    desc: "प्रथम ज्योतिर्लिंग सोमनाथ",
+  },
+  {
+    name: "Badrinath, India",
+    country: "IN",
+    lat: 30.7433,
+    lon: 79.4938,
+    tz: "Asia/Kolkata",
+    desc: "श्री बद्रीनाथ धाम",
+  },
+  {
+    name: "Dwarka, India",
+    country: "IN",
+    lat: 22.2442,
+    lon: 68.9685,
+    tz: "Asia/Kolkata",
+    desc: "द्वारकाधीश धाम",
+  },
+  {
+    name: "Rishikesh, India",
+    country: "IN",
+    lat: 30.0869,
+    lon: 78.2676,
+    tz: "Asia/Kolkata",
+    desc: "योग नगरी / गंगा तट",
+  },
+  {
+    name: "Nashik / Trimbakeshwar, India",
+    country: "IN",
+    lat: 19.9975,
+    lon: 73.7898,
+    tz: "Asia/Kolkata",
+    desc: "त्र्यंबकेश्वर ज्योतिर्लिंग",
+  },
 ];
 
-const MAJOR_INDIA_CITIES: { name: string; country: string; lat: number; lon: number; tz: string }[] = [
+const MAJOR_INDIA_CITIES: {
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+  tz: string;
+}[] = [
   { name: "New Delhi, India", country: "IN", lat: 28.6139, lon: 77.209, tz: "Asia/Kolkata" },
   { name: "Mumbai, India", country: "IN", lat: 19.076, lon: 72.8777, tz: "Asia/Kolkata" },
   { name: "Bengaluru, India", country: "IN", lat: 12.9716, lon: 77.5946, tz: "Asia/Kolkata" },
@@ -59,14 +177,32 @@ const MAJOR_INDIA_CITIES: { name: string; country: string; lat: number; lon: num
 
 const GLOBAL_CITIES: { name: string; country: string; lat: number; lon: number; tz: string }[] = [
   { name: "Kathmandu, Nepal", country: "NP", lat: 27.7172, lon: 85.324, tz: "Asia/Kathmandu" },
-  { name: "London, United Kingdom", country: "GB", lat: 51.5074, lon: -0.1278, tz: "Europe/London" },
+  {
+    name: "London, United Kingdom",
+    country: "GB",
+    lat: 51.5074,
+    lon: -0.1278,
+    tz: "Europe/London",
+  },
   { name: "New York, USA", country: "US", lat: 40.7128, lon: -74.006, tz: "America/New_York" },
-  { name: "San Francisco, USA", country: "US", lat: 37.7749, lon: -122.4194, tz: "America/Los_Angeles" },
+  {
+    name: "San Francisco, USA",
+    country: "US",
+    lat: 37.7749,
+    lon: -122.4194,
+    tz: "America/Los_Angeles",
+  },
   { name: "Chicago, USA", country: "US", lat: 41.8781, lon: -87.6298, tz: "America/Chicago" },
   { name: "Toronto, Canada", country: "CA", lat: 43.6532, lon: -79.3832, tz: "America/Toronto" },
   { name: "Dubai, UAE", country: "AE", lat: 25.2048, lon: 55.2708, tz: "Asia/Dubai" },
   { name: "Singapore", country: "SG", lat: 1.3521, lon: 103.8198, tz: "Asia/Singapore" },
-  { name: "Sydney, Australia", country: "AU", lat: -33.8688, lon: 151.2093, tz: "Australia/Sydney" },
+  {
+    name: "Sydney, Australia",
+    country: "AU",
+    lat: -33.8688,
+    lon: 151.2093,
+    tz: "Australia/Sydney",
+  },
   { name: "Tokyo, Japan", country: "JP", lat: 35.6762, lon: 139.6503, tz: "Asia/Tokyo" },
   { name: "Frankfurt, Germany", country: "DE", lat: 50.1109, lon: 8.6821, tz: "Europe/Berlin" },
   { name: "Paris, France", country: "FR", lat: 48.8566, lon: 2.3522, tz: "Europe/Paris" },
@@ -95,11 +231,17 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
   selectedCityName,
   onSelectCity,
 }) => {
-  const [activeTab, setActiveTab] = useState<"search" | "pilgrimage" | "popular" | "global" | "custom">("search");
+  const [activeTab, setActiveTab] = useState<
+    "search" | "pilgrimage" | "popular" | "global" | "custom"
+  >("search");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<CityLocation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [gpsStatus, setGpsStatus] = useState<{ loading: boolean; error?: string; detected?: { name: string; lat: number; lon: number; tz: string } }>({
+  const [gpsStatus, setGpsStatus] = useState<{
+    loading: boolean;
+    error?: string;
+    detected?: { name: string; lat: number; lon: number; tz: string };
+  }>({
     loading: false,
   });
 
@@ -331,7 +473,9 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
               <div className="divide-y divide-zinc-700 max-h-72 overflow-y-auto rounded-xl border border-zinc-700 bg-zinc-800/40">
                 {searchResults.length > 0 ? (
                   searchResults.map((city, idx) => {
-                    const isSelected = selectedCityName.toLowerCase().includes(city.name.toLowerCase().split(",")[0]);
+                    const isSelected = selectedCityName
+                      .toLowerCase()
+                      .includes(city.name.toLowerCase().split(",")[0]);
                     return (
                       <div
                         key={`${city.name}-${idx}`}
@@ -352,7 +496,8 @@ export const KundliCityModal: React.FC<KundliCityModalProps> = ({
                           <div>
                             <div className="text-sm font-semibold text-white">{city.name}</div>
                             <div className="text-xs text-zinc-400">
-                              अक्षांश: {city.latitude.toFixed(4)}°N • देशान्तर: {city.longitude.toFixed(4)}°E • {city.timezone}
+                              अक्षांश: {city.latitude.toFixed(4)}°N • देशान्तर:{" "}
+                              {city.longitude.toFixed(4)}°E • {city.timezone}
                             </div>
                           </div>
                         </div>

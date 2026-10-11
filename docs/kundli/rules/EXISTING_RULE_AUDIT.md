@@ -1,6 +1,7 @@
 # Existing Rule & Yoga Audit (Phase 5 Pre-Implementation)
 
 ## Overview
+
 This audit maps all astrological combinations, yogas, and doshas currently evaluated in the codebase (primarily in `src/lib/kundliEngine.ts`) prior to the implementation of the declarative Phase 5 Rule Engine.
 
 ---
@@ -8,6 +9,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ## 1. Inventory of Existing Rules
 
 ### Rule 1: Gajakesari Yoga (गजकेसरी योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1350–1365)
 - **Current Formula**: `((jupSign - moonSign + 12) % 12) + 1` in `[1, 4, 7, 10]`
 - **Classical Source**: Brihat Parashara Hora Shastra (BPHS), Adhyaya 36, Shlokas 3–4; Phaladeepika, Adhyaya 6, Shloka 14.
@@ -20,6 +22,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 2: Budhaditya Yoga (बुधादित्य योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1367–1381)
 - **Current Formula**: `sunObj.signIndex === mercObj.signIndex`
 - **Classical Source**: Saravali, Adhyaya 31, Shloka 1; Brihat Jataka, Adhyaya 14.
@@ -32,6 +35,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 3: Ruchaka Mahapurusha Yoga (रुचक महापुरुष योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1383–1395)
 - **Current Formula**: `mars.dignity === 'exalted' || (mars.dignity === 'own' && [1, 4, 7, 10].includes(mars.houseD1))`
 - **Classical Source**: BPHS, Adhyaya 75, Shlokas 1–5; Phaladeepika, Adhyaya 6, Shlokas 1–4.
@@ -44,6 +48,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 4: Hamsa Mahapurusha Yoga (हंस महापुरुष योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1397–1408)
 - **Current Formula**: `jup.dignity === 'exalted' || (jup.dignity === 'own' && [1, 4, 7, 10].includes(jup.houseD1))`
 - **Classical Source**: BPHS, Adhyaya 75, Shlokas 6–10; Saravali, Adhyaya 35.
@@ -56,6 +61,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 5: Malavya Mahapurusha Yoga (मालव्य महापुरुष योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1410–1423)
 - **Current Formula**: `venus.dignity === 'exalted' || (venus.dignity === 'own' && [1, 4, 7, 10].includes(venus.houseD1))`
 - **Classical Source**: BPHS, Adhyaya 75, Shlokas 11–15; Phaladeepika, Adhyaya 6.
@@ -68,6 +74,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 6: Shasha Mahapurusha Yoga (शश महापुरुष योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1425–1438)
 - **Current Formula**: `saturn.dignity === 'exalted' || (saturn.dignity === 'own' && [1, 4, 7, 10].includes(saturn.houseD1))`
 - **Classical Source**: BPHS, Adhyaya 75, Shlokas 16–20; Saravali, Adhyaya 35.
@@ -80,6 +87,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 7: Bhadra Mahapurusha Yoga (भद्र महापुरुष योग)
+
 - **Current File**: None (omitted in legacy code).
 - **Current Formula**: Missing in legacy inline engine.
 - **Classical Source**: BPHS, Adhyaya 75, Shlokas 21–25.
@@ -90,6 +98,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 8: Chandra-Mangala Yoga (चन्द्र-मंगल योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1440–1451)
 - **Current Formula**: `moon.signIndex === mars.signIndex`
 - **Classical Source**: Saravali, Adhyaya 15, Shloka 20; BPHS, Adhyaya 36.
@@ -101,6 +110,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 9: Guru-Chandal Yoga (गुरु-चांडाल योग)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1453–1464)
 - **Current Formula**: `jup.signIndex === rahu.signIndex`
 - **Classical Source**: Classical Parashari commentators / Jataka Parijata.
@@ -112,6 +122,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 10: Manglik / Kuja Dosha (मांगलिक दोष)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1155–1200, 1285–1308)
 - **Current Formula**: Mars in 1, 2, 4, 7, 8, 12 from Lagna or Moon.
 - **Exceptions**: Mars in Aries 1st, Scorpio 4th, Capricorn 7th, or exalted anywhere.
@@ -124,6 +135,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 11: Kalsarpa Dosha (कालसर्प योग / दोष)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1191–1231, 1309–1321)
 - **Current Formula**: All 7 classical planets between Rahu and Ketu or Ketu and Rahu.
 - **Classical Source**: Post-classical tradition (omitted in Brihat Jataka and original BPHS manuscripts, codified in later regional traditions like Agni Purana commentary and modern 20th-century compendiums).
@@ -135,6 +147,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 12: Sade Sati (शनि साढ़े साती)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1232–1265, 1322–1332)
 - **Current Formula**: Transiting Saturn in 12th, 1st, 2nd, 4th (Kantaka), or 8th (Ashtama) from Natal Moon.
 - **Classical Source**: Gochara Phala in Phaladeepika, Adhyaya 26; Varahamihira's Brihat Samhita.
@@ -146,6 +159,7 @@ This audit maps all astrological combinations, yogas, and doshas currently evalu
 ---
 
 ### Rule 13: Gandanta (गंडान्त दोष)
+
 - **Current File**: `src/lib/kundliEngine.ts` (lines 1266–1284, 1333–1344)
 - **Current Formula**: Moon at water-fire junctions ($0^\circ, 120^\circ, 240^\circ, 360^\circ \pm 0.4444^\circ$) and Abhukta Moola ($240^\circ - 1.3333^\circ$ to $240^\circ + 1.7777^\circ$).
 - **Classical Source**: BPHS, Adhyaya 9 (गण्डान्तदोषः); Narada Samhita.

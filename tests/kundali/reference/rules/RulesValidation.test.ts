@@ -6,10 +6,7 @@ describe("Reference Corpus — Parashari Rule & Yoga Validation Suite", () => {
   const engine = new RuleEngine();
 
   // Helper to evaluate a specific rule on a mock context
-  function evaluateRule(
-    ruleId: string,
-    params: Parameters<typeof createMockContext>[0],
-  ) {
+  function evaluateRule(ruleId: string, params: Parameters<typeof createMockContext>[0]) {
     const ctx = createMockContext(params);
     const results = engine.evaluateAll(ctx);
     return results.find((r) => r.ruleId === ruleId);

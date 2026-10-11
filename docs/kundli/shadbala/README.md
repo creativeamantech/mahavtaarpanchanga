@@ -1,9 +1,11 @@
 # Mahavtaar Kundali: Shadbala Engine Documentation
 
 ## Overview
+
 Shadbala (षड्बल) is the classical Hindu predictive astrological system of quantifying the six-fold strength of the seven visible Grahas (Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn). Bhava Bala (भावबल) extends this methodology to compute the absolute and relative strengths of the twelve astrological houses (Bhavas).
 
 ## Directory Structure
+
 - `README.md`: This overview index.
 - `IMPLEMENTATION_PLAN.md`: System architecture, pipeline, and module decomposition.
 - `sources.md`: Classical text citations, chapter verses, and commentary lineages.

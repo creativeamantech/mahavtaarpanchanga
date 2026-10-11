@@ -132,8 +132,8 @@ export function TattvaView({
     // Tithi Swara alternates every 60 minutes starting from the Tithi's start time
     const msElapsed = now - currentTithiTattva.startTime;
     const hoursElapsed = Math.floor(msElapsed / (60 * 60 * 1000));
-    const isOpposite = (hoursElapsed % 2) !== 0;
-    
+    const isOpposite = hoursElapsed % 2 !== 0;
+
     if (isOpposite) {
       return currentTithiTattva.startNadi === "ida" ? "pingala" : "ida";
     }
@@ -219,7 +219,9 @@ export function TattvaView({
             <div className="flex justify-between mt-2 pt-2 border-t border-amber-200/50 dark:border-amber-800/50">
               <div>
                 <div className="text-[10px] uppercase tracking-wider opacity-70">Hora</div>
-                <div className="text-sm font-medium">{activeHora ? (activeHora as any).planet : "-"}</div>
+                <div className="text-sm font-medium">
+                  {activeHora ? (activeHora as any).planet : "-"}
+                </div>
               </div>
             </div>
           </div>

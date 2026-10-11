@@ -37,18 +37,19 @@ tests/kundali/reference/
 ## Canonical Machine-Readable Format
 
 Every test case adheres strictly to `ReferenceCase<T>`:
+
 ```typescript
 interface ReferenceCase<T> {
   id: string;
   category: string;
   subCategory?: string;
-  birthDate: string;    // YYYY-MM-DD
-  birthTime: string;    // HH:mm:ss
-  timezone: string;     // IANA timezone identifier
+  birthDate: string; // YYYY-MM-DD
+  birthTime: string; // HH:mm:ss
+  timezone: string; // IANA timezone identifier
   latitude: number;
   longitude: number;
   altitudeMeters?: number;
-  ayanamsha: string;    // lahiri | raman | krishnamurti | sayana | true_chitra
+  ayanamsha: string; // lahiri | raman | krishnamurti | sayana | true_chitra
   houseSystem: "whole_sign" | "sripati" | "placidus" | "equal";
   expected: T;
   source: string;
@@ -62,6 +63,7 @@ interface ReferenceCase<T> {
 ## Discrepancy Classification Taxonomy
 
 All engine differences are categorized under one of 13 official classes:
+
 1. `EPHEMERIS_DIFFERENCE`
 2. `COORDINATE_FRAME_DIFFERENCE`
 3. `AYANAMSHA_DIFFERENCE`

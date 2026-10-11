@@ -1,6 +1,7 @@
 # Mahavtaar Kundali — Dasha Engine & Multi-Tier Timeline Architecture (Phase 4)
 
 ## Overview
+
 Phase 4 of the Mahavtaar Kundali core introduces a canonical, high-precision, multi-tier Dasha calculation engine. Rooted in classical **Brihat Parashara Hora Shastra (BPHS Adhyayas 46–50)**, this subsystem establishes a unified temporal framework supporting up to 5 nested tiers of planetary periods:
 
 1. **Level 1 — Mahadasha (महादशा)**
@@ -41,6 +42,7 @@ docs/kundli/dasha/
 ---
 
 ## Verification Summary
+
 - **Total Test Suite**: 88 unit and integration tests passing.
 - **Dasha Specific Tests**: 21 tests covering exact boundary values, sequence invariants, 5-tier nested conservation, and high-throughput benchmarks.
 - **Zero Lint / Type Errors**: 100% strict TypeScript and ESLint compliance.

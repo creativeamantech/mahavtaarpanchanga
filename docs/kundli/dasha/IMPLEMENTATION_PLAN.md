@@ -3,7 +3,9 @@
 ## 1. Executive Summary & Audit of Existing Implementation
 
 ### 1.1 Existing Architecture
+
 Currently, the codebase contains:
+
 - **Legacy Inline Implementation (`src/lib/kundliEngine.ts`, lines 1089–1168)**:
   - Computes Vimshottari Mahadashas and Antardashas inline inside `computeFullKundli()`.
   - Uses `VIMSHOTTARI_LORDS` mapping 9 grahas to their classical planetary periods:
@@ -31,6 +33,7 @@ Currently, the codebase contains:
   - Level was capped at level 3 without formal Level 4 (Sookshma) and Level 5 (Prana).
 
 ### 1.2 Identified Architectural Gaps & Targets for Phase 4
+
 1. **Multi-Tier Depth**: The legacy system only reaches Level 2 (Antardasha). Phase 4 must support 5 full tiers:
    - Level 1: Mahadasha (महादशा)
    - Level 2: Antardasha / Bhukti (अन्तर्दशा / भुक्ति)

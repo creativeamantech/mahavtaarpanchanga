@@ -1,14 +1,17 @@
 # Mahavtaar Kundali: Shadbala & Bhava Bala Implementation Plan
 
 ## 1. Architectural Overview & Objective
+
 This document outlines the design, mathematical foundations, and implementation steps for **Shadbala (षड्बल - Six-fold Planetary Strength)** and **Bhava Bala (भावबल - House Strength)** in the Mahavtaar Panchanga & Kundali ecosystem.
 
-The system adheres strictly to the classical guidelines of the *Brihat Parashara Hora Shastra* (BPHS Adhyaya 27: Shadbaladhyaya) with full floating-point precision, explicit unit tagging, non-duplication of astronomical calculations, and verifiable test vectors.
+The system adheres strictly to the classical guidelines of the _Brihat Parashara Hora Shastra_ (BPHS Adhyaya 27: Shadbaladhyaya) with full floating-point precision, explicit unit tagging, non-duplication of astronomical calculations, and verifiable test vectors.
 
 ---
 
 ## 2. Input Pipeline & Dependencies
+
 Shadbala and Bhava Bala are pure analytical consumers of existing astronomical and sidereal calculations. In accordance with the single-source-of-truth directive, the engine **never recalculates**:
+
 1. Planetary tropical coordinates, speeds, distances, and declinations (provided by `AstronomicalCore`).
 2. Ayanamsha (provided by `AyanamshaProvider`).
 3. Sidereal Ascendant (Lagna) and 12 Bhava madhyas (provided by `AstronomicalCore` / `kundliEngine`).
@@ -16,6 +19,7 @@ Shadbala and Bhava Bala are pure analytical consumers of existing astronomical a
 5. Sunrise, sunset, day/night division, and weekday (Vara) / planetary hour (Hora) (provided by `AstronomicalCore` / `horaEngine`).
 
 ### Dependency Graph
+
 ```
 Birth Input (Date, Time, Lat, Lon, Timezone)
     │
@@ -55,24 +59,25 @@ BhavaBalaEngine (12 Bhavas)
 
 ## 3. Sub-Module Breakdown in `src/kundali/shadbala/`
 
-| Module | File | Purpose |
-|---|---|---|
-| **Types & Metadata** | `ShadbalaTypes.ts` | Complete TypeScript contracts, interfaces, and unit enums |
-| **Sthana Bala** | `SthanaBala.ts` | Uchcha, Saptavargaja, Ojayugmarashi, Kendradi, Drekkana Bala |
-| **Dig Bala** | `DigBala.ts` | Directional strength of planets based on angular distance from zero point |
-| **Kala Bala** | `KalaBala.ts` | Natonnata, Paksha, Tribhaga, Varsha/Masa/Dina/Hora, Ayana, Yuddha Bala |
-| **Cheshta Bala** | `CheshtaBala.ts` | Planetary motion & speed evaluation; Ayana/Paksha fallback for Sun & Moon |
-| **Naisargika Bala** | `NaisargikaBala.ts` | Fixed classical immutable values for 7 Grahas |
-| **Drik Bala** | `DrikBala.ts` | Aspectual strength based on classical piecewise linear Drishti rules |
-| **Ishta / Kashta** | `IshtaKashtaPhala.ts` | Geometric mean calculations of Uchcha and Cheshta Balas |
-| **Bhava Bala** | `BhavaBalaEngine.ts` | 12 Houses strength (Bhavadhipati, Bhava Dig, Bhava Drishti) |
-| **Orchestrator** | `ShadbalaEngine.ts` | Main calculation engine assembling all components |
-| **Validation** | `ShadbalaValidation.ts` | Boundary and assertion checks |
-| **Unit Tests** | `ShadbalaEngine.test.ts` | Comprehensive Vitest suite covering all components |
+| Module               | File                     | Purpose                                                                   |
+| -------------------- | ------------------------ | ------------------------------------------------------------------------- |
+| **Types & Metadata** | `ShadbalaTypes.ts`       | Complete TypeScript contracts, interfaces, and unit enums                 |
+| **Sthana Bala**      | `SthanaBala.ts`          | Uchcha, Saptavargaja, Ojayugmarashi, Kendradi, Drekkana Bala              |
+| **Dig Bala**         | `DigBala.ts`             | Directional strength of planets based on angular distance from zero point |
+| **Kala Bala**        | `KalaBala.ts`            | Natonnata, Paksha, Tribhaga, Varsha/Masa/Dina/Hora, Ayana, Yuddha Bala    |
+| **Cheshta Bala**     | `CheshtaBala.ts`         | Planetary motion & speed evaluation; Ayana/Paksha fallback for Sun & Moon |
+| **Naisargika Bala**  | `NaisargikaBala.ts`      | Fixed classical immutable values for 7 Grahas                             |
+| **Drik Bala**        | `DrikBala.ts`            | Aspectual strength based on classical piecewise linear Drishti rules      |
+| **Ishta / Kashta**   | `IshtaKashtaPhala.ts`    | Geometric mean calculations of Uchcha and Cheshta Balas                   |
+| **Bhava Bala**       | `BhavaBalaEngine.ts`     | 12 Houses strength (Bhavadhipati, Bhava Dig, Bhava Drishti)               |
+| **Orchestrator**     | `ShadbalaEngine.ts`      | Main calculation engine assembling all components                         |
+| **Validation**       | `ShadbalaValidation.ts`  | Boundary and assertion checks                                             |
+| **Unit Tests**       | `ShadbalaEngine.test.ts` | Comprehensive Vitest suite covering all components                        |
 
 ---
 
 ## 4. Execution Phases
+
 1. **Types & Contracts (`ShadbalaTypes.ts`)**: Define all sub-scores, units (Virupas vs Rupas), required benchmarks, and Bhava Bala types.
 2. **Component Implementations**:
    - `NaisargikaBala.ts` (constants)

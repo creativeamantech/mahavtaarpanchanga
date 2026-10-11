@@ -76,9 +76,9 @@ describe("Reference Corpus — Vimshottari Dasha 5-Tier Timeline & Sum Conservat
 
       // First child start = parent start; last child end = parent end (within 50ms)
       expect(period.children[0].startTimestampMs).toBe(period.startTimestampMs);
-      expect(Math.abs(period.children[8].endTimestampMs - period.endTimestampMs)).toBeLessThanOrEqual(
-        50,
-      );
+      expect(
+        Math.abs(period.children[8].endTimestampMs - period.endTimestampMs),
+      ).toBeLessThanOrEqual(50);
 
       // Recursively test lower levels
       for (const child of period.children) {

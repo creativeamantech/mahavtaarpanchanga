@@ -1,6 +1,7 @@
 # Mahavtaar Kundali Engine Architecture (Phase 1)
 
 ## 1. Executive Architecture Summary
+
 Mahavtaar Kundali introduces a high-precision, classical Jyotisha computation engine designed to provide sub-arcsecond accuracy anchored on true celestial mechanics and Brihat Parashara Hora Shastra (BPHS) principles.
 
 Prior to Phase 1, disparate modules across the codebase utilized varying ayanamsha approximations and distinct vector projections. Phase 1 establishes a single canonical astronomical core, an extensible Ayanamsha provider registry, a unified domain model, and clean engine boundary contracts for all upcoming classical calculations.

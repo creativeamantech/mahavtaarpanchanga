@@ -16,7 +16,7 @@
 import type { PanchangaResponse, TimingInterval, Segment } from "../types";
 import type { Language } from "../i18n";
 import { computeDailyHoras } from "./horaEngine";
-import { computeSwaraYoga } from "../swaraYoga";
+import { computeSwaraYoga, parseTimeToMinutes } from "../swaraYoga";
 import { calculateTithiSwaraInfo } from "./tithiSwaraEngine";
 import { computeNakshatraSwaraEvents } from "./nakshatraSwaraEngine";
 import { EKADASHI_NAMES } from "../vedicData";
@@ -298,9 +298,9 @@ export function normalizeDailySchedule(
   const timeZone = data.timezone || "Asia/Kolkata";
   const currentNow = nowMs ?? Date.now();
 
-  const sunriseMs = data.sunrise_ms;
-  const sunsetMs = data.sunset_ms;
-  const nextSunriseMs = data.next_sunrise_ms;
+  const sunriseMs = data.sunrise_ms || data.sunriseMs;
+  const sunsetMs = data.sunset_ms || data.sunsetMs;
+  const nextSunriseMs = data.next_sunrise_ms || (sunriseMs ? sunriseMs + 24 * 3600000 : undefined);
 
   if (!sunriseMs || !sunsetMs || !nextSunriseMs) {
     return {
@@ -485,7 +485,10 @@ export function normalizeDailySchedule(
       Water: "जल",
     };
 
-    const NADI_LABELS: Record<string, { hi: string; en: string; swaraHi: string; swaraEn: string }> = {
+    const NADI_LABELS: Record<
+      string,
+      { hi: string; en: string; swaraHi: string; swaraEn: string }
+    > = {
       ida: {
         hi: "चन्द्र नाड़ी (इड़ा · वाम स्वर)",
         en: "Lunar Nadi (Ida · Left Swara)",
@@ -605,6 +608,9 @@ export function normalizeDailySchedule(
       data.tithi[0]?.number || 1,
       formatTimeInZone(sunriseMs, timeZone),
       formatTimeInZone(sunsetMs, timeZone),
+      undefined,
+      data.moonrise,
+      data.moonset,
     );
 
     // 4.1 Sunrise Swara Window (60 mins from Sunrise)
@@ -634,7 +640,37 @@ export function normalizeDailySchedule(
       },
     });
 
-    // 4.2 Sunset Swara Window (60 mins before Sunset)
+    // 4.2 Midday Swara Window (60 mins from Midday)
+    let daytimeMs = sunsetMs - sunriseMs;
+    if (daytimeMs < 0) daytimeMs += 86400000;
+    const middayMs = sunriseMs + Math.floor(daytimeMs / 2);
+    const middayEndMs = middayMs + 3600000;
+    events.push({
+      id: `swara-midday-${middayMs}`,
+      type: "swara",
+      source: "Swara Engine",
+      category: "swara",
+      startTimeMs: middayMs,
+      endTimeMs: middayEndMs,
+      durationMs: 3600000,
+      title:
+        lang === "hi"
+          ? `मध्याह्न स्वर · ${swaraYoga.sunriseSwara === "ida" ? "इड़ा (बायाँ)" : "पिंगला (दायाँ)"}`
+          : `Midday Swara · ${swaraYoga.sunriseSwara === "ida" ? "Ida (Lunar / Left)" : "Pingala (Solar / Right)"}`,
+      subtitle:
+        lang === "hi"
+          ? `${swaraYoga.sunriseNostril === "Left" ? "बायाँ" : "दायाँ"} स्वर · मध्याह्न संधिकाल (सूर्योदय सदृश)`
+          : `${swaraYoga.sunriseNostril} Nostril · Midday Transition Window (Mirror of Sunrise)`,
+      priority: EVENT_PRIORITIES.swara,
+      colorTheme: getEventColorTheme("swara"),
+      metadata: {
+        window: "midday",
+        nadi: swaraYoga.sunriseSwara,
+        nostril: swaraYoga.sunriseNostril,
+      },
+    });
+
+    // 4.3 Sunset Swara Window (60 mins before Sunset)
     const sunsetSwaraStartMs = sunsetMs - 3600000;
     events.push({
       id: `swara-sunset-${sunsetSwaraStartMs}`,
@@ -658,6 +694,235 @@ export function normalizeDailySchedule(
         window: "sunset",
         nadi: swaraYoga.sunsetSwara,
         nostril: swaraYoga.sunsetNostril,
+      },
+    });
+
+    // 4.4 Moonrise Swara Window (60 mins from Moonrise)
+    if (data.moonrise && swaraYoga.moonriseWindow) {
+      const moonriseMs = resolveTimeStringToMs(data.moonrise, sunriseMs, timeZone);
+      if (moonriseMs !== null && !isNaN(moonriseMs)) {
+        const isMrIda = swaraYoga.moonriseSwara === "ida";
+        events.push({
+          id: `swara-moonrise-${moonriseMs}`,
+          type: "swara",
+          source: "Swara Engine",
+          category: "swara",
+          startTimeMs: moonriseMs,
+          endTimeMs: moonriseMs + 3600000,
+          durationMs: 3600000,
+          title:
+            lang === "hi"
+              ? `चन्द्रोदय स्वर · ${isMrIda ? "इड़ा (बायाँ)" : "पिंगला (दायाँ)"}`
+              : `Moonrise Swara · ${isMrIda ? "Ida (Lunar / Left)" : "Pingala (Solar / Right)"}`,
+          subtitle:
+            lang === "hi"
+              ? `${swaraYoga.moonriseNostril === "Left" ? "बायाँ" : "दायाँ"} स्वर · चन्द्रोदय संधिकाल`
+              : `${swaraYoga.moonriseNostril} Nostril · Moonrise Swara Window`,
+          priority: EVENT_PRIORITIES.swara,
+          colorTheme: getEventColorTheme("swara"),
+          metadata: {
+            window: "moonrise",
+            nadi: swaraYoga.moonriseSwara,
+            nostril: swaraYoga.moonriseNostril,
+          },
+        });
+      }
+    }
+
+    // 4.5 Moonset Swara Window (60 mins before Moonset)
+    if (data.moonset && swaraYoga.moonsetWindow) {
+      const moonsetMs = resolveTimeStringToMs(data.moonset, sunriseMs, timeZone);
+      if (moonsetMs !== null && !isNaN(moonsetMs)) {
+        const isMsIda = swaraYoga.moonsetSwara === "ida";
+        events.push({
+          id: `swara-moonset-${moonsetMs - 3600000}`,
+          type: "swara",
+          source: "Swara Engine",
+          category: "swara",
+          startTimeMs: moonsetMs - 3600000,
+          endTimeMs: moonsetMs,
+          durationMs: 3600000,
+          title:
+            lang === "hi"
+              ? `चन्द्रास्त स्वर · ${isMsIda ? "इड़ा (बायाँ)" : "पिंगला (दायाँ)"}`
+              : `Moonset Swara · ${isMsIda ? "Ida (Lunar / Left)" : "Pingala (Solar / Right)"}`,
+          subtitle:
+            lang === "hi"
+              ? `${swaraYoga.moonsetNostril === "Left" ? "बायाँ" : "दायाँ"} स्वर · चन्द्रास्त संधिकाल`
+              : `${swaraYoga.moonsetNostril} Nostril · Moonset Swara Window`,
+          priority: EVENT_PRIORITIES.swara,
+          colorTheme: getEventColorTheme("swara"),
+          metadata: {
+            window: "moonset",
+            nadi: swaraYoga.moonsetSwara,
+            nostril: swaraYoga.moonsetNostril,
+          },
+        });
+      }
+    }
+
+    // 4.6 24-Hour Alternating Hourly Swara Cycles (इड़ा/पिंगला २४-होरा प्रहर)
+    const initialIsIda = swaraYoga.sunriseSwara === "ida";
+    for (let i = 0; i < 24; i++) {
+      const cycleStartMs = sunriseMs + i * 3600000;
+      const cycleEndMs = cycleStartMs + 3600000;
+      const isIda = i % 2 === 0 ? initialIsIda : !initialIsIda;
+      const nadiHi = isIda ? "इड़ा (बायाँ/चन्द्र)" : "पिंगला (दायाँ/सूर्य)";
+      const nadiEn = isIda ? "Ida (Left/Lunar)" : "Pingala (Right/Solar)";
+      const nostril = isIda ? "Left" : "Right";
+      events.push({
+        id: `swara-cycle-${i + 1}-${cycleStartMs}`,
+        type: "swara",
+        source: "Swara Engine",
+        category: "swara",
+        startTimeMs: cycleStartMs,
+        endTimeMs: cycleEndMs,
+        durationMs: 3600000,
+        title:
+          lang === "hi" ? `स्वर प्रहर #${i + 1} · ${nadiHi}` : `Swara Prahar #${i + 1} · ${nadiEn}`,
+        subtitle:
+          lang === "hi"
+            ? `${nostril === "Left" ? "बायाँ नथुना" : "दायाँ नथुना"} · ${isIda ? "शीतल, सौम्य व शुभ कर्म" : "उष्ण, तेजस्वी व क्रियाशील कर्म"}`
+            : `${nostril} Nostril · ${isIda ? "Cooling & peaceful tasks" : "Active & dynamic tasks"}`,
+        priority: EVENT_PRIORITIES.swara + 2,
+        colorTheme: getEventColorTheme("swara"),
+        metadata: {
+          window: "hourly-cycle",
+          cycleNumber: i + 1,
+          nadi: isIda ? "ida" : "pingala",
+          nostril,
+        },
+      });
+
+      // Sushumna Sandhi (8 minutes transition at the end of each cycle)
+      const sushumnaStartMs = cycleStartMs + 52 * 60000;
+      events.push({
+        id: `swara-sushumna-sandhi-${i + 1}-${sushumnaStartMs}`,
+        type: "swara",
+        source: "Swara Engine",
+        category: "swara",
+        startTimeMs: sushumnaStartMs,
+        endTimeMs: cycleEndMs,
+        durationMs: 8 * 60000,
+        title:
+          lang === "hi"
+            ? `सुषुम्ना संधिकाल #${i + 1} · उभय नासिका (मध्य स्वर)`
+            : `Sushumna Sandhi #${i + 1} · Both Nostrils (Neutral Swara)`,
+        subtitle:
+          lang === "hi"
+            ? `स्वर परिवर्तन संधिकाल · केवल ध्यान, जप व साधना काल`
+            : `Swara shift junction · Auspicious only for meditation & japa`,
+        priority: EVENT_PRIORITIES.swara + 3,
+        colorTheme: {
+          badgeBg: "bg-purple-100",
+          badgeText: "text-purple-900",
+          badgeBorder: "border-purple-200",
+          barColor: "bg-purple-500",
+          iconColor: "text-purple-600",
+        },
+        metadata: {
+          window: "sushumna-sandhi",
+          cycleNumber: i + 1,
+          nadi: "sushumna",
+          nostril: "Both",
+        },
+      });
+    }
+
+    // 4.7 Tri-Sandhya Major Sushumna Windows
+    // Pratah Sandhya Sushumna (Dawn junction - 20 mins around sunrise)
+    events.push({
+      id: `swara-sushumna-pratah-${sunriseMs}`,
+      type: "swara",
+      source: "Swara Engine",
+      category: "swara",
+      startTimeMs: sunriseMs - 10 * 60000,
+      endTimeMs: sunriseMs + 10 * 60000,
+      durationMs: 20 * 60000,
+      title:
+        lang === "hi"
+          ? "प्रातः महा-संध्या सुषुम्ना काल · सूर्योदय संधिकाल"
+          : "Dawn Mahasandhya Sushumna · Pratah Sandhi",
+      subtitle:
+        lang === "hi"
+          ? "उभय नासिका प्रवाह · गायत्री मंत्र, प्राणायाम व ध्यान"
+          : "Both nostrils flowing · Gayatri japa, pranayama & dhyana",
+      priority: EVENT_PRIORITIES.swara + 1,
+      colorTheme: {
+        badgeBg: "bg-purple-100",
+        badgeText: "text-purple-900",
+        badgeBorder: "border-purple-200",
+        barColor: "bg-purple-500",
+        iconColor: "text-purple-600",
+      },
+      metadata: {
+        window: "sushumna-dawn",
+        nadi: "sushumna",
+        nostril: "Both",
+      },
+    });
+
+    // Madhyahna Vishuvat Sushumna (Solar noon junction - 20 mins around midday)
+    events.push({
+      id: `swara-sushumna-madhyahna-${middayMs}`,
+      type: "swara",
+      source: "Swara Engine",
+      category: "swara",
+      startTimeMs: middayMs - 10 * 60000,
+      endTimeMs: middayMs + 10 * 60000,
+      durationMs: 20 * 60000,
+      title:
+        lang === "hi"
+          ? "मध्याह्न विषुवत् सुषुम्ना काल · मध्य संधिकाल"
+          : "Midday Vishuvat Sushumna · Solar Noon Sandhi",
+      subtitle:
+        lang === "hi"
+          ? "उभय नासिका प्रवाह · मौन, आत्मचिंतन व शांति साधना"
+          : "Both nostrils flowing · Silence & spiritual contemplation",
+      priority: EVENT_PRIORITIES.swara + 1,
+      colorTheme: {
+        badgeBg: "bg-purple-100",
+        badgeText: "text-purple-900",
+        badgeBorder: "border-purple-200",
+        barColor: "bg-purple-500",
+        iconColor: "text-purple-600",
+      },
+      metadata: {
+        window: "sushumna-noon",
+        nadi: "sushumna",
+        nostril: "Both",
+      },
+    });
+
+    // Sayam Sandhya Sushumna (Dusk junction - 20 mins around sunset)
+    events.push({
+      id: `swara-sushumna-sayam-${sunsetMs}`,
+      type: "swara",
+      source: "Swara Engine",
+      category: "swara",
+      startTimeMs: sunsetMs - 10 * 60000,
+      endTimeMs: sunsetMs + 10 * 60000,
+      durationMs: 20 * 60000,
+      title:
+        lang === "hi"
+          ? "सायं महा-संध्या सुषुम्ना काल · सूर्यास्त संधिकाल"
+          : "Dusk Mahasandhya Sushumna · Sayam Sandhi",
+      subtitle:
+        lang === "hi"
+          ? "उभय नासिका प्रवाह · सांध्य वंदन, आरती, ॐ जप व दीप प्रज्वलन"
+          : "Both nostrils flowing · Evening prayers, aarti & meditation",
+      priority: EVENT_PRIORITIES.swara + 1,
+      colorTheme: {
+        badgeBg: "bg-purple-100",
+        badgeText: "text-purple-900",
+        badgeBorder: "border-purple-200",
+        barColor: "bg-purple-500",
+        iconColor: "text-purple-600",
+      },
+      metadata: {
+        window: "sushumna-dusk",
+        nadi: "sushumna",
+        nostril: "Both",
       },
     });
   } catch (err) {

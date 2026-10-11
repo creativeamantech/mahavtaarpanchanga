@@ -17,6 +17,15 @@ import { GocharView } from "./GocharView";
 import { JaiminiView } from "./JaiminiView";
 import { ShadbalaView } from "./ShadbalaView";
 import { CoordinateSelection } from "../types";
+import { KundaliCalculationService } from "../kundali/calculation/KundaliCalculationService";
+import { KundaliBirthInput } from "../kundali/core/KundaliBirthInput";
+import { FullKundliData as CanonicalFullKundliData } from "../kundali/core/FullKundliData";
+import { KundaliViewModelAdapter } from "../kundali/viewmodel/KundaliViewModelAdapter";
+import { CalculationConfigPanel } from "./CalculationConfigPanel";
+import { CalculationAuditPanel } from "./CalculationAuditPanel";
+import { EvidenceYogaCards } from "./EvidenceYogaCards";
+import { KundaliReportGenerator } from "../kundali/report/KundaliReportModel";
+import { PrintableHtmlReportGenerator } from "../kundali/report/PrintableHtmlReport";
 import {
   Sparkles,
   Calendar,
@@ -46,6 +55,9 @@ import {
   Zap,
   SlidersHorizontal,
   ArrowRight,
+  ShieldCheck,
+  FileText,
+  X,
 } from "lucide-react";
 
 interface KundliViewProps {
@@ -85,7 +97,8 @@ type TabId =
   | "ashtakavarga"
   | "kp"
   | "gunaMilan"
-  | "avakahada";
+  | "avakahada"
+  | "audit";
 
 const TAB_GROUP_CONFIG: Record<
   TabGroup,
@@ -110,7 +123,7 @@ const TAB_GROUP_CONFIG: Record<
     icon: "⏱",
     subTabs: [
       { id: "dasha", label: "दशा चक्र", icon: Clock },
-      { id: "yogas", label: "शुभ योग", icon: Award },
+      { id: "yogas", label: "शास्त्रीय योग", icon: Award },
       { id: "doshas", label: "दोष", icon: ShieldAlert },
       { id: "gochar", label: "गोचर", icon: RefreshCw },
     ],
@@ -123,6 +136,7 @@ const TAB_GROUP_CONFIG: Record<
       { id: "jaimini", label: "जैमिनी", icon: Award },
       { id: "ashtakavarga", label: "बिंदु तालिका", icon: BarChart2 },
       { id: "kp", label: "K.P. भाव", icon: Compass },
+      { id: "audit", label: "अंकेक्षण (Audit)", icon: ShieldCheck },
     ],
   },
   match: {
@@ -150,6 +164,7 @@ const TAB_TO_GROUP: Record<TabId, TabGroup> = {
   kp: "advanced",
   gunaMilan: "match",
   avakahada: "match",
+  audit: "advanced",
 };
 
 const POPULAR_BIRTH_CITIES: {
@@ -159,8 +174,20 @@ const POPULAR_BIRTH_CITIES: {
   lon: number;
   tz: string;
 }[] = [
-  { name: "Varanasi (Kashi), India", country: "IN", lat: 25.3176, lon: 82.9739, tz: "Asia/Kolkata" },
-  { name: "Ujjain (Mahakal), India", country: "IN", lat: 23.1765, lon: 75.7885, tz: "Asia/Kolkata" },
+  {
+    name: "Varanasi (Kashi), India",
+    country: "IN",
+    lat: 25.3176,
+    lon: 82.9739,
+    tz: "Asia/Kolkata",
+  },
+  {
+    name: "Ujjain (Mahakal), India",
+    country: "IN",
+    lat: 23.1765,
+    lon: 75.7885,
+    tz: "Asia/Kolkata",
+  },
   { name: "New Delhi, India", country: "IN", lat: 28.6139, lon: 77.209, tz: "Asia/Kolkata" },
   { name: "Ayodhya, India", country: "IN", lat: 26.7922, lon: 82.1998, tz: "Asia/Kolkata" },
   { name: "Haridwar, India", country: "IN", lat: 29.9457, lon: 78.1642, tz: "Asia/Kolkata" },
@@ -171,7 +198,13 @@ const POPULAR_BIRTH_CITIES: {
   { name: "Jaipur, India", country: "IN", lat: 26.9124, lon: 75.7873, tz: "Asia/Kolkata" },
   { name: "Ahmedabad, India", country: "IN", lat: 23.0225, lon: 72.5714, tz: "Asia/Kolkata" },
   { name: "Kathmandu, Nepal", country: "NP", lat: 27.7172, lon: 85.324, tz: "Asia/Kathmandu" },
-  { name: "London, United Kingdom", country: "GB", lat: 51.5074, lon: -0.1278, tz: "Europe/London" },
+  {
+    name: "London, United Kingdom",
+    country: "GB",
+    lat: 51.5074,
+    lon: -0.1278,
+    tz: "Europe/London",
+  },
   { name: "New York, USA", country: "US", lat: 40.7128, lon: -74.006, tz: "America/New_York" },
   { name: "Dubai, UAE", country: "AE", lat: 25.2048, lon: 55.2708, tz: "Asia/Dubai" },
 ];
@@ -189,7 +222,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
     const found = POPULAR_BIRTH_CITIES.find(
       (c) =>
         c.name.toLowerCase().includes(prefix) ||
-        prefix.includes(c.name.toLowerCase().split(",")[0].trim())
+        prefix.includes(c.name.toLowerCase().split(",")[0].trim()),
     );
     return found || POPULAR_BIRTH_CITIES[0];
   }, [initialCity]);
@@ -207,24 +240,18 @@ export const KundliView: React.FC<KundliViewProps> = ({
   const [selectedCity, setSelectedCity] = useState<string>(
     initialCity && POPULAR_BIRTH_CITIES.some((c) => c.name === initialCity)
       ? initialCity
-      : matchedInitialCity.name
+      : matchedInitialCity.name,
   );
   const [latitude, setLatitude] = useState<number>(
-    typeof initialLat === "number" && !isNaN(initialLat)
-      ? initialLat
-      : matchedInitialCity.lat
+    typeof initialLat === "number" && !isNaN(initialLat) ? initialLat : matchedInitialCity.lat,
   );
   const [longitude, setLongitude] = useState<number>(
-    typeof initialLon === "number" && !isNaN(initialLon)
-      ? initialLon
-      : matchedInitialCity.lon
+    typeof initialLon === "number" && !isNaN(initialLon) ? initialLon : matchedInitialCity.lon,
   );
   const [timezone, setTimezone] = useState<string>(
-    initialTimezone || matchedInitialCity.tz || "Asia/Kolkata"
+    initialTimezone || matchedInitialCity.tz || "Asia/Kolkata",
   );
-  const [ayanamsaKey, setAyanamsaKey] = useState<CoordinateSelection>(
-    initialAyanamsa || "citra"
-  );
+  const [ayanamsaKey, setAyanamsaKey] = useState<CoordinateSelection>(initialAyanamsa || "citra");
   const [isCityModalOpen, setIsCityModalOpen] = useState<boolean>(false);
   const [isFormCollapsed, setIsFormCollapsed] = useState<boolean>(false);
   const [showAdvancedLocation, setShowAdvancedLocation] = useState<boolean>(false);
@@ -264,18 +291,38 @@ export const KundliView: React.FC<KundliViewProps> = ({
     }
   }, []);
 
-  const kundliData: FullKundliData = useMemo(() => {
-    return computeFullKundli(
-      birthDate,
-      birthTime,
-      latitude,
-      longitude,
-      timezone,
-      selectedCity,
-      ayanamsaKey,
-      personName,
-      gender
-    );
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+
+  const canonicalFullData: CanonicalFullKundliData = useMemo(() => {
+    const input: KundaliBirthInput = {
+      name: personName || "जातक (Jātaka)",
+      date: birthDate || new Date().toISOString().split("T")[0],
+      time: birthTime || "12:00:00",
+      timeZone: timezone || "Asia/Kolkata",
+      latitude: typeof latitude === "number" && !isNaN(latitude) ? latitude : 25.3176,
+      longitude: typeof longitude === "number" && !isNaN(longitude) ? longitude : 82.9739,
+      placeName: selectedCity || "Varanasi (Kashi), India",
+      gender: gender as any,
+    };
+    const profileOverrides = {
+      ayanamsha: (ayanamsaKey === "citra" ? "lahiri" : ayanamsaKey) as any,
+    };
+    try {
+      return KundaliCalculationService.calculateFullKundli(input, profileOverrides);
+    } catch (e) {
+      console.warn("Retrying with safe defaults due to birth input error:", e);
+      const safeInput: KundaliBirthInput = {
+        name: "जातक (Jātaka)",
+        date: new Date().toISOString().split("T")[0],
+        time: "12:00:00",
+        timeZone: "Asia/Kolkata",
+        latitude: 25.3176,
+        longitude: 82.9739,
+        placeName: "Varanasi (Kashi), India",
+        gender: "male",
+      };
+      return KundaliCalculationService.calculateFullKundli(safeInput, profileOverrides);
+    }
   }, [
     birthDate,
     birthTime,
@@ -287,6 +334,48 @@ export const KundliView: React.FC<KundliViewProps> = ({
     personName,
     gender,
   ]);
+
+  const kundliData = useMemo(() => {
+    try {
+      if (canonicalFullData) {
+        return KundaliViewModelAdapter.createCompatibilityBundle(canonicalFullData);
+      }
+    } catch (e) {
+      console.warn("Kundli compatibility bundle creation error:", e);
+    }
+    const safeInput: KundaliBirthInput = {
+      name: "जातक (Jātaka)",
+      date: new Date().toISOString().split("T")[0],
+      time: "12:00:00",
+      timeZone: "Asia/Kolkata",
+      latitude: 25.3176,
+      longitude: 82.9739,
+      placeName: "Varanasi (Kashi), India",
+      gender: "male",
+    };
+    const safeData = KundaliCalculationService.calculateFullKundli(safeInput);
+    return KundaliViewModelAdapter.createCompatibilityBundle(safeData);
+  }, [canonicalFullData]);
+
+  const handleImportKundali = (imported: CanonicalFullKundliData) => {
+    setPersonName(imported.birthInput.name || "जातक");
+    setBirthDate(imported.birthInput.date);
+    setBirthTime(imported.birthInput.time);
+    setSelectedCity(imported.birthInput.placeName || "Imported Location");
+    setLatitude(imported.birthInput.latitude);
+    setLongitude(imported.birthInput.longitude);
+    setTimezone(imported.birthInput.timeZone);
+    if (imported.profile.ayanamsha) {
+      setAyanamsaKey(
+        (imported.profile.ayanamsha === "lahiri"
+          ? "citra"
+          : imported.profile.ayanamsha) as CoordinateSelection,
+      );
+    }
+    if (imported.birthInput.gender) {
+      setGender(imported.birthInput.gender);
+    }
+  };
 
   useEffect(() => {
     if (kundliData.vimshottari.currentMahadasha && !expandedMahadasha) {
@@ -325,8 +414,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
       setBirthTime(
         `${String(newH).padStart(2, "0")}:${String(newM).padStart(
           2,
-          "0"
-        )}:${String(newS).padStart(2, "0")}`
+          "0",
+        )}:${String(newS).padStart(2, "0")}`,
       );
     } catch {
       // ignore
@@ -368,10 +457,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
       ayanamsaKey,
       gender,
     };
-    const updated = [
-      newProfile,
-      ...savedProfiles.filter((p) => p.name !== newProfile.name),
-    ].slice(0, 10);
+    const updated = [newProfile, ...savedProfiles.filter((p) => p.name !== newProfile.name)].slice(
+      0,
+      10,
+    );
     setSavedProfiles(updated);
     try {
       localStorage.setItem("drik_kundli_profiles", JSON.stringify(updated));
@@ -437,8 +526,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
   const handlePlanetSelect = (planet: KundliPlanet) => {
     setSelectedPlanet(planet);
-    const house =
-      kundliData.housesD1.find((h) => h.houseNumber === planet.houseD1) || null;
+    const house = kundliData.housesD1.find((h) => h.houseNumber === planet.houseD1) || null;
     if (house) setSelectedHouse(house);
   };
 
@@ -510,8 +598,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 {gender === "male"
                   ? "पुरुष (Male)"
                   : gender === "female"
-                  ? "स्त्री (Female)"
-                  : "जातक"}
+                    ? "स्त्री (Female)"
+                    : "जातक"}
               </span>
             </p>
           </div>
@@ -533,6 +621,15 @@ export const KundliView: React.FC<KundliViewProps> = ({
             >
               <Save className="w-3.5 h-3.5 text-white" />
               सहेजें
+            </button>
+
+            <button
+              onClick={() => setIsReportModalOpen(true)}
+              className="flex items-center gap-1.5 min-h-[44px] px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-600 text-xs font-semibold transition-all shadow-md active:scale-95 cursor-pointer"
+              title="15-खंडीय संपूर्ण प्रामाणिक कुण्डली रिपोर्ट देखें"
+            >
+              <FileText className="w-3.5 h-3.5 text-amber-400" />
+              विस्तृत रिपोर्ट
             </button>
 
             <button
@@ -584,9 +681,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
             >
               <User className="w-3.5 h-3.5 text-amber-400" />
               <span>{p.name}</span>
-              <span className="text-[10px] opacity-60">
-                ({p.birthDate.slice(0, 4)})
-              </span>
+              <span className="text-[10px] opacity-60">({p.birthDate.slice(0, 4)})</span>
               <button
                 onClick={(e) => handleDeleteProfile(p.id, e)}
                 className="hover:text-red-400 ml-1 text-sm font-bold"
@@ -739,9 +834,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   </label>
                   <select
                     value={ayanamsaKey}
-                    onChange={(e) =>
-                      setAyanamsaKey(e.target.value as CoordinateSelection)
-                    }
+                    onChange={(e) => setAyanamsaKey(e.target.value as CoordinateSelection)}
                     className="w-full bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 min-h-[44px]"
                   >
                     <option value="citra">चित्रापक्षीय / लाहिरी (Lahiri - Drik)</option>
@@ -873,6 +966,12 @@ export const KundliView: React.FC<KundliViewProps> = ({
         </div>
       )}
 
+      {/* ================= SECTION 2: CALCULATION CONFIGURATION PANEL ================= */}
+      <CalculationConfigPanel
+        profile={canonicalFullData.profile}
+        engineVersion={canonicalFullData.engineVersion}
+      />
+
       {/* ================= 2-LEVEL TAB SYSTEM (STICKY ON MOBILE) ================= */}
       <div className="sticky top-0 z-30 bg-zinc-950/95 backdrop-blur-md pb-2 pt-1 border-b border-zinc-700 space-y-2">
         {/* Level 1: 4 Group Pills */}
@@ -933,7 +1032,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 {kundliData.lagna.signNameHi} ({kundliData.lagna.degreeInSign.toFixed(1)}°)
               </div>
               <div className="text-[11px] text-zinc-400 truncate mt-0.5">
-                {kundliData.lagna.nakshatraNameHi} (पाद {kundliData.lagna.pada}) • {kundliData.lagna.lordHi}
+                {kundliData.lagna.nakshatraNameHi} (पाद {kundliData.lagna.pada}) •{" "}
+                {kundliData.lagna.lordHi}
               </div>
             </div>
 
@@ -946,7 +1046,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 {kundliData.chandraLagna.signNameHi}
               </div>
               <div className="text-[11px] text-zinc-400 truncate mt-0.5">
-                {kundliData.planets.find((p) => p.id === "Moon")?.nakshatraNameHi} • {kundliData.avakahada.gana.hi} गण
+                {kundliData.planets.find((p) => p.id === "Moon")?.nakshatraNameHi || "अश्विनी"} •{" "}
+                {kundliData.avakahada?.gana?.hi || "देव"} गण
               </div>
             </div>
 
@@ -959,7 +1060,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 {kundliData.suryaLagna.signNameHi}
               </div>
               <div className="text-[11px] text-zinc-400 truncate mt-0.5">
-                {kundliData.planets.find((p) => p.id === "Sun")?.nakshatraNameHi} • {kundliData.planets.find((p) => p.id === "Sun")?.degreeInSign.toFixed(1)}°
+                {kundliData.planets.find((p) => p.id === "Sun")?.nakshatraNameHi} •{" "}
+                {kundliData.planets.find((p) => p.id === "Sun")?.degreeInSign.toFixed(1)}°
               </div>
             </div>
 
@@ -1071,12 +1173,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                     <ArrowRight className="w-3 h-3 text-zinc-400 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                   <div>
-                    <span className="font-bold text-xs text-white block">
-                      {card.title}
-                    </span>
-                    <span className="text-[10px] text-zinc-400 block">
-                      {card.desc}
-                    </span>
+                    <span className="font-bold text-xs text-white block">{card.title}</span>
+                    <span className="text-[10px] text-zinc-400 block">{card.desc}</span>
                   </div>
                 </button>
               );
@@ -1094,9 +1192,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 </h3>
                 <div className="flex items-center gap-1">
                   <button
-                    onClick={() =>
-                      setChartStyle(chartStyle === "north" ? "south" : "north")
-                    }
+                    onClick={() => setChartStyle(chartStyle === "north" ? "south" : "north")}
                     className="text-[11px] px-2.5 py-1 rounded-lg bg-zinc-800 border border-zinc-600 text-zinc-200 hover:bg-zinc-700 min-h-[36px]"
                   >
                     {chartStyle === "north" ? "उत्तर (Diamond)" : "दक्षिण (Square)"}
@@ -1257,14 +1353,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                     }
                   }}
                   className={`min-h-[40px] px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border appearance-none cursor-pointer pr-7 ${
-                    ![
-                      "d1",
-                      "d9",
-                      "chandra",
-                      "surya",
-                      "d10",
-                      "chalit",
-                    ].includes(activeChartType)
+                    !["d1", "d9", "chandra", "surya", "d10", "chalit"].includes(activeChartType)
                       ? "bg-amber-600 text-white border-amber-500 font-bold shadow-md"
                       : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700 hover:text-white"
                   }`}
@@ -1476,9 +1565,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                             </span>
                           ))
                         ) : (
-                          <span className="text-xs text-zinc-500">
-                            कोई प्रत्यक्ष दृष्टि नहीं
-                          </span>
+                          <span className="text-xs text-zinc-500">कोई प्रत्यक्ष दृष्टि नहीं</span>
                         )}
                       </div>
                     </div>
@@ -1507,8 +1594,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                           selectedPlanet.dignity === "exalted"
                             ? "bg-emerald-900 text-emerald-300 border-emerald-600"
                             : selectedPlanet.dignity === "debilitated"
-                            ? "bg-red-900/60 text-red-300 border-red-600"
-                            : "bg-zinc-800 text-zinc-300 border-zinc-600"
+                              ? "bg-red-900/60 text-red-300 border-red-600"
+                              : "bg-zinc-800 text-zinc-300 border-zinc-600"
                         }`}
                       >
                         {selectedPlanet.dignityLabelHi}
@@ -1517,17 +1604,13 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="bg-zinc-800 p-2 rounded-lg border border-zinc-700">
-                        <span className="text-[10px] text-zinc-400 block">
-                          राशि व भोगांश:
-                        </span>
+                        <span className="text-[10px] text-zinc-400 block">राशि व भोगांश:</span>
                         <span className="font-bold text-white">
                           {selectedPlanet.signNameHi} ({selectedPlanet.degreeInSign.toFixed(2)}°)
                         </span>
                       </div>
                       <div className="bg-zinc-800 p-2 rounded-lg border border-zinc-700">
-                        <span className="text-[10px] text-zinc-400 block">
-                          नक्षत्र व चरण:
-                        </span>
+                        <span className="text-[10px] text-zinc-400 block">नक्षत्र व चरण:</span>
                         <span className="font-bold text-white">
                           {selectedPlanet.nakshatraNameHi} ({selectedPlanet.pada})
                         </span>
@@ -1541,9 +1624,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                         </span>
                       </div>
                       <div className="bg-zinc-800 p-2 rounded-lg border border-zinc-700">
-                        <span className="text-[10px] text-zinc-400 block">
-                          D1 / D9 भाव:
-                        </span>
+                        <span className="text-[10px] text-zinc-400 block">D1 / D9 भाव:</span>
                         <span className="font-bold text-white">
                           {selectedPlanet.houseD1}म / {selectedPlanet.houseD9}म भाव
                         </span>
@@ -1648,10 +1729,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 </tr>
 
                 {filteredPlanets.map((planet) => (
-                  <tr
-                    key={planet.id}
-                    className="hover:bg-zinc-800/50 transition-colors"
-                  >
+                  <tr key={planet.id} className="hover:bg-zinc-800/50 transition-colors">
                     <td className="p-3 font-bold flex items-center gap-2">
                       <span className="text-amber-400 font-bold">{planet.symbol}</span>
                       <span className="text-white">
@@ -1676,25 +1754,19 @@ export const KundliView: React.FC<KundliViewProps> = ({
                       {planet.nakshatraNameHi} (चरण {planet.pada})
                     </td>
                     <td className="p-3 font-medium text-zinc-300">{planet.nakshatraLord}</td>
-                    <td className="p-3 text-zinc-400 font-medium">
-                      {planet.subLord}
-                    </td>
-                    <td className="p-3 font-bold text-amber-400">
-                      {planet.houseD1}म
-                    </td>
-                    <td className="p-3 font-bold text-zinc-400">
-                      {planet.houseD9}म
-                    </td>
+                    <td className="p-3 text-zinc-400 font-medium">{planet.subLord}</td>
+                    <td className="p-3 font-bold text-amber-400">{planet.houseD1}म</td>
+                    <td className="p-3 font-bold text-zinc-400">{planet.houseD9}म</td>
                     <td className="p-3">
                       <span
                         className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                           planet.dignity === "exalted"
                             ? "bg-emerald-900 text-emerald-300 border border-emerald-600"
                             : planet.dignity === "debilitated"
-                            ? "bg-red-900/60 text-red-300 border border-red-600"
-                            : planet.dignity === "own"
-                            ? "bg-blue-900 text-blue-300 border border-blue-600"
-                            : "bg-zinc-800 text-zinc-300 border border-zinc-600"
+                              ? "bg-red-900/60 text-red-300 border border-red-600"
+                              : planet.dignity === "own"
+                                ? "bg-blue-900 text-blue-300 border border-blue-600"
+                                : "bg-zinc-800 text-zinc-300 border border-zinc-600"
                         }`}
                       >
                         {planet.dignityLabelHi}
@@ -1736,10 +1808,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
                     isKendra
                       ? "border-l-4 border-l-amber-500"
                       : isTrikona
-                      ? "border-l-4 border-l-emerald-500"
-                      : isDusthana
-                      ? "border-l-4 border-l-red-500"
-                      : ""
+                        ? "border-l-4 border-l-emerald-500"
+                        : isDusthana
+                          ? "border-l-4 border-l-red-500"
+                          : ""
                   }`}
                 >
                   <div className="space-y-2">
@@ -1769,16 +1841,12 @@ export const KundliView: React.FC<KundliViewProps> = ({
                       </div>
                     </div>
 
-                    <p className="text-xs text-zinc-300 leading-relaxed">
-                      {house.significanceHi}
-                    </p>
+                    <p className="text-xs text-zinc-300 leading-relaxed">{house.significanceHi}</p>
                   </div>
 
                   <div className="pt-2 border-t border-zinc-700 space-y-1.5 text-xs">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-amber-400 font-bold text-[11px]">
-                        स्थित ग्रह:
-                      </span>
+                      <span className="text-amber-400 font-bold text-[11px]">स्थित ग्रह:</span>
                       {house.planets.length > 0 ? (
                         house.planets.map((p) => (
                           <span
@@ -1789,16 +1857,12 @@ export const KundliView: React.FC<KundliViewProps> = ({
                           </span>
                         ))
                       ) : (
-                        <span className="text-zinc-500 text-[11px]">
-                          कोई ग्रह नहीं
-                        </span>
+                        <span className="text-zinc-500 text-[11px]">कोई ग्रह नहीं</span>
                       )}
                     </div>
 
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-zinc-400 font-bold text-[11px]">
-                        दृष्टि प्रभाव:
-                      </span>
+                      <span className="text-zinc-400 font-bold text-[11px]">दृष्टि प्रभाव:</span>
                       {house.aspectingPlanets.length > 0 ? (
                         house.aspectingPlanets.map((p) => (
                           <span key={p.id} className="text-zinc-300 text-[11px]">
@@ -1806,9 +1870,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                           </span>
                         ))
                       ) : (
-                        <span className="text-zinc-500 text-[11px]">
-                          कोई नहीं
-                        </span>
+                        <span className="text-zinc-500 text-[11px]">कोई नहीं</span>
                       )}
                     </div>
                   </div>
@@ -1847,8 +1909,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   {kundliData.vimshottari.currentAntardasha
                     ? ` / ${kundliData.vimshottari.currentAntardasha.planetNameHi} अन्तर्दशा`
                     : ""}
-                  {kundliData.vimshottari.canonicalTimeline?.currentPeriods
-                    .pratyantardasha
+                  {kundliData.vimshottari.canonicalTimeline?.currentPeriods.pratyantardasha
                     ? ` / ${kundliData.vimshottari.canonicalTimeline.currentPeriods.pratyantardasha.lordNameHi} प्रत्यन्तर`
                     : ""}
                 </span>
@@ -1870,17 +1931,13 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   }`}
                 >
                   <div
-                    onClick={() =>
-                      setExpandedMahadasha(isExpanded ? null : maha.planet)
-                    }
+                    onClick={() => setExpandedMahadasha(isExpanded ? null : maha.planet)}
                     className="p-4 flex items-center justify-between cursor-pointer select-none text-xs sm:text-sm min-h-[48px]"
                   >
                     <div className="flex items-center gap-3">
                       <span
                         className={`w-3 h-3 rounded-full ${
-                          maha.isCurrent
-                            ? "bg-emerald-400 animate-ping"
-                            : "bg-zinc-600"
+                          maha.isCurrent ? "bg-emerald-400 animate-ping" : "bg-zinc-600"
                         }`}
                       ></span>
                       <span className="font-bold text-white text-sm sm:text-base">
@@ -1895,8 +1952,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
                     <div className="flex items-center gap-4 text-xs">
                       <span className="text-zinc-300 font-mono font-semibold">
-                        {maha.startDate} से {maha.endDate} ({maha.durationYears}{" "}
-                        वर्ष)
+                        {maha.startDate} से {maha.endDate} ({maha.durationYears} वर्ष)
                       </span>
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4 text-amber-400" />
@@ -1910,21 +1966,18 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   {isExpanded && (
                     <div className="p-4 pt-0 border-t border-zinc-700 animate-fadeIn">
                       <div className="text-[11px] font-bold text-amber-400 mb-2.5">
-                        {maha.planetNameHi} महादशा के अन्तर्गत 9 अन्तर्दशाएं
-                        (प्रत्यन्तर्दशा देखने हेतु क्लिक करें):
+                        {maha.planetNameHi} महादशा के अन्तर्गत 9 अन्तर्दशाएं (प्रत्यन्तर्दशा देखने
+                        हेतु क्लिक करें):
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
                         {maha.antardashas.map((antar) => {
                           const antarKey = `${maha.planet}-${antar.planet}`;
-                          const isAntarExpanded =
-                            expandedAntardasha === antarKey;
+                          const isAntarExpanded = expandedAntardasha === antarKey;
                           return (
                             <div
                               key={antar.planet}
                               className={`p-2.5 rounded-xl border flex flex-col justify-between transition-all ${
-                                isAntarExpanded
-                                  ? "col-span-full ring-1 ring-amber-500"
-                                  : ""
+                                isAntarExpanded ? "col-span-full ring-1 ring-amber-500" : ""
                               } ${
                                 antar.isCurrent
                                   ? "bg-amber-700 text-white border-amber-500 font-bold shadow-md"
@@ -1933,16 +1986,13 @@ export const KundliView: React.FC<KundliViewProps> = ({
                             >
                               <div
                                 onClick={() =>
-                                  setExpandedAntardasha(
-                                    isAntarExpanded ? null : antarKey
-                                  )
+                                  setExpandedAntardasha(isAntarExpanded ? null : antarKey)
                                 }
                                 className="cursor-pointer select-none"
                               >
                                 <div className="flex items-center justify-between">
                                   <span className="font-semibold flex items-center gap-1.5">
-                                    {maha.planetNameHi}-{antar.planetNameHi} (
-                                    {antar.planet})
+                                    {maha.planetNameHi}-{antar.planetNameHi} ({antar.planet})
                                     {antar.pratyantardashas && (
                                       <span className="text-[9px] px-1 py-0.2 rounded bg-zinc-700 text-zinc-300 border border-zinc-600">
                                         9 प्रत्यन्तर {isAntarExpanded ? "▲" : "▼"}
@@ -1956,8 +2006,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                                   )}
                                 </div>
                                 <div className="text-[11px] text-zinc-300 font-mono mt-1">
-                                  {antar.startDate} → {antar.endDate} (
-                                  {antar.durationMonths} माह)
+                                  {antar.startDate} → {antar.endDate} ({antar.durationMonths} माह)
                                 </div>
                               </div>
 
@@ -1965,8 +2014,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                               {isAntarExpanded && antar.pratyantardashas && (
                                 <div className="mt-3 pt-2.5 border-t border-zinc-700 animate-fadeIn">
                                   <div className="text-[10px] font-bold text-amber-400 mb-2">
-                                    {maha.planetNameHi}-{antar.planetNameHi} के
-                                    अन्तर्गत 9 प्रत्यन्तर्दशाएं (Level 3):
+                                    {maha.planetNameHi}-{antar.planetNameHi} के अन्तर्गत 9
+                                    प्रत्यन्तर्दशाएं (Level 3):
                                   </div>
                                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
                                     {antar.pratyantardashas.map((prat) => (
@@ -1989,8 +2038,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                                           )}
                                         </div>
                                         <div className="text-[9px] text-zinc-400 font-mono">
-                                          {prat.startDate} → {prat.endDate} (
-                                          {prat.durationDays} दिन)
+                                          {prat.startDate} → {prat.endDate} ({prat.durationDays}{" "}
+                                          दिन)
                                         </div>
                                       </div>
                                     ))}
@@ -2011,14 +2060,10 @@ export const KundliView: React.FC<KundliViewProps> = ({
       )}
 
       {/* ================= TAB 5: SHADBALA VIEW ================= */}
-      {selectedTab === "shadbala" && (
-        <ShadbalaView shadbala={kundliData.shadbala} />
-      )}
+      {selectedTab === "shadbala" && <ShadbalaView shadbala={kundliData.shadbala} />}
 
       {/* ================= TAB 6: JAIMINI JYOTISHA SYSTEM ================= */}
-      {selectedTab === "jaimini" && (
-        <JaiminiView jaimini={kundliData.jaimini} />
-      )}
+      {selectedTab === "jaimini" && <JaiminiView jaimini={kundliData.jaimini} />}
 
       {/* ================= TAB 7: ASHTAKAVARGA ================= */}
       {selectedTab === "ashtakavarga" && (
@@ -2030,123 +2075,11 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
       {/* ================= TAB 8: KP ASTROLOGY CUSPS ================= */}
       {selectedTab === "kp" && (
-        <KpAstrologyView
-          lagnaLongitude={kundliData.lagna.longitude}
-          planets={kundliData.planets}
-        />
+        <KpAstrologyView lagnaLongitude={kundliData.lagna.longitude} planets={kundliData.planets} />
       )}
 
       {/* ================= TAB 9: AUSPICIOUS YOGAS ================= */}
-      {selectedTab === "yogas" && (
-        <div className="bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-700 p-4 sm:p-6 shadow-xl space-y-4 animate-fadeIn">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-700 pb-3 gap-2">
-            <div>
-              <h3 className="text-base sm:text-lg font-bold text-zinc-200 flex items-center gap-2">
-                <Award className="w-5 h-5 text-amber-400" />
-                कुण्डली में उपस्थित विशिष्ट योग व फल (Planetary Yogas)
-              </h3>
-              <p className="text-xs text-zinc-400 mt-0.5">
-                गजकेसरी, बुधादित्य, पंचमहापुरुष एवं अन्य शुभ-अशुभ वैदिक योग संयोजन
-              </p>
-            </div>
-
-            <div className="flex gap-1.5 text-xs">
-              <button
-                onClick={() => setYogaFilter("all")}
-                className={`min-h-[36px] px-3 py-1 rounded-lg font-semibold border cursor-pointer ${
-                  yogaFilter === "all"
-                    ? "bg-amber-600 text-white border-amber-500"
-                    : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-white"
-                }`}
-              >
-                सभी
-              </button>
-              <button
-                onClick={() => setYogaFilter("auspicious")}
-                className={`min-h-[36px] px-3 py-1 rounded-lg font-semibold border cursor-pointer ${
-                  yogaFilter === "auspicious"
-                    ? "bg-emerald-900 text-emerald-300 border-emerald-600"
-                    : "bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-white"
-                }`}
-              >
-                शुभ योग
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {kundliData.yogas
-              .filter((y) => (yogaFilter === "all" ? true : y.type === yogaFilter))
-              .map((yoga, idx) => {
-                const matchingRule = kundliData.ruleResults?.find(
-                  (r) =>
-                    r.nameEn.toLowerCase() === yoga.nameEn.toLowerCase() ||
-                    r.nameHi === yoga.nameHi
-                );
-                return (
-                  <div
-                    key={idx}
-                    className={`p-4 rounded-2xl border transition-all ${
-                      yoga.present
-                        ? yoga.type === "auspicious"
-                          ? "bg-emerald-950 border border-emerald-700 shadow-sm"
-                          : "bg-red-950/60 border border-red-600"
-                        : "bg-zinc-900 border border-zinc-700 opacity-50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        {yoga.present ? (
-                          <CheckCircle2
-                            className={`w-4 h-4 ${
-                              yoga.type === "auspicious"
-                                ? "text-emerald-400"
-                                : "text-red-400"
-                            }`}
-                          />
-                        ) : (
-                          <span className="w-2 h-2 rounded-full bg-zinc-600"></span>
-                        )}
-                        <span className={`text-sm ${yoga.present ? "font-bold text-emerald-300" : "font-semibold text-zinc-400"}`}>
-                          {yoga.nameHi}
-                        </span>
-                      </div>
-                      <span
-                        className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
-                          yoga.present
-                            ? "bg-emerald-800 text-emerald-200 border border-emerald-600"
-                            : "bg-zinc-800 text-zinc-500 border border-zinc-700"
-                        }`}
-                      >
-                        {yoga.present ? "सक्रिय (Present)" : "अनुपस्थित"}
-                      </span>
-                    </div>
-                    <p className="text-xs text-zinc-300 leading-relaxed">
-                      {yoga.descriptionHi}
-                    </p>
-                    {matchingRule && (
-                      <div className="mt-2.5 pt-2 border-t border-zinc-700 flex flex-wrap items-center gap-2 text-[10px]">
-                        <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded border border-zinc-600">
-                          {matchingRule.sourceReference}
-                        </span>
-                        {matchingRule.dashaActivation
-                          ?.isActivatedByCurrentMaha && (
-                          <span className="bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded border border-emerald-600 font-bold">
-                            दशा सक्रिय (
-                            {matchingRule.dashaActivation.activeMahadashaLord})
-                          </span>
-                        )}
-                        <span className="text-amber-400 font-mono">
-                          बल: {(matchingRule.overallStrengthScore * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      )}
+      {selectedTab === "yogas" && <EvidenceYogaCards rules={canonicalFullData.rules} />}
 
       {/* ================= TAB 10: VEDIC DOSHAS ANALYSIS ================= */}
       {selectedTab === "doshas" && (
@@ -2163,9 +2096,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
               <h3 className="text-base font-bold flex items-center gap-2">
                 <Flame
                   className={`w-5 h-5 ${
-                    kundliData.doshas.manglik.isManglik
-                      ? "text-red-400"
-                      : "text-emerald-400"
+                    kundliData.doshas.manglik.isManglik ? "text-red-400" : "text-emerald-400"
                   }`}
                 />
                 <span
@@ -2188,8 +2119,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 {kundliData.doshas.manglik.isManglik
                   ? "मांगलिक प्रभाव उपस्थित"
                   : kundliData.doshas.manglik.isCancelled
-                  ? "दोष निष्प्रभावी (Cancelled)"
-                  : "मांगलिक दोष नहीं"}
+                    ? "दोष निष्प्रभावी (Cancelled)"
+                    : "मांगलिक दोष नहीं"}
               </span>
             </div>
 
@@ -2198,12 +2129,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
             </p>
 
             <div className="bg-zinc-800 p-3.5 rounded-xl border border-zinc-700 text-xs space-y-1">
-              <span className="font-bold text-amber-400 block">
-                वैदिक उपाय व मार्गदर्शन:
-              </span>
-              <p className="text-zinc-300">
-                {kundliData.doshas.manglik.remedyHi}
-              </p>
+              <span className="font-bold text-amber-400 block">वैदिक उपाय व मार्गदर्शन:</span>
+              <p className="text-zinc-300">{kundliData.doshas.manglik.remedyHi}</p>
             </div>
           </div>
 
@@ -2219,9 +2146,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
               <h3 className="text-base font-bold flex items-center gap-2">
                 <ShieldAlert
                   className={`w-5 h-5 ${
-                    kundliData.doshas.kalsarpa.present
-                      ? "text-orange-400"
-                      : "text-emerald-400"
+                    kundliData.doshas.kalsarpa.present ? "text-orange-400" : "text-emerald-400"
                   }`}
                 />
                 <span
@@ -2241,9 +2166,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                     : "bg-emerald-900 text-emerald-300 border-emerald-600"
                 }`}
               >
-                {kundliData.doshas.kalsarpa.present
-                  ? "कालसर्प योग उपस्थित"
-                  : "कालसर्प योग नहीं"}
+                {kundliData.doshas.kalsarpa.present ? "कालसर्प योग उपस्थित" : "कालसर्प योग नहीं"}
               </span>
             </div>
 
@@ -2252,12 +2175,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
             </p>
 
             <div className="bg-zinc-800 p-3.5 rounded-xl border border-zinc-700 text-xs space-y-1">
-              <span className="font-bold text-amber-400 block">
-                वैदिक उपाय व मार्गदर्शन:
-              </span>
-              <p className="text-zinc-300">
-                {kundliData.doshas.kalsarpa.remedyHi}
-              </p>
+              <span className="font-bold text-amber-400 block">वैदिक उपाय व मार्गदर्शन:</span>
+              <p className="text-zinc-300">{kundliData.doshas.kalsarpa.remedyHi}</p>
             </div>
           </div>
 
@@ -2278,12 +2197,8 @@ export const KundliView: React.FC<KundliViewProps> = ({
             </p>
 
             <div className="bg-zinc-800 p-3.5 rounded-xl border border-zinc-700 text-xs space-y-1">
-              <span className="font-bold text-amber-400 block">
-                शनि कृपा व शांति उपाय:
-              </span>
-              <p className="text-zinc-300">
-                {kundliData.doshas.sadeSati.remedyHi}
-              </p>
+              <span className="font-bold text-amber-400 block">शनि कृपा व शांति उपाय:</span>
+              <p className="text-zinc-300">{kundliData.doshas.sadeSati.remedyHi}</p>
             </div>
           </div>
 
@@ -2295,9 +2210,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                 गण्डान्त व मूल नक्षत्र स्थिति
               </h3>
               <span className="text-xs px-2.5 py-1 rounded-full font-bold bg-zinc-800 text-zinc-200 border border-zinc-600">
-                {kundliData.doshas.gandanta.isGandanta
-                  ? "गण्डान्त प्रभाव"
-                  : "गण्डान्त मुक्त"}
+                {kundliData.doshas.gandanta.isGandanta ? "गण्डान्त प्रभाव" : "गण्डान्त मुक्त"}
               </span>
             </div>
 
@@ -2307,9 +2220,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
             <div className="bg-zinc-800 p-3.5 rounded-xl border border-zinc-700 text-xs space-y-1">
               <span className="font-bold text-amber-400 block">शांति उपाय:</span>
-              <p className="text-zinc-300">
-                {kundliData.doshas.gandanta.remedyHi}
-              </p>
+              <p className="text-zinc-300">{kundliData.doshas.gandanta.remedyHi}</p>
             </div>
           </div>
         </div>
@@ -2322,9 +2233,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
           currentMoonNakshatra={
             kundliData.planets.find((p) => p.id === "Moon")?.nakshatraNumber || 1
           }
-          currentMoonPada={
-            kundliData.planets.find((p) => p.id === "Moon")?.pada || 1
-          }
+          currentMoonPada={kundliData.planets.find((p) => p.id === "Moon")?.pada || 1}
           currentMoonRasi={kundliData.chandraLagna.signIndex}
           currentIsManglik={kundliData.doshas.manglik.isManglik}
         />
@@ -2352,60 +2261,46 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="bg-zinc-800 p-3 rounded-xl border border-zinc-700">
-                <span className="text-zinc-400 font-bold block text-[11px]">
-                  वर्ण (Varna)
-                </span>
+                <span className="text-zinc-400 font-bold block text-[11px]">वर्ण (Varna)</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.varna.hi}
+                  {kundliData.avakahada?.varna?.hi || "ब्राह्मण"}
                 </span>
               </div>
               <div className="bg-zinc-800 p-3 rounded-xl border border-zinc-700">
-                <span className="text-zinc-400 font-bold block text-[11px]">
-                  वश्य (Vashya)
-                </span>
+                <span className="text-zinc-400 font-bold block text-[11px]">वश्य (Vashya)</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.vashya.hi}
+                  {kundliData.avakahada?.vashya?.hi || "मानव"}
                 </span>
               </div>
               <div className="bg-zinc-800 p-3 rounded-xl border border-zinc-700">
-                <span className="text-zinc-400 font-bold block text-[11px]">
-                  योनि (Yoni)
-                </span>
+                <span className="text-zinc-400 font-bold block text-[11px]">योनि (Yoni)</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.yoni.hi}
+                  {kundliData.avakahada?.yoni?.hi || "अश्व"}
                 </span>
               </div>
               <div className="bg-zinc-800 p-3 rounded-xl border border-zinc-700">
-                <span className="text-zinc-400 font-bold block text-[11px]">
-                  गण (Gana)
-                </span>
+                <span className="text-zinc-400 font-bold block text-[11px]">गण (Gana)</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.gana.hi}
+                  {kundliData.avakahada?.gana?.hi || "देव"}
                 </span>
               </div>
               <div className="bg-zinc-800 p-3 rounded-xl border border-zinc-700">
-                <span className="text-zinc-400 font-bold block text-[11px]">
-                  नाड़ी (Nadi)
-                </span>
+                <span className="text-zinc-400 font-bold block text-[11px]">नाड़ी (Nadi)</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.nadi.hi}
+                  {kundliData.avakahada?.nadi?.hi || "आदि"}
                 </span>
               </div>
               <div className="bg-zinc-800 p-3 rounded-xl border border-zinc-700">
-                <span className="text-zinc-400 font-bold block text-[11px]">
-                  तत्त्व (Tatva)
-                </span>
+                <span className="text-zinc-400 font-bold block text-[11px]">तत्त्व (Tatva)</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.tatva.hi}
+                  {kundliData.avakahada?.tatva?.hi || "अग्नि"}
                 </span>
               </div>
               <div className="bg-zinc-800 p-3 rounded-xl border border-zinc-700 col-span-2">
-                <span className="text-zinc-400 font-bold block text-[11px]">
-                  पाया (Paya)
-                </span>
+                <span className="text-zinc-400 font-bold block text-[11px]">पाया (Paya)</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.paya.hi} पाया (
-                  {kundliData.avakahada.paya.quality})
+                  {kundliData.avakahada?.paya?.hi || "ताम्र"} पाया (
+                  {kundliData.avakahada?.paya?.quality || "शुभ"})
                 </span>
               </div>
             </div>
@@ -2420,38 +2315,30 @@ export const KundliView: React.FC<KundliViewProps> = ({
 
             <div className="space-y-3 text-xs">
               <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-xl border border-zinc-700">
-                <span className="text-zinc-300 font-semibold">
-                  शुभ रत्न (Lucky Gemstone):
-                </span>
+                <span className="text-zinc-300 font-semibold">शुभ रत्न (Lucky Gemstone):</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.luckyGemstone.hi}
+                  {kundliData.avakahada?.luckyGemstone?.hi || "पुखराज"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-xl border border-zinc-700">
-                <span className="text-zinc-300 font-semibold">
-                  शुभ रंग (Lucky Color):
-                </span>
+                <span className="text-zinc-300 font-semibold">शुभ रंग (Lucky Color):</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.luckyColor.hi}
+                  {kundliData.avakahada?.luckyColor?.hi || "पीला"}
                 </span>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-xl border border-zinc-700">
-                <span className="text-zinc-300 font-semibold">
-                  शुभ अंक (Lucky Number):
-                </span>
+                <span className="text-zinc-300 font-semibold">शुभ अंक (Lucky Number):</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.luckyNumber}
+                  {kundliData.avakahada?.luckyNumber || 3}
                 </span>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-zinc-800 rounded-xl border border-zinc-700">
-                <span className="text-zinc-300 font-semibold">
-                  इष्ट देव (Presiding Deity):
-                </span>
+                <span className="text-zinc-300 font-semibold">इष्ट देव (Presiding Deity):</span>
                 <span className="text-sm font-bold text-white">
-                  {kundliData.avakahada.luckyDeity.hi}
+                  {kundliData.avakahada?.luckyDeity?.hi || "भगवान विष्णु"}
                 </span>
               </div>
 
@@ -2460,7 +2347,7 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   अनुकूल राशियां (Friendly Signs):
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {kundliData.avakahada.friendlyRasis.map((r, i) => (
+                  {(kundliData.avakahada?.friendlyRasis || ["सिंह", "धनु", "तुला"]).map((r, i) => (
                     <span
                       key={i}
                       className="bg-zinc-900 text-amber-400 px-2.5 py-0.5 rounded-lg border border-zinc-600 text-xs font-medium"
@@ -2470,6 +2357,74 @@ export const KundliView: React.FC<KundliViewProps> = ({
                   ))}
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ================= TAB 14: CALCULATION AUDIT PANEL ================= */}
+      {selectedTab === "audit" && (
+        <CalculationAuditPanel fullData={canonicalFullData} onImportKundali={handleImportKundali} />
+      )}
+
+      {/* ================= COMPREHENSIVE 15-SECTION REPORT PREVIEW MODAL ================= */}
+      {isReportModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Comprehensive Kundali Report"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4"
+        >
+          <div className="bg-zinc-900 border border-zinc-700 w-full max-w-5xl h-[92vh] rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-zinc-800 bg-zinc-950">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-amber-400" />
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-white">
+                    15-खंडीय संपूर्ण प्रामाणिक कुण्डली रिपोर्ट (Comprehensive Executive Report)
+                  </h3>
+                  <p className="text-[11px] text-zinc-400">
+                    A4-अनुकूल, मुद्रण योग्य एवं कैनोनिकल FullKundliData द्वारा संचालित
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const iframe = document.getElementById(
+                      "report-preview-frame",
+                    ) as HTMLIFrameElement;
+                    if (iframe && iframe.contentWindow) {
+                      iframe.contentWindow.print();
+                    }
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-md"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>प्रिंट / PDF सेव करें</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(false)}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer"
+                  aria-label="Close Report Modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body / Report Iframe */}
+            <div className="flex-1 bg-white">
+              <iframe
+                id="report-preview-frame"
+                title="Mahavtaar Kundali Comprehensive Report"
+                srcDoc={PrintableHtmlReportGenerator.generatePrintableHtml(
+                  KundaliReportGenerator.generateReportModel(canonicalFullData),
+                )}
+                className="w-full h-full border-none"
+              />
             </div>
           </div>
         </div>

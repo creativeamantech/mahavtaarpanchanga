@@ -2,7 +2,7 @@
 
 **Date:** September 2026  
 **Auditor:** Principal Jyotisha Software Architect & Computational Astrology Engineer  
-**Status:** Audit Completed  
+**Status:** Audit Completed
 
 ---
 
@@ -16,17 +16,17 @@ Only a superficial 7-planet degree sort existed in `src/lib/kundliEngine.ts` (li
 
 ## 2. Inventory of Existing Code & Status
 
-| Jaimini Component | Existing Location | Implementation Quality | Classical Fidelity | Migration / Action Needed |
-| :--- | :--- | :--- | :--- | :--- |
-| **7 Chara Karakas** | `src/lib/kundliEngine.ts` (868–885) | Naive `sort((a,b) => b.degreeInSign - a.degreeInSign)` on 7 planets | Incomplete: No tie-breaking, no arcsecond precision, hardcoded to 7 planets | Replace with canonical `CharaKarakaEngine` supporting both 7-Karaka and 8-Karaka models with tie-resolution. |
-| **8 Chara Karakas** | None | Absent | N/A | Implement 8-karaka scheme with Rahu reverse degree calculation ($30^\circ - \text{deg}$). |
-| **Arudha Lagna (AL)** | None | Absent | N/A | Implement universal `calculateArudhaPada` with classical 1st/7th house exception rules. |
-| **Bhava Padas (A2–A12)**| None | Absent | N/A | Implement all 12 Arudha Padas. |
-| **Upapada Lagna (UL)** | None | Absent | N/A | Implement Upapada (A12 / Gauna Pada) with lord, dispositor, and aspect metadata. |
-| **Karakamsha** | None | Absent | N/A | Implement Karakamsha Lagna (Navamsha sign of Atmakaraka) vs D1 Karaka placement. |
-| **Jaimini Rashi Drishti**| None | Absent | N/A | Implement dedicated `JaiminiRashiDrishtiEngine` (Movable, Fixed, Dual sign aspects). |
-| **Jaimini Dasha (Chara)**| Enum in `IDashaEngine.ts` | Type definition only | N/A | Implement canonical `CharaDashaEngine` implementing `IJaiminiDashaAdapter`. |
-| **Jaimini Yogas** | Enum in `RuleTypes.ts` | Enum definition only (`tradition: "Jaimini"`) | N/A | Register canonical Jaimini Yogas in separate Jaimini registry. |
+| Jaimini Component         | Existing Location                   | Implementation Quality                                              | Classical Fidelity                                                          | Migration / Action Needed                                                                                    |
+| :------------------------ | :---------------------------------- | :------------------------------------------------------------------ | :-------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **7 Chara Karakas**       | `src/lib/kundliEngine.ts` (868–885) | Naive `sort((a,b) => b.degreeInSign - a.degreeInSign)` on 7 planets | Incomplete: No tie-breaking, no arcsecond precision, hardcoded to 7 planets | Replace with canonical `CharaKarakaEngine` supporting both 7-Karaka and 8-Karaka models with tie-resolution. |
+| **8 Chara Karakas**       | None                                | Absent                                                              | N/A                                                                         | Implement 8-karaka scheme with Rahu reverse degree calculation ($30^\circ - \text{deg}$).                    |
+| **Arudha Lagna (AL)**     | None                                | Absent                                                              | N/A                                                                         | Implement universal `calculateArudhaPada` with classical 1st/7th house exception rules.                      |
+| **Bhava Padas (A2–A12)**  | None                                | Absent                                                              | N/A                                                                         | Implement all 12 Arudha Padas.                                                                               |
+| **Upapada Lagna (UL)**    | None                                | Absent                                                              | N/A                                                                         | Implement Upapada (A12 / Gauna Pada) with lord, dispositor, and aspect metadata.                             |
+| **Karakamsha**            | None                                | Absent                                                              | N/A                                                                         | Implement Karakamsha Lagna (Navamsha sign of Atmakaraka) vs D1 Karaka placement.                             |
+| **Jaimini Rashi Drishti** | None                                | Absent                                                              | N/A                                                                         | Implement dedicated `JaiminiRashiDrishtiEngine` (Movable, Fixed, Dual sign aspects).                         |
+| **Jaimini Dasha (Chara)** | Enum in `IDashaEngine.ts`           | Type definition only                                                | N/A                                                                         | Implement canonical `CharaDashaEngine` implementing `IJaiminiDashaAdapter`.                                  |
+| **Jaimini Yogas**         | Enum in `RuleTypes.ts`              | Enum definition only (`tradition: "Jaimini"`)                       | N/A                                                                         | Register canonical Jaimini Yogas in separate Jaimini registry.                                               |
 
 ---
 

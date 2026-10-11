@@ -91,10 +91,10 @@ export function getCanonicalNadiAtTime(
     const minutesElapsed = currentMins - sunriseMins;
     const hoursElapsed = Math.floor(minutesElapsed / 60);
     if (hoursElapsed % 2 === 1) {
-       // Toggle the Swara
-       activeSwara = swaraData.sunriseSwara === "ida" ? "pingala" : "ida";
+      // Toggle the Swara
+      activeSwara = swaraData.sunriseSwara === "ida" ? "pingala" : "ida";
     } else {
-       activeSwara = swaraData.sunriseSwara;
+      activeSwara = swaraData.sunriseSwara;
     }
   } else {
     // If before sunrise, it belongs to the previous day's alternating cycle.

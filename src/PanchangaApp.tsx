@@ -16,6 +16,7 @@ import { NextMajorIngressWidget } from "./components/NextMajorIngressWidget";
 import { PlanetaryPositionsCard } from "./components/PlanetaryPositionsCard";
 import { PlanetTransitionsCard } from "./components/PlanetTransitionsCard";
 import { MonthlyCalendarView } from "./components/MonthlyCalendarView";
+import { GoogleCalendarSyncModal } from "./components/GoogleCalendarSyncModal";
 import { LocationModal } from "./components/LocationModal";
 import { SettingsModal } from "./components/SettingsModal";
 import { PrintablePanchanga } from "./components/PrintablePanchanga";
@@ -215,7 +216,7 @@ export default function App() {
   const initialNavPrefs = getStoredNavPreferences();
   const [navPreferences, setNavPreferences] = useState<NavPreferences>(initialNavPrefs);
   const [activeView, setActiveView] = useState<ActiveView>(
-    initialNavPrefs.defaultLandingView || "home"
+    initialNavPrefs.defaultLandingView || "home",
   );
 
   const handleUpdateNavPreferences = (newPrefs: NavPreferences) => {
@@ -225,6 +226,7 @@ export default function App() {
 
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
   const [isPrintOpen, setIsPrintOpen] = useState(false);
   const [isDetectingGps, setIsDetectingGps] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -488,10 +490,17 @@ export default function App() {
   }, [fetchPanchanga]);
 
   const handleSelectCity = (city: CityLocation, saveDefault: boolean = true) => {
-    setCustomCoords(null);
+    const coords = {
+      lat: city.latitude,
+      lon: city.longitude,
+      tz: city.timezone || "Asia/Kolkata",
+      name: city.name,
+      isDeviceLocation: false,
+    };
+    setCustomCoords(coords);
     setCurrentCity(city.name);
     if (saveDefault) {
-      persistSettings(lang, ayanamsa, monthSystem, city.name, null);
+      persistSettings(lang, ayanamsa, monthSystem, city.name, coords);
       showToast(t.settingsSavedToast);
     }
   };
@@ -624,7 +633,9 @@ export default function App() {
             <NavItem
               icon={Home}
               label={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
-              subLabel={lang === "hi" ? "कस्टमाइजेबल डैशबोर्ड व प्राथमिकताएं" : "Custom Dashboard & Sorting"}
+              subLabel={
+                lang === "hi" ? "कस्टमाइजेबल डैशबोर्ड व प्राथमिकताएं" : "Custom Dashboard & Sorting"
+              }
               badge={lang === "hi" ? "केन्द्र" : "Hub"}
               isActive={activeView === "home"}
               onClick={() => setActiveView("home")}
@@ -642,7 +653,11 @@ export default function App() {
               <NavItem
                 icon={Sun}
                 label={t.views.panchanga}
-                subLabel={lang === "hi" ? "पञ्च अङ्गानि • तिथि, वार, नक्षत्र" : "Five Limbs • Tithi, Nakshatra"}
+                subLabel={
+                  lang === "hi"
+                    ? "पञ्च अङ्गानि • तिथि, वार, नक्षत्र"
+                    : "Five Limbs • Tithi, Nakshatra"
+                }
                 isActive={activeView === "panchanga"}
                 onClick={() => setActiveView("panchanga")}
                 theme={theme}
@@ -676,7 +691,9 @@ export default function App() {
               <NavItem
                 icon={Moon}
                 label={t.views.planets}
-                subLabel={lang === "hi" ? "नवग्रह प्रत्यक्ष खगोलीय स्थिति" : "Navagraha Ephemeris & Ingress"}
+                subLabel={
+                  lang === "hi" ? "नवग्रह प्रत्यक्ष खगोलीय स्थिति" : "Navagraha Ephemeris & Ingress"
+                }
                 isActive={activeView === "planets"}
                 onClick={() => setActiveView("planets")}
                 theme={theme}
@@ -684,7 +701,9 @@ export default function App() {
               <NavItem
                 icon={Compass}
                 label={t.views.kundli}
-                subLabel={lang === "hi" ? "लग्न, विंशोत्तरी, KP, गोचर" : "Birth Charts, KP, Gochar, Dasha"}
+                subLabel={
+                  lang === "hi" ? "लग्न, विंशोत्तरी, KP, गोचर" : "Birth Charts, KP, Gochar, Dasha"
+                }
                 badge={lang === "hi" ? "11 विधाएं" : "11 Tabs"}
                 isActive={activeView === "kundli" || activeView === "lagna"}
                 onClick={() => setActiveView("kundli")}
@@ -693,7 +712,9 @@ export default function App() {
               <NavItem
                 icon={Star}
                 label={t.views.navagraha}
-                subLabel={lang === "hi" ? "बीज मन्त्र, स्तोत्र व रत्न उपाय" : "Mantras, Stotram & Remedies"}
+                subLabel={
+                  lang === "hi" ? "बीज मन्त्र, स्तोत्र व रत्न उपाय" : "Mantras, Stotram & Remedies"
+                }
                 isActive={activeView === "navagraha"}
                 onClick={() => setActiveView("navagraha")}
                 theme={theme}
@@ -711,7 +732,9 @@ export default function App() {
               <NavItem
                 icon={Wind}
                 label={t.views.swara}
-                subLabel={lang === "hi" ? "इड़ा, पिङ्गला, सुषुम्णा नाड़ी" : "Ida, Pingala & Breath Flow"}
+                subLabel={
+                  lang === "hi" ? "इड़ा, पिङ्गला, सुषुम्णा नाड़ी" : "Ida, Pingala & Breath Flow"
+                }
                 isActive={activeView === "swara"}
                 onClick={() => setActiveView("swara")}
                 theme={theme}
@@ -719,7 +742,9 @@ export default function App() {
               <NavItem
                 icon={Star}
                 label={t.views.navtara}
-                subLabel={lang === "hi" ? "जन्मतारा से सम्पद-विपत् चक्र" : "Janma to Ati-Mitra Matrix"}
+                subLabel={
+                  lang === "hi" ? "जन्मतारा से सम्पद-विपत् चक्र" : "Janma to Ati-Mitra Matrix"
+                }
                 isActive={activeView === "navtara"}
                 onClick={() => setActiveView("navtara")}
                 theme={theme}
@@ -727,7 +752,9 @@ export default function App() {
               <NavItem
                 icon={Hourglass}
                 label={t.views.horas}
-                subLabel={lang === "hi" ? "सूर्योदय कालीन 24 होरा चक्र" : "24 Hourly Planetary Rulers"}
+                subLabel={
+                  lang === "hi" ? "सूर्योदय कालीन 24 होरा चक्र" : "24 Hourly Planetary Rulers"
+                }
                 isActive={activeView === "horas"}
                 onClick={() => setActiveView("horas")}
                 theme={theme}
@@ -761,12 +788,44 @@ export default function App() {
               <NavItem
                 icon={Flame}
                 label={t.views.festivals}
-                subLabel={lang === "hi" ? "एकादशी, प्रदोष, संक्रांति व जयंतियां" : "Ekadashi, Pradosh & Vratas"}
+                subLabel={
+                  lang === "hi"
+                    ? "एकादशी, प्रदोष, संक्रांति व जयंतियां"
+                    : "Ekadashi, Pradosh & Vratas"
+                }
                 badge={lang === "hi" ? "पर्व" : "Vrat"}
                 isActive={activeView === "festivals"}
                 onClick={() => setActiveView("festivals")}
                 theme={theme}
               />
+
+              {/* Google Calendar Quick Sync entry */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCalendarSyncOpen(true)}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                    theme === "nightSky"
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-200 hover:bg-amber-500/20"
+                      : "bg-amber-50/80 border-amber-200/90 text-amber-950 hover:bg-amber-100"
+                  }`}
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-600 shrink-0">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-bold font-devanagari flex items-center justify-between">
+                      <span>{lang === "hi" ? "Google Calendar सिंक" : "Google Calendar Sync"}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 font-sans font-bold uppercase">
+                        Sync
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-stone-500 dark:text-slate-400 truncate">
+                      {lang === "hi" ? "दैनिक मुहूर्त व पंचांग" : "Daily Muhurta & Events"}
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -797,6 +856,7 @@ export default function App() {
           onOpenLocation={() => setIsLocationOpen(true)}
           onDetectDeviceLocation={handleDetectDeviceLocation}
           onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
           onPrint={() => setIsPrintOpen(true)}
           lang={lang}
           onLangChange={handleLangChange}
@@ -846,7 +906,18 @@ export default function App() {
                 <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                   {customCoords && (
                     <button
-                      onClick={() => handleSelectCity({ name: "Bengaluru, IN", country: "IN", latitude: 12.9716, longitude: 77.5946, timezone: "Asia/Kolkata" }, true)}
+                      onClick={() =>
+                        handleSelectCity(
+                          {
+                            name: "Bengaluru, IN",
+                            country: "IN",
+                            latitude: 12.9716,
+                            longitude: 77.5946,
+                            timezone: "Asia/Kolkata",
+                          },
+                          true,
+                        )
+                      }
                       className="inline-flex items-center rounded-xl border border-rose-300 dark:border-rose-700 bg-white dark:bg-stone-900 px-3 py-1.5 text-xs font-semibold text-rose-800 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-stone-800 transition-colors"
                     >
                       Reset Location
@@ -876,6 +947,7 @@ export default function App() {
                   onUpdateNavPreferences={handleUpdateNavPreferences}
                   onSelectView={setActiveView}
                   onOpenSettings={() => setIsSettingsOpen(true)}
+                  onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
                 />
               </div>
             ) : isLoading && !panchangaData ? (
@@ -969,6 +1041,7 @@ export default function App() {
                       currentDateStr={currentDate}
                       onSelectDate={setCurrentDate}
                       onOpenSettings={() => setIsSettingsOpen(true)}
+                      onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
                     />
                   </div>
                 )}
@@ -1139,7 +1212,12 @@ export default function App() {
                     </div>
 
                     <section className="space-y-6">
-                      <SwaraYogaCard data={panchangaData} lang={lang} theme={theme} />
+                      <SwaraYogaCard
+                        data={panchangaData}
+                        lang={lang}
+                        theme={theme}
+                        onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
+                      />
                     </section>
                   </div>
                 )}
@@ -1228,6 +1306,7 @@ export default function App() {
                     <section className="space-y-6">
                       <MonthlyCalendarView
                         currentCity={currentCity}
+                        customCoords={customCoords}
                         monthSystem={monthSystem}
                         ayanamsa={ayanamsa}
                         currentDateStr={currentDate}
@@ -1236,6 +1315,7 @@ export default function App() {
                           setActiveView("panchanga");
                         }}
                         lang={lang}
+                        onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
                       />
                     </section>
                   </div>
@@ -1277,6 +1357,14 @@ export default function App() {
       </div>
 
       {/* Modals */}
+      <GoogleCalendarSyncModal
+        isOpen={isCalendarSyncOpen}
+        onClose={() => setIsCalendarSyncOpen(false)}
+        panchangaData={panchangaData}
+        lang={lang}
+        theme={theme}
+      />
+
       <LocationModal
         isOpen={isLocationOpen}
         onClose={() => setIsLocationOpen(false)}

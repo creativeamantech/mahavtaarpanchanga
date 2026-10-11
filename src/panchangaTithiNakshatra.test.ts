@@ -45,13 +45,21 @@ describe("Tithi and Nakshatra Exact boundaries", () => {
       "citra",
     );
 
-    expect(Math.abs(resNY.tithi[0].startTimeMs - resLon.tithi[0].startTimeMs)).toBeLessThanOrEqual(10);
+    expect(Math.abs(resNY.tithi[0].startTimeMs - resLon.tithi[0].startTimeMs)).toBeLessThanOrEqual(
+      10,
+    );
     if (resNY.tithi[0].endTimeMs && resLon.tithi[0].endTimeMs) {
-      expect(Math.abs(resNY.tithi[0].endTimeMs - resLon.tithi[0].endTimeMs)).toBeLessThanOrEqual(10);
+      expect(Math.abs(resNY.tithi[0].endTimeMs - resLon.tithi[0].endTimeMs)).toBeLessThanOrEqual(
+        10,
+      );
     }
-    expect(Math.abs(resNY.nakshatra[0].startTimeMs - resLon.nakshatra[0].startTimeMs)).toBeLessThanOrEqual(10);
+    expect(
+      Math.abs(resNY.nakshatra[0].startTimeMs - resLon.nakshatra[0].startTimeMs),
+    ).toBeLessThanOrEqual(10);
     if (resNY.nakshatra[0].endTimeMs && resLon.nakshatra[0].endTimeMs) {
-      expect(Math.abs(resNY.nakshatra[0].endTimeMs - resLon.nakshatra[0].endTimeMs)).toBeLessThanOrEqual(10);
+      expect(
+        Math.abs(resNY.nakshatra[0].endTimeMs - resLon.nakshatra[0].endTimeMs),
+      ).toBeLessThanOrEqual(10);
     }
 
     // Formatting must differ

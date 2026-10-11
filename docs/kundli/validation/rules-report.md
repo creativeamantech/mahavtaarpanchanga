@@ -2,7 +2,7 @@
 
 ## Implemented Rule Inventory
 
-The rule engine evaluates 13 core classical Parashari formations, strictly cited from *Brihat Parashara Hora Shastra* (BPHS), *Saravali*, and *Phaladeepika*:
+The rule engine evaluates 13 core classical Parashari formations, strictly cited from _Brihat Parashara Hora Shastra_ (BPHS), _Saravali_, and _Phaladeepika_:
 
 1. **Ruchaka Mahapurusha Yoga** (BPHS 75.1–5): Mars in Kendra in Aries, Scorpio, or Capricorn. Cancellation: Deep combustion (<3° Sun).
 2. **Bhadra Mahapurusha Yoga** (BPHS 75.21–25): Mercury in Kendra in Gemini or Virgo. Cancellation: Deep combustion (<2° Sun).
@@ -19,7 +19,9 @@ The rule engine evaluates 13 core classical Parashari formations, strictly cited
 13. **Guru-Chandal Yoga** (Jataka Parijata 6): Jupiter conjoined with Rahu.
 
 ## Verification Matrix
+
 Every rule is validated across 4 distinct test conditions:
+
 - **Positive Case**: Meets primary condition $\to$ `PRESENT`.
 - **Negative Case**: Fails house or sign conditions $\to$ `ABSENT`.
 - **Exception / Cancellation**: Primary condition met, but combustion or debility triggers $\to$ `CANCELLED`.

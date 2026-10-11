@@ -16,10 +16,17 @@ import { getMonthCacheKey, loadCachedMonth, saveCachedMonth } from "../lib/panch
 interface MonthlyCalendarViewProps {
   currentDateStr: string;
   currentCity: string;
+  customCoords?: {
+    lat: number;
+    lon: number;
+    tz: string;
+    name: string;
+  } | null;
   monthSystem: MonthSystem;
   ayanamsa: string;
   onSelectDate: (dateStr: string) => void;
   lang: Language;
+  onOpenCalendarSync?: () => void;
 }
 
 const MONTH_NAMES_EN = [
@@ -97,10 +104,12 @@ const parseDateString = (str: string): { year: number; month: number; day: numbe
 export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   currentDateStr,
   currentCity,
+  customCoords,
   monthSystem,
   ayanamsa,
   onSelectDate,
   lang,
+  onOpenCalendarSync,
 }) => {
   const t = translations[lang];
 
@@ -122,7 +131,10 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   useEffect(() => {
     let isCancelled = false;
     async function loadMonth() {
-      const cacheKey = getMonthCacheKey(year, month, currentCity, monthSystem, ayanamsa);
+      const locKey = customCoords
+        ? `coords_${customCoords.lat.toFixed(4)}_${customCoords.lon.toFixed(4)}`
+        : currentCity;
+      const cacheKey = getMonthCacheKey(year, month, locKey, monthSystem, ayanamsa);
       const cached = loadCachedMonth(cacheKey);
 
       if (cached && cached.length > 0) {
@@ -140,11 +152,16 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
 
       const attemptFetch = async () => {
         try {
-          const res = await fetch(
-            `/api/panchanga/month?year=${year}&month=${month}&city=${encodeURIComponent(
-              currentCity,
-            )}&month_system=${monthSystem}&ayanamsa=${ayanamsa}`,
-          );
+          let url = `/api/panchanga/month?year=${year}&month=${month}&city=${encodeURIComponent(
+            currentCity,
+          )}&month_system=${monthSystem}&ayanamsa=${ayanamsa}`;
+          if (customCoords) {
+            url += `&lat=${customCoords.lat}&lon=${customCoords.lon}&tz=${encodeURIComponent(
+              customCoords.tz || "Asia/Kolkata",
+            )}`;
+          }
+
+          const res = await fetch(url);
           if (!res.ok) throw new Error(`Failed to load month data (Status ${res.status})`);
           const json = await res.json();
           if (!isCancelled && json.days) {
@@ -608,19 +625,37 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             )}
           </div>
 
-          <button
-            type="button"
-            id="view-selected-date-btn"
-            onClick={() => onSelectDate(inspectedDay.date)}
-            className="inline-flex items-center justify-center space-x-2 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 transition-colors shrink-0"
-          >
-            <span>
-              {lang === "hi"
-                ? "इस दिन का सम्पूर्ण पञ्चाङ्ग देखें"
-                : "Open Daily Panchanga for This Date"}
-            </span>
-            <ArrowRight className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+            {onOpenCalendarSync && (
+              <button
+                type="button"
+                onClick={onOpenCalendarSync}
+                className="inline-flex items-center justify-center space-x-1.5 rounded-xl border border-amber-300 bg-amber-50 px-3.5 py-2 text-xs font-bold text-amber-900 shadow-2xs hover:bg-amber-100 transition-colors cursor-pointer"
+                title={
+                  lang === "hi"
+                    ? "गूगल कैलेंडर में सिंक करें"
+                    : "Sync Daily Events to Google Calendar"
+                }
+              >
+                <CalendarIcon className="h-3.5 w-3.5 text-amber-600" />
+                <span>{lang === "hi" ? "कैलेंडर सिंक" : "Calendar Sync"}</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              id="view-selected-date-btn"
+              onClick={() => onSelectDate(inspectedDay.date)}
+              className="inline-flex items-center justify-center space-x-2 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-amber-700 transition-colors shrink-0"
+            >
+              <span>
+                {lang === "hi"
+                  ? "इस दिन का सम्पूर्ण पञ्चाङ्ग देखें"
+                  : "Open Daily Panchanga for This Date"}
+              </span>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       )}
     </div>

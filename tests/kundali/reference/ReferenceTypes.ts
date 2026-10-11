@@ -14,11 +14,7 @@ export type DiscrepancyClassification =
   | "UNKNOWN";
 
 export type ValidationStatus =
-  | "MATCH"
-  | "WITHIN_TOLERANCE"
-  | "CONVENTION_DIFFERENCE"
-  | "REFERENCE_REQUIRED"
-  | "UNRESOLVED";
+  "MATCH" | "WITHIN_TOLERANCE" | "CONVENTION_DIFFERENCE" | "REFERENCE_REQUIRED" | "UNRESOLVED";
 
 export interface PrecisionBudgetEntry {
   subsystem: string;

@@ -14,6 +14,7 @@
 import type { PanchangaResponse } from "../types";
 import { normalizeDailySchedule } from "./dailyScheduleNormalizer";
 import type { DailyScheduleEvent, UnifiedDailySchedule } from "./dailyScheduleModel";
+import { TATTVA_MASTER_TABLE } from "../swaraYoga";
 
 export interface NotificationPreferences {
   enabled: boolean;
@@ -364,20 +365,49 @@ export function schedulePanchangaNotifications(
       }
     }
 
-    // 3. Hora-Tattva Micro-Period Events (FIX: Identifies exact Tattva whose period begins)
-    if (event.type === "hora-tattva" && prefs.horaTattvaStarts) {
+    // 3. Hora-Tattva Micro-Period Events (Exact Tatwa notification with complete details)
+    if (event.type === "hora-tattva" && (prefs.horaTattvaStarts || prefs.swaraTattvaChanges)) {
       const parentRuler = String(event.metadata?.parentHoraRuler || "");
+      const parentRulerHi = String(event.metadata?.parentHoraRulerHi || parentRuler);
+      const parentHoraIndex = event.metadata?.parentHoraIndex;
       const isPlanetEnabled = prefs.horaPlanets[parentRuler] ?? true;
 
       if (isPlanetEnabled) {
         const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
         const sanskrit = String(event.metadata?.sanskrit || "Tattva");
-        const name = String(event.metadata?.name || "");
+        const nameHi = String(event.metadata?.nameHi || sanskrit);
+        const nadiLabel = String(event.metadata?.nadiLabel || "इड़ा");
+
+        // Lookup Tattva details
+        const skey = sanskrit.toLowerCase();
+        const tKey = skey.includes("akash")
+          ? "akash"
+          : skey.includes("vayu")
+            ? "vayu"
+            : skey.includes("agni") || skey.includes("tejas")
+              ? "tejas"
+              : skey.includes("jala")
+                ? "jala"
+                : "prithvi";
+
+        const tDetails = TATTVA_MASTER_TABLE[tKey];
+        const symbol = tDetails?.symbol || "✨";
+        const qualityHi = tDetails?.quality?.hi || "";
+        const appHi = tDetails?.application?.hi || "";
+
+        const title = `${advancePrefix}${symbol} ${sanskrit} तत्त्व (${nameHi}) · ${parentRulerHi} होरा${parentHoraIndex ? ` #${parentHoraIndex}` : ""}`;
+
+        const timeRange =
+          event.formattedStart && event.formattedEnd
+            ? `${event.formattedStart} से ${event.formattedEnd}`
+            : `तक ${event.formattedEnd || ""}`;
+
+        const body = `⏰ समय: ${timeRange}\n🪐 होरा: ${parentRulerHi} | 💨 नाड़ी: ${nadiLabel}\n✨ फल: ${qualityHi}\n💡 सलाह: ${appHi}`;
 
         scheduleAlert(
           `${event.id}_start_${triggerTimeMs}`,
-          `${advancePrefix}✨ ${sanskrit} Tattva (${name}) in ${parentRuler} Hora`,
-          `Micro-period active until ${event.formattedEnd}. Element: ${name}.`,
+          title,
+          body,
           triggerTimeMs,
           prefs.customTune,
         );
@@ -403,12 +433,23 @@ export function schedulePanchangaNotifications(
         triggerTimeMs,
         prefs.customTune,
       );
-    } else if (event.type === "swara-tattva" && prefs.swaraTattvaChanges) {
+    } else if (
+      event.type === "swara-tattva" &&
+      (prefs.swaraTattvaChanges || prefs.horaTattvaStarts)
+    ) {
       const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
+      const timeRange =
+        event.formattedStart && event.formattedEnd
+          ? `${event.formattedStart} से ${event.formattedEnd}`
+          : `तक ${event.formattedEnd || ""}`;
+
+      const title = `${advancePrefix}🧘 ${event.title}`;
+      const body = `⏰ समय: ${timeRange}\n${event.subtitle || "स्वरोदय सूक्ष्म तत्त्व काल।"}`;
+
       scheduleAlert(
         `${event.id}_start_${triggerTimeMs}`,
-        `${advancePrefix}🧘 ${event.title}`,
-        `${event.subtitle || "Swarodaya elemental sub-period."}`,
+        title,
+        body,
         triggerTimeMs,
         prefs.customTune,
       );

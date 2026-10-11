@@ -16,7 +16,7 @@ export const GocharView: React.FC<GocharViewProps> = ({
   longitude = 77.209,
 }) => {
   const [selectedTransitDate, setSelectedTransitDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
+    new Date().toISOString().split("T")[0],
   );
 
   const report: GocharaReport = computeGochara(
@@ -24,7 +24,7 @@ export const GocharView: React.FC<GocharViewProps> = ({
     natalLagnaSignIndex,
     new Date(selectedTransitDate),
     latitude,
-    longitude
+    longitude,
   );
 
   return (
@@ -39,7 +39,8 @@ export const GocharView: React.FC<GocharViewProps> = ({
             </h3>
           </div>
           <p className="text-xs text-zinc-400">
-            जन्म चन्द्र राशि ({report.natalMoonSignHi}) एवं लग्न ({report.natalLagnaSignHi}) से वर्तमान गोचरीय प्रभाव
+            जन्म चन्द्र राशि ({report.natalMoonSignHi}) एवं लग्न ({report.natalLagnaSignHi}) से
+            वर्तमान गोचरीय प्रभाव
           </p>
         </div>
 
@@ -66,12 +67,8 @@ export const GocharView: React.FC<GocharViewProps> = ({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Moon className="w-4 h-4 text-amber-400" />
-            <span className="text-xs uppercase font-bold text-amber-400">
-              शनि गोचर स्थिति:
-            </span>
-            <span className="text-sm font-bold text-white">
-              {report.sadeSatiTransit.phaseHi}
-            </span>
+            <span className="text-xs uppercase font-bold text-amber-400">शनि गोचर स्थिति:</span>
+            <span className="text-sm font-bold text-white">{report.sadeSatiTransit.phaseHi}</span>
           </div>
           <p className="text-xs text-zinc-300 leading-relaxed">
             {report.sadeSatiTransit.descriptionHi}
@@ -104,8 +101,8 @@ export const GocharView: React.FC<GocharViewProps> = ({
                 t.isFavorableFromMoon
                   ? "bg-emerald-950/40 border-emerald-700"
                   : t.hasVedha
-                  ? "bg-zinc-800 border-amber-600/60"
-                  : "bg-zinc-800 border-zinc-700"
+                    ? "bg-zinc-800 border-amber-600/60"
+                    : "bg-zinc-800 border-zinc-700"
               }`}
             >
               <div>
@@ -123,8 +120,8 @@ export const GocharView: React.FC<GocharViewProps> = ({
                       t.isFavorableFromMoon
                         ? "bg-emerald-900 text-emerald-300 border-emerald-600"
                         : t.hasVedha
-                        ? "bg-orange-900 text-orange-300 border-orange-700"
-                        : "bg-zinc-700 text-zinc-300 border-zinc-600"
+                          ? "bg-orange-900 text-orange-300 border-orange-700"
+                          : "bg-zinc-700 text-zinc-300 border-zinc-600"
                     }`}
                   >
                     {t.verdictHi}
@@ -133,7 +130,8 @@ export const GocharView: React.FC<GocharViewProps> = ({
 
                 <div className="flex items-center justify-between text-xs text-zinc-400 mb-2 font-mono">
                   <span>
-                    गोचर राशि: <b className="text-white">{t.transitSignNameHi}</b> ({t.transitDegree.toFixed(1)}°)
+                    गोचर राशि: <b className="text-white">{t.transitSignNameHi}</b> (
+                    {t.transitDegree.toFixed(1)}°)
                   </span>
                   <span>
                     चन्द्र से: <b className="text-amber-400">{t.houseFromMoon}वाँ भाव</b>

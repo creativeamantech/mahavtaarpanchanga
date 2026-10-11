@@ -8,10 +8,7 @@ interface AshtakavargaViewProps {
   lagnaSignIndex: number;
 }
 
-export const AshtakavargaView: React.FC<AshtakavargaViewProps> = ({
-  planets,
-  lagnaSignIndex,
-}) => {
+export const AshtakavargaView: React.FC<AshtakavargaViewProps> = ({ planets, lagnaSignIndex }) => {
   const [selectedPlanetBAV, setSelectedPlanetBAV] = useState<string>("all");
   const data: AshtakavargaData = computeAshtakavarga(planets, lagnaSignIndex);
 
@@ -27,18 +24,23 @@ export const AshtakavargaView: React.FC<AshtakavargaViewProps> = ({
             </h3>
           </div>
           <p className="text-xs text-zinc-400">
-            महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र अनुसार कुल ३३७ रेखा/बिन्दु का १२ राशियों में वितरण
+            महर्षि पराशर विरचित बृहत्पाराशर होराशास्त्र अनुसार कुल ३३७ रेखा/बिन्दु का १२ राशियों में
+            वितरण
           </p>
         </div>
 
         <div className="flex items-center gap-3 bg-zinc-800 px-4 py-2 rounded-xl border border-zinc-700">
           <div className="text-center">
-            <span className="text-[10px] text-zinc-400 block uppercase font-bold">कुल रेखा (Total SAV)</span>
+            <span className="text-[10px] text-zinc-400 block uppercase font-bold">
+              कुल रेखा (Total SAV)
+            </span>
             <span className="text-lg font-black text-white font-mono">{data.totalSAV} / 337</span>
           </div>
           <div className="h-7 w-px bg-zinc-700"></div>
           <div className="text-center">
-            <span className="text-[10px] text-zinc-400 block uppercase font-bold">औसत प्रति भाव</span>
+            <span className="text-[10px] text-zinc-400 block uppercase font-bold">
+              औसत प्रति भाव
+            </span>
             <span className="text-lg font-black text-emerald-400 font-mono">28.08</span>
           </div>
         </div>
@@ -67,8 +69,8 @@ export const AshtakavargaView: React.FC<AshtakavargaViewProps> = ({
                   isHigh
                     ? "bg-emerald-950/40 border-emerald-700 shadow-sm"
                     : isMedium
-                    ? "bg-zinc-800 border-zinc-700"
-                    : "bg-red-950/40 border-red-800"
+                      ? "bg-zinc-800 border-zinc-700"
+                      : "bg-red-950/40 border-red-800"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -80,8 +82,8 @@ export const AshtakavargaView: React.FC<AshtakavargaViewProps> = ({
                       isHigh
                         ? "bg-emerald-900 text-emerald-300 border border-emerald-600"
                         : isMedium
-                        ? "bg-zinc-700 text-zinc-200"
-                        : "bg-red-900/60 text-red-300"
+                          ? "bg-zinc-700 text-zinc-200"
+                          : "bg-red-900/60 text-red-300"
                     }`}
                   >
                     {isHigh ? "बलवान" : isMedium ? "मध्यम" : "अल्प"}
@@ -168,7 +170,11 @@ export const AshtakavargaView: React.FC<AshtakavargaViewProps> = ({
                       <td
                         key={signIdx}
                         className={`p-2.5 text-center font-mono ${
-                          b >= 5 ? "font-bold text-emerald-300 bg-emerald-950/30" : b <= 2 ? "text-red-300" : "text-zinc-200"
+                          b >= 5
+                            ? "font-bold text-emerald-300 bg-emerald-950/30"
+                            : b <= 2
+                              ? "text-red-300"
+                              : "text-zinc-200"
                         }`}
                       >
                         {b}
@@ -211,7 +217,8 @@ export const AshtakavargaView: React.FC<AshtakavargaViewProps> = ({
             त्रिकोण शोधन (Trikona Shodhana Reduction)
           </h4>
           <p className="text-xs text-zinc-400 leading-relaxed">
-            धर्म, अर्थ, काम व मोक्ष त्रिकोणों (1-5-9, 2-6-10, 3-7-11, 4-8-12) के न्यूनतम बिन्दु घटाकर शोधन:
+            धर्म, अर्थ, काम व मोक्ष त्रिकोणों (1-5-9, 2-6-10, 3-7-11, 4-8-12) के न्यूनतम बिन्दु
+            घटाकर शोधन:
           </p>
           <div className="grid grid-cols-4 gap-2 pt-1 text-center">
             {data.trikonaShodhitaSAV.map((val, idx) => (

@@ -42,6 +42,7 @@ interface HomeHubViewProps {
   onUpdateNavPreferences: (newPrefs: NavPreferences) => void;
   onSelectView: (view: ActiveView) => void;
   onOpenSettings?: () => void;
+  onOpenCalendarSync?: () => void;
 }
 
 export const HomeHubView: React.FC<HomeHubViewProps> = ({
@@ -51,18 +52,19 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
   navPreferences,
   onUpdateNavPreferences,
   onSelectView,
+  onOpenCalendarSync,
 }) => {
   const isNight = theme === "nightSky";
 
   // Local state for editing order before or while saving
   const [currentOrder, setCurrentOrder] = useState<ActiveView[]>(
-    navPreferences.orderedViews || ALL_VIEW_METAS.map((m) => m.id)
+    navPreferences.orderedViews || ALL_VIEW_METAS.map((m) => m.id),
   );
   const [selectedDefaultView, setSelectedDefaultView] = useState<ActiveView>(
-    navPreferences.defaultLandingView || "home"
+    navPreferences.defaultLandingView || "home",
   );
   const [layoutMode, setLayoutMode] = useState<"grid" | "list">(
-    navPreferences.layoutFormat || "grid"
+    navPreferences.layoutFormat || "grid",
   );
   const [categoryFilter, setCategoryFilter] = useState<
     "all" | "core" | "astrology" | "esoteric" | "calendar"
@@ -202,81 +204,95 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
           </div>
 
           {/* Quick Cosmic Live Glance */}
-          {data && (() => {
-            const primaryTithi = Array.isArray(data.tithi) && data.tithi.length > 0 ? data.tithi[0] : null;
-            const tithiDisplay = primaryTithi
-              ? typeof primaryTithi.number === "number"
-                ? getLocalizedTithi(primaryTithi.number, lang) || primaryTithi.name
-                : primaryTithi.name || `Tithi ${primaryTithi.number}`
-              : typeof data.tithi === "string"
-              ? data.tithi
-              : "—";
+          {data &&
+            (() => {
+              const primaryTithi =
+                Array.isArray(data.tithi) && data.tithi.length > 0 ? data.tithi[0] : null;
+              const tithiDisplay = primaryTithi
+                ? typeof primaryTithi.number === "number"
+                  ? getLocalizedTithi(primaryTithi.number, lang) || primaryTithi.name
+                  : primaryTithi.name || `Tithi ${primaryTithi.number}`
+                : typeof data.tithi === "string"
+                  ? data.tithi
+                  : "—";
 
-            const primaryNak = Array.isArray(data.nakshatra) && data.nakshatra.length > 0 ? data.nakshatra[0] : null;
-            const nakshatraDisplay = primaryNak
-              ? typeof primaryNak.number === "number"
-                ? getLocalizedNakshatra(primaryNak.number, primaryNak.name || "", lang) || primaryNak.name
-                : primaryNak.name || `Nakshatra ${primaryNak.number}`
-              : typeof data.nakshatra === "string"
-              ? data.nakshatra
-              : "—";
+              const primaryNak =
+                Array.isArray(data.nakshatra) && data.nakshatra.length > 0
+                  ? data.nakshatra[0]
+                  : null;
+              const nakshatraDisplay = primaryNak
+                ? typeof primaryNak.number === "number"
+                  ? getLocalizedNakshatra(primaryNak.number, primaryNak.name || "", lang) ||
+                    primaryNak.name
+                  : primaryNak.name || `Nakshatra ${primaryNak.number}`
+                : typeof data.nakshatra === "string"
+                  ? data.nakshatra
+                  : "—";
 
-            const vaaraDisplay = data.vaara
-              ? getLocalizedVaara(data.vaara, lang)
-              : lang === "hi"
-              ? "आज का पञ्चाङ्ग"
-              : "Today's Almanac";
+              const vaaraDisplay = data.vaara
+                ? getLocalizedVaara(data.vaara, lang)
+                : lang === "hi"
+                  ? "आज का पञ्चाङ्ग"
+                  : "Today's Almanac";
 
-            return (
-              <div
-                className={`flex flex-col gap-2 p-3.5 sm:p-4 rounded-2xl border text-xs min-w-[240px] sm:min-w-[280px] shrink-0 backdrop-blur-md ${
-                  isNight
-                    ? "bg-indigo-950/60 border-indigo-800/60 text-slate-200 shadow-inner"
-                    : "bg-white/85 border-amber-300/60 text-stone-800 shadow-xs"
-                }`}
-              >
-                <div className="flex items-center justify-between border-b pb-2 border-stone-200/60 dark:border-indigo-800/40 font-bold">
-                  <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-300">
-                    <Sun className="w-4 h-4" />
-                    {vaaraDisplay}
-                  </span>
-                  <span className="text-[11px] opacity-80">{data.city}</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-[11px] pt-0.5">
-                  <div>
-                    <span className="text-stone-400 block text-[10px]">
-                      {lang === "hi" ? "तिथि" : "Tithi"}
+              return (
+                <div
+                  className={`flex flex-col gap-2 p-3.5 sm:p-4 rounded-2xl border text-xs min-w-[240px] sm:min-w-[280px] shrink-0 backdrop-blur-md ${
+                    isNight
+                      ? "bg-indigo-950/60 border-indigo-800/60 text-slate-200 shadow-inner"
+                      : "bg-white/85 border-amber-300/60 text-stone-800 shadow-xs"
+                  }`}
+                >
+                  <div className="flex items-center justify-between border-b pb-2 border-stone-200/60 dark:border-indigo-800/40 font-bold">
+                    <span className="flex items-center gap-1.5 text-amber-600 dark:text-amber-300">
+                      <Sun className="w-4 h-4" />
+                      {vaaraDisplay}
                     </span>
-                    <span className="font-bold truncate block">{tithiDisplay}</span>
+                    <span className="text-[11px] opacity-80">{data.city}</span>
                   </div>
-                  <div>
-                    <span className="text-stone-400 block text-[10px]">
-                      {lang === "hi" ? "नक्षत्र" : "Nakshatra"}
+                  <div className="grid grid-cols-2 gap-2 text-[11px] pt-0.5">
+                    <div>
+                      <span className="text-stone-400 block text-[10px]">
+                        {lang === "hi" ? "तिथि" : "Tithi"}
+                      </span>
+                      <span className="font-bold truncate block">{tithiDisplay}</span>
+                    </div>
+                    <div>
+                      <span className="text-stone-400 block text-[10px]">
+                        {lang === "hi" ? "नक्षत्र" : "Nakshatra"}
+                      </span>
+                      <span className="font-bold truncate block">{nakshatraDisplay}</span>
+                    </div>
+                  </div>
+                  <div className="pt-1 flex items-center justify-between text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {lang === "hi" ? "सूर्योदय" : "Sunrise"}: {data.sunrise || "—"}
                     </span>
-                    <span className="font-bold truncate block">{nakshatraDisplay}</span>
+                    <span>
+                      {lang === "hi" ? "सूर्यास्त" : "Sunset"}: {data.sunset || "—"}
+                    </span>
                   </div>
+                  {onOpenCalendarSync && (
+                    <button
+                      type="button"
+                      onClick={onOpenCalendarSync}
+                      className="mt-1 w-full py-1.5 px-2.5 rounded-xl border border-amber-400/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>{lang === "hi" ? "Google Calendar में सिंक करें" : "Sync to Google Calendar"}</span>
+                    </button>
+                  )}
                 </div>
-                <div className="pt-1 flex items-center justify-between text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {lang === "hi" ? "सूर्योदय" : "Sunrise"}: {data.sunrise || "—"}
-                  </span>
-                  <span>
-                    {lang === "hi" ? "सूर्यास्त" : "Sunset"}: {data.sunset || "—"}
-                  </span>
-                </div>
-              </div>
-            );
-          })()}
+              );
+            })()}
         </div>
       </div>
 
       {/* ─── Preference Control Bar (Sort, Layout, Save, Reset) ──── */}
       <div
         className={`p-4 sm:p-5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm ${
-          isNight
-            ? "bg-[#0f1527]/90 border-indigo-900/60"
-            : "bg-white border-amber-200/80"
+          isNight ? "bg-[#0f1527]/90 border-indigo-900/60" : "bg-white border-amber-200/80"
         }`}
       >
         {/* Left: Category Filters */}
@@ -301,8 +317,8 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                     ? "bg-amber-400 text-indigo-950 shadow-xs"
                     : "bg-amber-600 text-white shadow-xs"
                   : isNight
-                  ? "bg-slate-800 text-slate-300 hover:bg-slate-700"
-                  : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                    ? "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                    : "bg-stone-100 text-stone-600 hover:bg-stone-200"
               }`}
             >
               {lang === "hi" ? cat.labelHi : cat.labelEn}
@@ -361,8 +377,8 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
               showReorderMode
                 ? "bg-amber-500 text-stone-950 border-amber-600 shadow-xs"
                 : isNight
-                ? "bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700"
-                : "bg-stone-50 border-stone-300 text-stone-700 hover:bg-stone-100"
+                  ? "bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700"
+                  : "bg-stone-50 border-stone-300 text-stone-700 hover:bg-stone-100"
             }`}
           >
             <ArrowUp className="w-3.5 h-3.5" />
@@ -373,8 +389,8 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                   ? "क्रम व्यवस्था पूर्ण"
                   : "Done Sorting"
                 : lang === "hi"
-                ? "क्रम बदलें (Sort)"
-                : "Customize Order"}
+                  ? "क्रम बदलें (Sort)"
+                  : "Customize Order"}
             </span>
           </button>
 
@@ -385,9 +401,7 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
             title={lang === "hi" ? "मूल क्रम में रीसेट करें" : "Reset Order"}
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">
-              {lang === "hi" ? "रीसेट" : "Reset"}
-            </span>
+            <span className="hidden sm:inline">{lang === "hi" ? "रीसेट" : "Reset"}</span>
           </button>
 
           {/* Save Preferences Button */}
@@ -396,9 +410,7 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
             className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-xs flex items-center gap-1.5 ring-2 ring-emerald-500/20"
           >
             <Save className="w-3.5 h-3.5" />
-            <span>
-              {lang === "hi" ? "प्रेफरेंस सहेजें" : "Save Preferences"}
-            </span>
+            <span>{lang === "hi" ? "प्रेफरेंस सहेजें" : "Save Preferences"}</span>
           </button>
         </div>
       </div>
@@ -481,8 +493,8 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                       ? "bg-gradient-to-b from-indigo-950/80 to-slate-900 border-amber-400/50 shadow-md ring-1 ring-amber-400/30"
                       : "bg-gradient-to-b from-amber-50/90 to-white border-amber-400 shadow-md ring-1 ring-amber-400/30"
                     : isNight
-                    ? "bg-[#11172a]/90 border-slate-800 hover:border-indigo-700/80 hover:bg-[#151d36]"
-                    : "bg-white border-stone-200/90 hover:border-amber-400/80 hover:bg-amber-50/20"
+                      ? "bg-[#11172a]/90 border-slate-800 hover:border-indigo-700/80 hover:bg-[#151d36]"
+                      : "bg-white border-stone-200/90 hover:border-amber-400/80 hover:bg-amber-50/20"
                 }`}
               >
                 {/* Header of Card */}
@@ -561,9 +573,7 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                         : "text-stone-400 hover:text-stone-700 dark:hover:text-slate-200 hover:bg-stone-100 dark:hover:bg-slate-800"
                     }`}
                     title={
-                      lang === "hi"
-                        ? "ऐप खुलने पर यह पेज दिखाएं"
-                        : "Set as initial landing page"
+                      lang === "hi" ? "ऐप खुलने पर यह पेज दिखाएं" : "Set as initial landing page"
                     }
                   >
                     <Bookmark className="w-3 h-3" />
@@ -573,8 +583,8 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                           ? "डिफ़ॉल्ट पेज ✓"
                           : "Default Landing ✓"
                         : lang === "hi"
-                        ? "डिफ़ॉल्ट बनाएं"
-                        : "Set Default"}
+                          ? "डिफ़ॉल्ट बनाएं"
+                          : "Set Default"}
                     </span>
                   </button>
 
@@ -605,8 +615,8 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                       ? "bg-indigo-950/80 border-amber-400/50"
                       : "bg-amber-50/90 border-amber-400/80"
                     : isNight
-                    ? "bg-[#11172a]/90 border-slate-800 hover:border-indigo-700"
-                    : "bg-white border-stone-200 hover:border-amber-300"
+                      ? "bg-[#11172a]/90 border-slate-800 hover:border-indigo-700"
+                      : "bg-white border-stone-200 hover:border-amber-300"
                 }`}
               >
                 <div className="flex items-center space-x-3.5 min-w-0 flex-1">
@@ -655,8 +665,8 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                         ? "डिफ़ॉल्ट ✓"
                         : "Default ✓"
                       : lang === "hi"
-                      ? "डिफ़ॉल्ट चुनें"
-                      : "Make Default"}
+                        ? "डिफ़ॉल्ट चुनें"
+                        : "Make Default"}
                   </button>
 
                   <div className="flex items-center gap-1 bg-stone-100 dark:bg-slate-800 p-1 rounded-xl border border-stone-200 dark:border-slate-700">

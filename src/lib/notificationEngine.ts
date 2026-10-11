@@ -40,6 +40,10 @@ export interface NotificationPreferences {
   planetaryTransits: boolean;
   tithiSwara: boolean;
 
+  /** Sensory feedback toggles on Tattva change */
+  tattvaAudioFeedback?: boolean;
+  tattvaHapticFeedback?: boolean;
+
   /** Filter by Planetary Hora ruler */
   horaPlanets: Record<string, boolean>;
 
@@ -66,6 +70,8 @@ export const defaultNotificationPreferences: NotificationPreferences = {
   muhurtas: true,
   planetaryTransits: true,
   tithiSwara: true,
+  tattvaAudioFeedback: true,
+  tattvaHapticFeedback: true,
   horaPlanets: {
     Sun: true,
     Moon: true,
@@ -197,6 +203,86 @@ export function playNotificationTune(tune: string | undefined) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Tattva Elemental Sensory Feedback (Audio Chime & Haptic Vibration)
+// ---------------------------------------------------------------------------
+
+const TATTVA_CHIME_SPECS: Record<
+  string,
+  { freqs: number[]; duration: number; type: OscillatorType }
+> = {
+  prithvi: { freqs: [216, 432], duration: 0.9, type: "sine" }, // Earth - grounding low warm frequency
+  jala: { freqs: [288, 576], duration: 1.1, type: "sine" }, // Water - soothing fluid chime
+  tejas: { freqs: [360, 720], duration: 0.7, type: "triangle" }, // Fire - energetic clear note
+  vayu: { freqs: [432, 864], duration: 0.9, type: "sine" }, // Air - light uplifting frequency
+  akash: { freqs: [528, 1056], duration: 1.6, type: "sine" }, // Ether - resonant cosmic bell
+};
+
+export function playTattvaAudioChime(tattvaName?: string) {
+  if (typeof window === "undefined") return;
+  const key = (tattvaName || "prithvi").toLowerCase();
+  const spec =
+    TATTVA_CHIME_SPECS[key] ||
+    (key.includes("water") || key.includes("jala")
+      ? TATTVA_CHIME_SPECS.jala
+      : key.includes("fire") || key.includes("tejas") || key.includes("agni")
+        ? TATTVA_CHIME_SPECS.tejas
+        : key.includes("air") || key.includes("vayu")
+          ? TATTVA_CHIME_SPECS.vayu
+          : key.includes("ether") || key.includes("akash")
+            ? TATTVA_CHIME_SPECS.akash
+            : TATTVA_CHIME_SPECS.prithvi);
+
+  try {
+    const Ctx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    void ctx.resume();
+    const now = ctx.currentTime;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + spec.duration);
+    gain.connect(ctx.destination);
+
+    spec.freqs.forEach((freq) => {
+      const osc = ctx.createOscillator();
+      osc.type = spec.type;
+      osc.frequency.setValueAtTime(freq, now);
+      osc.connect(gain);
+      osc.start(now);
+      osc.stop(now + spec.duration);
+    });
+    window.setTimeout(() => void ctx.close().catch(() => {}), (spec.duration + 0.3) * 1000);
+  } catch {
+    // Audio unavailable
+  }
+}
+
+export function triggerTattvaHapticVibration() {
+  if (typeof window === "undefined" || !("navigator" in window)) return;
+  try {
+    if ("vibrate" in navigator && typeof navigator.vibrate === "function") {
+      // Subtle haptic pulse: 80ms vibration, 50ms pause, 80ms vibration
+      navigator.vibrate([80, 50, 80]);
+    }
+  } catch {
+    // Haptics unavailable
+  }
+}
+
+export function triggerTattvaSensoryFeedback(tattvaName?: string, prefs?: NotificationPreferences) {
+  const effectivePrefs = prefs || getNotificationPreferences();
+  if (effectivePrefs.tattvaAudioFeedback ?? true) {
+    playTattvaAudioChime(tattvaName);
+  }
+  if (effectivePrefs.tattvaHapticFeedback ?? true) {
+    triggerTattvaHapticVibration();
+  }
+}
+
 // Keep track of active timeouts so we can clear them when data or settings change
 let activeTimeouts: ReturnType<typeof setTimeout>[] = [];
 const scheduledIds = new Set<string>();
@@ -258,6 +344,11 @@ function scheduleAlert(
   body: string,
   triggerTimeMs: number,
   customTune?: string,
+  sensoryOptions?: {
+    isTattva?: boolean;
+    tattvaName?: string;
+    prefs?: NotificationPreferences;
+  },
 ) {
   if (scheduledIds.has(id)) return; // Prevent duplicates
   scheduledIds.add(id);
@@ -268,7 +359,11 @@ function scheduleAlert(
   // Only schedule if it's in the future and within the next 24 hours
   if (delay > 0 && delay < 24 * 60 * 60 * 1000) {
     const timeout = setTimeout(() => {
-      playNotificationTune(customTune);
+      if (sensoryOptions?.isTattva) {
+        triggerTattvaSensoryFeedback(sensoryOptions.tattvaName, sensoryOptions.prefs);
+      } else {
+        playNotificationTune(customTune);
+      }
       void showNotificationNow(title, body, id);
     }, delay);
     activeTimeouts.push(timeout);
@@ -365,11 +460,10 @@ export function schedulePanchangaNotifications(
       }
     }
 
-    // 3. Hora-Tattva Micro-Period Events (Exact Tatwa notification with complete details)
+    // 3. Hora-Tattva Micro-Period Events (Exact Tattva notification with complete Planet & Nadi details)
     if (event.type === "hora-tattva" && (prefs.horaTattvaStarts || prefs.swaraTattvaChanges)) {
       const parentRuler = String(event.metadata?.parentHoraRuler || "");
       const parentRulerHi = String(event.metadata?.parentHoraRulerHi || parentRuler);
-      const parentHoraIndex = event.metadata?.parentHoraIndex;
       const isPlanetEnabled = prefs.horaPlanets[parentRuler] ?? true;
 
       if (isPlanetEnabled) {
@@ -377,6 +471,7 @@ export function schedulePanchangaNotifications(
         const sanskrit = String(event.metadata?.sanskrit || "Tattva");
         const nameHi = String(event.metadata?.nameHi || sanskrit);
         const nadiLabel = String(event.metadata?.nadiLabel || "इड़ा");
+        const nadiSwara = String(event.metadata?.nadiSwara || "वाम नासिका (बायाँ स्वर)");
 
         // Lookup Tattva details
         const skey = sanskrit.toLowerCase();
@@ -395,14 +490,14 @@ export function schedulePanchangaNotifications(
         const qualityHi = tDetails?.quality?.hi || "";
         const appHi = tDetails?.application?.hi || "";
 
-        const title = `${advancePrefix}${symbol} ${sanskrit} तत्त्व (${nameHi}) · ${parentRulerHi} होरा${parentHoraIndex ? ` #${parentHoraIndex}` : ""}`;
+        const title = `${advancePrefix}${symbol} ${sanskrit} तत्त्व (${nameHi}) · 🪐 ${parentRulerHi} होरा · 💨 ${nadiLabel} नाड़ी`;
 
         const timeRange =
           event.formattedStart && event.formattedEnd
             ? `${event.formattedStart} से ${event.formattedEnd}`
             : `तक ${event.formattedEnd || ""}`;
 
-        const body = `⏰ समय: ${timeRange}\n🪐 होरा: ${parentRulerHi} | 💨 नाड़ी: ${nadiLabel}\n✨ फल: ${qualityHi}\n💡 सलाह: ${appHi}`;
+        const body = `⏰ समय: ${timeRange}\n🪐 होरा शासक ग्रह (Planet): ${parentRulerHi}\n💨 सक्रिय नाड़ी (Nadi): ${nadiLabel} (${nadiSwara})\n✨ फल: ${qualityHi}\n💡 सलाह: ${appHi}`;
 
         scheduleAlert(
           `${event.id}_start_${triggerTimeMs}`,
@@ -410,6 +505,38 @@ export function schedulePanchangaNotifications(
           body,
           triggerTimeMs,
           prefs.customTune,
+          { isTattva: true, tattvaName: sanskrit, prefs },
+        );
+      }
+    }
+
+    // 3b. Tattva Transitions (Transitions between elements with explicit Planet & Nadi)
+    if (
+      event.type === "tattva-transition" &&
+      (prefs.horaTattvaStarts || prefs.swaraTattvaChanges)
+    ) {
+      const parentRuler = String(event.metadata?.parentHoraRuler || "");
+      const parentRulerHi = String(event.metadata?.parentHoraRulerHi || parentRuler);
+      const isPlanetEnabled = prefs.horaPlanets[parentRuler] ?? true;
+
+      if (isPlanetEnabled) {
+        const triggerTimeMs = event.startTimeMs - advanceOffsetMs;
+        const fromTattva = String(event.metadata?.fromTattva || "तत्त्व");
+        const toTattva = String(event.metadata?.toTattva || "तत्त्व");
+        const nadiLabel = String(event.metadata?.nadiLabel || "इड़ा");
+        const nadiSwara = String(event.metadata?.nadiSwara || "वाम नासिका");
+
+        const title = `${advancePrefix}🔄 तत्त्व संधिकाल: ${fromTattva} ➔ ${toTattva} · 🪐 ${parentRulerHi} | 💨 ${nadiLabel}`;
+        const timeStr = event.formattedStart || "संक्रमण काल";
+        const body = `⏰ परिवर्तन समय: ${timeStr}\n🪐 शासक ग्रह (Planet): ${parentRulerHi}\n💨 सक्रिय नाड़ी (Nadi): ${nadiLabel} (${nadiSwara})\n✨ ${fromTattva} तत्त्व संधिकाल समाप्त, नवीन ${toTattva} तत्त्व आरंभ।\n💡 सलाह: श्वास संतुलन, ध्यान व शांतिपूर्ण सूक्ष्म साधना करें।`;
+
+        scheduleAlert(
+          `${event.id}_trans_${triggerTimeMs}`,
+          title,
+          body,
+          triggerTimeMs,
+          prefs.customTune,
+          { isTattva: true, tattvaName: toTattva, prefs },
         );
       }
     }
@@ -443,8 +570,13 @@ export function schedulePanchangaNotifications(
           ? `${event.formattedStart} से ${event.formattedEnd}`
           : `तक ${event.formattedEnd || ""}`;
 
-      const title = `${advancePrefix}🧘 ${event.title}`;
-      const body = `⏰ समय: ${timeRange}\n${event.subtitle || "स्वरोदय सूक्ष्म तत्त्व काल।"}`;
+      const nadiLabel = String(event.metadata?.nadiLabel || event.metadata?.nadi || "स्वर नाड़ी");
+      const planetLabel = String(
+        event.metadata?.planetLabel || event.metadata?.parentHoraRulerHi || "होरा ग्रह",
+      );
+
+      const title = `${advancePrefix}🧘 ${event.title} · 🪐 ${planetLabel} | 💨 ${nadiLabel}`;
+      const body = `⏰ समय: ${timeRange}\n🪐 ग्रह (Planet): ${planetLabel}\n💨 नाड़ी (Nadi): ${nadiLabel}\n✨ ${event.subtitle || "स्वरोदय सूक्ष्म तत्त्व काल।"}`;
 
       scheduleAlert(
         `${event.id}_start_${triggerTimeMs}`,
@@ -452,6 +584,7 @@ export function schedulePanchangaNotifications(
         body,
         triggerTimeMs,
         prefs.customTune,
+        { isTattva: true, tattvaName: event.title, prefs },
       );
     }
 

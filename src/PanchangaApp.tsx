@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Header } from "./components/Header";
 import { SpiritualTabs } from "./components/SpiritualTabs";
 import { VedicInvocationBanner } from "./components/VedicInvocationBanner";
@@ -28,6 +28,11 @@ import { FestivalsView } from "./components/FestivalsView";
 import { InvocationBanner } from "./components/InvocationBanner";
 import { NavagrahaView } from "./components/NavagrahaView";
 import { KundliView } from "./components/KundliView";
+import { getAccessToken } from "./services/googleCalendarAuth";
+import {
+  syncMultiDayPanchangaEvents,
+  getAutoContinuousSyncPref,
+} from "./services/googleCalendarService";
 import type {
   PanchangaResponse,
   CityLocation,
@@ -64,7 +69,9 @@ import { type Language, translations } from "./i18n";
 import {
   schedulePanchangaNotifications,
   getNotificationPreferences,
+  triggerTattvaSensoryFeedback,
 } from "./lib/notificationEngine";
+import { resolveCurrentHora } from "./horaEngine";
 import type { ActiveView } from "./components/Header";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -244,6 +251,17 @@ export default function App() {
     if (panchangaData) {
       const prefs = getNotificationPreferences();
       schedulePanchangaNotifications(panchangaData, prefs);
+
+      // Background Continuous Auto-Sync into "Panchang Calendar" if enabled by user
+      if (getAutoContinuousSyncPref()) {
+        getAccessToken().then((token) => {
+          if (token) {
+            syncMultiDayPanchangaEvents(token, panchangaData, 30).catch((err) =>
+              console.warn("Panchang Calendar auto-sync background notice:", err),
+            );
+          }
+        });
+      }
     }
   }, [panchangaData]);
 
@@ -253,6 +271,16 @@ export default function App() {
       if (panchangaData) {
         const prefs = getNotificationPreferences();
         schedulePanchangaNotifications(panchangaData, prefs);
+
+        if (getAutoContinuousSyncPref()) {
+          getAccessToken().then((token) => {
+            if (token) {
+              syncMultiDayPanchangaEvents(token, panchangaData, 30).catch((err) =>
+                console.warn("Panchang Calendar auto-sync background notice:", err),
+              );
+            }
+          });
+        }
       }
     };
     const handleVisibility = () => {
@@ -264,6 +292,24 @@ export default function App() {
       window.removeEventListener("mahavtaar_notif_prefs_updated", handlePrefsUpdate);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
+  }, [panchangaData]);
+
+  // Real-time sensory feedback (Audio Chime & Subtle Haptic Vibration) on live Tattva transitions
+  const prevActiveTattvaKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!panchangaData) return;
+    const interval = setInterval(() => {
+      const nowMs = Date.now();
+      const currentHoraState = resolveCurrentHora(nowMs, panchangaData);
+      if (currentHoraState?.activeTattva) {
+        const currentKey = `${currentHoraState.activeTattva.sanskrit}_${currentHoraState.activeTattva.startTimeMs}`;
+        if (prevActiveTattvaKeyRef.current && prevActiveTattvaKeyRef.current !== currentKey) {
+          triggerTattvaSensoryFeedback(currentHoraState.activeTattva.sanskrit);
+        }
+        prevActiveTattvaKeyRef.current = currentKey;
+      }
+    }, 1000);
+    return () => clearInterval(interval);
   }, [panchangaData]);
 
   useEffect(() => {

@@ -159,7 +159,11 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({
                 type="button"
                 onClick={onOpenCalendarSync}
                 className="inline-flex items-center space-x-1.5 rounded-xl border border-cyan-300 dark:border-cyan-700 bg-cyan-50 dark:bg-cyan-950/60 px-3 py-1.5 text-xs font-bold text-cyan-900 dark:text-cyan-200 hover:bg-cyan-100 transition-colors shadow-2xs cursor-pointer"
-                title={lang === "hi" ? "गूगल कैलेंडर में स्वर काल सिंक करें" : "Sync Swara Events to Google Calendar"}
+                title={
+                  lang === "hi"
+                    ? "गूगल कैलेंडर में स्वर काल सिंक करें"
+                    : "Sync Swara Events to Google Calendar"
+                }
               >
                 <Calendar className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
                 <span>{lang === "hi" ? "कैलेंडर सिंक" : "Sync Swara"}</span>
@@ -714,20 +718,37 @@ export const SwaraYogaCard: React.FC<SwaraYogaCardProps> = ({
             </div>
 
             {activeHoraTattva && (
-              <div className="rounded-xl border border-amber-200/80 bg-white/80 p-3 flex items-center justify-between">
+              <div className="rounded-xl border border-amber-200/80 bg-white/80 p-3 flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-wider text-stone-500">
                     {lang === "hi" ? "वर्तमान होरा तत्त्व" : "Active Hora Tattva"}
                   </div>
-                  <div className="font-serif-vedic text-sm font-bold text-stone-900 flex items-center space-x-1.5 mt-0.5">
+                  <div className="font-serif-vedic text-sm font-bold text-stone-900 flex flex-wrap items-center gap-1.5 mt-0.5">
                     <span
-                      className="inline-block h-2.5 w-2.5 rounded-full"
+                      className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
                       style={{ backgroundColor: activeHoraTattva.color }}
                     ></span>
                     <span>{activeHoraTattva.sanskrit}</span>
                     <span className="text-xs font-normal text-stone-500 font-sans">
                       ({activeHoraTattva.name})
                     </span>
+                    {horaState?.activeHora && (
+                      <>
+                        <span className="text-[10px] font-medium text-indigo-800 bg-indigo-100/90 px-1.5 py-0.5 rounded border border-indigo-200">
+                          🪐 {horaState.activeHora.planet}
+                        </span>
+                        <span className="text-[10px] font-medium text-cyan-800 bg-cyan-100/90 px-1.5 py-0.5 rounded border border-cyan-200">
+                          💨{" "}
+                          {horaState.activeHora.nadi === "ida"
+                            ? lang === "hi"
+                              ? "इड़ा (वाम)"
+                              : "Ida (Left)"
+                            : lang === "hi"
+                              ? "पिङ्गला (दक्षिण)"
+                              : "Pingala (Right)"}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="text-right text-[11px] text-stone-600">

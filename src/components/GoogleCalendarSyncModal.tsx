@@ -28,9 +28,15 @@ import {
 } from "../services/googleCalendarAuth";
 import {
   syncDailyPanchangaEvents,
+  syncMultiDayPanchangaEvents,
+  getAutoContinuousSyncPref,
+  setAutoContinuousSyncPref,
   listPanchangaEvents,
   deleteCalendarEvent,
   deletePanchangaEventsForDate,
+  downloadPanchangaIcsFile,
+  openDirectGoogleCalendarUrl,
+  buildPanchangaEventPayloads,
   SyncedCalendarEvent,
   SyncOptions,
   DEFAULT_SYNC_OPTIONS,
@@ -77,6 +83,13 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [confirmDeleteAll, setConfirmDeleteAll] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  // Continuous Sync & Multi-Day Range State
+  const [syncRangeDays, setSyncRangeDays] = useState<number>(30); // 1, 7, 30
+  const [autoContinuousSync, setAutoContinuousSync] = useState<boolean>(
+    getAutoContinuousSyncPref(),
+  );
+  const [syncProgress, setSyncProgress] = useState<{ current: number; total: number } | null>(null);
 
   // Initialize Auth
   useEffect(() => {
@@ -193,37 +206,62 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
     }
   };
 
-  // Handle Sync
-  const handleSyncToday = async () => {
+  const toggleAutoContinuousSync = (val: boolean) => {
+    setAutoContinuousSync(val);
+    setAutoContinuousSyncPref(val);
+  };
+
+  // Handle Sync with Multi-Day Range into Panchang Calendar
+  const handleSyncRange = async () => {
     if (!token || !panchangaData) return;
 
     setIsSyncing(true);
     setActionError(null);
     setSyncSuccessMsg(null);
+    setSyncProgress({ current: 1, total: syncRangeDays });
 
     try {
-      const result = await syncDailyPanchangaEvents(token, panchangaData, options);
+      if (syncRangeDays === 1) {
+        const result = await syncDailyPanchangaEvents(token, panchangaData, options);
 
-      if (result.created.length > 0) {
+        if (result.created.length > 0) {
+          const msg =
+            lang === "hi"
+              ? `सफलतापूर्वक ${result.created.length} पंचांग कार्यक्रम 'Panchang Calendar' में सिंक किए गए!`
+              : `Successfully synced ${result.created.length} Panchanga event(s) to 'Panchang Calendar'!`;
+          setSyncSuccessMsg(msg);
+        } else {
+          const msg =
+            lang === "hi"
+              ? `आज के कार्यक्रम पहले से ही 'Panchang Calendar' में उपस्थित हैं।`
+              : `Events for today are already present in 'Panchang Calendar'.`;
+          setSyncSuccessMsg(msg);
+        }
+      } else {
+        const result = await syncMultiDayPanchangaEvents(
+          token,
+          panchangaData,
+          syncRangeDays,
+          options,
+          (cur, total) => {
+            setSyncProgress({ current: cur, total });
+          },
+        );
+
         const msg =
           lang === "hi"
-            ? `सफलतापूर्वक ${result.created.length} पंचांग कार्यक्रम Google Calendar में सिंक किए गए!`
-            : `Successfully synced ${result.created.length} Panchanga event(s) to Google Calendar!`;
-        setSyncSuccessMsg(msg);
-      } else if (result.skipped > 0) {
-        const msg =
-          lang === "hi"
-            ? `आज के कार्यक्रम पहले से ही Google Calendar में उपस्थित हैं।`
-            : `All selected events for today are already present in Google Calendar.`;
+            ? `सफलतापूर्वक ${syncRangeDays} दिनों के कार्यक्रम (कुल ${result.totalCreated} नए) 'Panchang Calendar' में सिंक किए गए!`
+            : `Successfully synced ${syncRangeDays} days of events (${result.totalCreated} new) to 'Panchang Calendar'!`;
         setSyncSuccessMsg(msg);
       }
 
       await fetchExistingEvents(token);
     } catch (err: any) {
       console.error("Sync failed:", err);
-      setActionError(err?.message || "Failed to sync events to Google Calendar");
+      setActionError(err?.message || "Failed to sync events to Panchang Calendar");
     } finally {
       setIsSyncing(false);
+      setSyncProgress(null);
     }
   };
 
@@ -308,6 +346,65 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
 
         {/* Scrollable Content Body */}
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6 hide-scrollbar">
+          {/* Section 0: Instant 1-Click .ICS & Direct Google Calendar Add (NO LOGIN REQUIRED) */}
+          {panchangaData && (
+            <div
+              className={`p-4.5 rounded-2xl border shadow-sm transition-all ${
+                isNight
+                  ? "bg-gradient-to-r from-amber-950/40 via-indigo-950/40 to-slate-900 border-amber-500/30 text-amber-100"
+                  : "bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50/40 border-amber-300/80 text-amber-950"
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">
+                      {lang === "hi"
+                        ? "त्वरित सिंक • बिना लॉगिन"
+                        : "Instant Sync • No Login Needed"}
+                    </span>
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold font-devanagari mt-1 text-amber-950 dark:text-amber-200">
+                    {lang === "hi"
+                      ? "डायरेक्ट पंचांग फाइल (.ICS) डाउनलोड करें"
+                      : "Direct 1-Click Calendar File (.ICS) Export"}
+                  </h3>
+                  <p className="text-xs text-stone-600 dark:text-slate-300 mt-0.5">
+                    {lang === "hi"
+                      ? "Google, Apple अथवा Outlook Calendar में सीधे तिथि, मुहूर्त एवं राहु काल इम्पोर्ट करें।"
+                      : "Directly import Tithi, Muhurta & Rahu Kalam into Google, Outlook, or Apple Calendar on phone or PC."}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => downloadPanchangaIcsFile(panchangaData, options)}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold text-xs shadow-md transition-all cursor-pointer active:scale-[0.98]"
+                  >
+                    <CalendarIcon className="w-4 h-4" />
+                    <span>{lang === "hi" ? "📥 डाउनलोड .ICS फाइल" : "📥 Download .ICS File"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const payloads = buildPanchangaEventPayloads(panchangaData, options);
+                      if (payloads.length > 0) {
+                        openDirectGoogleCalendarUrl(payloads[0]);
+                      }
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white dark:bg-stone-800 border border-amber-300/80 dark:border-stone-600 text-amber-900 dark:text-amber-200 font-bold text-xs transition-all hover:bg-amber-100 dark:hover:bg-stone-700 shadow-xs cursor-pointer"
+                    title="Open Google Calendar Direct Add in new tab"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>{lang === "hi" ? "Google Web में खोलें" : "Open GCal Web"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Section 1: Authentication Connection Status */}
           <div
             className={`p-4 rounded-2xl border ${
@@ -741,111 +838,6 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                   </div>
                 </label>
 
-                {/* 9. 24-Hour Alternating Hourly Swara Cycles */}
-                <label
-                  className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                    options.includeSwaraHourlyCycles
-                      ? isNight
-                        ? "bg-indigo-950/40 border-amber-500/40 text-amber-200"
-                        : "bg-amber-50/70 border-amber-300/80 text-amber-950 font-medium"
-                      : isNight
-                        ? "bg-slate-900/40 border-slate-800 text-slate-400"
-                        : "bg-white border-stone-200 text-stone-600"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={options.includeSwaraHourlyCycles}
-                    onChange={(e) =>
-                      setOptions((prev) => ({
-                        ...prev,
-                        includeSwaraHourlyCycles: e.target.checked,
-                      }))
-                    }
-                    className="mt-0.5 rounded text-amber-600 focus:ring-amber-500"
-                  />
-                  <div>
-                    <span className="font-bold block text-sm flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-indigo-400" />
-                      {lang === "hi"
-                        ? "२४-घंटे प्रति-घंटा स्वर चक्र (इड़ा, पिंगला व सुषुम्ना)"
-                        : "24-Hour Alternating Swara Cycles (Ida, Pingala, Sushumna)"}
-                    </span>
-                    <span className="text-[11px] opacity-80 block mt-0.5">
-                      {lang === "hi"
-                        ? "सूर्योदय से सम्पूर्ण २४ घंटे के इड़ा, पिंगला व सुषुम्ना संधिकाल के सटीक टाइमिंग्स"
-                        : "Precise calculated start and end timestamps for Ida, Pingala and Sushumna"}
-                    </span>
-                  </div>
-                </label>
-
-                {/* Sub-options for Ida, Pingala, and Sushumna */}
-                {options.includeSwaraHourlyCycles && (
-                  <div className="ml-4 pl-3 border-l-2 border-amber-200 dark:border-amber-900/50 space-y-2">
-                    {/* Ida Swara */}
-                    <label className="flex items-center gap-2.5 text-xs text-stone-700 dark:text-slate-300 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={options.includeSwaraIda !== false}
-                        onChange={(e) =>
-                          setOptions((prev) => ({
-                            ...prev,
-                            includeSwaraIda: e.target.checked,
-                          }))
-                        }
-                        className="rounded text-cyan-600 focus:ring-cyan-500"
-                      />
-                      <span className="font-medium">
-                        🌙{" "}
-                        {lang === "hi"
-                          ? "इड़ा स्वर (चन्द्र नाड़ी / बायाँ नथुना - ५२ मिनट)"
-                          : "Ida Swara (Lunar / Left Nostril - 52m)"}
-                      </span>
-                    </label>
-
-                    {/* Pingala Swara */}
-                    <label className="flex items-center gap-2.5 text-xs text-stone-700 dark:text-slate-300 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={options.includeSwaraPingala !== false}
-                        onChange={(e) =>
-                          setOptions((prev) => ({
-                            ...prev,
-                            includeSwaraPingala: e.target.checked,
-                          }))
-                        }
-                        className="rounded text-amber-600 focus:ring-amber-500"
-                      />
-                      <span className="font-medium">
-                        ☀️{" "}
-                        {lang === "hi"
-                          ? "पिंगला स्वर (सूर्य नाड़ी / दायाँ नथुना - ५२ मिनट)"
-                          : "Pingala Swara (Solar / Right Nostril - 52m)"}
-                      </span>
-                    </label>
-
-                    {/* Sushumna Swara */}
-                    <label className="flex items-center gap-2.5 text-xs text-stone-700 dark:text-slate-300 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={options.includeSwaraSushumna !== false}
-                        onChange={(e) =>
-                          setOptions((prev) => ({
-                            ...prev,
-                            includeSwaraSushumna: e.target.checked,
-                          }))
-                        }
-                        className="rounded text-purple-600 focus:ring-purple-500"
-                      />
-                      <span className="font-medium">
-                        🧘{" "}
-                        {lang === "hi"
-                          ? "सुषुम्ना संधिकाल (शून्य/मध्य स्वर - ८ मिनट व त्रिसंध्या)"
-                          : "Sushumna Sandhi (Yogic / Neutral - 8m & Sandhyas)"}
-                      </span>
-                    </label>
-                  </div>
-                )}
 
                 {/* 10. Vedic Horas & Hora Nadi (24 Horas with Planet, Nadi & Tattva) */}
                 <label
@@ -924,7 +916,121 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                     <option value={60}>1 hour</option>
                   </select>
                 </div>
+                {/* 12. Sync Duration Range Selector */}
+                <div
+                  className={`p-3.5 rounded-xl border ${
+                    isNight
+                      ? "bg-slate-900/40 border-slate-800 text-slate-300"
+                      : "bg-white border-stone-200 text-stone-700"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-xs flex items-center gap-1.5">
+                      <CalendarCheck className="w-4 h-4 text-amber-500" />
+                      {lang === "hi" ? "सिंक समयावधि (Sync Duration Range)" : "Sync Duration Range"}
+                    </span>
+                    <span className="text-[10px] text-amber-600 dark:text-amber-300 font-semibold bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      Panchang Calendar
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSyncRangeDays(1)}
+                      className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                        syncRangeDays === 1
+                          ? "bg-amber-500 text-stone-950 border-amber-600 shadow-xs"
+                          : isNight
+                            ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
+                            : "bg-stone-100 border-stone-300 text-stone-700 hover:bg-stone-200"
+                      }`}
+                    >
+                      {lang === "hi" ? "1 दिन (आज)" : "1 Day (Today)"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSyncRangeDays(7)}
+                      className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                        syncRangeDays === 7
+                          ? "bg-amber-500 text-stone-950 border-amber-600 shadow-xs"
+                          : isNight
+                            ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
+                            : "bg-stone-100 border-stone-300 text-stone-700 hover:bg-stone-200"
+                      }`}
+                    >
+                      {lang === "hi" ? "7 दिन (1 सप्ताह)" : "7 Days (1 Wk)"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSyncRangeDays(30)}
+                      className={`py-2 px-3 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                        syncRangeDays === 30
+                          ? "bg-amber-500 text-stone-950 border-amber-600 shadow-xs"
+                          : isNight
+                            ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
+                            : "bg-stone-100 border-stone-300 text-stone-700 hover:bg-stone-200"
+                      }`}
+                    >
+                      {lang === "hi" ? "30 दिन (1 माह निरंतर)" : "30 Days (Continuous)"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 13. Continuous Auto-Sync Toggle */}
+                <div
+                  className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 ${
+                    isNight
+                      ? "bg-indigo-950/30 border-indigo-900/60 text-slate-200"
+                      : "bg-amber-50/60 border-amber-200/80 text-amber-950"
+                  }`}
+                >
+                  <div>
+                    <span className="font-bold text-xs flex items-center gap-1.5 text-amber-900 dark:text-amber-300">
+                      <RefreshCw className="w-3.5 h-3.5 text-amber-500" />
+                      {lang === "hi"
+                        ? "निरंतर कनेक्टेड रखें (Auto Continuous Sync)"
+                        : "Keep App in Touch (Auto Continuous Sync)"}
+                    </span>
+                    <span className="text-[10px] text-stone-600 dark:text-slate-400 block mt-0.5">
+                      {lang === "hi"
+                        ? "ऐप खोलने पर पंचमहीना कैलेंडर स्वतः अप-टू-डेट रहेगा ताकि एक भी इवेंट न छूटे।"
+                        : "Auto-updates Panchang Calendar in background so no single event is ever missed."}
+                    </span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={autoContinuousSync}
+                      onChange={(e) => toggleAutoContinuousSync(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-stone-300 peer-focus:outline-none rounded-full peer dark:bg-stone-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-stone-600 peer-checked:bg-amber-500"></div>
+                  </label>
+                </div>
               </div>
+
+              {/* Progress Feedback during Multi-Day Sync */}
+              {syncProgress && (
+                <div className="p-3.5 rounded-xl border border-amber-300/80 bg-amber-50 dark:bg-slate-900 text-amber-900 dark:text-amber-200 text-xs space-y-2">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin text-amber-500" />
+                      {lang === "hi"
+                        ? `Panchang Calendar सिंक हो रहा है (${syncProgress.current}/${syncProgress.total} दिन)...`
+                        : `Syncing Panchang Calendar (Day ${syncProgress.current} of ${syncProgress.total})...`}
+                    </span>
+                    <span>{Math.round((syncProgress.current / syncProgress.total) * 100)}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-amber-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-500 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${(syncProgress.current / syncProgress.total) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Action Error / Success feedback */}
               {actionError && (
@@ -946,7 +1052,7 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                     rel="noreferrer"
                     className="inline-flex items-center gap-1 font-bold underline hover:text-emerald-950 dark:hover:text-white"
                   >
-                    {lang === "hi" ? "कैलेंडर खोलें" : "Open Calendar"}
+                    {lang === "hi" ? "Panchang Calendar खोलें" : "Open Panchang Calendar"}
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -956,12 +1062,18 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
               <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
                 <button
                   type="button"
-                  onClick={handleSyncToday}
-                  disabled={!user || !token || isSyncing}
-                  className={`w-full sm:flex-1 py-3 px-5 rounded-2xl font-bold font-devanagari text-sm shadow-md transition-all flex items-center justify-center gap-2.5 ${
+                  onClick={() => {
+                    if (user && token) {
+                      handleSyncRange();
+                    } else if (panchangaData) {
+                      downloadPanchangaIcsFile(panchangaData, options);
+                    }
+                  }}
+                  disabled={isSyncing}
+                  className={`w-full sm:flex-1 py-3 px-5 rounded-2xl font-bold font-devanagari text-sm shadow-md transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-[0.99] ${
                     user && token
-                      ? "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-700 hover:to-amber-700 text-white shadow-amber-600/20 active:scale-[0.99] cursor-pointer"
-                      : "bg-stone-300 dark:bg-slate-800 text-stone-500 dark:text-slate-500 cursor-not-allowed border border-stone-200 dark:border-slate-700"
+                      ? "bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-700 hover:to-amber-700 text-white shadow-amber-600/20"
+                      : "bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-stone-950 shadow-amber-500/20"
                   }`}
                 >
                   {isSyncing ? (
@@ -969,8 +1081,8 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                       <RefreshCw className="w-4 h-4 animate-spin" />
                       <span>
                         {lang === "hi"
-                          ? "Google Calendar में सिंक हो रहा है..."
-                          : "Syncing to Google Calendar..."}
+                          ? `'Panchang Calendar' में सिंक हो रहा है...`
+                          : "Syncing to 'Panchang Calendar'..."}
                       </span>
                     </>
                   ) : (
@@ -979,11 +1091,11 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                       <span>
                         {user && token
                           ? lang === "hi"
-                            ? `आज के कार्यक्रम Google Calendar में सिंक करें`
-                            : `Sync Today's Events to Google Calendar`
+                            ? `${syncRangeDays} दिनों के कार्यक्रम 'Panchang Calendar' में सिंक करें`
+                            : `Sync ${syncRangeDays} Days of Events to 'Panchang Calendar'`
                           : lang === "hi"
-                            ? "कृपया पहले Google Account से साइन इन करें"
-                            : "Please Sign in with Google to Sync"}
+                            ? "📥 बिना लॉगिन - पंचांग .ICS फाइल डाउनलोड करें"
+                            : "📥 Instant 1-Click .ICS Calendar Export"}
                       </span>
                     </>
                   )}

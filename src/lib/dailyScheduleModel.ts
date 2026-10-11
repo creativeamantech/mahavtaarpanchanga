@@ -23,6 +23,7 @@ export type DailyScheduleEventType =
   | "karana"
   | "hora"
   | "hora-tattva"
+  | "tattva-transition"
   | "swara"
   | "swara-tattva"
   | "nadi"

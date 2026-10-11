@@ -24,6 +24,7 @@ import {
 } from "../lib/tithiTattvaEngine";
 
 import { resolveCurrentHora } from "../horaEngine";
+import { triggerTattvaSensoryFeedback } from "../lib/notificationEngine";
 import {
   getKaranaTattvaCycle,
   getActiveKaranaTattva,
@@ -210,17 +211,46 @@ export function TattvaView({
           </div>
 
           <div className="p-3 rounded-xl bg-amber-50/50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/50">
-            <div className="text-[10px] uppercase font-bold tracking-wider mb-1 opacity-70">
-              Hora Tattva
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-[10px] uppercase font-bold tracking-wider opacity-70">
+                Hora Tattva
+              </div>
+              <button
+                type="button"
+                onClick={() => triggerTattvaSensoryFeedback(activeHoraTattva?.sanskrit || "Akash")}
+                title={
+                  lang === "hi"
+                    ? "ध्वनि व कंपन संकेत का परीक्षण करें"
+                    : "Test Tattva Audio Chime & Haptic Vibration"
+                }
+                className="px-2 py-0.5 rounded text-[10px] bg-amber-200/60 dark:bg-amber-800/60 text-amber-900 dark:text-amber-100 font-medium hover:bg-amber-300 transition-colors flex items-center gap-1 active:scale-95"
+              >
+                🔊 {lang === "hi" ? "संकेत परीक्षण" : "Test Chime"}
+              </button>
             </div>
             <div className="text-lg font-bold text-amber-700 dark:text-amber-300">
               {activeHoraTattva ? activeHoraTattva.sanskrit : "-"}
             </div>
             <div className="flex justify-between mt-2 pt-2 border-t border-amber-200/50 dark:border-amber-800/50">
               <div>
-                <div className="text-[10px] uppercase tracking-wider opacity-70">Hora</div>
+                <div className="text-[10px] uppercase tracking-wider opacity-70">Planet (ग्रह)</div>
                 <div className="text-sm font-medium">
-                  {activeHora ? (activeHora as any).planet : "-"}
+                  🪐 {activeHora ? (activeHora as any).planet : "-"}
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-[10px] uppercase tracking-wider opacity-70">Nadi (नाड़ी)</div>
+                <div className="text-sm font-medium">
+                  💨{" "}
+                  {activeHora
+                    ? (activeHora as any).nadi === "ida"
+                      ? lang === "hi"
+                        ? "इड़ा (वाम)"
+                        : "Ida (Left)"
+                      : lang === "hi"
+                        ? "पिङ्गला (दक्षिण)"
+                        : "Pingala (Right)"
+                    : "-"}
                 </div>
               </div>
             </div>

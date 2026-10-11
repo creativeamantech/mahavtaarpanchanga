@@ -24,6 +24,8 @@ import {
   getNotificationPermissionStatus,
   sendTestNotification,
   playNotificationTune,
+  triggerTattvaSensoryFeedback,
+  playTattvaAudioChime,
   type NotificationPermissionStatus,
 } from "../lib/notificationEngine";
 import { BellOff, BellRing } from "lucide-react";
@@ -631,8 +633,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       />
                       <span className="text-xs font-medium text-stone-700">
                         {lang === "hi"
-                          ? "तत्त्व अलार्म (Tatwa Alerts)"
-                          : "Tattva Alerts (Elements)"}
+                          ? "तत्त्व अलार्म एवं संधिकाल (नाड़ी व ग्रह सहित)"
+                          : "Tattva Alerts & Transitions (with Nadi & Planet)"}
                       </span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -659,6 +661,71 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         Tithi/Nakshatra Swara
                       </span>
                     </label>
+                  </div>
+                </div>
+
+                {/* Tattva Sensory Feedback Settings (Audio Chime & Haptic Vibration) */}
+                <div className="mt-4 pt-3 border-t border-amber-100/80 bg-amber-50/50 p-3 rounded-xl">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-amber-900 mb-2 font-devanagari flex items-center gap-1.5">
+                    ✨{" "}
+                    {lang === "hi"
+                      ? "तत्त्व संवेदी संकेत अनुभव (Sensory Experience)"
+                      : "Tattva Sensory Experience & Feedback"}
+                  </span>
+                  <div className="space-y-2.5">
+                    <label className="flex items-center justify-between cursor-pointer text-xs">
+                      <span className="font-medium text-stone-700 flex items-center gap-1.5">
+                        🔊{" "}
+                        {lang === "hi"
+                          ? "तत्त्व परिवर्तन ध्वनि (Audio Chime)"
+                          : "Audio Chime on Tattva Change"}
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.tattvaAudioFeedback ?? true}
+                        onChange={(e) =>
+                          setNotifPrefs({ ...notifPrefs, tattvaAudioFeedback: e.target.checked })
+                        }
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                    </label>
+
+                    <label className="flex items-center justify-between cursor-pointer text-xs">
+                      <span className="font-medium text-stone-700 flex items-center gap-1.5">
+                        📳{" "}
+                        {lang === "hi"
+                          ? "तत्त्व सूक्ष्म कंपन (Haptic Vibration)"
+                          : "Subtle Haptic Vibration"}
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.tattvaHapticFeedback ?? true}
+                        onChange={(e) =>
+                          setNotifPrefs({ ...notifPrefs, tattvaHapticFeedback: e.target.checked })
+                        }
+                        className="rounded text-amber-600 focus:ring-amber-600"
+                      />
+                    </label>
+
+                    <div className="pt-1 flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          triggerTattvaSensoryFeedback("Akash", notifPrefs);
+                        }}
+                        className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium shadow-sm transition-all flex items-center gap-1.5 active:scale-95"
+                      >
+                        🔔{" "}
+                        {lang === "hi"
+                          ? "परीक्षण करें (Test Sound & Vibration)"
+                          : "Test Sound & Vibration"}
+                      </button>
+                      <span className="text-[10px] text-stone-500 italic">
+                        {lang === "hi"
+                          ? "तत्त्व बदलते ही ध्वनि एवं कंपन द्वारा सूचना"
+                          : "Plays chime & subtle vibration on element shift"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

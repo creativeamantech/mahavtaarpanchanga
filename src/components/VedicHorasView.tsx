@@ -182,12 +182,28 @@ export function VedicHorasView({
                 <div className="text-indigo-200 text-xs font-bold uppercase tracking-widest mb-2">
                   {lang === "hi" ? "सूक्ष्म पंच तत्त्व" : "Micro Pancha Tattva"}
                 </div>
-                <span
-                  className={`px-4 py-1.5 rounded-full text-sm font-bold border ${getTattvaColor(activeTattva.name)}`}
-                >
-                  {lang === "hi" ? "तत्त्व: " : "Tattva: "} {activeTattva.sanskrit} (
-                  {lang === "hi" ? getTattvaNameHi(activeTattva.name) : activeTattva.name})
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-bold border ${getTattvaColor(activeTattva.name)}`}
+                  >
+                    {lang === "hi" ? "तत्त्व: " : "Tattva: "} {activeTattva.sanskrit} (
+                    {lang === "hi" ? getTattvaNameHi(activeTattva.name) : activeTattva.name})
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-950/80 text-indigo-200 border border-indigo-700/60">
+                    🪐 {lang === "hi" ? "ग्रह: " : "Planet: "}
+                    {activeHora.planet}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-950/80 text-cyan-200 border border-cyan-700/60">
+                    💨 {lang === "hi" ? "नाड़ी: " : "Nadi: "}
+                    {activeHora.nadi === "ida"
+                      ? lang === "hi"
+                        ? "इड़ा (वाम)"
+                        : "Ida (Left)"
+                      : lang === "hi"
+                        ? "पिङ्गला (दक्षिण)"
+                        : "Pingala (Right)"}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -381,9 +397,13 @@ export function VedicHorasView({
                         return (
                           <div
                             key={tIdx}
-                            className={`flex items-center justify-between p-2.5 rounded-xl border ${isTattvaActive ? "border-emerald-400 shadow-xs bg-white" : "border-stone-100 bg-white/50"}`}
+                            className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                              isTattvaActive
+                                ? "border-emerald-400 shadow-xs bg-emerald-50/40 dark:bg-emerald-950/20 ring-1 ring-emerald-400/50"
+                                : "border-stone-100 bg-white/50 dark:bg-slate-800/40"
+                            }`}
                           >
-                            <div className="flex items-center space-x-3">
+                            <div className="flex flex-wrap items-center gap-2">
                               <span
                                 className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border ${getTattvaColor(tattva.name)}`}
                               >
@@ -391,10 +411,28 @@ export function VedicHorasView({
                                 {lang === "hi" ? getTattvaNameHi(tattva.name) : tattva.name})
                               </span>
                               {isTattvaActive && (
-                                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <>
+                                  <span className="text-[10px] font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 px-1.5 py-0.5 rounded border border-indigo-200/60 dark:border-indigo-800/40">
+                                    🪐 {hora.planet}
+                                  </span>
+                                  <span className="text-[10px] font-medium text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/30 px-1.5 py-0.5 rounded border border-cyan-200/60 dark:border-cyan-800/40">
+                                    💨{" "}
+                                    {hora.nadi === "ida"
+                                      ? lang === "hi"
+                                        ? "इड़ा"
+                                        : "Ida"
+                                      : lang === "hi"
+                                        ? "पिंगला"
+                                        : "Pingala"}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-1.5 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    {lang === "hi" ? "सक्रिय (रनिंग)" : "RUNNING NOW"}
+                                  </span>
+                                </>
                               )}
                             </div>
-                            <div className="text-[11px] font-mono text-stone-600">
+                            <div className="text-[11px] font-mono font-medium text-stone-600 dark:text-slate-400">
                               {tattva.startTime} - {tattva.endTime}
                             </div>
                           </div>
@@ -437,21 +475,11 @@ export function VedicHorasView({
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-stone-200 bg-stone-50 text-stone-700 font-bold">
-                <th className="p-2.5">
-                  {lang === "hi" ? "ग्रह (Planet)" : "Planet (Graha)"}
-                </th>
-                <th className="p-2.5">
-                  {lang === "hi" ? "नाड़ी (Swara Nadi)" : "Nadi (Swara)"}
-                </th>
-                <th className="p-2.5">
-                  {lang === "hi" ? "नासिका प्रवाह" : "Nostril Flow"}
-                </th>
-                <th className="p-2.5">
-                  {lang === "hi" ? "मुख्य तत्त्व" : "Primary Tattva"}
-                </th>
-                <th className="p-2.5">
-                  {lang === "hi" ? "अवधि (६० मि)" : "Duration in 60m"}
-                </th>
+                <th className="p-2.5">{lang === "hi" ? "ग्रह (Planet)" : "Planet (Graha)"}</th>
+                <th className="p-2.5">{lang === "hi" ? "नाड़ी (Swara Nadi)" : "Nadi (Swara)"}</th>
+                <th className="p-2.5">{lang === "hi" ? "नासिका प्रवाह" : "Nostril Flow"}</th>
+                <th className="p-2.5">{lang === "hi" ? "मुख्य तत्त्व" : "Primary Tattva"}</th>
+                <th className="p-2.5">{lang === "hi" ? "अवधि (६० मि)" : "Duration in 60m"}</th>
                 <th className="p-2.5">
                   {lang === "hi" ? "प्रकृति एवं कार्य" : "Nature & Activities"}
                 </th>

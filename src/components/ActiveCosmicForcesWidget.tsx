@@ -258,19 +258,36 @@ export const ActiveCosmicForcesWidget: React.FC<ActiveCosmicForcesWidgetProps> =
             {/* Tattva Micro-Period */}
             {activeTattva && (
               <div
-                className={`rounded-lg p-2.5 flex items-center justify-between text-xs border ${
+                className={`rounded-lg p-2.5 flex flex-wrap items-center justify-between text-xs gap-2 border ${
                   isNight
                     ? "bg-slate-900/60 border-indigo-900/50 text-slate-200"
                     : "bg-amber-50/70 border-amber-200/70 text-stone-800"
                 }`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span
                     className="w-2.5 h-2.5 rounded-full shrink-0"
                     style={{ backgroundColor: activeTattva.color }}
                   />
                   <span className="font-bold font-devanagari">{activeTattva.sanskrit}</span>
                   <span className="text-stone-500 dark:text-slate-400">({activeTattva.name})</span>
+                  {activeHora && (
+                    <>
+                      <span className="text-[10px] font-semibold text-indigo-800 dark:text-indigo-300 bg-indigo-100/80 dark:bg-indigo-900/40 px-1.5 py-0.5 rounded border border-indigo-200/60 dark:border-indigo-800/40">
+                        🪐 {activeHora.ruler}
+                      </span>
+                      <span className="text-[10px] font-semibold text-cyan-800 dark:text-cyan-300 bg-cyan-100/80 dark:bg-cyan-900/40 px-1.5 py-0.5 rounded border border-cyan-200/60 dark:border-cyan-800/40">
+                        💨{" "}
+                        {activeHora.nadi === "ida"
+                          ? lang === "hi"
+                            ? "इड़ा"
+                            : "Ida"
+                          : lang === "hi"
+                            ? "पिङ्गला"
+                            : "Pingala"}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="font-mono text-[11px] font-bold text-amber-900 dark:text-amber-300">
                   {activeTattva.startTime} – {activeTattva.endTime}

@@ -375,13 +375,13 @@ export const RunningNowWidget: React.FC<RunningNowWidgetProps> = ({ data, lang, 
               </span>
             </div>
             {activeTattva ? (
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex flex-wrap items-center justify-between text-sm gap-1.5">
                 <span className="text-stone-500 dark:text-slate-400">
                   {lang === "hi" ? "सक्रिय तत्त्व:" : "Active Tattva:"}
                 </span>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <span
-                    className="w-2.5 h-2.5 rounded-full"
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
                     style={{ backgroundColor: activeTattva.color }}
                   />
                   <span className="font-bold font-devanagari">
@@ -389,6 +389,23 @@ export const RunningNowWidget: React.FC<RunningNowWidgetProps> = ({ data, lang, 
                       ? tattvaNamesHi[activeTattva.sanskrit] || activeTattva.sanskrit
                       : activeTattva.sanskrit}
                   </span>
+                  {horaState?.activeHora && (
+                    <>
+                      <span className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/40 px-1.5 py-0.5 rounded border border-indigo-200/60 dark:border-indigo-800/40">
+                        🪐 {horaState.activeHora.planet}
+                      </span>
+                      <span className="text-[10px] font-semibold text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-900/40 px-1.5 py-0.5 rounded border border-cyan-200/60 dark:border-cyan-800/40">
+                        💨{" "}
+                        {horaState.activeHora.nadi === "ida"
+                          ? lang === "hi"
+                            ? "इड़ा"
+                            : "Ida"
+                          : lang === "hi"
+                            ? "पिङ्गला"
+                            : "Pingala"}
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             ) : null}

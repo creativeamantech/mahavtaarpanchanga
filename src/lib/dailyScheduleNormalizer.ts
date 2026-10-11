@@ -40,6 +40,7 @@ const EVENT_PRIORITIES: Record<DailyScheduleEventType, number> = {
   karana: 23,
   hora: 30,
   "hora-tattva": 35,
+  "tattva-transition": 36,
   swara: 40,
   nadi: 42,
   "swara-tattva": 45,
@@ -175,6 +176,7 @@ function getEventColorTheme(type: DailyScheduleEventType, auspiciousness?: strin
         iconColor: "text-indigo-600",
       };
     case "hora-tattva":
+    case "tattva-transition":
       return {
         badgeBg: "bg-purple-100",
         badgeText: "text-purple-900",
@@ -554,9 +556,11 @@ export function normalizeDailySchedule(
         colorTheme: getEventColorTheme("hora"),
       });
 
-      // 3.2 Hora-Tattva Micro-Period Events (All 5 periods)
+      // 3.2 Hora-Tattva Micro-Period & Transition Events (All 5 periods)
       h.tattvas.forEach((tp, tIdx) => {
         const tattvaHi = TATTVA_HI_NAMES[tp.sanskrit] || TATTVA_HI_NAMES[tp.name] || tp.name;
+        const nextTp = h.tattvas[tIdx + 1];
+        const nextSanskrit = nextTp ? nextTp.sanskrit : "अगला तत्त्व";
 
         events.push({
           id: `hora-tattva-${h.index}-${tp.sanskrit}-${tp.startTimeMs}`,
@@ -568,21 +572,23 @@ export function normalizeDailySchedule(
           durationMs: tp.durationMs,
           title:
             lang === "hi"
-              ? `${tp.sanskrit} तत्त्व (${tattvaHi})`
-              : `${tp.sanskrit} Tattva (${tp.name})`,
+              ? `${tp.sanskrit} तत्त्व (${tattvaHi}) · 🪐 ${rulerHi} | 💨 ${nadiMeta.hi}`
+              : `${tp.sanskrit} Tattva (${tp.name}) · 🪐 ${h.ruler} | 💨 ${nadiMeta.en}`,
           subtitle:
             lang === "hi"
-              ? `${rulerHi} होरा · ${nadiMeta.hi} · सूक्ष्म काल ${tIdx + 1}/5`
-              : `${h.ruler} Hora · ${nadiMeta.en} · Micro-period ${tIdx + 1}/5`,
+              ? `होरा ग्रह: ${rulerHi} · नाड़ी: ${nadiMeta.hi} · सूक्ष्म काल ${tIdx + 1}/5`
+              : `Hora Planet: ${h.ruler} · Nadi: ${nadiMeta.en} · Micro-period ${tIdx + 1}/5`,
           localizedTitle: {
-            en: `${tp.sanskrit} Tattva (${tp.name})`,
-            hi: `${tp.sanskrit} तत्त्व (${tattvaHi})`,
+            en: `${tp.sanskrit} Tattva (${tp.name}) · 🪐 ${h.ruler} | 💨 ${nadiMeta.en}`,
+            hi: `${tp.sanskrit} तत्त्व (${tattvaHi}) · 🪐 ${rulerHi} | 💨 ${nadiMeta.hi}`,
             sa: `${tp.sanskrit}-तत्त्वम्`,
           },
           metadata: {
             parentHoraIndex: h.index,
             parentHoraRuler: h.ruler,
             parentHoraRulerHi: rulerHi,
+            planet: h.ruler,
+            planetHi: rulerHi,
             nadi: h.nadi,
             nadiLabel: lang === "hi" ? nadiMeta.hi : nadiMeta.en,
             nadiSwara: lang === "hi" ? nadiMeta.swaraHi : nadiMeta.swaraEn,
@@ -593,6 +599,39 @@ export function normalizeDailySchedule(
           },
           priority: EVENT_PRIORITIES["hora-tattva"],
           colorTheme: getEventColorTheme("hora-tattva"),
+        });
+
+        // 3.3 Tattva Transition Event at boundary
+        events.push({
+          id: `tattva-transition-${h.index}-${tp.sanskrit}-${tp.endTimeMs}`,
+          type: "tattva-transition",
+          source: "Hora Engine",
+          category: "hora",
+          startTimeMs: tp.endTimeMs,
+          endTimeMs: tp.endTimeMs + 60000,
+          durationMs: 60000,
+          title:
+            lang === "hi"
+              ? `🔄 तत्त्व संधिकाल: ${tp.sanskrit} ➔ ${nextSanskrit} · 🪐 ${rulerHi} | 💨 ${nadiMeta.hi}`
+              : `🔄 Tattva Transition: ${tp.sanskrit} ➔ ${nextSanskrit} · 🪐 ${h.ruler} | 💨 ${nadiMeta.en}`,
+          subtitle:
+            lang === "hi"
+              ? `होरा ग्रह: ${rulerHi} · नाड़ी: ${nadiMeta.hi} · सूक्ष्म तत्त्व संधिकाल`
+              : `Hora Planet: ${h.ruler} · Nadi: ${nadiMeta.en} · Element Transition Window`,
+          metadata: {
+            fromTattva: tp.sanskrit,
+            toTattva: nextSanskrit,
+            parentHoraIndex: h.index,
+            parentHoraRuler: h.ruler,
+            parentHoraRulerHi: rulerHi,
+            planet: h.ruler,
+            planetHi: rulerHi,
+            nadi: h.nadi,
+            nadiLabel: lang === "hi" ? nadiMeta.hi : nadiMeta.en,
+            nadiSwara: lang === "hi" ? nadiMeta.swaraHi : nadiMeta.swaraEn,
+          },
+          priority: EVENT_PRIORITIES["tattva-transition"],
+          colorTheme: getEventColorTheme("tattva-transition"),
         });
       });
     });

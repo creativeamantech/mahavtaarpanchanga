@@ -88,7 +88,7 @@ export const DEFAULT_SYNC_OPTIONS: SyncOptions = {
   includeSwaraSunrise: true,
   includeSwaraCelestialWindows: true,
   includeSwaraTransitions: true,
-  includeSwaraHourlyCycles: true,
+  includeSwaraHourlyCycles: false,
   includeSwaraIda: true,
   includeSwaraPingala: true,
   includeSwaraSushumna: true,
@@ -251,24 +251,91 @@ function buildDateTimeIso(
   return safeIsoString(ms);
 }
 
+let cachedPanchangCalendarId: string | null = null;
+
 /**
- * List events created by Mahavtaar Panchanga within a time window
+ * Retrieves or creates a dedicated secondary Google Calendar named "Panchang Calendar".
+ */
+export async function getOrCreatePanchangCalendarId(token: string): Promise<string> {
+  if (cachedPanchangCalendarId) return cachedPanchangCalendarId;
+
+  try {
+    const listRes = await fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
+
+    if (listRes.ok) {
+      const listData = await listRes.json();
+      const items = listData.items || [];
+      const found = items.find(
+        (c: any) =>
+          c.summary === "Panchang Calendar" ||
+          c.summary === "Panchanga Calendar" ||
+          c.summary === "Mahavtaar Panchang Calendar" ||
+          c.summary === "पंचांग कैलेंडर",
+      );
+
+      if (found && found.id) {
+        cachedPanchangCalendarId = found.id;
+        return found.id;
+      }
+    }
+
+    // Create secondary calendar named "Panchang Calendar"
+    const createRes = await fetch("https://www.googleapis.com/calendar/v3/calendars", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        summary: "Panchang Calendar",
+        description:
+          "Continuous Panchanga, Swara Yoga, Nadi, Tattva & Planetary Horas by Mahavtaar Panchanga",
+        timeZone: "Asia/Kolkata",
+      }),
+    });
+
+    if (createRes.ok) {
+      const createdData = await createRes.json();
+      if (createdData.id) {
+        cachedPanchangCalendarId = createdData.id;
+        return createdData.id;
+      }
+    }
+  } catch (err) {
+    console.warn("Could not retrieve/create Panchang Calendar, using primary:", err);
+  }
+
+  return "primary";
+}
+
+/**
+ * List events created by Mahavtaar Panchanga in Panchang Calendar
  */
 export async function listPanchangaEvents(
   token: string,
   startDateStr: string,
   endDateStr?: string,
+  customCalendarId?: string,
 ): Promise<SyncedCalendarEvent[]> {
+  const calId = customCalendarId || (await getOrCreatePanchangCalendarId(token));
   const isoStart = normalizeToIsoDate(startDateStr);
   const isoEnd = normalizeToIsoDate(endDateStr || startDateStr);
   const timeMin = safeIsoString(new Date(`${isoStart}T00:00:00Z`).getTime());
   const timeMax = safeIsoString(new Date(`${isoEnd}T23:59:59Z`).getTime());
 
-  const url = new URL("https://www.googleapis.com/calendar/v3/calendars/primary/events");
+  const url = new URL(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`,
+  );
   url.searchParams.set("timeMin", timeMin);
   url.searchParams.set("timeMax", timeMax);
   url.searchParams.set("singleEvents", "true");
-  url.searchParams.set("maxResults", "100");
+  url.searchParams.set("maxResults", "250");
 
   const res = await fetch(url.toString(), {
     headers: {
@@ -314,13 +381,15 @@ export async function listPanchangaEvents(
 }
 
 /**
- * Create a single event in user's Primary Google Calendar
+ * Create a single event in user's Panchang Calendar
  */
 export async function createCalendarEvent(
   token: string,
   payload: CalendarEventPayload,
+  customCalendarId?: string,
 ): Promise<SyncedCalendarEvent> {
-  const url = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+  const calId = customCalendarId || (await getOrCreatePanchangCalendarId(token));
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`;
 
   const res = await fetch(url, {
     method: "POST",
@@ -352,10 +421,15 @@ export async function createCalendarEvent(
 }
 
 /**
- * Delete a single event by ID (Requires explicit user confirmation before calling!)
+ * Delete a single event by ID from Panchang Calendar
  */
-export async function deleteCalendarEvent(token: string, eventId: string): Promise<boolean> {
-  const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(eventId)}`;
+export async function deleteCalendarEvent(
+  token: string,
+  eventId: string,
+  customCalendarId?: string,
+): Promise<boolean> {
+  const calId = customCalendarId || (await getOrCreatePanchangCalendarId(token));
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events/${encodeURIComponent(eventId)}`;
 
   const res = await fetch(url, {
     method: "DELETE",
@@ -1217,8 +1291,8 @@ export function buildPanchangaEventPayloads(
 
           const tattvaNamesHi = h.tattvas.map((t) => getTattvaNameHi(t.name)).join(", ");
 
-          // Title me planet, nadi, tatwa
-          const summary = `${planetHi} होरा (#${h.index}) · नाड़ी: ${nadiHi} ${nadiSymbol} · तत्त्व: ${tattvaNamesHi}`;
+          // Title with planet, nadi, and tatwa
+          const summary = `🪐 ${planetHi} होरा (#${h.index}) · 💨 नाड़ी: ${nadiHi} ${nadiSymbol} · 🟡 तत्त्व: ${tattvaNamesHi}`;
 
           // Detail me start to end time and proper app timings
           const tattvaBreakdownLines = h.tattvas
@@ -1234,8 +1308,9 @@ export function buildPanchangaEventPayloads(
             `🌟 वैदिक होरा #${h.index} (${h.isDay ? "दिन होरा" : "रात्रि होरा"})`,
             `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
             `• समय अवधि: ${h.startTime} से ${h.endTime}`,
-            `• ग्रह स्वामी (Planet): ${planetHi} (${h.ruler})`,
-            `• स्वर नाड़ी (Nadi): ${nadiHi} ${nadiSymbol}`,
+            `• 🪐 शासक ग्रह (Planet): ${planetHi} (${h.ruler})`,
+            `• 💨 स्वर नाड़ी (Nadi): ${nadiHi} ${nadiSymbol}`,
+            `• 🟡 मुख्य तत्त्व (Primary Tattvas): ${tattvaNamesHi}`,
             `• नाड़ी स्वभाव: ${
               h.nadi === "ida"
                 ? "शीतल व सौम्य · बायाँ नासिका छिद्र (Left Nostril)"
@@ -1244,7 +1319,7 @@ export function buildPanchangaEventPayloads(
                   : "ध्यान व समाधि योग (Both Nostrils)"
             }`,
             ``,
-            `🔮 सूक्ष्म पंच तत्त्व विवरण (Pancha Tattva Timings):`,
+            `🔮 सूक्ष्म पंच तत्त्व विवरण (Pancha Tattva Micro-Period Timings):`,
             tattvaBreakdownLines,
             ``,
             `✨ शुभ कार्य सलाह: "${advice}"`,
@@ -1280,14 +1355,22 @@ export function buildPanchangaEventPayloads(
           if (options.includeHoraTattvas) {
             h.tattvas.forEach((tp, tIdx) => {
               const tpNameHi = getTattvaNameHi(tp.name);
-              const tpSummary = `${planetHi} होरा · ${nadiHi} · ${tp.sanskrit} (${tpNameHi}) तत्त्व`;
+              const tpSummary = `🔮 ${tp.sanskrit} (${tpNameHi}) तत्त्व · 🪐 ग्रह: ${planetHi} · 💨 नाड़ी: ${nadiHi} ${nadiSymbol}`;
 
               const tpDescription = [
-                `🔮 वैदिक होरा सूक्ष्म तत्त्वकाल: ${tp.sanskrit} (${tpNameHi})`,
+                `🔮 वैदिक होरा सूक्ष्म तत्त्वकाल: ${tp.sanskrit} (${tpNameHi}) तत्त्व`,
                 `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
                 `• समय अवधि: ${tp.startTime} से ${tp.endTime}`,
-                `• मुख्य होरा: ${planetHi} होरा (#${h.index})`,
-                `• सक्रिय नाड़ी: ${nadiHi} ${nadiSymbol}`,
+                `• 🟡 सूक्ष्म तत्त्व (Tattva): ${tp.sanskrit} (${tpNameHi})`,
+                `• 🪐 होरा ग्रह (Planet): ${planetHi} (${h.ruler})`,
+                `• 💨 स्वर नाड़ी (Nadi): ${nadiHi} ${nadiSymbol}`,
+                `• नाड़ी स्वभाव: ${
+                  h.nadi === "ida"
+                    ? "शीतल व सौम्य (Left Nostril)"
+                    : h.nadi === "pingala"
+                      ? "उष्ण व तेजस्वी (Right Nostril)"
+                      : "ध्यान व समाधि योग (Both Nostrils)"
+                }`,
                 ``,
                 `📍 स्थान: ${city}`,
                 `गणना स्रोत: Mahavtaar Panchanga (Drik Vedic Hora Engine)`,
@@ -1370,4 +1453,178 @@ export async function syncDailyPanchangaEvents(
     skipped,
     total: payloads.length,
   };
+}
+
+const AUTO_SYNC_KEY = "mahavtaar_auto_continuous_sync";
+
+export function getAutoContinuousSyncPref(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(AUTO_SYNC_KEY) === "true";
+}
+
+export function setAutoContinuousSyncPref(enabled: boolean): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(AUTO_SYNC_KEY, enabled ? "true" : "false");
+}
+
+/**
+ * Multi-day continuous synchronization (e.g. 7 days or 30 days ahead) into Panchang Calendar
+ */
+export async function syncMultiDayPanchangaEvents(
+  token: string,
+  baseData: PanchangaResponse,
+  daysAhead: number = 30,
+  options: SyncOptions = DEFAULT_SYNC_OPTIONS,
+  onProgress?: (currentDay: number, totalDays: number) => void,
+): Promise<{ totalCreated: number; totalSkipped: number }> {
+  let totalCreated = 0;
+  let totalSkipped = 0;
+
+  // Get or create dedicated "Panchang Calendar"
+  const calId = await getOrCreatePanchangCalendarId(token);
+
+  const startDateParts = baseData.date.split("-").map(Number);
+  const baseYear = startDateParts[0] || new Date().getFullYear();
+  const baseMonth = (startDateParts[1] || 1) - 1;
+  const baseDay = startDateParts[2] || 1;
+
+  for (let i = 0; i < daysAhead; i++) {
+    const targetDate = new Date(baseYear, baseMonth, baseDay + i);
+    const dateIso = targetDate.toISOString().slice(0, 10);
+
+    if (onProgress) onProgress(i + 1, daysAhead);
+
+    try {
+      let dayData = baseData;
+      if (i > 0) {
+        dayData = {
+          ...baseData,
+          date: dateIso,
+          sunrise_ms: baseData.sunrise_ms ? baseData.sunrise_ms + i * 86400000 : undefined,
+          sunset_ms: baseData.sunset_ms ? baseData.sunset_ms + i * 86400000 : undefined,
+          next_sunrise_ms: baseData.next_sunrise_ms
+            ? baseData.next_sunrise_ms + i * 86400000
+            : undefined,
+          weekday: (baseData.weekday + i) % 7,
+        };
+      }
+
+      const res = await syncDailyPanchangaEvents(token, dayData, options);
+      totalCreated += res.created.length;
+      totalSkipped += res.skipped;
+    } catch (err) {
+      console.warn(`Continuous sync notice for date ${dateIso}:`, err);
+    }
+  }
+
+  return { totalCreated, totalSkipped };
+}
+
+/**
+ * Generate standard RFC 5545 iCalendar (.ics) content for Panchanga events
+ */
+export function generatePanchangaIcsContent(
+  data: PanchangaResponse,
+  options: SyncOptions = DEFAULT_SYNC_OPTIONS,
+): string {
+  const payloads = buildPanchangaEventPayloads(data, options);
+  const lines: string[] = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Mahavtaar Panchanga//NONSGML Drik Almanac//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "X-WR-CALNAME:Mahavtaar Panchanga",
+  ];
+
+  const formatIcsTime = (isoStr: string | undefined): string => {
+    if (!isoStr) return "";
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  };
+
+  for (const payload of payloads) {
+    lines.push("BEGIN:VEVENT");
+    lines.push(
+      `UID:mahavtaar-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@panchanga`,
+    );
+    lines.push(`SUMMARY:${payload.summary.replace(/\n/g, " ")}`);
+    lines.push(`DESCRIPTION:${payload.description.replace(/\n/g, "\\n")}`);
+    if (payload.location) {
+      lines.push(`LOCATION:${payload.location.replace(/\n/g, " ")}`);
+    }
+
+    if (payload.start.dateTime) {
+      lines.push(`DTSTART:${formatIcsTime(payload.start.dateTime)}`);
+    } else if (payload.start.date) {
+      lines.push(`DTSTART;VALUE=DATE:${payload.start.date.replace(/-/g, "")}`);
+    }
+
+    if (payload.end.dateTime) {
+      lines.push(`DTEND:${formatIcsTime(payload.end.dateTime)}`);
+    } else if (payload.end.date) {
+      lines.push(`DTEND;VALUE=DATE:${payload.end.date.replace(/-/g, "")}`);
+    }
+
+    // Add explicit VALARM audio/popup alarm block so native calendar apps show alerts with Planet, Nadi & Tattva
+    const reminderMins = options.reminderMinutes !== undefined ? options.reminderMinutes : 0;
+    lines.push("BEGIN:VALARM");
+    lines.push("ACTION:DISPLAY");
+    lines.push(`DESCRIPTION:🔔 ${payload.summary.replace(/\n/g, " ")}`);
+    lines.push(`TRIGGER:-PT${reminderMins}M`);
+    lines.push("END:VALARM");
+
+    lines.push("END:VEVENT");
+  }
+
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+/**
+ * Download .ics file directly to user device for instant import into Google Calendar / Apple Calendar
+ */
+export function downloadPanchangaIcsFile(
+  data: PanchangaResponse,
+  options: SyncOptions = DEFAULT_SYNC_OPTIONS,
+): void {
+  const icsString = generatePanchangaIcsContent(data, options);
+  const blob = new Blob([icsString], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  const filename = `Mahavtaar_Panchanga_${normalizeToIsoDate(data.date)}.ics`;
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Open Google Calendar direct TEMPLATE link in new tab for an event
+ */
+export function openDirectGoogleCalendarUrl(payload: CalendarEventPayload): void {
+  const title = encodeURIComponent(payload.summary);
+  const details = encodeURIComponent(payload.description);
+  const location = encodeURIComponent(payload.location || "");
+
+  const formatGCalTime = (isoStr: string | undefined): string => {
+    if (!isoStr) return "";
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return "";
+    return d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  };
+
+  let datesParam = "";
+  if (payload.start.dateTime && payload.end.dateTime) {
+    datesParam = `${formatGCalTime(payload.start.dateTime)}/${formatGCalTime(payload.end.dateTime)}`;
+  } else if (payload.start.date) {
+    const cleanDate = payload.start.date.replace(/-/g, "");
+    datesParam = `${cleanDate}/${cleanDate}`;
+  }
+
+  const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${datesParam}`;
+  window.open(gcalUrl, "_blank", "noopener,noreferrer");
 }

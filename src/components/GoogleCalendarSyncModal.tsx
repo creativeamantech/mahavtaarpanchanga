@@ -21,6 +21,7 @@ import { User } from "firebase/auth";
 import {
   initAuth,
   googleSignIn,
+  signInWithGsi,
   logoutGoogleCalendar,
   getAccessToken,
   getCurrentUser,
@@ -134,7 +135,7 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
 
   if (!isOpen) return null;
 
-  // Handle Google Login
+  // Handle Google Login (Attempts Firebase Auth then falls back to Direct GIS Token Client)
   const handleLogin = async () => {
     setIsLoggingIn(true);
     setAuthError(null);
@@ -148,7 +149,33 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
       }
     } catch (err: any) {
       console.error("Login failed:", err);
-      setAuthError(err?.message || "Google Calendar connection was cancelled or failed.");
+      let msg = err?.message || "Google Calendar connection failed.";
+      if (msg.includes("unauthorized-domain")) {
+        msg =
+          lang === "hi"
+            ? "प्रारंभिक फ़ायरबेस डोमेन सीमा। नीचे 'डायरेक्ट Google OAuth कनेक्ट' बटन का उपयोग करें।"
+            : "Preview domain restriction. Use the 'Direct Google OAuth Connect' option below.";
+      }
+      setAuthError(msg);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleDirectGsiLogin = async () => {
+    setIsLoggingIn(true);
+    setAuthError(null);
+    setActionError(null);
+    try {
+      const res = await signInWithGsi();
+      if (res) {
+        setUser(res.user);
+        setToken(res.accessToken);
+        fetchExistingEvents(res.accessToken);
+      }
+    } catch (err: any) {
+      console.error("Direct GIS Login failed:", err);
+      setAuthError(err?.message || "Google Calendar connection failed.");
     } finally {
       setIsLoggingIn(false);
     }
@@ -408,9 +435,20 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
             )}
 
             {authError && (
-              <div className="mt-3 p-3 rounded-xl border border-rose-300/80 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
-                <span>{authError}</span>
+              <div className="mt-3 p-3 rounded-xl border border-rose-300/80 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+                  <span>{authError}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDirectGsiLogin}
+                  disabled={isLoggingIn}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs transition-colors shrink-0 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {lang === "hi" ? "डायरेक्ट गूगल सिंक" : "Direct Google Connect"}
+                </button>
               </div>
             )}
           </div>

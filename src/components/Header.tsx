@@ -173,21 +173,21 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       id="app-header"
-      className={`sticky top-0 z-50 transition-all duration-200 border-b shadow-md ${
+      className={`sticky top-0 z-50 transition-all duration-200 border-b shadow-md w-full overflow-hidden ${
         isNight
           ? "bg-[#0B0F1E] border-indigo-900/50 shadow-black/50 text-white"
           : "bg-[#1A1F5E] border-[#15194D] shadow-indigo-950/20 text-white"
       }`}
     >
       {/* ─── HEADER TOP ─────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-2.5 sm:px-6 lg:px-8 max-w-full overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between min-h-[3.5rem] sm:min-h-[4rem] py-1.5 sm:py-2 gap-2">
+      <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8 w-full">
+        <div className="flex items-center justify-between h-14 sm:h-16 gap-1 sm:gap-3 w-full">
           {/* App Name & Sacred Vedic Branding with Home Link */}
-          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink min-w-0">
+          <div className="flex items-center space-x-1.5 sm:space-x-2.5 min-w-0 shrink">
             <button
               type="button"
               onClick={() => onViewChange?.("home")}
-              className={`flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl shadow-inner border transition-all hover:scale-105 cursor-pointer ${
+              className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl shadow-inner border transition-all hover:scale-105 cursor-pointer ${
                 activeView === "home"
                   ? "bg-amber-500 text-stone-950 border-amber-300 ring-2 ring-amber-400/50 shadow-md"
                   : isNight
@@ -197,7 +197,9 @@ export const Header: React.FC<HeaderProps> = ({
               title={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
               aria-label="Home Hub"
             >
-              <span className="font-serif-vedic font-bold text-lg sm:text-2xl leading-none">ॐ</span>
+              <span className="font-serif-vedic font-bold text-base sm:text-xl leading-none">
+                ॐ
+              </span>
             </button>
 
             <div
@@ -206,16 +208,16 @@ export const Header: React.FC<HeaderProps> = ({
               title={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
             >
               <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-                <span className="font-serif-vedic font-bold text-sm sm:text-lg text-[#F0C96A] tracking-tight leading-tight group-hover:underline decoration-amber-400/50 truncate">
+                <span className="font-serif-vedic font-bold text-xs xs:text-sm sm:text-base text-[#F0C96A] tracking-tight leading-tight group-hover:underline decoration-amber-400/50 truncate max-w-[110px] xs:max-w-[150px] sm:max-w-none">
                   Mahavtaar Panchanga
                 </span>
                 <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider bg-white/15 text-amber-200 border border-white/20 shrink-0">
                   Drik
                 </span>
               </div>
-              <span className="text-[10px] sm:text-[11px] font-devanagari text-white/60 tracking-wider leading-none mt-0.5 flex items-center gap-1 truncate">
+              <span className="hidden xs:flex text-[9px] sm:text-[10px] font-devanagari text-white/60 tracking-wider leading-none mt-0.5 items-center gap-1 truncate">
                 <span>महावतार पञ्चाङ्ग</span>
-                <span className="text-[9px] text-amber-400/80 shrink-0">
+                <span className="text-[8px] sm:text-[9px] text-amber-400/80 shrink-0">
                   • {lang === "hi" ? "होम" : "Home"}
                 </span>
               </span>
@@ -225,7 +227,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={() => onViewChange?.("home")}
-              className={`hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all border shrink-0 ${
+              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all border shrink-0 ${
                 activeView === "home"
                   ? "bg-amber-500 text-stone-950 border-amber-400 shadow-xs"
                   : "bg-white/10 hover:bg-white/20 border-white/15 text-amber-300"
@@ -237,13 +239,13 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Action Bar */}
-          <div className="flex items-center justify-end gap-1 sm:gap-2 shrink-0 max-w-full overflow-x-auto hide-scrollbar py-0.5">
+          <div className="flex items-center justify-end gap-1 sm:gap-1.5 shrink-0 min-w-0">
             {/* Location Pill */}
             <div className="flex items-center space-x-1 shrink-0">
               <button
                 type="button"
                 onClick={onOpenLocation}
-                className="flex items-center space-x-1 sm:space-x-1.5 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold text-white/90 transition-colors shadow-2xs max-w-[95px] xs:max-w-[130px] sm:max-w-[170px] min-w-0 shrink"
+                className="flex items-center space-x-1 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs font-semibold text-white/90 transition-colors shadow-2xs max-w-[85px] xs:max-w-[115px] sm:max-w-[160px] min-w-0 shrink"
                 title={isDeviceLocation ? `${currentCity} (Active GPS)` : "Change Location"}
               >
                 {isDeviceLocation ? (
@@ -252,7 +254,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
                   </span>
                 ) : (
-                  <span className="text-xs shrink-0">📍</span>
+                  <span className="text-[10px] sm:text-xs shrink-0">📍</span>
                 )}
                 <span className="truncate text-[10px] sm:text-xs">{currentCity}</span>
               </button>
@@ -298,7 +300,7 @@ export const Header: React.FC<HeaderProps> = ({
               type="button"
               id="theme-toggle-btn"
               onClick={onToggleTheme}
-              className="flex h-7 sm:h-8 px-1.5 sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
+              className="flex h-7 w-7 sm:h-8 sm:w-auto sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
               title={isNight ? t.switchToParchment : t.switchToNightSky}
               aria-label={isNight ? t.switchToParchment : t.switchToNightSky}
             >
@@ -317,7 +319,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={onOpenCalendarSync}
-                className="flex h-7 sm:h-8 px-1.5 sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-[#F0C96A] transition-colors shrink-0"
+                className="flex h-7 w-7 sm:h-8 sm:w-auto sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-[#F0C96A] transition-colors shrink-0"
                 title={lang === "hi" ? "गूगल कैलेंडर दैनिक सिंक" : "Google Calendar Daily Sync"}
                 aria-label={lang === "hi" ? "गूगल कैलेंडर सिंक" : "Google Calendar Sync"}
               >
@@ -344,7 +346,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="flex h-7 sm:h-8 px-1.5 sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
+              className="flex h-7 w-7 sm:h-8 sm:w-auto sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
               title={t.settings}
               aria-label={t.settings}
             >
@@ -361,16 +363,16 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* ─── DATE STRIP ─────────────────────────────────────────── */}
       <div
-        className={`border-t px-2 sm:px-6 lg:px-8 py-1.5 sm:py-2 transition-colors ${
+        className={`border-t px-2 sm:px-4 lg:px-8 py-1.5 transition-colors w-full ${
           isNight ? "border-indigo-900/40 bg-black/20" : "border-white/10 bg-black/15"
         }`}
       >
-        <div className="mx-auto max-w-7xl flex items-center justify-between">
+        <div className="mx-auto max-w-7xl flex items-center justify-between gap-1 w-full">
           {/* Previous Day */}
           <button
             type="button"
             onClick={handlePrevDay}
-            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/85 text-base sm:text-lg transition-colors leading-none shrink-0"
+            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/85 text-base sm:text-lg transition-colors leading-none shrink-0 cursor-pointer"
             title="Previous Day"
             aria-label="Previous Day"
           >
@@ -378,8 +380,8 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {/* Date Center Info */}
-          <div className="flex flex-col items-center justify-center text-center px-2 cursor-pointer group min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex flex-col items-center justify-center text-center px-1 cursor-pointer group min-w-0 flex-1">
+            <div className="flex items-center gap-1 sm:gap-2 max-w-full min-w-0">
               <span
                 onClick={() => {
                   try {
@@ -399,9 +401,9 @@ export const Header: React.FC<HeaderProps> = ({
                     dateInputRef.current?.focus();
                   }
                 }}
-                className="text-xs sm:text-sm font-semibold text-white/95 tracking-wide group-hover:text-[#F0C96A] transition-colors flex items-center gap-1 sm:gap-1.5 truncate"
+                className="text-[11px] sm:text-sm font-semibold text-white/95 tracking-wide group-hover:text-[#F0C96A] transition-colors flex items-center gap-1 sm:gap-1.5 truncate max-w-full"
               >
-                <CalendarIcon className="w-3.5 h-3.5 text-[#F0C96A]/80 inline-block shrink-0" />
+                <CalendarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#F0C96A]/80 inline-block shrink-0" />
                 <span className="truncate">{gregorianDisplay}</span>
               </span>
 
@@ -412,14 +414,14 @@ export const Header: React.FC<HeaderProps> = ({
                     e.stopPropagation();
                     handleToday();
                   }}
-                  className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-[#D4680A] text-white hover:bg-[#E5761A] transition-colors uppercase tracking-wider shrink-0"
+                  className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold bg-[#D4680A] text-white hover:bg-[#E5761A] transition-colors uppercase tracking-wider shrink-0"
                 >
                   {t.today}
                 </button>
               )}
             </div>
 
-            <span className="text-[10px] sm:text-xs font-devanagari text-[#F0A44A] mt-0.5 tracking-wide truncate max-w-full">
+            <span className="text-[9px] sm:text-xs font-devanagari text-[#F0A44A] mt-0.5 tracking-wide truncate max-w-full">
               {getVedicDisplay()}
             </span>
 
@@ -438,7 +440,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={handleNextDay}
-            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/85 text-base sm:text-lg transition-colors leading-none"
+            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/85 text-base sm:text-lg transition-colors leading-none shrink-0 cursor-pointer"
             title="Next Day"
             aria-label="Next Day"
           >

@@ -16,8 +16,17 @@ import firebaseConfig from "../../firebase-applet-config.json";
 
 export const SCOPES = ["https://www.googleapis.com/auth/calendar.events"];
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+let app: any = null;
+let auth: any = null;
+
+try {
+  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  auth = getAuth(app);
+} catch (e) {
+  console.warn("Firebase Auth init notice (falling back to direct GIS):", e);
+}
+
+export { auth };
 
 const provider = new GoogleAuthProvider();
 SCOPES.forEach((scope) => provider.addScope(scope));
@@ -120,6 +129,10 @@ export const initAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
   onAuthFailure?: () => void,
 ) => {
+  if (!auth) {
+    if (onAuthFailure) onAuthFailure();
+    return () => {};
+  }
   return onAuthStateChanged(auth, async (user: User | null) => {
     if (user) {
       if (cachedAccessToken) {
@@ -141,19 +154,18 @@ export const initAuth = (
 export const googleSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
   isSigningIn = true;
   try {
-    // Strategy 1: Attempt Firebase Auth popup
-    const result = await signInWithPopup(auth, provider);
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    if (credential?.accessToken) {
-      cachedAccessToken = credential.accessToken;
-      return { user: result.user, accessToken: cachedAccessToken };
+    if (auth) {
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential?.accessToken) {
+        cachedAccessToken = credential.accessToken;
+        return { user: result.user, accessToken: cachedAccessToken };
+      }
     }
-    // If token not present in credential, fallback to GIS
     return await signInWithGsi();
   } catch (error: any) {
     console.warn("Firebase Auth error, falling back to Direct Google GIS OAuth:", error?.message);
 
-    // Strategy 2: Automatic Fallback to Direct Google GIS Token Client
     try {
       return await signInWithGsi();
     } catch (gsiError: any) {
@@ -181,7 +193,7 @@ export const getAccessToken = async (): Promise<string | null> => {
  * Current authenticated Firebase user
  */
 export const getCurrentUser = (): User | null => {
-  return auth.currentUser;
+  return auth?.currentUser || null;
 };
 
 /**
@@ -189,7 +201,9 @@ export const getCurrentUser = (): User | null => {
  */
 export const logoutGoogleCalendar = async (): Promise<void> => {
   try {
-    await signOut(auth);
+    if (auth) {
+      await signOut(auth);
+    }
   } catch {
     // ignore
   }

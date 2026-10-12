@@ -839,10 +839,10 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                 </label>
 
 
-                {/* 10. Vedic Horas & Hora Nadi (24 Horas with Planet, Nadi & Tattva) */}
+                {/* 10. Individual Tattva Events per Hora (हर Hora के अंदर आने वाला हर Tattva अपना अलग Event) */}
                 <label
                   className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                    options.includeVedicHoras !== false
+                    options.includeHoraTattvas !== false
                       ? isNight
                         ? "bg-indigo-950/40 border-amber-500/40 text-amber-200"
                         : "bg-amber-50/70 border-amber-300/80 text-amber-950 font-medium"
@@ -853,11 +853,11 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                 >
                   <input
                     type="checkbox"
-                    checked={options.includeVedicHoras !== false}
+                    checked={options.includeHoraTattvas !== false}
                     onChange={(e) =>
                       setOptions((prev) => ({
                         ...prev,
-                        includeVedicHoras: e.target.checked,
+                        includeHoraTattvas: e.target.checked,
                       }))
                     }
                     className="mt-0.5 rounded text-amber-600 focus:ring-amber-500"
@@ -866,13 +866,13 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                     <span className="font-bold block text-sm flex items-center gap-1">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                       {lang === "hi"
-                        ? "२४ वैदिक होरा व होरा नाड़ी (ग्रह, नाड़ी व तत्त्व)"
-                        : "24 Vedic Horas & Hora Nadi (Planet, Nadi & Tattva)"}
+                        ? "प्रति होरा स्वतंत्र तत्त्व इवेंट्स (Individual Tattva Events)"
+                        : "Independent Tattva Events per Hora"}
                     </span>
                     <span className="text-[11px] opacity-80 block mt-0.5">
                       {lang === "hi"
-                        ? "शीर्षक में ग्रह स्वामी, स्वर नाड़ी व तत्त्व; विवरण में प्रारंभ-समाप्ति समय व पंच तत्त्व काल"
-                        : "Title with Planet, Nadi & Tattva; detail with exact start-end times & micro Tattvas"}
+                        ? "हर Hora के अंदर 5 स्वतंत्र तत्त्व इवेंट (जैसे 🪐 सूर्य · 🌍 पृथ्वी · 💨 पिंगला), केवल उसी तत्त्व की जानकारी के साथ"
+                        : "Creates 5 independent events per Hora (e.g. 🪐 Sun · 🌍 Prithvi · 💨 Pingala) with current Tattva info only"}
                     </span>
                   </div>
                 </label>

@@ -124,13 +124,13 @@ describe("Comprehensive Swara Events Integration", () => {
     expect(moonrisePayload).toBeDefined();
     expect(moonsetPayload).toBeDefined();
 
-    // Explicit Ida, Pingala, and Sushumna events must exist
+    // Explicit Ida and Pingala events must exist, Sushumna events must be completely disabled & 0
     expect(idaPayloads.length).toBeGreaterThan(0);
     expect(pingalaPayloads.length).toBeGreaterThan(0);
-    expect(sushumnaPayloads.length).toBeGreaterThan(0);
+    expect(sushumnaPayloads.length).toBe(0);
 
-    // Verify all Ida, Pingala, Sushumna events have calculated valid start & end timestamps
-    for (const p of [...idaPayloads, ...pingalaPayloads, ...sushumnaPayloads]) {
+    // Verify all Ida and Pingala events have calculated valid start & end timestamps
+    for (const p of [...idaPayloads, ...pingalaPayloads]) {
       expect(p.start.dateTime).toBeDefined();
       expect(p.end.dateTime).toBeDefined();
       expect(new Date(p.start.dateTime!).getTime()).toBeLessThan(
@@ -189,5 +189,95 @@ describe("Comprehensive Swara Events Integration", () => {
     expect(new Date(firstHora.start.dateTime!).getTime()).toBeLessThan(
       new Date(firstHora.end.dateTime!).getTime(),
     );
+  });
+
+  it("verifies 120 independent Tattva events per full Panchanga day with single Tattva info and exact boundaries", () => {
+    // 1. By default, standalone Hora events are disabled and Tattva events are enabled
+    expect(DEFAULT_SYNC_OPTIONS.includeVedicHoras).toBe(false);
+    expect(DEFAULT_SYNC_OPTIONS.includeHoraTattvas).toBe(true);
+
+    const payloads = buildPanchangaEventPayloads(mockPanchanga, DEFAULT_SYNC_OPTIONS);
+
+    const tattvaPayloads = payloads.filter((p) =>
+      p.extendedProperties?.private?.eventType?.startsWith("hora_tattva_"),
+    );
+
+    // Requirement 1: Exactly 120 independent Tattva events (24 Horas * 5 Tattvas)
+    expect(tattvaPayloads.length).toBe(120);
+
+    // Requirement 4 & 5: No standalone Hora and No Sushumna events by default
+    const standaloneHoras = payloads.filter((p) =>
+      p.extendedProperties?.private?.eventType?.startsWith("vedic_hora_"),
+    );
+    expect(standaloneHoras.length).toBe(0);
+
+    const sushumnaEvents = payloads.filter(
+      (p) =>
+        p.extendedProperties?.private?.eventType?.includes("sushumna") ||
+        p.summary.includes("सुषुम्ना") ||
+        p.description.includes("सुषुम्ना"),
+    );
+    expect(sushumnaEvents.length).toBe(0);
+
+    // Requirement 2 & 3: Check every single Tattva event
+    for (let i = 0; i < tattvaPayloads.length; i++) {
+      const tp = tattvaPayloads[i];
+      const horaIdx = Math.floor(i / 5) + 1;
+      const tIdx = i % 5;
+
+      // Check eventType
+      expect(tp.extendedProperties?.private?.eventType).toBe(`hora_tattva_${horaIdx}_${tIdx}`);
+
+      // Check boundaries
+      expect(tp.start.dateTime).toBeDefined();
+      expect(tp.end.dateTime).toBeDefined();
+      const startMs = new Date(tp.start.dateTime!).getTime();
+      const endMs = new Date(tp.end.dateTime!).getTime();
+      expect(startMs).toBeLessThan(endMs);
+
+      // Check Title format: 🪐 [Planet] · [Icon] [Tattva] · 💨 [Nadi]
+      expect(tp.summary).toMatch(/^🪐\s+\S+\s+·\s+[\S\s]+\s+·\s+💨\s+\S+$/);
+
+      // Check Description: contains only current Tattva and NOT others
+      expect(tp.description).toContain("Tattva:");
+      expect(tp.description).toContain("Planet:");
+      expect(tp.description).toContain("Nadi:");
+      expect(tp.description).toContain("Tattva Time:");
+      expect(tp.description).toContain(`Hora Reference:`);
+      expect(tp.description).toContain(`(होरा #${horaIdx})`);
+
+      // Verify it does NOT list all five Tattvas
+      const tattvaKeywords = ["पृथ्वी", "जल", "अग्नि", "वायु", "आकाश"];
+      const mentionedTattvas = tattvaKeywords.filter((tk) => tp.description.includes(tk));
+      // Only the single active Tattva should be described
+      expect(mentionedTattvas.length).toBe(1);
+    }
+  });
+
+  it("verifies Google Calendar sync and ICS export produce 1:1 consistent results with deterministic UIDs", () => {
+    import("../src/services/googleCalendarService").then(({ generatePanchangaIcsContent }) => {
+      const gcalPayloads = buildPanchangaEventPayloads(mockPanchanga, DEFAULT_SYNC_OPTIONS);
+      const icsString = generatePanchangaIcsContent(mockPanchanga, DEFAULT_SYNC_OPTIONS);
+
+      // Verify VEVENT count matches payload count
+      const veventMatches = icsString.match(/BEGIN:VEVENT/g);
+      expect(veventMatches?.length).toBe(gcalPayloads.length);
+
+      // Verify deterministic UIDs (repeat export produces identical UIDs)
+      const icsStringRepeat = generatePanchangaIcsContent(mockPanchanga, DEFAULT_SYNC_OPTIONS);
+      expect(icsString).toBe(icsStringRepeat);
+
+      // Verify UIDs are formatted deterministically: mahavtaar-YYYYMMDD-[eventType]@panchanga
+      const uids = [...icsString.matchAll(/UID:([^\r\n]+)/g)].map((m) => m[1]);
+      expect(uids.length).toBe(gcalPayloads.length);
+      for (let i = 0; i < uids.length; i++) {
+        const expectedType = gcalPayloads[i].extendedProperties?.private?.eventType;
+        expect(uids[i]).toBe(`mahavtaar-20261003-${expectedType}@panchanga`);
+      }
+
+      // Verify no Sushumna events in ICS
+      expect(icsString).not.toContain("सुषुम्ना");
+      expect(icsString).not.toContain("Sushumna");
+    });
   });
 });

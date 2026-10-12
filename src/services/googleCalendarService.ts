@@ -69,10 +69,10 @@ export interface SyncOptions {
   includeSwaraHourlyCycles: boolean; // 24-Hour Alternating Hourly Swara Cycles
   includeSwaraIda: boolean; // Explicit Ida Swara (Left Nostril / Lunar) timing events
   includeSwaraPingala: boolean; // Explicit Pingala Swara (Right Nostril / Solar) timing events
-  includeSwaraSushumna: boolean; // Explicit Sushumna Swara (Both Nostrils / Sandhi Yogic) timing events
+  includeSwaraSushumna?: boolean; // Sushumna events disabled & removed per Vedic requirements
   // Vedic Horas & Hora Nadi (वैदिक होरा चक्र) options
-  includeVedicHoras: boolean; // 24 Vedic Horas with Planet, Nadi & Pancha Tattvas
-  includeHoraTattvas: boolean; // Individual Micro Pancha Tattva periods within Horas
+  includeVedicHoras: boolean; // 24 Vedic Horas with Planet, Nadi & Pancha Tattvas (disabled by default)
+  includeHoraTattvas: boolean; // Individual Micro Pancha Tattva periods within Horas (120 events)
   reminderMinutes: number; // e.g. 15
 }
 
@@ -91,9 +91,9 @@ export const DEFAULT_SYNC_OPTIONS: SyncOptions = {
   includeSwaraHourlyCycles: false,
   includeSwaraIda: true,
   includeSwaraPingala: true,
-  includeSwaraSushumna: true,
-  includeVedicHoras: true,
-  includeHoraTattvas: false,
+  includeSwaraSushumna: false, // Sushumna events completely disabled
+  includeVedicHoras: false, // Standalone Hora events disabled by default
+  includeHoraTattvas: true, // 120 Individual Tattva events enabled by default
   reminderMinutes: 15,
 };
 
@@ -329,32 +329,43 @@ export async function listPanchangaEvents(
   const timeMin = safeIsoString(new Date(`${isoStart}T00:00:00Z`).getTime());
   const timeMax = safeIsoString(new Date(`${isoEnd}T23:59:59Z`).getTime());
 
-  const url = new URL(
-    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`,
-  );
-  url.searchParams.set("timeMin", timeMin);
-  url.searchParams.set("timeMax", timeMax);
-  url.searchParams.set("singleEvents", "true");
-  url.searchParams.set("maxResults", "250");
+  const items: GoogleCalendarApiItem[] = [];
+  let pageToken: string | undefined = undefined;
 
-  const res = await fetch(url.toString(), {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(
-      errorData?.error?.message || `Failed to fetch events from Google Calendar (${res.status})`,
+  do {
+    const url = new URL(
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events`,
     );
-  }
+    url.searchParams.set("timeMin", timeMin);
+    url.searchParams.set("timeMax", timeMax);
+    url.searchParams.set("singleEvents", "true");
+    url.searchParams.set("maxResults", "2500");
+    if (pageToken) {
+      url.searchParams.set("pageToken", pageToken);
+    }
 
-  const data = await res.json();
-  const items = data.items || [];
+    const res = await fetch(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+    });
 
-  return (items as GoogleCalendarApiItem[])
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(
+        errorData?.error?.message || `Failed to fetch events from Google Calendar (${res.status})`,
+      );
+    }
+
+    const data = await res.json();
+    if (Array.isArray(data.items)) {
+      items.push(...data.items);
+    }
+    pageToken = data.nextPageToken;
+  } while (pageToken);
+
+  return items
     .filter(
       (item: GoogleCalendarApiItem) =>
         item.extendedProperties?.private?.source === "mahavtaar_panchanga" ||
@@ -367,7 +378,12 @@ export async function listPanchangaEvents(
         item.summary?.includes("पिंगला") ||
         item.summary?.includes("Pingala") ||
         item.summary?.includes("सुषुम्ना") ||
-        item.summary?.includes("Sushumna"),
+        item.summary?.includes("Sushumna") ||
+        item.summary?.includes("होरा") ||
+        item.summary?.includes("Hora") ||
+        item.summary?.includes("तत्त्व") ||
+        item.summary?.includes("Tattva") ||
+        item.summary?.includes("🪐"),
     )
     .map((item: GoogleCalendarApiItem) => ({
       id: item.id,
@@ -1054,166 +1070,13 @@ export function buildPanchangaEventPayloads(
             },
           });
         }
-
-        // 12.1.3 Explicit Sushumna Sandhi Timing Event (Both Nostrils / Neutral Yogic)
-        if (includeSushumna) {
-          payloads.push({
-            summary: `🧘 सुषुम्ना संधिकाल (Sushumna Sandhi) · ध्यान व योग [प्रहर #${i + 1}] (${sushumnaStartFormatted} – ${sushumnaEndFormatted})`,
-            description: [
-              `🧘 शिवस्वरोदय सुषुम्ना नाड़ी संधिकाल (Sushumna Sandhi · Neutral Yogic Breath)`,
-              `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-              `• समय अवधि: ${sushumnaStartFormatted} से ${sushumnaEndFormatted} (प्रहर #${i + 1} स्वर संधिकाल - ८ मिनट)`,
-              `• सक्रिय नाड़ी: सुषुम्ना नाड़ी (मध्य / शून्य / ब्रह्म स्वर)`,
-              `• श्वास प्रवाह: दोनों नासिकाओं में सम प्रवाह (Both Nostrils Equal Flow)`,
-              `• शास्त्रीय नियम: इस संधि-काल में भौतिक, सांसारिक एवं आर्थिक कर्म निष्फल होते हैं (Worldly affairs prohibited)।`,
-              `• अनुशंसित साधना: केवल ध्यान (Meditation), प्राणायाम, मंत्र जप, कुण्डलिनी जागरण एवं ईश्वर आराधना हेतु सर्वोत्तम काल।`,
-              ``,
-              `📍 स्थान: ${city}`,
-              `स्रोत: Mahavtaar Panchanga (Shiva Swarodaya Engine)`,
-            ].join("\n"),
-            location: city,
-            start: { dateTime: safeIsoString(sushumnaStartMs), timeZone: tz },
-            end: { dateTime: safeIsoString(sushumnaEndMs), timeZone: tz },
-            colorId: "3", // Grape / Purple (Spiritual / Yogic)
-            reminders: {
-              useDefault: false,
-              overrides: [{ method: "popup", minutes: options.reminderMinutes }],
-            },
-            extendedProperties: {
-              private: {
-                source: "mahavtaar_panchanga",
-                eventType: `swara_sushumna_cycle_${i + 1}`,
-                nadi: "sushumna",
-                nostril: "Both",
-                cycle: String(i + 1),
-                date: isoDate,
-              },
-            },
-          });
-        }
       }
     }
 
-    // 12.2 Major Cardinal Sandhya Sushumna Timing Windows (त्रिसंध्या सुषुम्ना काल)
-    if (options.includeSwaraSushumna !== false) {
-      // 12.2.1 Dawn Sandhya Sushumna (Sunrise junction - 20 mins)
-      const dawnStartMs = sunriseMs - 10 * 60000;
-      const dawnEndMs = sunriseMs + 10 * 60000;
-      const dawnStartFormatted = formatTimeInZone(dawnStartMs, tz);
-      const dawnEndFormatted = formatTimeInZone(dawnEndMs, tz);
-
-      payloads.push({
-        summary: `🧘 प्रातः महा-संध्या सुषुम्ना काल (${dawnStartFormatted} – ${dawnEndFormatted})`,
-        description: [
-          `🧘 शिवस्वरोदय प्रातः महा-संधिकाल सुषुम्ना (Dawn Sandhya Sushumna Window)`,
-          `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-          `• समय अवधि: ${dawnStartFormatted} से ${dawnEndFormatted} (सूर्योदय संधि - २० मिनट)`,
-          `• सक्रिय नाड़ी: सुषुम्ना नाड़ी (उभय नासिका प्रवाह)`,
-          `• शास्त्रीय महत्व: सूर्योदय का संधिकाल जहाँ प्राण सुषुम्ना में प्रवेश करता है।`,
-          `• अनुशंसित कर्म: गायत्री मंत्र, ध्यान, प्राणायाम, सूर्य नमस्कार एवं शिव साधना।`,
-          ``,
-          `📍 स्थान: ${city}`,
-          `स्रोत: Mahavtaar Panchanga (Shiva Swarodaya Engine)`,
-        ].join("\n"),
-        location: city,
-        start: { dateTime: safeIsoString(dawnStartMs), timeZone: tz },
-        end: { dateTime: safeIsoString(dawnEndMs), timeZone: tz },
-        colorId: "3", // Grape / Purple
-        reminders: {
-          useDefault: false,
-          overrides: [{ method: "popup", minutes: options.reminderMinutes }],
-        },
-        extendedProperties: {
-          private: {
-            source: "mahavtaar_panchanga",
-            eventType: "swara_sushumna_dawn",
-            nadi: "sushumna",
-            nostril: "Both",
-            date: isoDate,
-          },
-        },
-      });
-
-      // 12.2.2 Midday Vishuvat Sandhya Sushumna (Solar Noon junction - 20 mins)
-      const noonStartMs = middayMs - 10 * 60000;
-      const noonEndMs = middayMs + 10 * 60000;
-      const noonStartFormatted = formatTimeInZone(noonStartMs, tz);
-      const noonEndFormatted = formatTimeInZone(noonEndMs, tz);
-
-      payloads.push({
-        summary: `🧘 मध्याह्न विषुवत् सुषुम्ना काल (${noonStartFormatted} – ${noonEndFormatted})`,
-        description: [
-          `🧘 शिवस्वरोदय मध्याह्न विषुवत् सुषुम्ना (Midday Solar Noon Sushumna Window)`,
-          `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-          `• समय अवधि: ${noonStartFormatted} से ${noonEndFormatted} (मध्याह्न संधि - २० मिनट)`,
-          `• सक्रिय नाड़ी: सुषुम्ना नाड़ी (उभय नासिका प्रवाह)`,
-          `• शास्त्रीय महत्व: विषुवत् काल में प्राण का मध्य में स्थिर होना।`,
-          `• अनुशंसित कर्म: मौन, ध्यान, शांति चिंतन एवं आध्यात्मिक स्थिरता।`,
-          ``,
-          `📍 स्थान: ${city}`,
-          `स्रोत: Mahavtaar Panchanga (Shiva Swarodaya Engine)`,
-        ].join("\n"),
-        location: city,
-        start: { dateTime: safeIsoString(noonStartMs), timeZone: tz },
-        end: { dateTime: safeIsoString(noonEndMs), timeZone: tz },
-        colorId: "3", // Grape / Purple
-        reminders: {
-          useDefault: false,
-          overrides: [{ method: "popup", minutes: options.reminderMinutes }],
-        },
-        extendedProperties: {
-          private: {
-            source: "mahavtaar_panchanga",
-            eventType: "swara_sushumna_midday",
-            nadi: "sushumna",
-            nostril: "Both",
-            date: isoDate,
-          },
-        },
-      });
-
-      // 12.2.3 Dusk Sandhya Sushumna (Sunset junction - 20 mins)
-      const duskStartMs = sunsetMs - 10 * 60000;
-      const duskEndMs = sunsetMs + 10 * 60000;
-      const duskStartFormatted = formatTimeInZone(duskStartMs, tz);
-      const duskEndFormatted = formatTimeInZone(duskEndMs, tz);
-
-      payloads.push({
-        summary: `🧘 सायं महा-संध्या सुषुम्ना काल (${duskStartFormatted} – ${duskEndFormatted})`,
-        description: [
-          `🧘 शिवस्वरोदय सायं महा-संधिकाल सुषुम्ना (Dusk Sandhya Sushumna Window)`,
-          `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-          `• समय अवधि: ${duskStartFormatted} से ${duskEndFormatted} (सूर्यास्त संधि - २० मिनट)`,
-          `• सक्रिय नाड़ी: सुषुम्ना नाड़ी (उभय नासिका प्रवाह)`,
-          `• शास्त्रीय महत्व: दिन और रात्रि का मिलन संधि-बिंदु।`,
-          `• अनुशंसित कर्म: सांध्य वंदन, आरती, ॐ जप, दीप प्रज्वलन एवं ध्यान।`,
-          ``,
-          `📍 स्थान: ${city}`,
-          `स्रोत: Mahavtaar Panchanga (Shiva Swarodaya Engine)`,
-        ].join("\n"),
-        location: city,
-        start: { dateTime: safeIsoString(duskStartMs), timeZone: tz },
-        end: { dateTime: safeIsoString(duskEndMs), timeZone: tz },
-        colorId: "3", // Grape / Purple
-        reminders: {
-          useDefault: false,
-          overrides: [{ method: "popup", minutes: options.reminderMinutes }],
-        },
-        extendedProperties: {
-          private: {
-            source: "mahavtaar_panchanga",
-            eventType: "swara_sushumna_dusk",
-            nadi: "sushumna",
-            nostril: "Both",
-            date: isoDate,
-          },
-        },
-      });
-    }
     // =========================================================================
-    // 13. VEDIC HORAS & HORA NADI (वैदिक होरा चक्र - Exact Hora Nadi Page Alignment)
+    // 13. VEDIC HORAS & INDIVIDUAL TATTVA EVENTS (हर Hora के अंदर आने वाला हर Tattva अपना अलग Event)
     // =========================================================================
-    if (options.includeVedicHoras !== false) {
+    if (options.includeHoraTattvas !== false || options.includeVedicHoras === true) {
       try {
         let sunriseMs = data.sunrise_ms || data.sunriseMs;
         if (!sunriseMs || isNaN(sunriseMs)) {
@@ -1252,128 +1115,70 @@ export function buildPanchangaEventPayloads(
           Saturn: "शनि",
         };
 
-        const adviceMapHi = {
-          Sun: "नेतृत्व, स्वास्थ्य, आध्यात्मिक कार्य, सरकारी कार्य।",
-          Moon: "जनसंपर्क, भावनाएं, माता, भोजन, बदलाव।",
-          Mars: "साहस, तकनीकी कार्य, शारीरिक गतिविधि, शल्य चिकित्सा।",
-          Mercury: "संचार, व्यापार, लेखन, बौद्धिक कार्य।",
-          Jupiter: "ज्ञान, धन, शिक्षा, धार्मिक कार्य।",
-          Venus: "कला, प्रेम, विलासिता, कूटनीति, सौंदर्य।",
-          Saturn: "अनुशासन, कड़ी मेहनत, वृद्ध लोगों से व्यवहार, विलंब।",
-        };
-
-        const getTattvaNameHi = (name: string) => {
-          switch (name) {
+        const getTattvaNameHi = (sanskritOrName: string) => {
+          switch (sanskritOrName) {
             case "Prithvi":
+            case "Earth":
               return "पृथ्वी";
             case "Jala":
+            case "Water":
               return "जल";
             case "Agni":
+            case "Fire":
               return "अग्नि";
             case "Vayu":
+            case "Air":
               return "वायु";
             case "Akasha":
+            case "Space":
               return "आकाश";
             default:
-              return name;
+              return sanskritOrName;
           }
+        };
+
+        const tattvaIconMap: Record<string, string> = {
+          Akasha: "🔮",
+          Space: "🔮",
+          Vayu: "🔮",
+          Air: "🔮",
+          Agni: "🔥",
+          Fire: "🔥",
+          Prithvi: "🌍",
+          Earth: "🌍",
+          Jala: "💧",
+          Water: "💧",
         };
 
         dailyHoras.horas.forEach((h) => {
           const planetHi = rulerMapHi[h.ruler] || h.ruler;
-          const nadiHi =
+          const nadiText = h.nadi === "ida" ? "इड़ा" : h.nadi === "pingala" ? "पिंगला" : "सुषुम्ना";
+          const nadiDetailed =
             h.nadi === "ida"
-              ? "इड़ा (चन्द्र नाड़ी)"
+              ? "इड़ा (चन्द्र नाड़ी / बायाँ नथुना)"
               : h.nadi === "pingala"
-                ? "पिंगला (सूर्य नाड़ी)"
-                : "सुषुम्ना नाड़ी";
-          const nadiSymbol = h.nadi === "ida" ? "🔵" : h.nadi === "pingala" ? "🔴" : "🟣";
+                ? "पिंगला (सूर्य नाड़ी / दायाँ नथुना)"
+                : "सुषुम्ना (मध्य नाड़ी)";
 
-          const tattvaNamesHi = h.tattvas.map((t) => getTattvaNameHi(t.name)).join(", ");
-
-          // Title with planet, nadi, and tatwa
-          const summary = `🪐 ${planetHi} होरा (#${h.index}) · 💨 नाड़ी: ${nadiHi} ${nadiSymbol} · 🟡 तत्त्व: ${tattvaNamesHi}`;
-
-          // Detail me start to end time and proper app timings
-          const tattvaBreakdownLines = h.tattvas
-            .map((t) => {
-              const tNameHi = getTattvaNameHi(t.name);
-              return `  • ${t.sanskrit} (${tNameHi}): ${t.startTime} से ${t.endTime}`;
-            })
-            .join("\n");
-
-          const advice = adviceMapHi[h.ruler as keyof typeof adviceMapHi] || "";
-
-          const description = [
-            `🌟 वैदिक होरा #${h.index} (${h.isDay ? "दिन होरा" : "रात्रि होरा"})`,
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-            `• समय अवधि: ${h.startTime} से ${h.endTime}`,
-            `• 🪐 शासक ग्रह (Planet): ${planetHi} (${h.ruler})`,
-            `• 💨 स्वर नाड़ी (Nadi): ${nadiHi} ${nadiSymbol}`,
-            `• 🟡 मुख्य तत्त्व (Primary Tattvas): ${tattvaNamesHi}`,
-            `• नाड़ी स्वभाव: ${
-              h.nadi === "ida"
-                ? "शीतल व सौम्य · बायाँ नासिका छिद्र (Left Nostril)"
-                : h.nadi === "pingala"
-                  ? "उष्ण व तेजस्वी · दायाँ नासिका छिद्र (Right Nostril)"
-                  : "ध्यान व समाधि योग (Both Nostrils)"
-            }`,
-            ``,
-            `🔮 सूक्ष्म पंच तत्त्व विवरण (Pancha Tattva Micro-Period Timings):`,
-            tattvaBreakdownLines,
-            ``,
-            `✨ शुभ कार्य सलाह: "${advice}"`,
-            ``,
-            `📍 स्थान: ${city}`,
-            `गणना स्रोत: Mahavtaar Panchanga (Drik Vedic Hora Engine)`,
-          ].join("\n");
-
-          payloads.push({
-            summary,
-            description,
-            location: city,
-            start: { dateTime: safeIsoString(h.startTimeMs), timeZone: tz },
-            end: { dateTime: safeIsoString(h.endTimeMs), timeZone: tz },
-            colorId: h.nadi === "ida" ? "7" : h.nadi === "pingala" ? "6" : "3",
-            reminders: {
-              useDefault: false,
-              overrides: [{ method: "popup", minutes: options.reminderMinutes }],
-            },
-            extendedProperties: {
-              private: {
-                source: "mahavtaar_panchanga",
-                eventType: `vedic_hora_${h.index}`,
-                horaIndex: String(h.index),
-                ruler: h.ruler,
-                nadi: h.nadi,
-                date: isoDate,
-              },
-            },
-          });
-
-          // Individual Hora Tattva micro periods
-          if (options.includeHoraTattvas) {
+          // 13.1 Individual Independent Tattva Events (Enabled by default: 24 Horas x 5 Tattvas = 120 Events)
+          if (options.includeHoraTattvas !== false) {
             h.tattvas.forEach((tp, tIdx) => {
-              const tpNameHi = getTattvaNameHi(tp.name);
-              const tpSummary = `🔮 ${tp.sanskrit} (${tpNameHi}) तत्त्व · 🪐 ग्रह: ${planetHi} · 💨 नाड़ी: ${nadiHi} ${nadiSymbol}`;
+              const tattvaHi = getTattvaNameHi(tp.sanskrit || tp.name);
+              const tattvaIcon = tattvaIconMap[tp.sanskrit] || tattvaIconMap[tp.name] || "🔮";
 
+              // Exact requested format: 🪐 सूर्य · 🌍 पृथ्वी · 💨 पिंगला
+              const tpSummary = `🪐 ${planetHi} · ${tattvaIcon} ${tattvaHi} · 💨 ${nadiText}`;
+
+              // Exact description containing CURRENT Tattva information only (Never list the other four Tattvas)
               const tpDescription = [
-                `🔮 वैदिक होरा सूक्ष्म तत्त्वकाल: ${tp.sanskrit} (${tpNameHi}) तत्त्व`,
-                `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-                `• समय अवधि: ${tp.startTime} से ${tp.endTime}`,
-                `• 🟡 सूक्ष्म तत्त्व (Tattva): ${tp.sanskrit} (${tpNameHi})`,
-                `• 🪐 होरा ग्रह (Planet): ${planetHi} (${h.ruler})`,
-                `• 💨 स्वर नाड़ी (Nadi): ${nadiHi} ${nadiSymbol}`,
-                `• नाड़ी स्वभाव: ${
-                  h.nadi === "ida"
-                    ? "शीतल व सौम्य (Left Nostril)"
-                    : h.nadi === "pingala"
-                      ? "उष्ण व तेजस्वी (Right Nostril)"
-                      : "ध्यान व समाधि योग (Both Nostrils)"
-                }`,
+                `Tattva: ${tattvaHi}`,
+                `Planet: ${planetHi}`,
+                `Nadi: ${nadiText}`,
+                `Tattva Time: ${tp.startTime} – ${tp.endTime}`,
+                `Hora Reference: ${h.startTime} – ${h.endTime} (होरा #${h.index})`,
                 ``,
                 `📍 स्थान: ${city}`,
-                `गणना स्रोत: Mahavtaar Panchanga (Drik Vedic Hora Engine)`,
+                `स्रोत: Mahavtaar Panchanga (horaEngine.ts)`,
               ].join("\n");
 
               payloads.push({
@@ -1390,13 +1195,63 @@ export function buildPanchangaEventPayloads(
                 extendedProperties: {
                   private: {
                     source: "mahavtaar_panchanga",
-                    eventType: `vedic_hora_tattva_${h.index}_${tIdx}`,
+                    eventType: `hora_tattva_${h.index}_${tIdx}`,
                     horaIndex: String(h.index),
+                    tattvaIndex: String(tIdx),
                     tattva: tp.sanskrit,
+                    planet: h.ruler,
+                    nadi: h.nadi,
                     date: isoDate,
                   },
                 },
               });
+            });
+          }
+
+          // 13.2 Optional Combined Hora event (DISABLED by default per strict requirements)
+          if (options.includeVedicHoras === true) {
+            const tattvaNamesHi = h.tattvas.map((t) => getTattvaNameHi(t.sanskrit)).join(", ");
+            const tattvaBreakdown = h.tattvas
+              .map(
+                (t) =>
+                  `  • ${getTattvaNameHi(t.sanskrit)} (${t.name}): ${t.startTime} – ${t.endTime}`,
+              )
+              .join("\n");
+            const summary = `🪐 ${planetHi} होरा (#${h.index}) · 💨 नाड़ी: ${nadiText} · 🟡 तत्त्व: ${tattvaNamesHi}`;
+            const description = [
+              `🌟 वैदिक होरा #${h.index} (${h.isDay ? "दिन होरा" : "रात्रि होरा"})`,
+              `━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+              `• समय अवधि: ${h.startTime} से ${h.endTime}`,
+              `• 🪐 ग्रह स्वामी (Planet Ruler): ${planetHi} (${h.ruler})`,
+              `• 💨 स्वर नाड़ी (Nadi): ${nadiDetailed}`,
+              `• 🟡 सूक्ष्म पंच तत्त्व विवरण (Micro Tattvas):`,
+              tattvaBreakdown,
+              ``,
+              `📍 स्थान: ${city}`,
+              `गणना स्रोत: Mahavtaar Panchanga (Drik Vedic Hora Engine)`,
+            ].join("\n");
+
+            payloads.push({
+              summary,
+              description,
+              location: city,
+              start: { dateTime: safeIsoString(h.startTimeMs), timeZone: tz },
+              end: { dateTime: safeIsoString(h.endTimeMs), timeZone: tz },
+              colorId: h.nadi === "ida" ? "7" : h.nadi === "pingala" ? "6" : "3",
+              reminders: {
+                useDefault: false,
+                overrides: [{ method: "popup", minutes: options.reminderMinutes }],
+              },
+              extendedProperties: {
+                private: {
+                  source: "mahavtaar_panchanga",
+                  eventType: `vedic_hora_${h.index}`,
+                  horaIndex: String(h.index),
+                  ruler: h.ruler,
+                  nadi: h.nadi,
+                  date: isoDate,
+                },
+              },
             });
           }
         });
@@ -1423,11 +1278,40 @@ export async function syncDailyPanchangaEvents(
   skipped: number;
   total: number;
 }> {
-  // 1. Fetch existing synced events for this day to avoid duplication
-  const existing = await listPanchangaEvents(token, data.date);
-  const existingTypes = new Set(existing.map((e) => e.eventType).filter(Boolean));
+  const calId = await getOrCreatePanchangCalendarId(token);
 
-  // 2. Build desired payloads
+  // 1. Fetch existing synced events for this day to avoid duplication
+  const existing = await listPanchangaEvents(token, data.date, undefined, calId);
+
+  // 2. Remove obsolete events previously generated by the app:
+  // - All Sushumna events (morning, midday, dusk, hourly)
+  // - Standalone Hora events if options.includeVedicHoras is false
+  const obsoleteEvents = existing.filter((ev) => {
+    const isSushumna =
+      ev.eventType?.includes("sushumna") ||
+      ev.summary?.includes("सुषुम्ना") ||
+      ev.summary?.includes("Sushumna");
+    const isStandaloneHora =
+      !options.includeVedicHoras &&
+      ((ev.eventType?.startsWith("vedic_hora_") && !ev.eventType?.includes("tattva")) ||
+        (ev.summary?.includes("होरा") &&
+          !ev.eventType?.startsWith("hora_tattva_") &&
+          !ev.summary?.includes("· 💨")));
+    return isSushumna || isStandaloneHora;
+  });
+
+  for (const obsolete of obsoleteEvents) {
+    try {
+      await deleteCalendarEvent(token, obsolete.id, calId);
+    } catch (err) {
+      console.warn(`Could not remove obsolete event ${obsolete.id}:`, err);
+    }
+  }
+
+  const remainingExisting = existing.filter((e) => !obsoleteEvents.some((obs) => obs.id === e.id));
+  const existingTypes = new Set(remainingExisting.map((e) => e.eventType).filter(Boolean));
+
+  // 3. Build desired payloads
   const payloads = buildPanchangaEventPayloads(data, options);
 
   const created: SyncedCalendarEvent[] = [];
@@ -1441,7 +1325,7 @@ export async function syncDailyPanchangaEvents(
     }
 
     try {
-      const result = await createCalendarEvent(token, payload);
+      const result = await createCalendarEvent(token, payload, calId);
       created.push(result);
     } catch (err) {
       console.error(`Error creating calendar event "${payload.summary}":`, err);
@@ -1544,11 +1428,16 @@ export function generatePanchangaIcsContent(
     return d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
   };
 
-  for (const payload of payloads) {
+  const isoDate = normalizeToIsoDate(data.date);
+  const cleanIso = isoDate.replace(/-/g, "");
+
+  for (let idx = 0; idx < payloads.length; idx++) {
+    const payload = payloads[idx];
+    const eventType = payload.extendedProperties?.private?.eventType || `event_${idx}`;
+    const uid = `mahavtaar-${cleanIso}-${eventType}@panchanga`;
+
     lines.push("BEGIN:VEVENT");
-    lines.push(
-      `UID:mahavtaar-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@panchanga`,
-    );
+    lines.push(`UID:${uid}`);
     lines.push(`SUMMARY:${payload.summary.replace(/\n/g, " ")}`);
     lines.push(`DESCRIPTION:${payload.description.replace(/\n/g, "\\n")}`);
     if (payload.location) {

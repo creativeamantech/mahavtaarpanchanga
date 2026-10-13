@@ -3,6 +3,15 @@ import {
   buildPanchangaEventPayloads,
   generatePanchangaIcsContent,
   DEFAULT_SYNC_OPTIONS,
+  parseDateComponents,
+  safeIsoString,
+  syncMultiDayPanchangaEvents,
+  listPanchangaEvents,
+  deletePanchangaEventsForDate,
+  syncDailyPanchangaEvents,
+  escapeIcsText,
+  foldIcsLine,
+  clearCalendarCache,
 } from "../src/services/googleCalendarService";
 import { computeDailyHoras } from "../src/horaEngine";
 import type { PanchangaResponse } from "../src/types";
@@ -209,5 +218,326 @@ describe("Strict Panchanga Calendar Events Validation (horaEngine.ts as Single S
     // Verify exactly 120 Tattva VEVENTs exist in the ICS export
     const tattvaUids = uids.filter((u) => u.includes("hora_tattva_"));
     expect(tattvaUids.length).toBe(120);
+  });
+
+  it("Critical Fix: parseDateComponents correctly parses dates without local-time zone shifts", () => {
+    const p1 = parseDateComponents("2026-10-14");
+    expect(p1).toEqual({ year: 2026, month: 10, day: 14 });
+
+    const p2 = parseDateComponents("14/10/2026");
+    expect(p2).toEqual({ year: 2026, month: 10, day: 14 });
+
+    const p3 = parseDateComponents("28/02/2026");
+    expect(p3).toEqual({ year: 2026, month: 2, day: 28 });
+  });
+
+  it("Critical Fix: safeIsoString throws strict error on invalid timestamps instead of returning current time", () => {
+    expect(() => safeIsoString(NaN)).toThrow("Invalid timestamp provided");
+    expect(() => safeIsoString(null)).toThrow("Invalid timestamp provided");
+    expect(() => safeIsoString(undefined)).toThrow("Invalid timestamp provided");
+
+    const validIso = safeIsoString(1791937320000);
+    expect(validIso).toBe("2026-10-14T00:22:00.000Z");
+  });
+
+  it("Critical Fix: syncMultiDayPanchangaEvents calculates each requested date independently", async () => {
+    const datesRequested: string[] = [];
+
+    // Custom provider that records fetched dates and returns distinct astronomical values per day
+    const customFetch = async (dateStr: string): Promise<PanchangaResponse> => {
+      datesRequested.push(dateStr);
+      const parts = dateStr.split("-").map(Number);
+      const dayNum = parts[2];
+      // Vary sunrise and sunset realistically for each day rather than adding fixed 24h
+      const dayOffset = dayNum - 14;
+      return {
+        ...mockPanchanga,
+        date: dateStr,
+        sunrise_ms: 1791937320000 + dayOffset * 86400000 + dayOffset * 60000,
+        sunset_ms: 1791979320000 + dayOffset * 86400000 + dayOffset * 120000,
+        next_sunrise_ms: 1792023720000 + dayOffset * 86400000 + dayOffset * 60000,
+      };
+    };
+
+    const dummyToken = "mock_token";
+    // Mock global fetch for getOrCreatePanchangCalendarId and listPanchangaEvents
+    const origFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL) => {
+      const urlStr = String(url);
+      if (urlStr.includes("calendarList")) {
+        return {
+          ok: true,
+          json: async () => ({ items: [{ id: "panchang_cal_123", summary: "Panchang Calendar" }] }),
+        } as Response;
+      }
+      if (urlStr.includes("/events")) {
+        return {
+          ok: true,
+          json: async () => ({ items: [] }),
+        } as Response;
+      }
+      return { ok: true, json: async () => ({}) } as Response;
+    }) as any;
+
+    try {
+      const result = await syncMultiDayPanchangaEvents(
+        dummyToken,
+        mockPanchanga,
+        3, // 3 days ahead
+        DEFAULT_SYNC_OPTIONS,
+        undefined,
+        customFetch,
+      );
+
+      // Prove day 1 (index 0) uses base date, and days 2 & 3 call customFetch with distinct independent dates
+      expect(datesRequested).toEqual(["2026-10-15", "2026-10-16"]);
+      expect(result.failedDays.length).toBe(0);
+    } finally {
+      globalThis.fetch = origFetch;
+    }
+  });
+
+  it("Critical Fix: syncMultiDayPanchangaEvents tracks failed calculation dates cleanly without generating fake events", async () => {
+    const customFailingFetch = async (_dateStr: string): Promise<PanchangaResponse | null> => {
+      return null; // calculation failed for date
+    };
+
+    const dummyToken = "mock_token";
+    const origFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL) => {
+      const urlStr = String(url);
+      if (urlStr.includes("calendarList")) {
+        return {
+          ok: true,
+          json: async () => ({ items: [{ id: "panchang_cal_123", summary: "Panchang Calendar" }] }),
+        } as Response;
+      }
+      if (urlStr.includes("/events")) {
+        return {
+          ok: true,
+          json: async () => ({ items: [] }),
+        } as Response;
+      }
+      return { ok: true, json: async () => ({}) } as Response;
+    }) as any;
+
+    try {
+      const result = await syncMultiDayPanchangaEvents(
+        dummyToken,
+        mockPanchanga,
+        3,
+        DEFAULT_SYNC_OPTIONS,
+        undefined,
+        customFailingFetch,
+      );
+
+      // Days 2 and 3 failed to calculate, so they are cleanly tracked in failedDays and skipped
+      expect(result.failedDays).toEqual(["2026-10-15", "2026-10-16"]);
+    } finally {
+      globalThis.fetch = origFetch;
+    }
+  });
+
+  it("Deletion Safety: Never lists or deletes user events matching title strings unless owned by mahavtaar_panchanga", async () => {
+    const deletedEventIds: string[] = [];
+    const origFetch = globalThis.fetch;
+
+    globalThis.fetch = (async (url: string | URL, opts?: any) => {
+      const urlStr = String(url);
+      const method = opts?.method || "GET";
+
+      if (urlStr.includes("calendarList")) {
+        return {
+          ok: true,
+          json: async () => ({ items: [{ id: "panchang_cal_123", summary: "Panchang Calendar" }] }),
+        } as Response;
+      }
+
+      if (urlStr.includes("/events") && method === "GET") {
+        return {
+          ok: true,
+          json: async () => ({
+            items: [
+              // 1. App-owned event (source === mahavtaar_panchanga)
+              {
+                id: "app_event_1",
+                summary: "🪐 सूर्य · 🔮 आकाश · 💨 पिंगला",
+                extendedProperties: {
+                  private: { source: "mahavtaar_panchanga", eventType: "hora_tattva_1_0" },
+                },
+              },
+              // 2. Unrelated USER event titled "Hora Meeting with Client"
+              {
+                id: "user_event_hora",
+                summary: "Hora Meeting with Client",
+              },
+              // 3. Unrelated USER event titled "Tattva Meditation Class"
+              {
+                id: "user_event_tattva",
+                summary: "Tattva Meditation Class",
+              },
+              // 4. Unrelated USER event titled "Sunrise Fitness Run"
+              {
+                id: "user_event_sunrise",
+                summary: "Sunrise Fitness Run",
+              },
+              // 5. Unrelated USER event titled "Sunset Dinner at Taj"
+              {
+                id: "user_event_sunset",
+                summary: "Sunset Dinner at Taj",
+              },
+            ],
+          }),
+        } as Response;
+      }
+
+      if (method === "DELETE") {
+        const id = urlStr.split("/").pop();
+        if (id) deletedEventIds.push(id);
+        return { ok: true, status: 204 } as Response;
+      }
+
+      return { ok: true, json: async () => ({}) } as Response;
+    }) as any;
+
+    try {
+      clearCalendarCache();
+      const events = await listPanchangaEvents("mock_token", "2026-10-14");
+
+      // Verify listPanchangaEvents ONLY returned the app-owned event
+      expect(events.length).toBe(1);
+      expect(events[0].id).toBe("app_event_1");
+
+      // Execute bulk delete for the date
+      await deletePanchangaEventsForDate("mock_token", "2026-10-14");
+
+      // Prove ONLY app_event_1 was deleted, and NO user events were touched
+      expect(deletedEventIds).toEqual(["app_event_1"]);
+      expect(deletedEventIds).not.toContain("user_event_hora");
+      expect(deletedEventIds).not.toContain("user_event_tattva");
+      expect(deletedEventIds).not.toContain("user_event_sunrise");
+      expect(deletedEventIds).not.toContain("user_event_sunset");
+    } finally {
+      globalThis.fetch = origFetch;
+    }
+  });
+
+  it("Idempotent Synchronization & Reconciliation: Identical re-sync performs 0 writes and marks all as unchanged", async () => {
+    let postCount = 0;
+    let putCount = 0;
+    const origFetch = globalThis.fetch;
+
+    // Generate payloads for mockPanchanga
+    const payloads = buildPanchangaEventPayloads(mockPanchanga, DEFAULT_SYNC_OPTIONS);
+    const existingItems = payloads.map((p, i) => ({
+      id: `existing_${i}`,
+      summary: p.summary,
+      description: p.description,
+      location: p.location,
+      start: p.start,
+      end: p.end,
+      extendedProperties: p.extendedProperties,
+    }));
+
+    globalThis.fetch = (async (url: string | URL, opts?: any) => {
+      const urlStr = String(url);
+      const method = opts?.method || "GET";
+
+      if (urlStr.includes("calendarList")) {
+        return {
+          ok: true,
+          json: async () => ({ items: [{ id: "panchang_cal_123", summary: "Panchang Calendar" }] }),
+        } as Response;
+      }
+
+      if (urlStr.includes("/events") && method === "GET") {
+        return {
+          ok: true,
+          json: async () => ({ items: existingItems }),
+        } as Response;
+      }
+
+      if (method === "POST") {
+        postCount++;
+        return { ok: true, json: async () => ({ id: `new_${postCount}` }) } as Response;
+      }
+
+      if (method === "PUT") {
+        putCount++;
+        return { ok: true, json: async () => ({ id: "updated" }) } as Response;
+      }
+
+      return { ok: true, json: async () => ({}) } as Response;
+    }) as any;
+
+    try {
+      clearCalendarCache();
+      const res = await syncDailyPanchangaEvents("mock_token", mockPanchanga, DEFAULT_SYNC_OPTIONS);
+
+      // Prove 100% idempotency: all payloads matched and were unchanged, 0 POSTs, 0 PUTs
+      expect(res.unchanged).toBe(payloads.length);
+      expect(res.created.length).toBe(0);
+      expect(res.updated.length).toBe(0);
+      expect(postCount).toBe(0);
+      expect(putCount).toBe(0);
+    } finally {
+      globalThis.fetch = origFetch;
+    }
+  });
+
+  it("RFC 5545 Compliance: Correct text escaping, line folding, and all-day DTEND exclusive date math", () => {
+    // 1. Text Escaping
+    const escaped = escapeIcsText("Line 1\nLine 2; with, backslash\\");
+    expect(escaped).toBe("Line 1\\nLine 2\\; with\\, backslash\\\\");
+
+    // 2. Line Folding (UTF-8 octets without splitting multibyte Hindi/Emoji characters)
+    const longLine =
+      "SUMMARY:This is a very long summary line that exceeds 75 characters in total length for RFC 5545 compliance testing";
+    const folded = foldIcsLine(longLine);
+    expect(folded).toContain("\r\n ");
+
+    const hindiEmojiLine =
+      "SUMMARY:🪐 सूर्य · 🌍 पृथ्वी · 💨 पिंगला (वैदिक होरा एवं सूक्ष्म पंच तत्त्व विवरण)";
+    const hindiFolded = foldIcsLine(hindiEmojiLine);
+    expect(hindiFolded).toContain("\r\n ");
+    expect(hindiFolded).not.toContain("\uFFFD");
+
+    // 3. All-Day Event DTEND
+    const allDayPanchanga: PanchangaResponse = {
+      ...mockPanchanga,
+    };
+    const optionsWithSummary: SyncOptions = {
+      ...DEFAULT_SYNC_OPTIONS,
+      includeDailySummary: true,
+      includeHoraTattvas: false,
+    };
+
+    const icsContent = generatePanchangaIcsContent(allDayPanchanga, optionsWithSummary);
+    expect(icsContent).toContain("DTSTART;VALUE=DATE:20261014");
+    expect(icsContent).toContain("DTEND;VALUE=DATE:20261015"); // Exclusive start + 1 day
+  });
+
+  it("Auth Failure: Throws actionable error when Google Calendar API returns 401 or 403", async () => {
+    const origFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL) => {
+      const urlStr = String(url);
+      if (urlStr.includes("calendarList")) {
+        return {
+          ok: false,
+          status: 401,
+          json: async () => ({ error: { message: "Invalid Credentials" } }),
+        } as Response;
+      }
+      return { ok: false, status: 401 } as Response;
+    }) as any;
+
+    try {
+      clearCalendarCache();
+      await expect(listPanchangaEvents("expired_token", "2026-10-14")).rejects.toThrow(
+        "Authentication expired or permission revoked",
+      );
+    } finally {
+      globalThis.fetch = origFetch;
+    }
   });
 });

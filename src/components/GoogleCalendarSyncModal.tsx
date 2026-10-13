@@ -130,8 +130,19 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
       setSyncedEvents(events);
     } catch (err: any) {
       console.warn("Could not list Google Calendar events:", err);
-      if (err?.message?.includes("401") || err?.message?.includes("Invalid Credentials")) {
+      const isAuthErr =
+        err?.message?.includes("Authentication expired") ||
+        err?.message?.includes("permission revoked") ||
+        err?.message?.includes("401") ||
+        err?.message?.includes("403") ||
+        err?.message?.includes("Invalid Credentials");
+      if (isAuthErr) {
         setToken(null);
+        setAuthError(
+          lang === "hi"
+            ? "गूगल कैलेंडर प्रमाणीकरण समाप्त हो गया है। कृपया 'Sign in with Google' अथवा नीचे दिए गए बटन से पुनः कनेक्ट करें।"
+            : "Google Calendar connection expired or revoked. Please reconnect below.",
+        );
       } else {
         setActionError(err?.message || "Failed to read calendar events");
       }
@@ -224,19 +235,35 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
       if (syncRangeDays === 1) {
         const result = await syncDailyPanchangaEvents(token, panchangaData, options);
 
+        const parts: string[] = [];
         if (result.created.length > 0) {
-          const msg =
+          parts.push(
             lang === "hi"
-              ? `सफलतापूर्वक ${result.created.length} पंचांग कार्यक्रम 'Panchang Calendar' में सिंक किए गए!`
-              : `Successfully synced ${result.created.length} Panchanga event(s) to 'Panchang Calendar'!`;
-          setSyncSuccessMsg(msg);
-        } else {
-          const msg =
-            lang === "hi"
-              ? `आज के कार्यक्रम पहले से ही 'Panchang Calendar' में उपस्थित हैं।`
-              : `Events for today are already present in 'Panchang Calendar'.`;
-          setSyncSuccessMsg(msg);
+              ? `${result.created.length} नए जोड़े गए`
+              : `${result.created.length} created`,
+          );
         }
+        if (result.updated.length > 0) {
+          parts.push(
+            lang === "hi"
+              ? `${result.updated.length} अपडेट किए गए`
+              : `${result.updated.length} updated`,
+          );
+        }
+        if (result.unchanged > 0) {
+          parts.push(
+            lang === "hi"
+              ? `${result.unchanged} यथावत (Unchanged)`
+              : `${result.unchanged} unchanged`,
+          );
+        }
+        if (result.deleted > 0) {
+          parts.push(lang === "hi" ? `${result.deleted} हटाए गए` : `${result.deleted} removed`);
+        }
+
+        const msg =
+          lang === "hi" ? `सिंक परिणाम: ${parts.join(", ")}` : `Sync result: ${parts.join(", ")}`;
+        setSyncSuccessMsg(msg);
       } else {
         const result = await syncMultiDayPanchangaEvents(
           token,
@@ -248,17 +275,66 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
           },
         );
 
+        const parts: string[] = [];
+        if (result.totalCreated > 0) {
+          parts.push(
+            lang === "hi" ? `${result.totalCreated} नए जोड़े गए` : `${result.totalCreated} created`,
+          );
+        }
+        if (result.totalUpdated > 0) {
+          parts.push(
+            lang === "hi"
+              ? `${result.totalUpdated} अपडेट किए गए`
+              : `${result.totalUpdated} updated`,
+          );
+        }
+        if (result.totalUnchanged > 0) {
+          parts.push(
+            lang === "hi"
+              ? `${result.totalUnchanged} अप-टू-डेट रहे`
+              : `${result.totalUnchanged} unchanged`,
+          );
+        }
+        if (result.totalDeleted > 0) {
+          parts.push(
+            lang === "hi" ? `${result.totalDeleted} हटाए गए` : `${result.totalDeleted} removed`,
+          );
+        }
+        if (result.failedDays && result.failedDays.length > 0) {
+          parts.push(
+            lang === "hi"
+              ? `${result.failedDays.length} तिथियाँ विफल रहीं`
+              : `${result.failedDays.length} date(s) failed`,
+          );
+        }
+
         const msg =
           lang === "hi"
-            ? `सफलतापूर्वक ${syncRangeDays} दिनों के कार्यक्रम (कुल ${result.totalCreated} नए) 'Panchang Calendar' में सिंक किए गए!`
-            : `Successfully synced ${syncRangeDays} days of events (${result.totalCreated} new) to 'Panchang Calendar'!`;
+            ? `सफलतापूर्वक ${syncRangeDays} दिनों का सिंक संपन्न: ${parts.join(", ")}`
+            : `Successfully completed ${syncRangeDays}-day sync: ${parts.join(", ")}`;
         setSyncSuccessMsg(msg);
       }
 
       await fetchExistingEvents(token);
     } catch (err: any) {
       console.error("Sync failed:", err);
-      setActionError(err?.message || "Failed to sync events to Panchang Calendar");
+      const isAuthErr =
+        err?.message?.includes("Authentication expired") ||
+        err?.message?.includes("permission revoked") ||
+        err?.message?.includes("401") ||
+        err?.message?.includes("403") ||
+        err?.message?.includes("Invalid Credentials");
+
+      if (isAuthErr) {
+        setToken(null);
+        setAuthError(
+          lang === "hi"
+            ? "गूगल कैलेंडर प्रमाणीकरण समाप्त हो गया है। कृपया 'Sign in with Google' से पुनः कनेक्ट करें।"
+            : "Google Calendar connection expired or revoked. Please reconnect Google Calendar below.",
+        );
+      } else {
+        setActionError(err?.message || "Failed to sync events to Panchang Calendar");
+      }
     } finally {
       setIsSyncing(false);
       setSyncProgress(null);
@@ -371,8 +447,8 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                   </h3>
                   <p className="text-xs text-stone-600 dark:text-slate-300 mt-0.5">
                     {lang === "hi"
-                      ? "Google, Apple अथवा Outlook Calendar में सीधे तिथि, मुहूर्त एवं राहु काल इम्पोर्ट करें।"
-                      : "Directly import Tithi, Muhurta & Rahu Kalam into Google, Outlook, or Apple Calendar on phone or PC."}
+                      ? `Google, Apple अथवा Outlook Calendar में सीधे तिथि, मुहूर्त एवं ${options.maxHoras || 24} होरा (${(options.maxHoras || 24) * 5} तत्त्व) इम्पोर्ट करें।`
+                      : `Directly import Tithi, Muhurta & ${options.maxHoras || 24}-Hour Hora-Tattvas (${(options.maxHoras || 24) * 5} events) into Google, Outlook, or Apple Calendar.`}
                   </p>
                 </div>
 
@@ -838,7 +914,6 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                   </div>
                 </label>
 
-
                 {/* 10. Individual Tattva Events per Hora (हर Hora के अंदर आने वाला हर Tattva अपना अलग Event) */}
                 <label
                   className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
@@ -876,6 +951,79 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                     </span>
                   </div>
                 </label>
+
+                {/* 10.5. Hora Duration Selection (कितने घंटे की होरा की ICS/कैलेंडर फाइल चाहिए) */}
+                <div
+                  className={`p-3.5 rounded-xl border col-span-1 sm:col-span-2 ${
+                    isNight
+                      ? "bg-indigo-950/40 border-amber-500/30 text-slate-200"
+                      : "bg-amber-50/80 border-amber-300/80 text-amber-950"
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2.5">
+                    <div>
+                      <span className="font-bold text-xs flex items-center gap-1.5 text-amber-900 dark:text-amber-200">
+                        <Clock className="w-4 h-4 text-amber-500" />
+                        {lang === "hi"
+                          ? "होरा / घंटे सीमा (ICS / कैलेंडर निर्यात समयावधि)"
+                          : "Hora / Hours Duration Limit (for ICS & Calendar Export)"}
+                      </span>
+                      <span className="text-[11px] text-stone-600 dark:text-slate-300 block mt-0.5">
+                        {lang === "hi"
+                          ? `चयनित: ${options.maxHoras || 24} होरा (घंटे) — कुल ${(options.maxHoras || 24) * 5} स्वतंत्र तत्त्व इवेंट्स`
+                          : `Selected: ${options.maxHoras || 24} Horas (Hours) — total ${(options.maxHoras || 24) * 5} independent Tattva events`}
+                      </span>
+                    </div>
+
+                    {/* Quick Preset Buttons */}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {[1, 3, 6, 12, 18, 24].map((hours) => (
+                        <button
+                          key={hours}
+                          type="button"
+                          onClick={() => setOptions((prev) => ({ ...prev, maxHoras: hours }))}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
+                            (options.maxHoras || 24) === hours
+                              ? "bg-amber-500 text-stone-950 border-amber-600 shadow-xs"
+                              : isNight
+                                ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
+                                : "bg-white border-stone-300 text-stone-700 hover:bg-stone-100"
+                          }`}
+                        >
+                          {hours === 24
+                            ? lang === "hi"
+                              ? "24 घंटे (पूरा दिन)"
+                              : "24 Hrs (Full Day)"
+                            : hours === 12
+                              ? lang === "hi"
+                                ? "12 घंटे (दिन)"
+                                : "12 Hrs (Day)"
+                              : `${hours} ${lang === "hi" ? "घंटे" : "Hrs"}`}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Custom hours slider */}
+                  <div className="flex items-center gap-3 pt-2 border-t border-amber-200/60 dark:border-indigo-900/40">
+                    <span className="text-[11px] font-semibold text-stone-600 dark:text-slate-400 shrink-0">
+                      {lang === "hi" ? "कस्टम घंटे चुनें (1 से 24):" : "Custom Hours (1 to 24):"}
+                    </span>
+                    <input
+                      type="range"
+                      min="1"
+                      max="24"
+                      value={options.maxHoras || 24}
+                      onChange={(e) =>
+                        setOptions((prev) => ({ ...prev, maxHoras: parseInt(e.target.value, 10) }))
+                      }
+                      className="flex-1 accent-amber-500 h-1.5 bg-stone-200 dark:bg-slate-700 rounded-lg cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-amber-700 dark:text-amber-300 min-w-[55px] text-right font-mono">
+                      {options.maxHoras || 24} {lang === "hi" ? "होरा" : "Horas"}
+                    </span>
+                  </div>
+                </div>
 
                 {/* 11. Notification reminder popup */}
                 <div
@@ -988,13 +1136,13 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
                     <span className="font-bold text-xs flex items-center gap-1.5 text-amber-900 dark:text-amber-300">
                       <RefreshCw className="w-3.5 h-3.5 text-amber-500" />
                       {lang === "hi"
-                        ? "निरंतर कनेक्टेड रखें (Auto Continuous Sync)"
-                        : "Keep App in Touch (Auto Continuous Sync)"}
+                        ? "ऐप लॉन्च व रीफ्रेश पर स्वतः सिंक (Auto-Sync on App Launch)"
+                        : "Auto-Sync on App Launch & Refresh"}
                     </span>
                     <span className="text-[10px] text-stone-600 dark:text-slate-400 block mt-0.5">
                       {lang === "hi"
-                        ? "ऐप खोलने पर पंचमहीना कैलेंडर स्वतः अप-टू-डेट रहेगा ताकि एक भी इवेंट न छूटे।"
-                        : "Auto-updates Panchang Calendar in background so no single event is ever missed."}
+                        ? "ऐप खोलने अथवा रीफ्रेश करने पर पंचांग कैलेंडर स्वतः अप-टू-डेट सिंक हो जाएगा।"
+                        : "Automatically syncs Panchang Calendar whenever you open or refresh the app."}
                     </span>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer shrink-0">
@@ -1034,9 +1182,24 @@ export const GoogleCalendarSyncModal: React.FC<GoogleCalendarSyncModalProps> = (
 
               {/* Action Error / Success feedback */}
               {actionError && (
-                <div className="p-3 rounded-xl border border-rose-300/80 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
-                  <span>{actionError}</span>
+                <div className="p-3 rounded-xl border border-rose-300/80 bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
+                    <span>{actionError}</span>
+                  </div>
+                  {(actionError.includes("expired") ||
+                    actionError.includes("revoked") ||
+                    actionError.includes("reconnect")) && (
+                    <button
+                      type="button"
+                      onClick={handleDirectGsiLogin}
+                      disabled={isLoggingIn}
+                      className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-stone-950 font-bold text-xs transition-colors shrink-0 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      {lang === "hi" ? "पुनः कनेक्ट करें" : "Reconnect Google Calendar"}
+                    </button>
+                  )}
                 </div>
               )}
 

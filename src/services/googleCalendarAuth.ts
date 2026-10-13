@@ -196,8 +196,10 @@ export const getCurrentUser = (): User | null => {
   return auth?.currentUser || null;
 };
 
+import { clearCalendarCache } from "./googleCalendarService";
+
 /**
- * Sign out and clear in-memory token
+ * Sign out and clear in-memory token and cached calendar ID
  */
 export const logoutGoogleCalendar = async (): Promise<void> => {
   try {
@@ -208,4 +210,5 @@ export const logoutGoogleCalendar = async (): Promise<void> => {
     // ignore
   }
   cachedAccessToken = null;
+  clearCalendarCache();
 };

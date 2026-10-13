@@ -280,4 +280,36 @@ describe("Comprehensive Swara Events Integration", () => {
       expect(icsString).not.toContain("Sushumna");
     });
   });
+
+  it("respects maxHoras option to limit the number of Horas in ICS export (e.g. 6 Horas = 30 Tattvas)", () => {
+    // Test 6 Horas limit
+    const payloads6 = buildPanchangaEventPayloads(mockPanchanga, {
+      ...DEFAULT_SYNC_OPTIONS,
+      maxHoras: 6,
+    });
+    const tattvas6 = payloads6.filter((p) =>
+      p.extendedProperties?.private?.eventType?.startsWith("hora_tattva_"),
+    );
+    expect(tattvas6.length).toBe(30); // 6 Horas * 5 Tattvas
+
+    // Test 12 Horas limit
+    const payloads12 = buildPanchangaEventPayloads(mockPanchanga, {
+      ...DEFAULT_SYNC_OPTIONS,
+      maxHoras: 12,
+    });
+    const tattvas12 = payloads12.filter((p) =>
+      p.extendedProperties?.private?.eventType?.startsWith("hora_tattva_"),
+    );
+    expect(tattvas12.length).toBe(60); // 12 Horas * 5 Tattvas
+
+    // Test 1 Hora limit
+    const payloads1 = buildPanchangaEventPayloads(mockPanchanga, {
+      ...DEFAULT_SYNC_OPTIONS,
+      maxHoras: 1,
+    });
+    const tattvas1 = payloads1.filter((p) =>
+      p.extendedProperties?.private?.eventType?.startsWith("hora_tattva_"),
+    );
+    expect(tattvas1.length).toBe(5); // 1 Hora * 5 Tattvas
+  });
 });

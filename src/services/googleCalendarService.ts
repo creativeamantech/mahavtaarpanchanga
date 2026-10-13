@@ -73,6 +73,7 @@ export interface SyncOptions {
   // Vedic Horas & Hora Nadi (वैदिक होरा चक्र) options
   includeVedicHoras: boolean; // 24 Vedic Horas with Planet, Nadi & Pancha Tattvas (disabled by default)
   includeHoraTattvas: boolean; // Individual Micro Pancha Tattva periods within Horas (120 events)
+  maxHoras?: number; // How many hours/Horas to include (1-24, default 24 = full day)
   reminderMinutes: number; // e.g. 15
 }
 
@@ -93,52 +94,83 @@ export const DEFAULT_SYNC_OPTIONS: SyncOptions = {
   includeSwaraPingala: true,
   includeSwaraSushumna: false, // Sushumna events completely disabled
   includeVedicHoras: false, // Standalone Hora events disabled by default
-  includeHoraTattvas: true, // 120 Individual Tattva events enabled by default
+  includeHoraTattvas: true, // Individual Tattva events enabled by default
+  maxHoras: 24, // Full 24 Horas / Hours by default
   reminderMinutes: 15,
 };
 
 /**
- * Normalizes any date string (DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD, ISO string) into standard YYYY-MM-DD.
+ * Safely parses any date string into year, month (1-indexed), and day components without timezone shifts.
  */
-export function normalizeToIsoDate(dateStr: string | undefined): string {
-  if (!dateStr) return new Date().toISOString().slice(0, 10);
+export function parseDateComponents(dateStr: string | undefined): {
+  year: number;
+  month: number;
+  day: number;
+} {
+  if (!dateStr) {
+    const n = new Date();
+    return { year: n.getFullYear(), month: n.getMonth() + 1, day: n.getDate() };
+  }
   const clean = dateStr.trim();
-
-  // YYYY-MM-DD or YYYY/MM/DD
-  const ymd = clean.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
-  if (ymd) {
-    return `${ymd[1]}-${ymd[2].padStart(2, "0")}-${ymd[3].padStart(2, "0")}`;
+  if (clean.includes("-")) {
+    const parts = clean.split("-").map(Number);
+    if (parts.length === 3 && parts[0] > 1000) {
+      return { year: parts[0], month: parts[1], day: parts[2] };
+    }
   }
-
-  // DD/MM/YYYY or DD-MM-YYYY (Standard Indian / Panchanga format)
-  const dmy = clean.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
-  if (dmy) {
-    return `${dmy[3]}-${dmy[2].padStart(2, "0")}-${dmy[1].padStart(2, "0")}`;
+  if (clean.includes("/")) {
+    const parts = clean.split("/").map(Number);
+    if (parts.length === 3) {
+      if (parts[2] > 1000) {
+        // DD/MM/YYYY
+        return { year: parts[2], month: parts[1], day: parts[0] };
+      } else if (parts[0] > 1000) {
+        // YYYY/MM/DD
+        return { year: parts[0], month: parts[1], day: parts[2] };
+      }
+    }
   }
-
   const d = new Date(clean);
   if (!isNaN(d.getTime())) {
-    return d.toISOString().slice(0, 10);
+    return { year: d.getFullYear(), month: d.getMonth() + 1, day: d.getDate() };
   }
-
-  return new Date().toISOString().slice(0, 10);
+  const n = new Date();
+  return { year: n.getFullYear(), month: n.getMonth() + 1, day: n.getDate() };
 }
 
 /**
- * Safely converts a timestamp in milliseconds to an ISO 8601 string without ever throwing "Invalid time value".
+ * Normalizes any date string (DD/MM/YYYY, DD-MM-YYYY, YYYY-MM-DD) into standard YYYY-MM-DD without UTC shifts.
  */
-export function safeIsoString(
-  ms: number | undefined | null,
-  fallbackMs: number = Date.now(),
-): string {
-  if (typeof ms === "number" && !isNaN(ms) && isFinite(ms)) {
+export function normalizeToIsoDate(dateStr: string | undefined): string {
+  const { year, month, day } = parseDateComponents(dateStr);
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+/**
+ * Safely converts a timestamp in milliseconds to an ISO 8601 string.
+ * Strictly validates the timestamp and throws or handles invalid numbers instead of falling back to Date.now().
+ */
+export function safeIsoString(ms: number | undefined | null, fallbackMs?: number): string {
+  if (typeof ms === "number" && !isNaN(ms) && isFinite(ms) && ms > 0) {
     try {
       return new Date(ms).toISOString();
     } catch {
       // ignore
     }
   }
-  return new Date(fallbackMs).toISOString();
+  if (
+    typeof fallbackMs === "number" &&
+    !isNaN(fallbackMs) &&
+    isFinite(fallbackMs) &&
+    fallbackMs > 0
+  ) {
+    try {
+      return new Date(fallbackMs).toISOString();
+    } catch {
+      // ignore
+    }
+  }
+  throw new Error(`Invalid timestamp provided: ${ms}`);
 }
 
 /**
@@ -254,6 +286,13 @@ function buildDateTimeIso(
 let cachedPanchangCalendarId: string | null = null;
 
 /**
+ * Resets cached calendar ID on logout or account switch
+ */
+export function clearCalendarCache(): void {
+  cachedPanchangCalendarId = null;
+}
+
+/**
  * Retrieves or creates a dedicated secondary Google Calendar named "Panchang Calendar".
  */
 export async function getOrCreatePanchangCalendarId(token: string): Promise<string> {
@@ -267,11 +306,17 @@ export async function getOrCreatePanchangCalendarId(token: string): Promise<stri
       },
     });
 
+    if (listRes.status === 401 || listRes.status === 403) {
+      throw new Error(
+        "Authentication expired or permission revoked. Please reconnect Google Calendar.",
+      );
+    }
+
     if (listRes.ok) {
       const listData = await listRes.json();
       const items = listData.items || [];
       const found = items.find(
-        (c: any) =>
+        (c: { summary?: string; id?: string }) =>
           c.summary === "Panchang Calendar" ||
           c.summary === "Panchanga Calendar" ||
           c.summary === "Mahavtaar Panchang Calendar" ||
@@ -300,6 +345,12 @@ export async function getOrCreatePanchangCalendarId(token: string): Promise<stri
       }),
     });
 
+    if (createRes.status === 401 || createRes.status === 403) {
+      throw new Error(
+        "Authentication expired or permission revoked. Please reconnect Google Calendar.",
+      );
+    }
+
     if (createRes.ok) {
       const createdData = await createRes.json();
       if (createdData.id) {
@@ -307,7 +358,8 @@ export async function getOrCreatePanchangCalendarId(token: string): Promise<stri
         return createdData.id;
       }
     }
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.message?.includes("Authentication expired")) throw err;
     console.warn("Could not retrieve/create Panchang Calendar, using primary:", err);
   }
 
@@ -315,7 +367,9 @@ export async function getOrCreatePanchangCalendarId(token: string): Promise<stri
 }
 
 /**
- * List events created by Mahavtaar Panchanga in Panchang Calendar
+ * List events created by Mahavtaar Panchanga in Panchang Calendar.
+ * Strictly verifies application ownership via extendedProperties.private.source === "mahavtaar_panchanga".
+ * Never returns or deletes unrelated user events matching title strings.
  */
 export async function listPanchangaEvents(
   token: string,
@@ -351,6 +405,12 @@ export async function listPanchangaEvents(
       },
     });
 
+    if (res.status === 401 || res.status === 403) {
+      throw new Error(
+        "Authentication expired or permission revoked. Please reconnect Google Calendar.",
+      );
+    }
+
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({}));
       throw new Error(
@@ -365,34 +425,24 @@ export async function listPanchangaEvents(
     pageToken = data.nextPageToken;
   } while (pageToken);
 
+  // Strict ownership verification: MUST match extendedProperties.private.source === "mahavtaar_panchanga"
   return items
     .filter(
       (item: GoogleCalendarApiItem) =>
-        item.extendedProperties?.private?.source === "mahavtaar_panchanga" ||
-        item.summary?.includes("पंचांग") ||
-        item.summary?.includes("Mahavtaar Panchanga") ||
-        item.summary?.includes("स्वर") ||
-        item.summary?.includes("Swara") ||
-        item.summary?.includes("इड़ा") ||
-        item.summary?.includes("Ida") ||
-        item.summary?.includes("पिंगला") ||
-        item.summary?.includes("Pingala") ||
-        item.summary?.includes("सुषुम्ना") ||
-        item.summary?.includes("Sushumna") ||
-        item.summary?.includes("होरा") ||
-        item.summary?.includes("Hora") ||
-        item.summary?.includes("तत्त्व") ||
-        item.summary?.includes("Tattva") ||
-        item.summary?.includes("🪐"),
+        item.extendedProperties?.private?.source === "mahavtaar_panchanga",
     )
     .map((item: GoogleCalendarApiItem) => ({
       id: item.id,
       summary: item.summary || "",
+      description: (item as any).description || "",
+      location: (item as any).location || "",
+      colorId: (item as any).colorId,
       htmlLink: item.htmlLink,
       start: { dateTime: item.start?.dateTime, date: item.start?.date },
       end: { dateTime: item.end?.dateTime, date: item.end?.date },
       eventType: item.extendedProperties?.private?.eventType,
       dateStr: item.extendedProperties?.private?.date,
+      extendedProperties: item.extendedProperties,
     }));
 }
 
@@ -417,6 +467,12 @@ export async function createCalendarEvent(
     body: JSON.stringify(payload),
   });
 
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(
+      "Authentication expired or permission revoked. Please reconnect Google Calendar.",
+    );
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(
@@ -428,6 +484,57 @@ export async function createCalendarEvent(
   return {
     id: item.id,
     summary: item.summary,
+    description: item.description,
+    location: item.location,
+    htmlLink: item.htmlLink,
+    start: item.start,
+    end: item.end,
+    eventType: item.extendedProperties?.private?.eventType,
+    dateStr: item.extendedProperties?.private?.date,
+  };
+}
+
+/**
+ * Update an existing event in user's Panchang Calendar (PUT reconciliation)
+ */
+export async function updateCalendarEvent(
+  token: string,
+  eventId: string,
+  payload: CalendarEventPayload,
+  customCalendarId?: string,
+): Promise<SyncedCalendarEvent> {
+  const calId = customCalendarId || (await getOrCreatePanchangCalendarId(token));
+  const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calId)}/events/${encodeURIComponent(eventId)}`;
+
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(
+      "Authentication expired or permission revoked. Please reconnect Google Calendar.",
+    );
+  }
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(
+      err?.error?.message || `Failed to update Google Calendar event (${res.status})`,
+    );
+  }
+
+  const item = await res.json();
+  return {
+    id: item.id,
+    summary: item.summary,
+    description: item.description,
+    location: item.location,
     htmlLink: item.htmlLink,
     start: item.start,
     end: item.end,
@@ -1105,6 +1212,10 @@ export function buildPanchangaEventPayloads(
           tz,
         );
 
+        const maxHoras =
+          typeof options.maxHoras === "number" && options.maxHoras > 0 ? options.maxHoras : 24;
+        const horasToProcess = dailyHoras.horas.slice(0, maxHoras);
+
         const rulerMapHi: Record<string, string> = {
           Sun: "सूर्य",
           Moon: "चन्द्र",
@@ -1150,7 +1261,7 @@ export function buildPanchangaEventPayloads(
           Water: "💧",
         };
 
-        dailyHoras.horas.forEach((h) => {
+        horasToProcess.forEach((h) => {
           const planetHi = rulerMapHi[h.ruler] || h.ruler;
           const nadiText = h.nadi === "ida" ? "इड़ा" : h.nadi === "pingala" ? "पिंगला" : "सुषुम्ना";
           const nadiDetailed =
@@ -1266,76 +1377,107 @@ export function buildPanchangaEventPayloads(
   return payloads;
 }
 
+export interface DailySyncResult {
+  created: SyncedCalendarEvent[];
+  updated: SyncedCalendarEvent[];
+  unchanged: number;
+  deleted: number;
+  failed: number;
+  total: number;
+  skipped: number; // backward compatibility alias for unchanged
+}
+
 /**
- * Synchronize daily Panchanga events to Google Calendar
+ * Synchronize daily Panchanga events to Google Calendar with full create/update/unchanged/delete reconciliation
  */
 export async function syncDailyPanchangaEvents(
   token: string,
   data: PanchangaResponse,
   options: SyncOptions = DEFAULT_SYNC_OPTIONS,
-): Promise<{
-  created: SyncedCalendarEvent[];
-  skipped: number;
-  total: number;
-}> {
+): Promise<DailySyncResult> {
   const calId = await getOrCreatePanchangCalendarId(token);
 
-  // 1. Fetch existing synced events for this day to avoid duplication
+  // 1. Fetch existing app-owned events for this day
   const existing = await listPanchangaEvents(token, data.date, undefined, calId);
 
-  // 2. Remove obsolete events previously generated by the app:
-  // - All Sushumna events (morning, midday, dusk, hourly)
-  // - Standalone Hora events if options.includeVedicHoras is false
-  const obsoleteEvents = existing.filter((ev) => {
-    const isSushumna =
-      ev.eventType?.includes("sushumna") ||
-      ev.summary?.includes("सुषुम्ना") ||
-      ev.summary?.includes("Sushumna");
-    const isStandaloneHora =
-      !options.includeVedicHoras &&
-      ((ev.eventType?.startsWith("vedic_hora_") && !ev.eventType?.includes("tattva")) ||
-        (ev.summary?.includes("होरा") &&
-          !ev.eventType?.startsWith("hora_tattva_") &&
-          !ev.summary?.includes("· 💨")));
-    return isSushumna || isStandaloneHora;
-  });
-
-  for (const obsolete of obsoleteEvents) {
-    try {
-      await deleteCalendarEvent(token, obsolete.id, calId);
-    } catch (err) {
-      console.warn(`Could not remove obsolete event ${obsolete.id}:`, err);
+  // Map existing app-owned events by eventType
+  const existingMap = new Map<string, SyncedCalendarEvent>();
+  for (const ev of existing) {
+    if (ev.eventType) {
+      existingMap.set(ev.eventType, ev);
     }
   }
 
-  const remainingExisting = existing.filter((e) => !obsoleteEvents.some((obs) => obs.id === e.id));
-  const existingTypes = new Set(remainingExisting.map((e) => e.eventType).filter(Boolean));
-
-  // 3. Build desired payloads
+  // 2. Build desired payloads for this date
   const payloads = buildPanchangaEventPayloads(data, options);
+  const desiredTypes = new Set<string>();
 
   const created: SyncedCalendarEvent[] = [];
-  let skipped = 0;
+  const updated: SyncedCalendarEvent[] = [];
+  let unchanged = 0;
+  let deleted = 0;
+  let failed = 0;
 
   for (const payload of payloads) {
     const eventType = payload.extendedProperties?.private?.eventType;
-    if (eventType && existingTypes.has(eventType)) {
-      skipped++;
-      continue;
-    }
+    if (eventType) desiredTypes.add(eventType);
 
-    try {
-      const result = await createCalendarEvent(token, payload, calId);
-      created.push(result);
-    } catch (err) {
-      console.error(`Error creating calendar event "${payload.summary}":`, err);
+    const existingEv = eventType ? existingMap.get(eventType) : undefined;
+
+    if (existingEv) {
+      // Check if event payload has changed
+      const isSummarySame = existingEv.summary === payload.summary;
+      const isStartSame =
+        (existingEv.start.dateTime || existingEv.start.date) ===
+        (payload.start.dateTime || payload.start.date);
+      const isEndSame =
+        (existingEv.end.dateTime || existingEv.end.date) ===
+        (payload.end.dateTime || payload.end.date);
+      const isLocationSame = (existingEv.location || "") === (payload.location || "");
+      const isDescriptionSame = (existingEv.description || "") === (payload.description || "");
+
+      if (isSummarySame && isStartSame && isEndSame && isLocationSame && isDescriptionSame) {
+        unchanged++;
+      } else {
+        try {
+          const res = await updateCalendarEvent(token, existingEv.id, payload, calId);
+          updated.push(res);
+        } catch (err) {
+          console.error(`Error updating event "${payload.summary}":`, err);
+          failed++;
+        }
+      }
+    } else {
+      try {
+        const res = await createCalendarEvent(token, payload, calId);
+        created.push(res);
+      } catch (err) {
+        console.error(`Error creating event "${payload.summary}":`, err);
+        failed++;
+      }
+    }
+  }
+
+  // 3. Delete obsolete app-owned events for this day that are no longer in desired payloads
+  for (const ev of existing) {
+    if (ev.eventType && !desiredTypes.has(ev.eventType)) {
+      try {
+        await deleteCalendarEvent(token, ev.id, calId);
+        deleted++;
+      } catch (err) {
+        console.warn(`Could not delete obsolete event ${ev.id}:`, err);
+      }
     }
   }
 
   return {
     created,
-    skipped,
+    updated,
+    unchanged,
+    deleted,
+    failed,
     total: payloads.length,
+    skipped: unchanged,
   };
 }
 
@@ -1352,7 +1494,54 @@ export function setAutoContinuousSyncPref(enabled: boolean): void {
 }
 
 /**
- * Multi-day continuous synchronization (e.g. 7 days or 30 days ahead) into Panchang Calendar
+ * Fetches independent Panchanga data for a specific target date via the server API endpoint /api/panchanga
+ */
+export async function fetchPanchangaForDate(
+  dateStr: string,
+  baseData: PanchangaResponse,
+): Promise<PanchangaResponse | null> {
+  const params = new URLSearchParams();
+  params.set("date", dateStr);
+  if (baseData.month_system) params.set("month_system", baseData.month_system);
+  if (baseData.ayanamsha || baseData.ayanamsa) {
+    params.set("ayanamsa", baseData.ayanamsha || baseData.ayanamsa || "citra");
+  }
+  if (baseData.latitude != null && baseData.longitude != null) {
+    params.set("lat", String(baseData.latitude));
+    params.set("lon", String(baseData.longitude));
+    if (baseData.timezone) params.set("tz", baseData.timezone);
+    if (baseData.city) params.set("city", baseData.city);
+  } else if (baseData.city) {
+    params.set("city", baseData.city);
+  }
+
+  let baseUrl = "";
+  if (typeof window !== "undefined" && window.location?.origin) {
+    baseUrl = window.location.origin;
+  }
+
+  const endpoint = `${baseUrl}/api/panchanga?${params.toString()}`;
+
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) {
+      console.warn(`Panchanga API returned status ${res.status} for date ${dateStr}`);
+      return null;
+    }
+    const data: PanchangaResponse = await res.json();
+    if (data && typeof data.sunrise_ms === "number" && typeof data.sunset_ms === "number") {
+      return data;
+    }
+    return null;
+  } catch (err) {
+    console.warn(`Failed to fetch independent Panchanga data for date ${dateStr}:`, err);
+    return null;
+  }
+}
+
+/**
+ * Multi-day continuous synchronization (e.g. 7 days or 30 days ahead) into Panchang Calendar.
+ * Calculates every date independently using the Panchanga engine without reusing shifted values.
  */
 export async function syncMultiDayPanchangaEvents(
   token: string,
@@ -1360,48 +1549,118 @@ export async function syncMultiDayPanchangaEvents(
   daysAhead: number = 30,
   options: SyncOptions = DEFAULT_SYNC_OPTIONS,
   onProgress?: (currentDay: number, totalDays: number) => void,
-): Promise<{ totalCreated: number; totalSkipped: number }> {
+  customFetchPanchanga?: (dateStr: string) => Promise<PanchangaResponse | null>,
+): Promise<{
+  totalCreated: number;
+  totalUpdated: number;
+  totalUnchanged: number;
+  totalDeleted: number;
+  totalFailed: number;
+  totalSkipped: number;
+  failedDays: string[];
+}> {
   let totalCreated = 0;
-  let totalSkipped = 0;
+  let totalUpdated = 0;
+  let totalUnchanged = 0;
+  let totalDeleted = 0;
+  let totalFailed = 0;
+  const failedDays: string[] = [];
 
-  // Get or create dedicated "Panchang Calendar"
-  const calId = await getOrCreatePanchangCalendarId(token);
+  // Reset calendar cache on multi-day sync run to ensure correct account calendar ID resolution
+  await getOrCreatePanchangCalendarId(token);
 
-  const startDateParts = baseData.date.split("-").map(Number);
-  const baseYear = startDateParts[0] || new Date().getFullYear();
-  const baseMonth = (startDateParts[1] || 1) - 1;
-  const baseDay = startDateParts[2] || 1;
+  const { year: baseYear, month: baseMonth, day: baseDay } = parseDateComponents(baseData.date);
 
   for (let i = 0; i < daysAhead; i++) {
-    const targetDate = new Date(baseYear, baseMonth, baseDay + i);
-    const dateIso = targetDate.toISOString().slice(0, 10);
+    const target = new Date(baseYear, baseMonth - 1, baseDay + i);
+    const targetYear = target.getFullYear();
+    const targetMonth = target.getMonth() + 1;
+    const targetDay = target.getDate();
+
+    const dateIso = `${targetYear}-${String(targetMonth).padStart(2, "0")}-${String(targetDay).padStart(2, "0")}`;
+    const dateDdMmYyyy = `${String(targetDay).padStart(2, "0")}/${String(targetMonth).padStart(2, "0")}/${targetYear}`;
 
     if (onProgress) onProgress(i + 1, daysAhead);
 
-    try {
-      let dayData = baseData;
-      if (i > 0) {
-        dayData = {
-          ...baseData,
-          date: dateIso,
-          sunrise_ms: baseData.sunrise_ms ? baseData.sunrise_ms + i * 86400000 : undefined,
-          sunset_ms: baseData.sunset_ms ? baseData.sunset_ms + i * 86400000 : undefined,
-          next_sunrise_ms: baseData.next_sunrise_ms
-            ? baseData.next_sunrise_ms + i * 86400000
-            : undefined,
-          weekday: (baseData.weekday + i) % 7,
-        };
+    let dayData: PanchangaResponse | null = null;
+    if (i === 0) {
+      dayData = { ...baseData, date: dateIso };
+    } else if (customFetchPanchanga) {
+      dayData = await customFetchPanchanga(dateIso);
+    } else {
+      dayData = await fetchPanchangaForDate(dateDdMmYyyy, baseData);
+      if (!dayData) {
+        dayData = await fetchPanchangaForDate(dateIso, baseData);
       }
+    }
 
+    if (!dayData) {
+      console.warn(`Could not calculate independent Panchanga for date ${dateIso}. Skipping.`);
+      failedDays.push(dateIso);
+      continue;
+    }
+
+    try {
       const res = await syncDailyPanchangaEvents(token, dayData, options);
       totalCreated += res.created.length;
-      totalSkipped += res.skipped;
+      totalUpdated += res.updated.length;
+      totalUnchanged += res.unchanged;
+      totalDeleted += res.deleted;
+      totalFailed += res.failed;
     } catch (err) {
       console.warn(`Continuous sync notice for date ${dateIso}:`, err);
+      failedDays.push(dateIso);
     }
   }
 
-  return { totalCreated, totalSkipped };
+  return {
+    totalCreated,
+    totalUpdated,
+    totalUnchanged,
+    totalDeleted,
+    totalFailed,
+    totalSkipped: totalUnchanged,
+    failedDays,
+  };
+}
+
+/**
+ * RFC 5545 text escaping for ICS fields (escapes backslashes, semicolons, commas, and newlines)
+ */
+export function escapeIcsText(str: string | undefined): string {
+  if (!str) return "";
+  return str
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
+/**
+ * RFC 5545 line folding (folds lines longer than 75 octets with CRLF + space).
+ * Measures exact UTF-8 byte length and iterates by code point to avoid splitting multibyte characters or emojis.
+ */
+export function foldIcsLine(line: string): string {
+  const encoder = new TextEncoder();
+  if (encoder.encode(line).length <= 75) return line;
+
+  let result = "";
+  let currentBytes = 0;
+  let currentSegment = "";
+
+  for (const char of line) {
+    const charBytes = encoder.encode(char).length;
+    if (currentBytes + charBytes > 75) {
+      result += currentSegment + "\r\n ";
+      currentSegment = char;
+      currentBytes = charBytes;
+    } else {
+      currentSegment += char;
+      currentBytes += charBytes;
+    }
+  }
+  result += currentSegment;
+  return result;
 }
 
 /**
@@ -1437,31 +1696,42 @@ export function generatePanchangaIcsContent(
     const uid = `mahavtaar-${cleanIso}-${eventType}@panchanga`;
 
     lines.push("BEGIN:VEVENT");
-    lines.push(`UID:${uid}`);
-    lines.push(`SUMMARY:${payload.summary.replace(/\n/g, " ")}`);
-    lines.push(`DESCRIPTION:${payload.description.replace(/\n/g, "\\n")}`);
+    lines.push(foldIcsLine(`UID:${uid}`));
+    lines.push(foldIcsLine(`SUMMARY:${escapeIcsText(payload.summary)}`));
+    lines.push(foldIcsLine(`DESCRIPTION:${escapeIcsText(payload.description)}`));
     if (payload.location) {
-      lines.push(`LOCATION:${payload.location.replace(/\n/g, " ")}`);
+      lines.push(foldIcsLine(`LOCATION:${escapeIcsText(payload.location)}`));
     }
 
     if (payload.start.dateTime) {
-      lines.push(`DTSTART:${formatIcsTime(payload.start.dateTime)}`);
+      lines.push(foldIcsLine(`DTSTART:${formatIcsTime(payload.start.dateTime)}`));
     } else if (payload.start.date) {
-      lines.push(`DTSTART;VALUE=DATE:${payload.start.date.replace(/-/g, "")}`);
+      const startDateClean = payload.start.date.replace(/-/g, "");
+      lines.push(foldIcsLine(`DTSTART;VALUE=DATE:${startDateClean}`));
     }
 
     if (payload.end.dateTime) {
-      lines.push(`DTEND:${formatIcsTime(payload.end.dateTime)}`);
+      lines.push(foldIcsLine(`DTEND:${formatIcsTime(payload.end.dateTime)}`));
     } else if (payload.end.date) {
-      lines.push(`DTEND;VALUE=DATE:${payload.end.date.replace(/-/g, "")}`);
+      let endDateClean = payload.end.date.replace(/-/g, "");
+      // RFC 5545 requires DTEND for all-day events to be the exclusive end date (start date + 1 day for 1-day events)
+      if (payload.start.date && endDateClean <= payload.start.date.replace(/-/g, "")) {
+        const { year, month, day } = parseDateComponents(payload.start.date);
+        const nextDay = new Date(year, month - 1, day + 1);
+        const ny = nextDay.getFullYear();
+        const nm = String(nextDay.getMonth() + 1).padStart(2, "0");
+        const nd = String(nextDay.getDate()).padStart(2, "0");
+        endDateClean = `${ny}${nm}${nd}`;
+      }
+      lines.push(foldIcsLine(`DTEND;VALUE=DATE:${endDateClean}`));
     }
 
-    // Add explicit VALARM audio/popup alarm block so native calendar apps show alerts with Planet, Nadi & Tattva
+    // Add explicit VALARM audio/popup alarm block so native calendar apps show alerts
     const reminderMins = options.reminderMinutes !== undefined ? options.reminderMinutes : 0;
     lines.push("BEGIN:VALARM");
     lines.push("ACTION:DISPLAY");
-    lines.push(`DESCRIPTION:🔔 ${payload.summary.replace(/\n/g, " ")}`);
-    lines.push(`TRIGGER:-PT${reminderMins}M`);
+    lines.push(foldIcsLine(`DESCRIPTION:🔔 ${escapeIcsText(payload.summary)}`));
+    lines.push(foldIcsLine(`TRIGGER:-PT${reminderMins}M`));
     lines.push("END:VALARM");
 
     lines.push("END:VEVENT");

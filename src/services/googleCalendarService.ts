@@ -35,11 +35,17 @@ export interface CalendarEventPayload {
 export interface SyncedCalendarEvent {
   id: string;
   summary: string;
+  description?: string;
+  location?: string;
+  colorId?: string;
   htmlLink?: string;
   start: { dateTime?: string; date?: string };
   end: { dateTime?: string; date?: string };
   eventType?: string;
   dateStr?: string;
+  extendedProperties?: {
+    private?: Record<string, string>;
+  };
 }
 
 interface GoogleCalendarApiItem {
@@ -358,8 +364,8 @@ export async function getOrCreatePanchangCalendarId(token: string): Promise<stri
         return createdData.id;
       }
     }
-  } catch (err: any) {
-    if (err?.message?.includes("Authentication expired")) throw err;
+  } catch (err: unknown) {
+    if ((err as Error)?.message?.includes("Authentication expired")) throw err;
     console.warn("Could not retrieve/create Panchang Calendar, using primary:", err);
   }
 

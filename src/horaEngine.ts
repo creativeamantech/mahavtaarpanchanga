@@ -6,6 +6,7 @@ export interface TattvaPeriod {
   name: string;
   sanskrit: string;
   durationMs: number;
+  durationMins?: number;
   startTime: string; // hh:mm:ss A (e.g., 06:15:23 AM)
   endTime: string; // hh:mm:ss A
   startTimeMs: number;
@@ -49,6 +50,8 @@ export const PLANET_TO_SWARA_NADI: Record<string, "ida" | "pingala"> = {
   Venus: "ida",
   Saturn: "pingala",
 };
+
+export const HORA_PLANET_NADI_TABLE = PLANET_TO_SWARA_NADI;
 
 export function getPlanetSwaraNadi(ruler: string): "ida" | "pingala" {
   return PLANET_TO_SWARA_NADI[ruler] ?? "ida";
@@ -165,6 +168,7 @@ export function computeDailyHoras(
         name: tDef.name,
         sanskrit: tDef.sanskrit,
         durationMs: tEndMs - tattvaStartMs,
+        durationMins: Math.round((tEndMs - tattvaStartMs) / 60000),
         startTimeMs: tattvaStartMs,
         endTimeMs: tEndMs,
         startTime: formatHMS(new Date(tattvaStartMs), timeZone),

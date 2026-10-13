@@ -111,7 +111,7 @@ export const signInWithGsi = async (): Promise<{ user: User; accessToken: string
             photoURL: "https://www.gstatic.com/images/branding/product/2x/calendar_2020q4_48dp.png",
           } as unknown as User;
 
-          resolve({ user: syntheticUser, accessToken: cachedAccessToken });
+          resolve({ user: syntheticUser, accessToken: response.access_token });
         },
       });
 

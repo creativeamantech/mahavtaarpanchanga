@@ -51,9 +51,13 @@ export interface Segment {
   end?: string;
   starts?: string;
   ends?: string | null;
+  end_time?: string;
+  end_time_ms?: number;
   startTimeMs?: number;
   endTimeMs?: number;
   percentage?: number;
+  paksha?: string;
+  pada?: number;
   nakshatraSwara?: any;
   tithiSwara?: any;
 }
@@ -340,13 +344,18 @@ export interface MonthlyPanchangaDay {
 
 export interface PanchangaResponse {
   city: string;
+  country?: string;
   date: string;
+  day?: string;
   timezone: string;
+  latitude?: number;
+  longitude?: number;
   jd: number;
   sunrise_jd: number;
   coordinate_mode: "tropical" | "sidereal";
   coordinate_label: string;
   ayanamsa: string | null;
+  ayanamsha?: string | null;
   ayanamsa_key: CoordinateSelection | null;
   ayanamsa_degrees: number | null;
   month_system: MonthSystem;
@@ -377,6 +386,9 @@ export interface PanchangaResponse {
   sunrise_ms?: number;
   sunset_ms?: number;
   next_sunrise_ms?: number;
+  sunriseMs?: number;
+  sunsetMs?: number;
+  nextSunriseMs?: number;
   moonrise: string | null;
   moonrise_status: string;
   moonset: string | null;
@@ -401,6 +413,8 @@ export interface PanchangaResponse {
   planets: PlanetPosition[];
   sun_rasi: string;
   moon_rasi: string;
+  sun_sign?: string;
+  moon_sign?: string;
   swara_yoga: SwaraDayRule;
   planet_transitions?: PlanetTransitionsData;
 }

@@ -16,6 +16,7 @@ export default defineConfig({
   },
   vite: {
     plugins: [
+      mcpPlugin(),
       VitePWA({
         registerType: "autoUpdate",
         includeAssets: ["favicon.ico", "apple-touch-icon.png", "icon.svg"],

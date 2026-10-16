@@ -118,6 +118,8 @@ export interface SiderealPosition {
   degreeInSign: number;
   /** Nakshatra 1 to 27 (1 = Ashwini, 27 = Revati) */
   nakshatraIndex: number;
+  nakshatraNumber?: number;
+  nakshatraName?: string;
   /** Pada 1 to 4 */
   pada: number;
   /** Daily speed preserved */
@@ -136,6 +138,8 @@ export interface LagnaPosition {
   signIndex: number;
   degreeInSign: number;
   nakshatraIndex: number;
+  nakshatraNumber?: number;
+  nakshatraName?: string;
   pada: number;
   /** Greenwich Mean Sidereal Time in hours [0, 24) */
   gmstHours: number;

@@ -728,6 +728,12 @@ export function resolveCity(cityName: string): CityLocation {
 }
 
 function getTimezoneOffsetHours(timeZone: string, date: Date): number {
+  if (typeof timeZone === "string" && /^[+-]?\d+(\.\d+)?$/.test(timeZone.trim())) {
+    const num = parseFloat(timeZone);
+    if (!isNaN(num) && num >= -14 && num <= 14) {
+      return num;
+    }
+  }
   try {
     const str = date.toLocaleString("en-US", { timeZone, timeZoneName: "shortOffset" });
     const match = str.match(/GMT([+-]\d+)(?::(\d+))?/);

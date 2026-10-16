@@ -20,6 +20,11 @@ export interface CalculationProvenance {
   profileVersion: string;
   inputsHash: string;
   resultHash: string;
+  timestampMs?: number;
+  environment?: {
+    platform?: string;
+    nodeVersion?: string;
+  };
   sectionProvenances: {
     astronomy: SectionProvenance;
     houses: SectionProvenance;
@@ -39,6 +44,8 @@ export function createCanonicalProvenance(
   profileVersion: string,
   inputsHash: string,
   resultHash: string,
+  timestampMs?: number,
+  environment?: { platform?: string; nodeVersion?: string },
 ): CalculationProvenance {
   return {
     engine: "Mahavtaar Kundali Engine",
@@ -46,6 +53,11 @@ export function createCanonicalProvenance(
     profileVersion,
     inputsHash,
     resultHash,
+    timestampMs: timestampMs ?? Date.now(),
+    environment: environment ?? {
+      platform: typeof process !== "undefined" ? process.platform : "browser",
+      nodeVersion: typeof process !== "undefined" ? process.version : "v20.0.0",
+    },
     sectionProvenances: {
       astronomy: {
         engine: "AstronomicalCore",

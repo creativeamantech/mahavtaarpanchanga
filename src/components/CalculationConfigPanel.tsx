@@ -68,7 +68,7 @@ export const CalculationConfigPanel: React.FC<CalculationConfigPanelProps> = ({
                   ? "Lahiri (Chitrapaksha / Indian National)"
                   : profile.ayanamsha === "raman"
                     ? "B.V. Raman Canonical"
-                    : profile.ayanamsha === "krishnamurti"
+                    : profile.ayanamsha === "kp" || (profile.ayanamsha as string) === "krishnamurti"
                       ? "KP (Krishnamurti Paddhati)"
                       : profile.ayanamsha.toUpperCase()}
               </div>

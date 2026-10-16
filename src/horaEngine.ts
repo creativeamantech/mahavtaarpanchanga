@@ -22,6 +22,7 @@ export interface Hora {
   endTimeMs: number;
   durationMs: number;
   ruler: string;
+  planet?: string;
   nadi: "ida" | "pingala" | "sushumna";
   tattvas: TattvaPeriod[];
 }
@@ -194,6 +195,7 @@ export function computeDailyHoras(
       startTime: formatHMS(new Date(startTimeMs), timeZone),
       endTime: formatHMS(new Date(endTimeMs), timeZone),
       ruler,
+      planet: ruler,
       nadi,
       tattvas,
     };
@@ -215,6 +217,7 @@ export function computeDailyHoras(
 
 export interface CurrentHoraState {
   hora: Hora | null;
+  activeHora?: Hora | null;
   activeTattva: TattvaPeriod | null;
   horaStartTimeMs: number | null;
   horaEndTimeMs: number | null;
@@ -228,6 +231,7 @@ export interface CurrentHoraState {
 
 export interface CurrentHoraData extends CurrentHoraState {
   hora: Hora;
+  activeHora?: Hora;
   tattva: TattvaPeriod | null;
 }
 
@@ -282,6 +286,7 @@ export function resolveCurrentHora(nowMs: number, data: PanchangaResponse): Curr
 
   return {
     hora: activeHora,
+    activeHora,
     activeTattva,
     tattva: activeTattva,
     horaStartTimeMs: activeHora.startTimeMs,

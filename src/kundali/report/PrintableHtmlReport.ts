@@ -45,7 +45,7 @@ export class PrintableHtmlReportGenerator {
       .map((pKey) => {
         const p = planets[pKey as keyof typeof planets];
         const sRupa =
-          shadbala.planetaryShadbala?.[pKey as any]?.totalShadbalaRupa?.toFixed(2) ?? "-";
+          (shadbala.planetaryShadbala as Record<string, any>)?.[pKey]?.totalShadbalaRupa?.toFixed(2) ?? "-";
         return `
         <tr>
           <td style="padding: 6px 8px; border: 1px solid #ccc; font-weight: bold;">${pKey}</td>

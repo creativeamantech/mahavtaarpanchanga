@@ -345,6 +345,7 @@ export interface MonthlyPanchangaDay {
 export interface PanchangaResponse {
   city: string;
   country?: string;
+  location?: CityLocation | any;
   date: string;
   day?: string;
   timezone: string;

@@ -75,7 +75,7 @@ export class KundaliReportGenerator {
       currentAntardasha: activeAnter ? String(activeAnter.lord) : "Unknown",
       totalYogasDetected: presentYogas.length,
       topStrengths: [
-        `Strongest Planet: ${shadbala.mostPowerfulPlanet}`,
+        `Strongest Planet: ${(shadbala as any).mostPowerfulPlanet ?? shadbala.strongestPlanet}`,
         `Weakest Planet: ${shadbala.weakestPlanet}`,
         `Ayana Ayanamsha: ${astro.ayanamshaDeg.toFixed(4)}° (${data.profile.ayanamsha})`,
       ],

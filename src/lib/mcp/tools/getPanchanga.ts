@@ -33,22 +33,46 @@ export default defineTool({
     if (parts.length !== 3) throw new ToolError("date must be in DD/MM/YYYY format.");
     const [dd, mm, yyyy] = parts;
 
-    // Call the internal Panchanga API
-    const baseUrl = process.env["VITE_APP_URL"] ?? "http://localhost:8080";
-    const url = `${baseUrl}/api/panchanga?date=${yyyy}-${mm}-${dd}&lat=${latitude}&lon=${longitude}&tz=${timezone_offset}&city=${encodeURIComponent(city ?? "")}`;
-
     let data: Record<string, unknown>;
     try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        const body = await res.text();
-        throw new ToolError(`Panchanga calculation failed [${res.status}]: ${body}`);
+      const { initPanchangaEngine, computePanchangaCustom } = await import("../../panchangaEngine.server");
+      initPanchangaEngine();
+      const result = computePanchangaCustom(
+        latitude,
+        longitude,
+        String(timezone_offset),
+        `${dd}/${mm}/${yyyy}`,
+        "amanta",
+        "citra",
+        city || `Custom (${latitude.toFixed(3)}°, ${longitude.toFixed(3)}°)`
+      );
+      data = result as unknown as Record<string, unknown>;
+    } catch {
+      // Fallback to internal HTTP route
+      const baseUrl = process.env["VITE_APP_URL"] ?? "http://localhost:3000";
+      const url = `${baseUrl}/api/panchanga?date=${yyyy}-${mm}-${dd}&lat=${latitude}&lon=${longitude}&tz=${timezone_offset}&city=${encodeURIComponent(city ?? "")}`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          const body = await res.text();
+          throw new ToolError(`Panchanga calculation failed [${res.status}]: ${body}`);
+        }
+        data = (await res.json()) as Record<string, unknown>;
+      } catch (err) {
+        if (err instanceof ToolError) throw err;
+        throw new ToolError(`Failed to fetch Panchanga: ${String(err instanceof Error ? err.message : err)}`);
       }
-      data = (await res.json()) as Record<string, unknown>;
-    } catch (err) {
-      if (err instanceof ToolError) throw err;
-      throw new ToolError(`Failed to fetch Panchanga: ${String(err instanceof Error ? err.message : err)}`);
     }
+
+    const formatSegment = (val: unknown): string => {
+      if (Array.isArray(val)) {
+        return val.map((s: any) => s?.name || s?.name_sa || String(s)).join(" / ");
+      }
+      if (val && typeof val === "object") {
+        return (val as any).name || (val as any).name_sa || JSON.stringify(val);
+      }
+      return val ? String(val) : "—";
+    };
 
     const summary = [
       `📅 Panchanga for ${date}${city ? ` — ${city}` : ""}`,
@@ -56,10 +80,10 @@ export default defineTool({
       `🌅 Sunrise: ${data.sunrise ?? "—"}   Sunset: ${data.sunset ?? "—"}`,
       ``,
       `PANCHA ANGAS`,
-      `• Tithi:    ${data.tithi ?? "—"}`,
-      `• Nakshatra: ${data.nakshatra ?? "—"}`,
-      `• Yoga:     ${data.yoga ?? "—"}`,
-      `• Karana:   ${data.karana ?? "—"}`,
+      `• Tithi:    ${formatSegment(data.tithi)}`,
+      `• Nakshatra: ${formatSegment(data.nakshatra)}`,
+      `• Yoga:     ${formatSegment(data.yoga)}`,
+      `• Karana:   ${formatSegment(data.karana)}`,
       `• Vaara:    ${data.vaara ?? "—"}`,
       ``,
       `VEDIC CALENDAR`,
@@ -68,14 +92,14 @@ export default defineTool({
       `• Samvatsara:   ${data.samvatsara ?? "—"}`,
       ``,
       `INAUSPICIOUS PERIODS`,
-      `• Rahu Kala:    ${data.rahu_kala ? `${(data.rahu_kala as Record<string,unknown>).start ?? "—"} – ${(data.rahu_kala as Record<string,unknown>).end ?? "—"}` : "—"}`,
-      `• Yamaganda:    ${data.yamaganda ? `${(data.yamaganda as Record<string,unknown>).start ?? "—"} – ${(data.yamaganda as Record<string,unknown>).end ?? "—"}` : "—"}`,
-      `• Gulika Kala:  ${data.gulika_kala ? `${(data.gulika_kala as Record<string,unknown>).start ?? "—"} – ${(data.gulika_kala as Record<string,unknown>).end ?? "—"}` : "—"}`,
+      `• Rahu Kala:    ${data.rahu_kala ? `${(data.rahu_kala as Record<string, unknown>).start ?? "—"} – ${(data.rahu_kala as Record<string, unknown>).end ?? "—"}` : "—"}`,
+      `• Yamaganda:    ${data.yamaganda ? `${(data.yamaganda as Record<string, unknown>).start ?? "—"} – ${(data.yamaganda as Record<string, unknown>).end ?? "—"}` : "—"}`,
+      `• Gulika Kala:  ${data.gulika_kala ? `${(data.gulika_kala as Record<string, unknown>).start ?? "—"} – ${(data.gulika_kala as Record<string, unknown>).end ?? "—"}` : "—"}`,
     ].join("\n");
 
     return {
       content: [{ type: "text" as const, text: summary }],
-      structuredContent: { panchanga: data },
+      structuredContent: { panchanga: data as any },
     };
   },
 });

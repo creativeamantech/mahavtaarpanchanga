@@ -308,16 +308,18 @@ export const CalculationAuditPanel: React.FC<CalculationAuditPanelProps> = ({
               <div>
                 उत्पन्न तिथि:{" "}
                 <span className="text-white">
-                  {new Date(fullData.provenance.timestampMs).toISOString()}
+                  {fullData.provenance.timestampMs
+                    ? new Date(fullData.provenance.timestampMs).toISOString()
+                    : fullData.generatedAt || new Date().toISOString()}
                 </span>
               </div>
               <div>
                 प्लेटफॉर्म:{" "}
-                <span className="text-white">{fullData.provenance.environment.platform}</span>
+                <span className="text-white">{fullData.provenance.environment?.platform || "browser"}</span>
               </div>
               <div>
                 नोड संस्करण:{" "}
-                <span className="text-white">{fullData.provenance.environment.nodeVersion}</span>
+                <span className="text-white">{fullData.provenance.environment?.nodeVersion || "v20.0.0"}</span>
               </div>
               <div>
                 संस्थान: <span className="text-white">Mahavtaar Jyotish Core</span>

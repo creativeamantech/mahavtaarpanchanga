@@ -139,7 +139,7 @@ export interface FullKundliData {
   vargas: Record<VargaType, VargaChartResult>;
   shadbala: CompleteShadbalaResult;
   dasha: DashaTimeline;
-  rules: RuleResult[];
+  rules: RuleResult[] | readonly RuleResult[];
   jaimini: JaiminiProfile;
   ashtakavarga: AshtakavargaData;
   kp: KpData;

@@ -30,17 +30,31 @@ export default defineTool({
     if (parts.length !== 3) throw new ToolError("date must be in DD/MM/YYYY format.");
     const [dd, mm, yyyy] = parts;
 
-    const baseUrl = process.env["VITE_APP_URL"] ?? "http://localhost:8080";
-    const url = `${baseUrl}/api/panchanga?date=${yyyy}-${mm}-${dd}&lat=${latitude}&lon=${longitude}&tz=${timezone_offset}&city=${encodeURIComponent(city ?? "")}`;
-
     let data: Record<string, unknown>;
     try {
-      const res = await fetch(url);
-      if (!res.ok) throw new ToolError(`API call failed [${res.status}]`);
-      data = (await res.json()) as Record<string, unknown>;
-    } catch (err) {
-      if (err instanceof ToolError) throw err;
-      throw new ToolError(`Failed to fetch timings: ${String(err instanceof Error ? err.message : err)}`);
+      const { initPanchangaEngine, computePanchangaCustom } = await import("../../panchangaEngine.server");
+      initPanchangaEngine();
+      const result = computePanchangaCustom(
+        latitude,
+        longitude,
+        String(timezone_offset),
+        `${dd}/${mm}/${yyyy}`,
+        "amanta",
+        "citra",
+        city || `Custom (${latitude.toFixed(3)}°, ${longitude.toFixed(3)}°)`
+      );
+      data = result as unknown as Record<string, unknown>;
+    } catch {
+      const baseUrl = process.env["VITE_APP_URL"] ?? "http://localhost:3000";
+      const url = `${baseUrl}/api/panchanga?date=${yyyy}-${mm}-${dd}&lat=${latitude}&lon=${longitude}&tz=${timezone_offset}&city=${encodeURIComponent(city ?? "")}`;
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new ToolError(`API call failed [${res.status}]`);
+        data = (await res.json()) as Record<string, unknown>;
+      } catch (err) {
+        if (err instanceof ToolError) throw err;
+        throw new ToolError(`Failed to fetch timings: ${String(err instanceof Error ? err.message : err)}`);
+      }
     }
 
     const lines: string[] = [
@@ -58,17 +72,39 @@ export default defineTool({
       lines.push(`• Abhijit Muhurta: ${a.start ?? "—"} – ${a.end ?? "—"} (auspicious midday period)`);
     }
     if (Array.isArray(data.amrita_kala) && (data.amrita_kala as unknown[]).length > 0) {
-      lines.push(`• Amrita Kala: ${(data.amrita_kala as Array<Record<string,unknown>>).map(k => `${k.start}–${k.end}`).join(", ")}`);
+      lines.push(
+        `• Amrita Kala: ${(data.amrita_kala as Array<Record<string, unknown>>).map((k) => `${k.start}–${k.end}`).join(", ")}`
+      );
     }
 
-    lines.push("", "CHOGHADIYA (Day Segments)");
-    if (Array.isArray(data.choghadiya)) {
-      for (const c of data.choghadiya as Array<Record<string, unknown>>) {
-        const quality = c.quality ?? c.type ?? "—";
-        lines.push(`• ${c.start ?? "—"} – ${c.end ?? "—"}: ${c.name ?? "—"} (${quality})`);
+    lines.push("", "CHOGHADIYA (Day & Night Segments)");
+    const dayChoghadiya = (data.gauri_choghadiya_day || data.choghadiya) as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(dayChoghadiya) && dayChoghadiya.length > 0) {
+      lines.push("Day Choghadiya:");
+      for (const c of dayChoghadiya) {
+        lines.push(`  • ${c.start ?? "—"} – ${c.end ?? "—"}: ${c.name ?? "—"}`);
       }
-    } else {
-      lines.push("• Not available for this date/location.");
+    }
+    const nightChoghadiya = data.gauri_choghadiya_night as Array<Record<string, unknown>> | undefined;
+    if (Array.isArray(nightChoghadiya) && nightChoghadiya.length > 0) {
+      lines.push("Night Choghadiya:");
+      for (const c of nightChoghadiya) {
+        lines.push(`  • ${c.start ?? "—"} – ${c.end ?? "—"}: ${c.name ?? "—"}`);
+      }
+    }
+
+    lines.push("", "INAUSPICIOUS PERIODS (AVOID)");
+    if (data.rahu_kala) {
+      const r = data.rahu_kala as Record<string, unknown>;
+      lines.push(`• Rahu Kala: ${r.start ?? "—"} – ${r.end ?? "—"}`);
+    }
+    if (data.yamaganda) {
+      const y = data.yamaganda as Record<string, unknown>;
+      lines.push(`• Yamaganda: ${y.start ?? "—"} – ${y.end ?? "—"}`);
+    }
+    if (data.gulika_kala) {
+      const g = data.gulika_kala as Record<string, unknown>;
+      lines.push(`• Gulika Kala: ${g.start ?? "—"} – ${g.end ?? "—"}`);
     }
 
     return {
@@ -77,9 +113,12 @@ export default defineTool({
         brahma_muhurta: data.brahma_muhurta,
         abhijit_muhurta: data.abhijit_muhurta,
         amrita_kala: data.amrita_kala,
-        choghadiya: data.choghadiya,
-        horas: data.horas,
-      },
+        gauri_choghadiya_day: data.gauri_choghadiya_day,
+        gauri_choghadiya_night: data.gauri_choghadiya_night,
+        rahu_kala: data.rahu_kala,
+        yamaganda: data.yamaganda,
+        gulika_kala: data.gulika_kala,
+      } as any,
     };
   },
 });

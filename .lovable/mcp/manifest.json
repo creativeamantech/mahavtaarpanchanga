@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "sdk_version": "3.1.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "panchanga-power",
+      "version": "1.0.0",
+      "title": "Panchanga Power"
+    },
+    "tools": [
+      {
+        "name": "get_panchanga",
+        "title": "Get Daily Panchanga",
+        "description": "Fetch the complete Vedic Panchanga (almanac) for a given date and location, including Tithi, Nakshatra, Yoga, Karana, Vara, Masa, Paksha, sunrise/sunset, Rahu Kala, Yamaganda, and Gulika Kala.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "api_key": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Your API key from the Panchanga Power Users sheet."
+            },
+            "date": {
+              "type": "string",
+              "pattern": "^\\d{2}\\/\\d{2}\\/\\d{4}$",
+              "description": "Date in DD/MM/YYYY format, e.g. '14/10/2026'."
+            },
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90,
+              "description": "Location latitude, e.g. 28.6139 for New Delhi."
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180,
+              "description": "Location longitude, e.g. 77.209 for New Delhi."
+            },
+            "timezone_offset": {
+              "type": "number",
+              "description": "UTC offset in decimal hours, e.g. 5.5 for IST (UTC+5:30)."
+            },
+            "city": {
+              "description": "City name for display purposes.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "api_key",
+            "date",
+            "latitude",
+            "longitude",
+            "timezone_offset"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_muhurtas",
+        "title": "Get Auspicious Timings",
+        "description": "Fetch auspicious and inauspicious timings (Muhurtas) for a given date and location: Brahma Muhurta, Abhijit Muhurta, Amrita Kala, Choghadiya, and Hora breakdown.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "api_key": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Your API key from the Panchanga Power Users sheet."
+            },
+            "date": {
+              "type": "string",
+              "pattern": "^\\d{2}\\/\\d{2}\\/\\d{4}$",
+              "description": "Date in DD/MM/YYYY format, e.g. '14/10/2026'."
+            },
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90,
+              "description": "Location latitude."
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180,
+              "description": "Location longitude."
+            },
+            "timezone_offset": {
+              "type": "number",
+              "description": "UTC offset in decimal hours, e.g. 5.5 for IST."
+            },
+            "city": {
+              "description": "City name for display purposes.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "api_key",
+            "date",
+            "latitude",
+            "longitude",
+            "timezone_offset"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_planetary_positions",
+        "title": "Get Planetary Positions",
+        "description": "Fetch Vedic (sidereal) planetary positions for a given date and location: longitude, rashi (sign), nakshatra, degree, and whether each planet is combust, retrograde, or exalted.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "api_key": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Your API key from the Panchanga Power Users sheet."
+            },
+            "date": {
+              "type": "string",
+              "pattern": "^\\d{2}\\/\\d{2}\\/\\d{4}$",
+              "description": "Date in DD/MM/YYYY format, e.g. '14/10/2026'."
+            },
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90,
+              "description": "Location latitude."
+            },
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180,
+              "description": "Location longitude."
+            },
+            "timezone_offset": {
+              "type": "number",
+              "description": "UTC offset in decimal hours, e.g. 5.5 for IST."
+            }
+          },
+          "required": [
+            "api_key",
+            "date",
+            "latitude",
+            "longitude",
+            "timezone_offset"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

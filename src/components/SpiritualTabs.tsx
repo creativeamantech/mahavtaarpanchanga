@@ -128,7 +128,7 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
   return (
     <nav
       id="category-navigation"
-      className={`sticky top-[96px] sm:top-[104px] z-40 border-b transition-colors shadow-2xs ${
+      className={`shrink-0 z-30 border-b transition-colors shadow-2xs ${
         isNight
           ? "bg-[#0E1322]/95 border-indigo-950/70 text-slate-300 backdrop-blur-md"
           : "bg-white/95 border-[#E4E2DD] text-stone-700 backdrop-blur-md"

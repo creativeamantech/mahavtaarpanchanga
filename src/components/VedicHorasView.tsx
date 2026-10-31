@@ -7,10 +7,9 @@ import {
   resolveCurrentHora,
   CurrentHoraData,
 } from "../horaEngine";
-import { Sun, Moon, Clock, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
+import { Sun, Moon, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { PanchangaResponse } from "../types";
 import { Language } from "../i18n";
-import { exportHorasToExcel } from "../services/excelExportService";
 
 export function VedicHorasView({
   panchangaData,

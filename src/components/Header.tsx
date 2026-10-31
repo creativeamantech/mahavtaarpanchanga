@@ -168,12 +168,16 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  // Compact mobile date string (e.g., "Tue, 31 Oct") vs full desktop string
-  const mobileDateDisplay = currentDateObj.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
+  // Full readable mobile date string (e.g., "शनिवार, 31 अक्टूबर 2026" / "Saturday, 31 October 2026")
+  const mobileFullDateDisplay = currentDateObj.toLocaleDateString(
+    lang === "hi" ? "hi-IN" : "en-US",
+    {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    },
+  );
 
   const desktopDateDisplay = currentDateObj.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", {
     weekday: "short",
@@ -203,7 +207,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       id="app-header"
-      className="sticky top-0 z-40 w-full bg-surface-1/95 backdrop-blur-md border-b border-border-subtle text-text-1 transition-colors"
+      className="shrink-0 z-40 w-full bg-surface-1/95 backdrop-blur-md border-b border-border-subtle text-text-1 transition-colors"
     >
       {/* Hidden native date input shared by mobile and desktop */}
       <input
@@ -215,90 +219,138 @@ export const Header: React.FC<HeaderProps> = ({
         className="sr-only"
       />
 
-      {/* ─── MOBILE TOP BAR (56px, 3 clean elements: Location | Date | Lang) ─── */}
-      <div className="flex lg:hidden items-center justify-between h-14 px-3 gap-2">
-        {/* Left: Location Pill */}
-        <div className="flex items-center gap-1 min-w-0 shrink">
-          <button
-            type="button"
-            onClick={onOpenLocation}
-            aria-label={`${lang === "hi" ? "स्थान बदलें" : "Change location"}: ${currentCity}`}
-            className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 hover:bg-surface-3 border border-border-subtle px-2.5 py-1.5 text-xs font-semibold text-text-1 min-h-[38px] max-w-[125px] cursor-pointer"
-          >
-            {isDeviceLocation ? (
-              <span className="h-2 w-2 rounded-full bg-auspicious shrink-0" />
-            ) : (
-              <MapPin className="w-3.5 h-3.5 text-saffron shrink-0" />
-            )}
-            <span className="truncate">{shortCityName}</span>
-          </button>
-
-          {onDetectDeviceLocation && (
+      {/* ─── MOBILE HEADER (< 1024px): Row 1 (Location & Controls) + Row 2 (Full Date Bar) ─── */}
+      <div className="flex flex-col lg:hidden">
+        {/* Row 1: Brand/Home, Location + GPS, Language & Theme */}
+        <div className="flex items-center justify-between h-12 px-3 gap-2 border-b border-border-subtle/70">
+          {/* Left: Home Hub + Location Pill + GPS */}
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
             <button
               type="button"
-              onClick={onDetectDeviceLocation}
-              disabled={isDetectingLocation}
-              aria-label={t.useDeviceLocation}
-              title={t.useDeviceLocation}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-2 border border-border-subtle text-text-2 hover:text-text-1 shrink-0 cursor-pointer"
+              onClick={() => onViewChange("home")}
+              aria-label={lang === "hi" ? "मुख्य पृष्ठ" : "Home Hub"}
+              className={`inline-flex h-8 w-8 items-center justify-center rounded-full border text-sm shrink-0 transition-colors cursor-pointer ${
+                activeView === "home"
+                  ? "bg-saffron text-white border-saffron shadow-2xs"
+                  : "bg-surface-2 hover:bg-surface-3 border-border-subtle text-saffron"
+              }`}
             >
-              {isDetectingLocation ? (
-                <Loader2 className="h-3.5 w-3.5 text-saffron animate-spin" />
+              🕉️
+            </button>
+
+            <button
+              type="button"
+              onClick={onOpenLocation}
+              aria-label={`${lang === "hi" ? "स्थान बदलें" : "Change location"}: ${currentCity}`}
+              className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 hover:bg-surface-3 border border-border-subtle px-3 py-1 text-xs font-semibold text-text-1 min-h-[34px] max-w-[175px] sm:max-w-[240px] cursor-pointer"
+            >
+              {isDeviceLocation ? (
+                <span className="h-2 w-2 rounded-full bg-auspicious shrink-0" />
               ) : (
-                <Navigation className="h-3.5 w-3.5" />
+                <MapPin className="w-3.5 h-3.5 text-saffron shrink-0" />
+              )}
+              <span className="truncate">{shortCityName}</span>
+            </button>
+
+            {onDetectDeviceLocation && (
+              <button
+                type="button"
+                onClick={onDetectDeviceLocation}
+                disabled={isDetectingLocation}
+                aria-label={t.useDeviceLocation}
+                title={t.useDeviceLocation}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 border border-border-subtle text-text-2 hover:text-text-1 shrink-0 cursor-pointer"
+              >
+                {isDetectingLocation ? (
+                  <Loader2 className="h-3.5 w-3.5 text-saffron animate-spin" />
+                ) : (
+                  <Navigation className="h-3.5 w-3.5" />
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Right: Language Segmented Switch + Theme Toggle */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="flex items-center rounded-full bg-surface-2 p-0.5 border border-border-subtle">
+              {(["en", "hi"] as Language[]).map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => onLangChange(l)}
+                  className={`rounded-full px-2.5 py-1 text-xs font-bold transition-all cursor-pointer ${
+                    lang === l
+                      ? "bg-saffron text-white shadow-2xs"
+                      : "text-text-2 hover:text-text-1"
+                  }`}
+                >
+                  {l === "en" ? "EN" : "हिं"}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={onToggleTheme}
+              title={isNight ? t.switchToParchment : t.switchToNightSky}
+              aria-label={isNight ? t.switchToParchment : t.switchToNightSky}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 hover:bg-surface-3 border border-border-subtle text-text-1 transition-colors cursor-pointer"
+            >
+              {isNight ? (
+                <Sun className="h-3.5 w-3.5 text-saffron" />
+              ) : (
+                <Moon className="h-3.5 w-3.5 text-info" />
               )}
             </button>
-          )}
+          </div>
         </div>
 
-        {/* Center: Date Stepper + Tap to pick date */}
-        <div className="flex items-center gap-0.5 bg-surface-2/80 border border-border-subtle rounded-full px-1 py-0.5 min-w-0">
+        {/* Row 2: Dedicated Full-Width Date Stepper & Vedic Masa/Paksha/Vaara Bar */}
+        <div className="flex items-center justify-between px-3 py-1.5 bg-surface-2/45 gap-2">
           <button
             type="button"
             onClick={handlePrevDay}
             aria-label={lang === "hi" ? "पिछला दिन" : "Previous day"}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-text-2 hover:text-text-1 hover:bg-surface-3 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-1 hover:bg-surface-2 border border-border-subtle text-text-1 shadow-2xs shrink-0 cursor-pointer active:scale-95 transition-transform"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
 
-          <button
-            type="button"
-            onClick={openNativeDatePicker}
-            className="px-1.5 py-1 text-xs font-bold text-text-1 truncate tabular-time cursor-pointer"
-          >
-            {mobileDateDisplay}
-          </button>
-
-          {!isCurrentDayToday() && (
+          <div className="flex items-center justify-center gap-2 min-w-0 flex-1">
             <button
               type="button"
-              onClick={handleToday}
-              className="px-1.5 py-0.5 rounded-full bg-saffron text-white text-xs font-bold cursor-pointer"
+              onClick={openNativeDatePicker}
+              className="flex flex-col items-center justify-center min-w-0 px-2 py-0.5 rounded-lg hover:bg-surface-2/80 transition-colors cursor-pointer"
             >
-              {lang === "hi" ? "आज" : "Today"}
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-text-1 font-devanagari leading-tight">
+                <CalendarIcon className="w-3.5 h-3.5 text-saffron shrink-0" />
+                <span className="truncate">{mobileFullDateDisplay}</span>
+              </div>
+              {panchangaData && (
+                <div className="text-xs text-saffron font-semibold font-devanagari leading-tight truncate max-w-full mt-0.5">
+                  {getVedicSubtitle()}
+                </div>
+              )}
             </button>
-          )}
+
+            {!isCurrentDayToday() && (
+              <button
+                type="button"
+                onClick={handleToday}
+                className="px-2.5 py-1 rounded-full bg-saffron text-white text-xs font-bold shrink-0 shadow-2xs cursor-pointer"
+              >
+                {lang === "hi" ? "आज" : "Today"}
+              </button>
+            )}
+          </div>
 
           <button
             type="button"
             onClick={handleNextDay}
             aria-label={lang === "hi" ? "अगला दिन" : "Next day"}
-            className="flex h-8 w-8 items-center justify-center rounded-full text-text-2 hover:text-text-1 hover:bg-surface-3 cursor-pointer"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-1 hover:bg-surface-2 border border-border-subtle text-text-1 shadow-2xs shrink-0 cursor-pointer active:scale-95 transition-transform"
           >
             <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Right: Language Quick-Toggle */}
-        <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={() => onLangChange(lang === "hi" ? "en" : "hi")}
-            aria-label={lang === "hi" ? "Switch to English" : "हिन्दी में बदलें"}
-            className="inline-flex items-center justify-center rounded-full bg-surface-2 border border-border-subtle px-2.5 py-1.5 text-xs font-bold text-text-1 min-h-[38px] min-w-[42px] cursor-pointer"
-          >
-            {lang === "hi" ? "EN" : "हिं"}
           </button>
         </div>
       </div>

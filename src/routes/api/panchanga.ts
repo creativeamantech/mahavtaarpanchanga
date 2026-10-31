@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { CoordinateSelection, MonthSystem } from "../../types";
+import { readSession } from "../../lib/auth/sheetsUserAuth.server";
 
 export const Route = createFileRoute("/api/panchanga")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        if (!readSession(request)) {
+          return Response.json({ error: "Authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+        }
         const { initPanchangaEngine, computePanchanga, computePanchangaCustom } =
           await import("../../lib/panchangaEngine.server");
         initPanchangaEngine();
@@ -46,7 +50,7 @@ export const Route = createFileRoute("/api/panchanga")({
           return Response.json(result, {
             headers: {
               "Cache-Control": "public, max-age=1800, stale-while-revalidate=86400",
-              "Access-Control-Allow-Origin": "*",
+              "Vary": "Cookie",
             },
           });
         } catch (err: unknown) {

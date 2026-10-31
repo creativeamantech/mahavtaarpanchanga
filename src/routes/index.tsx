@@ -1,5 +1,6 @@
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
+import { AuthGate } from "../components/auth/AuthGate";
 
 const PanchangaApp = lazy(() => import("../PanchangaApp"));
 
@@ -24,7 +25,7 @@ function Index() {
   return (
     <ClientOnly fallback={<div className="min-h-screen" />}>
       <Suspense fallback={<div className="min-h-screen" />}>
-        <PanchangaApp />
+        <AuthGate><PanchangaApp /></AuthGate>
       </Suspense>
     </ClientOnly>
   );

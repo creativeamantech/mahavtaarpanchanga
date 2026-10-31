@@ -43,8 +43,11 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   }
 
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
-    setUser(null);
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
+    } finally {
+      setUser(null);
+    }
   }
 
   if (checking) return <main className="min-h-screen grid place-items-center bg-[#0b0f19] text-amber-100">Checking secure session…</main>;
@@ -77,5 +80,13 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     </main>
   );
 
-  return <>{children}</>;
+  return (
+    <div className="min-h-screen">
+      <div className="flex items-center justify-end gap-3 border-b border-slate-700 bg-[#0b0f19] px-4 py-2 text-sm text-slate-300">
+        <span>{user.fullName || user.username}</span>
+        <button type="button" onClick={handleLogout} className="rounded-md border border-amber-300/30 px-3 py-1.5 text-amber-200 hover:bg-amber-300/10">Sign out</button>
+      </div>
+      {children}
+    </div>
+  );
 }

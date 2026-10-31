@@ -8,7 +8,7 @@ Spreadsheet ID: `1NN45ok4QVJGlTLD_uHK_a-BBWlK5Hp6XaWw2rHa9Hp8`
 
 Configure these variables in the deployment platform's server-side environment (never as `VITE_*` variables):
 
-- `PANCHANGA_USERS_SPREADSHEET_ID`: the spreadsheet ID above.
+- `PANCHANGA_AUTH_SPREADSHEET_ID`: the spreadsheet ID above.
 - `LOVABLE_API_KEY`: the existing Lovable connector gateway credential.
 - `GOOGLE_SHEETS_API_KEY`: the existing Google Sheets connection key.
 - `PANCHANGA_SESSION_SECRET`: a random secret of at least 32 bytes, used to sign sessions.

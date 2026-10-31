@@ -24,6 +24,7 @@ import {
   GRAHA_TRANSLATIONS,
   getLocalizedRasi,
   getLocalizedNakshatra,
+  getRasiNadiLabel,
 } from "../i18n";
 
 interface PlanetTransitionsCardProps {
@@ -416,6 +417,8 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
                 {todayEvents.map((ev) => {
                   const status = getLiveTransitStatus(ev.timestamp, now, lang);
+                  const rasiNadi =
+                    ev.type === "rasi" ? getRasiNadiLabel(ev.toName || ev.toValue, lang) : null;
                   return (
                     <div
                       key={ev.id}
@@ -425,7 +428,7 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                           : "bg-white/80 border-amber-200/70 text-stone-800"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between flex-wrap gap-1">
                         <div className="flex items-center space-x-2">
                           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-950 font-bold text-xs">
                             {ev.symbol}
@@ -437,6 +440,17 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                           <span className="font-semibold text-stone-900 dark:text-stone-100">
                             {ev.toName || ev.toValue}
                           </span>
+                          {rasiNadi && (
+                            <span
+                              className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold border ${
+                                rasiNadi.nadi === "pingala"
+                                  ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                                  : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                              }`}
+                            >
+                              {rasiNadi.nadi === "pingala" ? "🔴" : "🔵"} {rasiNadi.shortLabel}
+                            </span>
+                          )}
                         </div>
                         {ev.specialName && (
                           <span className="rounded-md bg-amber-200/80 px-1.5 py-0.5 text-[10px] font-bold text-amber-950">
@@ -585,6 +599,31 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                     </span>
                   </div>
 
+                  {(() => {
+                    const currentRasiNadi = getRasiNadiLabel(
+                      planet.currentRasiNumber || planet.currentRasi,
+                      lang,
+                    );
+                    if (!currentRasiNadi) return null;
+                    return (
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-stone-200/40 dark:border-indigo-900/30">
+                        <span className={isNight ? "text-slate-400" : "text-stone-500"}>
+                          {lang === "hi" ? "राशि अनुसार नाड़ी" : "Rāśi Nadi"}:
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border ${
+                            currentRasiNadi.nadi === "pingala"
+                              ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                              : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                          }`}
+                        >
+                          <span>{currentRasiNadi.nadi === "pingala" ? "🔴" : "🔵"}</span>
+                          <span>{currentRasiNadi.label}</span>
+                        </span>
+                      </div>
+                    );
+                  })()}
+
                   <div className="flex items-center justify-between text-xs pt-1 border-t border-stone-200/40 dark:border-indigo-900/30">
                     <span className={isNight ? "text-slate-400" : "text-stone-500"}>
                       {lang === "hi" ? "नक्षत्र व चरण" : "Nakshatra"}:
@@ -624,11 +663,32 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                         )}
                       </div>
 
-                      <div className="flex items-center justify-between pt-1.5">
-                        <span className="text-sm font-bold font-devanagari text-stone-900 dark:text-slate-100">
-                          → {nextRasi.toName || nextRasi.toValue}
-                        </span>
-                        <div className="text-right text-[11px] font-mono text-stone-600 dark:text-slate-400">
+                      <div className="flex items-center justify-between pt-1.5 gap-2">
+                        <div className="flex items-center flex-wrap gap-1.5">
+                          <span className="text-sm font-bold font-devanagari text-stone-900 dark:text-slate-100">
+                            → {nextRasi.toName || nextRasi.toValue}
+                          </span>
+                          {(() => {
+                            const nextRasiNadi = getRasiNadiLabel(
+                              nextRasi.toName || nextRasi.toValue,
+                              lang,
+                            );
+                            if (!nextRasiNadi) return null;
+                            return (
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                  nextRasiNadi.nadi === "pingala"
+                                    ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                                    : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                                }`}
+                              >
+                                {nextRasiNadi.nadi === "pingala" ? "🔴" : "🔵"}{" "}
+                                {nextRasiNadi.shortLabel}
+                              </span>
+                            );
+                          })()}
+                        </div>
+                        <div className="text-right text-[11px] font-mono text-stone-600 dark:text-slate-400 shrink-0">
                           <div>{nextRasi.dateStr}</div>
                           <div className="text-[10px] text-stone-500 dark:text-slate-500">
                             {nextRasi.timeStr} ({nextRasi.dayOfWeek})
@@ -830,6 +890,22 @@ export const PlanetTransitionsCard: React.FC<PlanetTransitionsCardProps> = ({
                               ? "नक्षत्र"
                               : "Nakṣatra"}
                         </span>
+                        {ev.type === "rasi" &&
+                          (() => {
+                            const rasiNadi = getRasiNadiLabel(ev.toName || ev.toValue, lang);
+                            if (!rasiNadi) return null;
+                            return (
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.2 rounded-full text-[10px] font-bold border ${
+                                  rasiNadi.nadi === "pingala"
+                                    ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                                    : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                                }`}
+                              >
+                                {rasiNadi.nadi === "pingala" ? "🔴" : "🔵"} {rasiNadi.label}
+                              </span>
+                            );
+                          })()}
                         {ev.isToday && (
                           <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/80 px-2 py-0.2 text-[10px] font-bold">
                             {lang === "hi" ? "आज" : "TODAY"}

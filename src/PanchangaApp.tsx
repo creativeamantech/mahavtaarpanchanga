@@ -15,7 +15,6 @@ import { RunningNowWidget } from "./components/RunningNowWidget";
 import { NextMajorIngressWidget } from "./components/NextMajorIngressWidget";
 import { PlanetaryPositionsCard } from "./components/PlanetaryPositionsCard";
 import { PlanetTransitionsCard } from "./components/PlanetTransitionsCard";
-import { MonthlyCalendarView } from "./components/MonthlyCalendarView";
 import { GoogleCalendarSyncModal } from "./components/GoogleCalendarSyncModal";
 import { GoogleSheetsModal } from "./components/GoogleSheetsModal";
 import { LocationModal } from "./components/LocationModal";
@@ -933,21 +932,13 @@ export default function App() {
             </div>
           </div>
 
-          {/* Section 4: Calendar & Festivals */}
+          {/* Section 4: Festivals & Sync */}
           <div>
             <div className="text-[10px] font-bold uppercase tracking-wider text-stone-400/90 mb-2 px-2.5 font-sans flex items-center justify-between">
-              <span>{lang === "hi" ? "मासिक पंचांग व पर्व" : "Calendar & Festivals"}</span>
+              <span>{lang === "hi" ? "पर्व व सिंक" : "Festivals & Sync"}</span>
               <span className="text-[9px] text-amber-600/70 font-mono">04</span>
             </div>
             <div className="space-y-1">
-              <NavItem
-                icon={CalendarDays}
-                label={t.views.calendar}
-                subLabel={lang === "hi" ? "सम्पूर्ण मास की तिथियाँ व वार" : "Complete Month Grid"}
-                isActive={activeView === "calendar"}
-                onClick={() => setActiveView("calendar")}
-                theme={theme}
-              />
               <NavItem
                 icon={Flame}
                 label={t.views.festivals}
@@ -1556,40 +1547,6 @@ export default function App() {
                       <VedicHorasView
                         panchangaData={panchangaData}
                         lang={lang}
-                        onOpenGoogleSheets={() => setIsGoogleSheetsOpen(true)}
-                      />
-                    </section>
-                  </div>
-                )}
-
-                {/* View: Monthly Calendar */}
-                {activeView === "calendar" && (
-                  <div
-                    id="view-month-calendar"
-                    className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto"
-                  >
-                    <div className="flex items-center space-x-3 mb-8">
-                      <div className="h-px bg-gradient-to-r from-transparent to-amber-200/80 flex-1"></div>
-                      <h2 className="text-sm font-bold uppercase tracking-widest text-amber-800 flex items-center gap-2 px-2">
-                        <Calendar className="w-4 h-4 text-amber-600" />
-                        {lang === "hi" ? "मासिक पंचांग" : "Monthly Calendar"}
-                      </h2>
-                      <div className="h-px bg-gradient-to-l from-transparent to-amber-200/80 flex-1"></div>
-                    </div>
-
-                    <section className="space-y-6">
-                      <MonthlyCalendarView
-                        currentCity={currentCity}
-                        customCoords={customCoords}
-                        monthSystem={monthSystem}
-                        ayanamsa={ayanamsa}
-                        currentDateStr={currentDate}
-                        onSelectDate={(newDate) => {
-                          setCurrentDate(newDate);
-                          setActiveView("panchanga");
-                        }}
-                        lang={lang}
-                        onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
                         onOpenGoogleSheets={() => setIsGoogleSheetsOpen(true)}
                       />
                     </section>

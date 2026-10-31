@@ -1,7 +1,5 @@
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
-
-const PanchangaApp = lazy(() => import("../PanchangaApp"));
+import PanchangaApp from "../PanchangaApp";
 
 const description =
   "High-precision observational Hindu lunisolar calendar (Drik Panchanga) with accurate Tithi, Nakshatra, Yoga, Karana, auspicious timings, planetary positions and transits.";
@@ -22,10 +20,8 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <ClientOnly fallback={<div className="min-h-screen" />}>
-      <Suspense fallback={<div className="min-h-screen" />}>
-        <PanchangaApp />
-      </Suspense>
+    <ClientOnly fallback={<div className="min-h-screen bg-[#0b0f19]" />}>
+      <PanchangaApp />
     </ClientOnly>
   );
 }

@@ -135,17 +135,6 @@ export const ALL_VIEW_METAS: ViewMeta[] = [
     category: "esoteric",
   },
   {
-    id: "calendar",
-    titleEn: "Monthly Calendar",
-    titleHi: "मासिक पंचांग",
-    sanskrit: "मासिक पञ्चाङ्ग पत्रकम्",
-    descEn:
-      "Complete month-at-a-glance grid with Shukla/Krishna Pakshas, Sankrantis and moon phases",
-    descHi: "मासिक पंचांग ग्रिड, शुक्ल व कृष्ण पक्ष, संक्रांति, एकादशी व चंद्र कलाएं",
-    icon: "📅",
-    category: "calendar",
-  },
-  {
     id: "festivals",
     titleEn: "Festivals & Vratas",
     titleHi: "पर्व, व्रत व त्यौहार",

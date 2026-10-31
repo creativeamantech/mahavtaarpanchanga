@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,12 +14,16 @@ import {
   User as UserIcon,
   LogOut,
   ShieldCheck,
+  Search,
+  Share2,
+  MapPin,
 } from "lucide-react";
 import { type Language, translations } from "../i18n";
 import type { AppTheme, PanchangaResponse } from "../types";
 import { PWAInstallButton } from "./PWAInstallButton";
 import { getLocalizedMasa, getLocalizedPaksha, getLocalizedVaara } from "../i18n";
 import type { AppUser } from "../services/userAuthService";
+import { KeyHint } from "./ds";
 
 export type ActiveView =
   | "home"
@@ -54,6 +58,7 @@ interface HeaderProps {
   onOpenSettings: () => void;
   onOpenCalendarSync?: () => void;
   onOpenGoogleSheets?: () => void;
+  onOpenCommandPalette?: () => void;
   onPrint: () => void;
   lang: Language;
   onLangChange: (lang: Language) => void;
@@ -66,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentCity,
   isDeviceLocation = false,
   isDetectingLocation = false,
-  activeView = "home",
+  activeView = "today",
   panchangaData,
   currentUser,
   onLogout,
@@ -78,6 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSettings,
   onOpenCalendarSync,
   onOpenGoogleSheets,
+  onOpenCommandPalette,
   onPrint,
   lang,
   onLangChange,
@@ -86,8 +92,8 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const t = translations[lang];
   const dateInputRef = useRef<HTMLInputElement>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
-  // Parse dd/mm/yyyy to standard date object
   const parseDateStr = (str: string): Date => {
     const parts = str.split("/");
     if (parts.length === 3) {
@@ -129,7 +135,6 @@ export const Header: React.FC<HeaderProps> = ({
     return currentDate === todayStr;
   };
 
-  // Convert dd/mm/yyyy to yyyy-mm-dd for input[type=date]
   const dateParts = currentDate.split("/");
   const inputDateVal =
     dateParts.length === 3
@@ -144,391 +149,447 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  // Formatted Gregorian Date (e.g., Monday, 14 September 2026)
-  const gregorianDisplay = currentDateObj.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", {
-    weekday: "long",
+  const openNativeDatePicker = () => {
+    try {
+      const inputEl = dateInputRef.current as HTMLInputElement & { showPicker?: () => void };
+      if (inputEl) {
+        if (typeof inputEl.showPicker === "function") {
+          try {
+            inputEl.showPicker();
+            return;
+          } catch {
+            // Ignore cross-origin iframe restrictions
+          }
+        }
+        inputEl.click();
+      }
+    } catch {
+      dateInputRef.current?.focus();
+    }
+  };
+
+  // Compact mobile date string (e.g., "Tue, 31 Oct") vs full desktop string
+  const mobileDateDisplay = currentDateObj.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", {
+    weekday: "short",
     day: "numeric",
-    month: "long",
+    month: "short",
+  });
+
+  const desktopDateDisplay = currentDateObj.toLocaleDateString(lang === "hi" ? "hi-IN" : "en-US", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
     year: "numeric",
   });
 
-  // Formatted Vedic Date
-  const getVedicDisplay = () => {
-    if (panchangaData) {
-      let rawMasa = panchangaData.masa || "";
-      if (rawMasa.includes("Adhika")) {
-        const base = rawMasa.replace("Adhika ", "").trim();
-        const translatedBase = getLocalizedMasa(base, lang);
-        rawMasa = lang === "hi" ? `अधिक ${translatedBase}` : `Adhika ${translatedBase}`;
-      } else {
-        rawMasa = getLocalizedMasa(rawMasa, lang);
-      }
-
-      const rawPaksha = panchangaData.paksha ? getLocalizedPaksha(panchangaData.paksha, lang) : "";
-      const rawVaara = panchangaData.vaara ? getLocalizedVaara(panchangaData.vaara, lang) : "";
-
-      if (lang === "hi") {
-        return `${rawMasa} ${rawPaksha} पक्ष · ${rawVaara}`;
-      } else {
-        return `${rawMasa} · ${rawPaksha} Paksha · ${rawVaara}`;
-      }
+  const getVedicSubtitle = () => {
+    if (!panchangaData) return "";
+    let rawMasa = panchangaData.masa || "";
+    if (rawMasa.includes("Adhika")) {
+      const base = rawMasa.replace("Adhika ", "").trim();
+      const translatedBase = getLocalizedMasa(base, lang);
+      rawMasa = lang === "hi" ? `अधिक ${translatedBase}` : `Adhika ${translatedBase}`;
+    } else {
+      rawMasa = getLocalizedMasa(rawMasa, lang);
     }
-    const vaarasEn = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const vaarasHi = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
-    const dayIdx = currentDateObj.getDay();
-    return lang === "hi"
-      ? `वैदिक पंचांग · ${vaarasHi[dayIdx]}`
-      : `Drik Almanac · ${vaarasEn[dayIdx]}`;
+    const rawPaksha = panchangaData.paksha ? getLocalizedPaksha(panchangaData.paksha, lang) : "";
+    const rawVaara = panchangaData.vaara ? getLocalizedVaara(panchangaData.vaara, lang) : "";
+    return `${rawMasa} · ${rawPaksha} · ${rawVaara}`;
   };
 
   const isNight = theme === "nightSky";
+  const shortCityName = currentCity.split(",")[0].trim();
 
   return (
     <header
       id="app-header"
-      className={`sticky top-0 z-50 transition-all duration-200 border-b shadow-md w-full overflow-hidden ${
-        isNight
-          ? "bg-[#0B0F1E] border-indigo-900/50 shadow-black/50 text-white"
-          : "bg-[#1A1F5E] border-[#15194D] shadow-indigo-950/20 text-white"
-      }`}
+      className="sticky top-0 z-40 w-full bg-surface-1/95 backdrop-blur-md border-b border-border-subtle text-text-1 transition-colors"
     >
-      {/* ─── HEADER TOP ─────────────────────────────────────────── */}
-      <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8 w-full">
-        <div className="flex items-center justify-between h-14 sm:h-16 gap-1 sm:gap-3 w-full">
-          {/* App Name & Sacred Vedic Branding with Home Link */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2.5 min-w-0 shrink">
+      {/* Hidden native date input shared by mobile and desktop */}
+      <input
+        ref={dateInputRef}
+        type="date"
+        value={inputDateVal}
+        onChange={handleDateInputChange}
+        aria-label={lang === "hi" ? "तिथि चुनें" : "Choose Date"}
+        className="sr-only"
+      />
+
+      {/* ─── MOBILE TOP BAR (56px, 3 clean elements: Location | Date | Lang) ─── */}
+      <div className="flex lg:hidden items-center justify-between h-14 px-3 gap-2">
+        {/* Left: Location Pill */}
+        <div className="flex items-center gap-1 min-w-0 shrink">
+          <button
+            type="button"
+            onClick={onOpenLocation}
+            aria-label={`${lang === "hi" ? "स्थान बदलें" : "Change location"}: ${currentCity}`}
+            className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 hover:bg-surface-3 border border-border-subtle px-2.5 py-1.5 text-xs font-semibold text-text-1 min-h-[38px] max-w-[125px] cursor-pointer"
+          >
+            {isDeviceLocation ? (
+              <span className="h-2 w-2 rounded-full bg-auspicious shrink-0" />
+            ) : (
+              <MapPin className="w-3.5 h-3.5 text-saffron shrink-0" />
+            )}
+            <span className="truncate">{shortCityName}</span>
+          </button>
+
+          {onDetectDeviceLocation && (
             <button
               type="button"
-              onClick={() => onViewChange?.("home")}
-              className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl shadow-inner border transition-all hover:scale-105 cursor-pointer ${
-                activeView === "home"
-                  ? "bg-amber-500 text-stone-950 border-amber-300 ring-2 ring-amber-400/50 shadow-md"
-                  : isNight
-                    ? "bg-indigo-950/80 border-indigo-700/60 text-[#F0C96A] hover:bg-indigo-900"
-                    : "bg-white/10 border-white/15 text-[#F0C96A] hover:bg-white/20"
-              }`}
-              title={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
-              aria-label="Home Hub"
+              onClick={onDetectDeviceLocation}
+              disabled={isDetectingLocation}
+              aria-label={t.useDeviceLocation}
+              title={t.useDeviceLocation}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface-2 border border-border-subtle text-text-2 hover:text-text-1 shrink-0 cursor-pointer"
             >
-              <span className="font-serif-vedic font-bold text-base sm:text-xl leading-none">
-                ॐ
-              </span>
-            </button>
-
-            <div
-              className="flex flex-col cursor-pointer group min-w-0 shrink"
-              onClick={() => onViewChange?.("home")}
-              title={lang === "hi" ? "मुख्य पृष्ठ (होम हब)" : "Home Hub"}
-            >
-              <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-                <span className="font-serif-vedic font-bold text-xs xs:text-sm sm:text-base text-[#F0C96A] tracking-tight leading-tight group-hover:underline decoration-amber-400/50 truncate max-w-[110px] xs:max-w-[150px] sm:max-w-none">
-                  Mahavtaar Panchanga
-                </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider bg-white/15 text-amber-200 border border-white/20 shrink-0">
-                  Drik
-                </span>
-              </div>
-              <span className="hidden xs:flex text-[9px] sm:text-[10px] font-devanagari text-white/60 tracking-wider leading-none mt-0.5 items-center gap-1 truncate">
-                <span>महावतार पञ्चाङ्ग</span>
-                <span className="text-[8px] sm:text-[9px] text-amber-400/80 shrink-0">
-                  • {lang === "hi" ? "होम" : "Home"}
-                </span>
-              </span>
-            </div>
-
-            {/* Quick Home Pill Button */}
-            <button
-              type="button"
-              onClick={() => onViewChange?.("home")}
-              className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold transition-all border shrink-0 ${
-                activeView === "home"
-                  ? "bg-amber-500 text-stone-950 border-amber-400 shadow-xs"
-                  : "bg-white/10 hover:bg-white/20 border-white/15 text-amber-300"
-              }`}
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span>{lang === "hi" ? "होम हब" : "Home"}</span>
-            </button>
-          </div>
-
-          {/* Action Bar */}
-          <div className="flex items-center justify-end gap-1 sm:gap-1.5 shrink-0 min-w-0">
-            {/* Location Pill */}
-            <div className="flex items-center space-x-1 shrink-0">
-              <button
-                type="button"
-                onClick={onOpenLocation}
-                className="flex items-center space-x-1 rounded-full bg-white/10 hover:bg-white/18 border border-white/15 px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs font-semibold text-white/90 transition-colors shadow-2xs max-w-[85px] xs:max-w-[115px] sm:max-w-[160px] min-w-0 shrink"
-                title={isDeviceLocation ? `${currentCity} (Active GPS)` : "Change Location"}
-              >
-                {isDeviceLocation ? (
-                  <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
-                  </span>
-                ) : (
-                  <span className="text-[10px] sm:text-xs shrink-0">📍</span>
-                )}
-                <span className="truncate text-[10px] sm:text-xs">{currentCity}</span>
-              </button>
-
-              {onDetectDeviceLocation && (
-                <button
-                  type="button"
-                  onClick={onDetectDeviceLocation}
-                  disabled={isDetectingLocation}
-                  className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
-                  title={t.useDeviceLocation}
-                  aria-label={t.useDeviceLocation}
-                >
-                  {isDetectingLocation ? (
-                    <Loader2 className="h-3.5 w-3.5 text-[#F0C96A] animate-spin" />
-                  ) : (
-                    <Navigation className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                  )}
-                </button>
-              )}
-            </div>
-
-            {/* Language Switcher */}
-            <div className="flex items-center rounded-lg bg-white/10 p-0.5 border border-white/15 shrink-0">
-              {(["en", "hi"] as Language[]).map((l) => (
-                <button
-                  key={l}
-                  type="button"
-                  onClick={() => onLangChange(l)}
-                  className={`rounded-md px-1.5 sm:px-2 py-0.5 sm:py-1 text-[9px] sm:text-[10px] font-bold uppercase transition-all tracking-wider ${
-                    lang === l
-                      ? "bg-[#F0C96A] text-[#1A1F5E] shadow-xs font-black"
-                      : "text-white/70 hover:text-white"
-                  }`}
-                >
-                  {l === "en" ? "EN" : "HI"}
-                </button>
-              ))}
-            </div>
-
-            {/* Theme Toggle Button */}
-            <button
-              type="button"
-              id="theme-toggle-btn"
-              onClick={onToggleTheme}
-              className="flex h-7 w-7 sm:h-8 sm:w-auto sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
-              title={isNight ? t.switchToParchment : t.switchToNightSky}
-              aria-label={isNight ? t.switchToParchment : t.switchToNightSky}
-            >
-              {isNight ? (
-                <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#F0C96A] fill-[#F0C96A]/20" />
+              {isDetectingLocation ? (
+                <Loader2 className="h-3.5 w-3.5 text-saffron animate-spin" />
               ) : (
-                <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-200 fill-amber-200/20" />
+                <Navigation className="h-3.5 w-3.5" />
               )}
-              <span className="hidden sm:inline text-[10px] sm:text-xs font-semibold">
-                {lang === "hi" ? "थीम" : "Theme"}
-              </span>
             </button>
-
-            {/* Google Calendar Sync Button (Desktop/Tablet) */}
-            {onOpenCalendarSync && (
-              <button
-                type="button"
-                onClick={onOpenCalendarSync}
-                className="hidden sm:flex h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-[#F0C96A] transition-colors shrink-0 cursor-pointer"
-                title={lang === "hi" ? "गूगल कैलेंडर दैनिक सिंक" : "Google Calendar Daily Sync"}
-                aria-label={lang === "hi" ? "गूगल कैलेंडर सिंक" : "Google Calendar Sync"}
-              >
-                <CalendarIcon className="h-4 w-4 text-[#F0C96A]" />
-                <span className="text-xs font-semibold">
-                  {lang === "hi" ? "कैलेंडर" : "Calendar"}
-                </span>
-              </button>
-            )}
-
-            {/* Google Sheets Sync & Export Button */}
-            {onOpenGoogleSheets && (
-              <button
-                type="button"
-                onClick={onOpenGoogleSheets}
-                className="hidden md:flex h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-300 hover:text-white transition-colors shrink-0 cursor-pointer"
-                title={
-                  lang === "hi" ? "गूगल शीट्स एक्सपोर्ट व सिंक" : "Google Sheets Export & Sync"
-                }
-                aria-label={lang === "hi" ? "गूगल शीट्स" : "Google Sheets"}
-              >
-                <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
-                <span className="text-xs font-semibold">
-                  {lang === "hi" ? "शीट्स" : "Sheets"}
-                </span>
-              </button>
-            )}
-
-            {/* Print Button */}
-            <button
-              type="button"
-              onClick={onPrint}
-              className="hidden md:flex h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
-              title={lang === "hi" ? "प्रिंट / PDF" : "Print / PDF Almanac"}
-              aria-label="Print"
-            >
-              <Printer className="h-4 w-4" />
-              <span className="text-xs font-semibold">{lang === "hi" ? "प्रिंट" : "Print"}</span>
-            </button>
-
-            {/* Settings Button */}
-            <button
-              type="button"
-              onClick={onOpenSettings}
-              className="hidden sm:flex h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
-              title={t.settings}
-              aria-label={t.settings}
-            >
-              <Settings className="h-4 w-4" />
-              <span className="text-xs font-semibold">
-                {lang === "hi" ? "सेटिंग्स" : "Settings"}
-              </span>
-            </button>
-
-            {/* Admin Management Button (Visible if user has admin role) */}
-            {currentUser?.role === "admin" && onOpenAdminUsers && (
-              <button
-                type="button"
-                onClick={onOpenAdminUsers}
-                className="hidden sm:flex h-8 px-2.5 items-center justify-center gap-1.5 rounded-lg bg-amber-500/25 hover:bg-amber-500/40 border border-amber-400/60 text-amber-300 hover:text-white transition-all shadow-xs cursor-pointer"
-                title={lang === "hi" ? "यूजर एवं एक्सेस प्रबंधन" : "User & Access Management"}
-                aria-label={lang === "hi" ? "एडमिन" : "Admin"}
-              >
-                <ShieldCheck className="h-4 w-4 text-amber-400" />
-                <span className="text-xs font-bold uppercase tracking-wider">
-                  {lang === "hi" ? "एडमिन" : "Admin"}
-                </span>
-              </button>
-            )}
-
-            {/* Logged In User Pill & Logout (Desktop/Tablet) */}
-            {currentUser && (
-              <div className="hidden sm:flex items-center gap-1 pl-1 border-l border-white/15 shrink-0">
-                <div
-                  className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/10 border border-white/15 text-xs text-white/90"
-                  title={`${currentUser.fullName} (${currentUser.username}) - ${currentUser.role}`}
-                >
-                  <UserIcon className="h-3.5 w-3.5 text-amber-400" />
-                  <span className="text-[11px] font-semibold max-w-[90px] truncate">
-                    {currentUser.fullName.split(" ")[0]}
-                  </span>
-                  <span
-                    className={`text-[9px] font-extrabold px-1 py-0.2 rounded uppercase ${
-                      currentUser.role === "admin"
-                        ? "bg-amber-400/20 text-amber-300 border border-amber-400/30"
-                        : "bg-white/15 text-white/80"
-                    }`}
-                  >
-                    {currentUser.role}
-                  </span>
-                </div>
-
-                {onLogout && (
-                  <button
-                    type="button"
-                    onClick={onLogout}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/15 hover:bg-rose-500/30 border border-rose-400/40 text-rose-300 hover:text-white transition-colors cursor-pointer shrink-0"
-                    title={lang === "hi" ? "लॉगआउट करें" : "Sign Out"}
-                    aria-label="Logout"
-                  >
-                    <LogOut className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
-            )}
-
-            <PWAInstallButton />
-          </div>
+          )}
         </div>
-      </div>
 
-      {/* ─── DATE STRIP ─────────────────────────────────────────── */}
-      <div
-        className={`border-t px-2 sm:px-4 lg:px-8 py-1.5 transition-colors w-full ${
-          isNight ? "border-indigo-900/40 bg-black/20" : "border-white/10 bg-black/15"
-        }`}
-      >
-        <div className="mx-auto max-w-7xl flex items-center justify-between gap-1 w-full">
-          {/* Previous Day */}
+        {/* Center: Date Stepper + Tap to pick date */}
+        <div className="flex items-center gap-0.5 bg-surface-2/80 border border-border-subtle rounded-full px-1 py-0.5 min-w-0">
           <button
             type="button"
             onClick={handlePrevDay}
-            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/85 text-base sm:text-lg transition-colors leading-none shrink-0 cursor-pointer"
-            title="Previous Day"
-            aria-label="Previous Day"
+            aria-label={lang === "hi" ? "पिछला दिन" : "Previous day"}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-text-2 hover:text-text-1 hover:bg-surface-3 cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
 
-          {/* Date Center Info */}
-          <div className="flex flex-col items-center justify-center text-center px-1 cursor-pointer group min-w-0 flex-1">
-            <div className="flex items-center gap-1 sm:gap-2 max-w-full min-w-0">
-              <span
-                onClick={() => {
-                  try {
-                    const inputEl = dateInputRef.current as any;
-                    if (inputEl) {
-                      if (typeof inputEl.showPicker === "function") {
-                        try {
-                          inputEl.showPicker();
-                          return;
-                        } catch {
-                          // Ignore cross-origin iframe restrictions
-                        }
-                      }
-                      inputEl.click();
-                    }
-                  } catch {
-                    dateInputRef.current?.focus();
-                  }
-                }}
-                className="text-[11px] sm:text-sm font-semibold text-white/95 tracking-wide group-hover:text-[#F0C96A] transition-colors flex items-center gap-1 sm:gap-1.5 truncate max-w-full"
-              >
-                <CalendarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#F0C96A]/80 inline-block shrink-0" />
-                <span className="truncate">{gregorianDisplay}</span>
-              </span>
+          <button
+            type="button"
+            onClick={openNativeDatePicker}
+            className="px-1.5 py-1 text-xs font-bold text-text-1 truncate tabular-time cursor-pointer"
+          >
+            {mobileDateDisplay}
+          </button>
 
-              {!isCurrentDayToday() && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToday();
-                  }}
-                  className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold bg-[#D4680A] text-white hover:bg-[#E5761A] transition-colors uppercase tracking-wider shrink-0"
-                >
-                  {t.today}
-                </button>
-              )}
-            </div>
+          {!isCurrentDayToday() && (
+            <button
+              type="button"
+              onClick={handleToday}
+              className="px-1.5 py-0.5 rounded-full bg-saffron text-white text-xs font-bold cursor-pointer"
+            >
+              {lang === "hi" ? "आज" : "Today"}
+            </button>
+          )}
 
-            <span className="text-[9px] sm:text-xs font-devanagari text-[#F0A44A] mt-0.5 tracking-wide truncate max-w-full">
-              {getVedicDisplay()}
-            </span>
-
-            {/* Hidden native input for custom date selection */}
-            <input
-              ref={dateInputRef}
-              type="date"
-              value={inputDateVal}
-              onChange={handleDateInputChange}
-              className="sr-only"
-              tabIndex={-1}
-            />
-          </div>
-
-          {/* Next Day */}
           <button
             type="button"
             onClick={handleNextDay}
-            className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 text-white/85 text-base sm:text-lg transition-colors leading-none shrink-0 cursor-pointer"
-            title="Next Day"
-            aria-label="Next Day"
+            aria-label={lang === "hi" ? "अगला दिन" : "Next day"}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-text-2 hover:text-text-1 hover:bg-surface-3 cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
+        </div>
+
+        {/* Right: Language Quick-Toggle */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => onLangChange(lang === "hi" ? "en" : "hi")}
+            aria-label={lang === "hi" ? "Switch to English" : "हिन्दी में बदलें"}
+            className="inline-flex items-center justify-center rounded-full bg-surface-2 border border-border-subtle px-2.5 py-1.5 text-xs font-bold text-text-1 min-h-[38px] min-w-[42px] cursor-pointer"
+          >
+            {lang === "hi" ? "EN" : "हिं"}
+          </button>
+        </div>
+      </div>
+
+      {/* ─── DESKTOP TOP BAR (>= 1024px) ────────────────────────────────────── */}
+      <div className="hidden lg:flex items-center justify-between h-16 px-6 gap-4 max-w-[1600px] mx-auto">
+        {/* Left: Date Stepper + Vedic Subtitle */}
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            type="button"
+            onClick={() => onViewChange("home")}
+            aria-label={lang === "hi" ? "होम हब" : "Home Hub"}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-colors cursor-pointer ${
+              activeView === "home"
+                ? "bg-saffron text-white border-saffron"
+                : "bg-surface-2 hover:bg-surface-3 text-text-1 border-border-subtle"
+            }`}
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>{lang === "hi" ? "होम" : "Hub"}</span>
+          </button>
+
+          <div className="flex items-center gap-1 bg-surface-2 border border-border-subtle rounded-xl p-1">
+            <button
+              type="button"
+              onClick={handlePrevDay}
+              aria-label="Previous Day"
+              title="Previous Day (←)"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-2 hover:text-text-1 hover:bg-surface-1 transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={openNativeDatePicker}
+              className="flex items-center gap-2 px-2.5 py-1 rounded-lg hover:bg-surface-1 text-left transition-colors cursor-pointer"
+            >
+              <CalendarIcon className="w-4 h-4 text-saffron shrink-0" />
+              <div>
+                <div className="text-xs font-bold text-text-1 tabular-time leading-tight">
+                  {desktopDateDisplay}
+                </div>
+                {panchangaData && (
+                  <div className="text-xs text-text-2 font-devanagari leading-tight truncate max-w-[230px]">
+                    {getVedicSubtitle()}
+                  </div>
+                )}
+              </div>
+            </button>
+
+            {!isCurrentDayToday() && (
+              <button
+                type="button"
+                onClick={handleToday}
+                title="Jump to Today (T)"
+                className="px-2.5 py-1 rounded-lg bg-saffron text-white text-xs font-bold hover:opacity-95 transition-opacity cursor-pointer"
+              >
+                {lang === "hi" ? "आज" : "Today"}
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleNextDay}
+              aria-label="Next Day"
+              title="Next Day (→)"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-2 hover:text-text-1 hover:bg-surface-1 transition-colors cursor-pointer"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Location Pill */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={onOpenLocation}
+              title="Change Location (/)"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border-subtle px-3 py-2 text-xs font-semibold text-text-1 transition-colors cursor-pointer"
+            >
+              {isDeviceLocation ? (
+                <span className="h-2 w-2 rounded-full bg-auspicious shrink-0" />
+              ) : (
+                <MapPin className="w-3.5 h-3.5 text-saffron shrink-0" />
+              )}
+              <span className="max-w-[150px] truncate">{currentCity}</span>
+            </button>
+
+            {onDetectDeviceLocation && (
+              <button
+                type="button"
+                onClick={onDetectDeviceLocation}
+                disabled={isDetectingLocation}
+                title={t.useDeviceLocation}
+                aria-label={t.useDeviceLocation}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-2 hover:bg-surface-3 border border-border-subtle text-text-2 hover:text-text-1 transition-colors cursor-pointer"
+              >
+                {isDetectingLocation ? (
+                  <Loader2 className="h-4 w-4 text-saffron animate-spin" />
+                ) : (
+                  <Navigation className="h-4 w-4" />
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Center: Command Palette Search Trigger */}
+        {onOpenCommandPalette && (
+          <button
+            type="button"
+            onClick={onOpenCommandPalette}
+            className="flex items-center justify-between gap-3 w-64 xl:w-80 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border-subtle px-3 py-2 text-xs text-text-2 transition-colors cursor-pointer"
+          >
+            <span className="flex items-center gap-2 truncate font-devanagari">
+              <Search className="w-3.5 h-3.5 text-saffron shrink-0" />
+              <span>
+                {lang === "hi"
+                  ? "व्यू, शहर या वैदिक शब्द खोजें..."
+                  : "Search views, cities, terms..."}
+              </span>
+            </span>
+            <KeyHint keys="⌘K" />
+          </button>
+        )}
+
+        {/* Right: Language, Theme, Share & Export, Settings, User */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Language Segmented Switch */}
+          <div className="flex items-center rounded-xl bg-surface-2 p-0.5 border border-border-subtle">
+            {(["en", "hi"] as Language[]).map((l) => (
+              <button
+                key={l}
+                type="button"
+                onClick={() => onLangChange(l)}
+                className={`rounded-lg px-2.5 py-1 text-xs font-bold uppercase transition-all cursor-pointer ${
+                  lang === l
+                    ? "bg-surface-1 text-text-1 shadow-2xs"
+                    : "text-text-2 hover:text-text-1"
+                }`}
+              >
+                {l === "en" ? "EN" : "हिं"}
+              </button>
+            ))}
+          </div>
+
+          {/* Theme Toggle */}
+          <button
+            type="button"
+            id="theme-toggle-btn"
+            onClick={onToggleTheme}
+            title={isNight ? t.switchToParchment : t.switchToNightSky}
+            aria-label={isNight ? t.switchToParchment : t.switchToNightSky}
+            className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border-subtle px-3 text-xs font-semibold text-text-1 transition-colors cursor-pointer"
+          >
+            {isNight ? (
+              <Sun className="h-4 w-4 text-saffron" />
+            ) : (
+              <Moon className="h-4 w-4 text-info" />
+            )}
+            <span className="hidden xl:inline">
+              {isNight
+                ? lang === "hi"
+                  ? "पर्चमेंट"
+                  : "Light"
+                : lang === "hi"
+                  ? "नाइट स्काई"
+                  : "Dark"}
+            </span>
+          </button>
+
+          {/* Consolidated Share & Export Menu */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowExportMenu((prev) => !prev)}
+              aria-expanded={showExportMenu}
+              aria-label={lang === "hi" ? "सिंक एवं एक्सपोर्ट" : "Sync & Export"}
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-surface-2 hover:bg-surface-3 border border-border-subtle px-3 text-xs font-semibold text-text-1 transition-colors cursor-pointer"
+            >
+              <Share2 className="h-3.5 w-3.5 text-saffron" />
+              <span>{lang === "hi" ? "सिंक / प्रिंट" : "Sync & Export"}</span>
+            </button>
+
+            {showExportMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowExportMenu(false)}
+                  aria-hidden="true"
+                />
+                <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-surface-1 border border-border-subtle shadow-xl p-1.5 z-50 space-y-1">
+                  {onOpenCalendarSync && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowExportMenu(false);
+                        onOpenCalendarSync();
+                      }}
+                      className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-text-1 hover:bg-surface-2 text-left cursor-pointer"
+                    >
+                      <CalendarIcon className="w-4 h-4 text-saffron" />
+                      <span>
+                        {lang === "hi" ? "Google Calendar सिंक" : "Google Calendar Sync"}
+                      </span>
+                    </button>
+                  )}
+                  {onOpenGoogleSheets && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowExportMenu(false);
+                        onOpenGoogleSheets();
+                      }}
+                      className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-text-1 hover:bg-surface-2 text-left cursor-pointer"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 text-auspicious" />
+                      <span>
+                        {lang === "hi" ? "Google Sheets एक्सपोर्ट" : "Google Sheets Export"}
+                      </span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowExportMenu(false);
+                      onPrint();
+                    }}
+                    className="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-text-1 hover:bg-surface-2 text-left cursor-pointer"
+                  >
+                    <Printer className="w-4 h-4 text-info" />
+                    <span>{lang === "hi" ? "प्रिंट / PDF पंचांग" : "Print / Save PDF"}</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Settings */}
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            title={t.settings}
+            aria-label={t.settings}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-surface-2 hover:bg-surface-3 border border-border-subtle text-text-1 transition-colors cursor-pointer"
+          >
+            <Settings className="h-4 w-4" />
+          </button>
+
+          {/* Admin Access */}
+          {currentUser?.role === "admin" && onOpenAdminUsers && (
+            <button
+              type="button"
+              onClick={onOpenAdminUsers}
+              title={lang === "hi" ? "यूजर एवं एक्सेस प्रबंधन" : "User & Access Management"}
+              aria-label="Admin Access Control"
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-saffron-lt border border-saffron/30 px-2.5 text-xs font-bold text-saffron cursor-pointer"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span className="hidden xl:inline">{lang === "hi" ? "एडमिन" : "Admin"}</span>
+            </button>
+          )}
+
+          {/* User Pill + Logout */}
+          {currentUser && (
+            <div className="flex items-center gap-1 pl-1 border-l border-border-subtle">
+              <div
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-surface-2 border border-border-subtle text-xs text-text-1"
+                title={`${currentUser.fullName} (@${currentUser.username})`}
+              >
+                <UserIcon className="h-3.5 w-3.5 text-saffron" />
+                <span className="font-semibold max-w-[85px] truncate">
+                  {currentUser.fullName.split(" ")[0]}
+                </span>
+              </div>
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  title={lang === "hi" ? "लॉगआउट करें" : "Sign Out"}
+                  aria-label="Logout"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-inauspicious-subtle border border-inauspicious/30 text-inauspicious hover:opacity-90 transition-opacity cursor-pointer"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+
+          <PWAInstallButton />
         </div>
       </div>
     </header>

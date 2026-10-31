@@ -15,6 +15,7 @@ import {
   GRAHA_TRANSLATIONS,
   getLocalizedRasi,
   getLocalizedNakshatra,
+  getRasiNadiLabel,
 } from "../i18n";
 import { KundaliChart } from "./KundaliChart";
 import { PlanetTransitionsCard } from "./PlanetTransitionsCard";
@@ -302,10 +303,30 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
                       >
                         {rasiLabel}
                       </div>
-                      <div
-                        className={`text-[11px] ${isNight ? "text-slate-400" : "text-stone-400"}`}
-                      >
-                        #{planet.rasiNumber}
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span
+                          className={`text-[11px] ${isNight ? "text-slate-400" : "text-stone-400"}`}
+                        >
+                          #{planet.rasiNumber}
+                        </span>
+                        {(() => {
+                          const rasiNadi = getRasiNadiLabel(
+                            planet.rasiNumber || planet.rasi,
+                            lang,
+                          );
+                          if (!rasiNadi) return null;
+                          return (
+                            <span
+                              className={`inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold border ${
+                                rasiNadi.nadi === "pingala"
+                                  ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                                  : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                              }`}
+                            >
+                              {rasiNadi.nadi === "pingala" ? "🔴" : "🔵"} {rasiNadi.shortLabel}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </td>
 
@@ -380,7 +401,7 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
                     <td className="px-3.5 py-3.5">
                       {nextRasi ? (
                         <div className="text-xs space-y-0.5">
-                          <div className="flex items-center space-x-1">
+                          <div className="flex items-center flex-wrap gap-1">
                             <span
                               className={`font-bold ${isNight ? "text-amber-500" : "text-amber-700"}`}
                             >
@@ -391,6 +412,24 @@ export const PlanetaryPositionsCard: React.FC<PlanetaryPositionsCardProps> = ({
                             >
                               {nextRasi.toName || nextRasi.toValue}
                             </span>
+                            {(() => {
+                              const nextNadi = getRasiNadiLabel(
+                                nextRasi.toName || nextRasi.toValue,
+                                lang,
+                              );
+                              if (!nextNadi) return null;
+                              return (
+                                <span
+                                  className={`inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-bold border ${
+                                    nextNadi.nadi === "pingala"
+                                      ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                                      : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                                  }`}
+                                >
+                                  {nextNadi.nadi === "pingala" ? "🔴" : "🔵"} {nextNadi.shortLabel}
+                                </span>
+                              );
+                            })()}
                           </div>
                           <div
                             className={`text-[11px] font-medium ${isNight ? "text-amber-300" : "text-amber-900"}`}

@@ -64,13 +64,6 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       isActive: false,
     },
     {
-      id: "calendar",
-      label: lang === "hi" ? "कैलेंडर" : "Calendar",
-      icon: CalendarDays,
-      onClick: () => onViewChange("calendar"),
-      isActive: activeView === "calendar",
-    },
-    {
       id: "sync",
       label: lang === "hi" ? "सिंक" : "Sync",
       icon: CalendarSync,
@@ -122,7 +115,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         }`}
         style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 6px)" }}
       >
-        <div className="grid grid-cols-6 h-14 max-w-lg mx-auto items-stretch px-1">
+        <div className="grid grid-cols-5 h-14 max-w-lg mx-auto items-stretch px-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (

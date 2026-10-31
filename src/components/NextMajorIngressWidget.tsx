@@ -1,7 +1,13 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { Sparkles, ArrowRight, Orbit, Calendar, Clock } from "lucide-react";
 import type { PanchangaResponse, PlanetTransitionEvent, AppTheme } from "../types";
-import { type Language, translations, GRAHA_TRANSLATIONS, getLocalizedRasi } from "../i18n";
+import {
+  type Language,
+  translations,
+  GRAHA_TRANSLATIONS,
+  getLocalizedRasi,
+  getRasiNadiLabel,
+} from "../i18n";
 
 interface NextMajorIngressWidgetProps {
   data: PanchangaResponse;
@@ -158,18 +164,48 @@ export const NextMajorIngressWidget: React.FC<NextMajorIngressWidgetProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-3 mt-1">
+          <div className="flex items-center flex-wrap gap-2.5 mt-1">
             <span
               className={`text-sm font-medium ${isNight ? "text-slate-400" : "text-stone-500"}`}
             >
               {fromRasi}
             </span>
+            {(() => {
+              const fromNadi = getRasiNadiLabel(nextMajorIngress.fromName, lang);
+              if (!fromNadi) return null;
+              return (
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                    fromNadi.nadi === "pingala"
+                      ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                      : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                  }`}
+                >
+                  {fromNadi.nadi === "pingala" ? "🔴" : "🔵"} {fromNadi.shortLabel}
+                </span>
+              );
+            })()}
             <ArrowRight className={`w-4 h-4 ${isNight ? "text-slate-600" : "text-stone-400"}`} />
             <span
               className={`text-sm font-bold ${isNight ? "text-indigo-300" : "text-indigo-700"}`}
             >
               {toRasi}
             </span>
+            {(() => {
+              const toNadi = getRasiNadiLabel(nextMajorIngress.toName, lang);
+              if (!toNadi) return null;
+              return (
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                    toNadi.nadi === "pingala"
+                      ? "bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-950/70 dark:text-orange-300 dark:border-orange-800/60"
+                      : "bg-sky-100 text-sky-800 border-sky-300 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800/60"
+                  }`}
+                >
+                  {toNadi.nadi === "pingala" ? "🔴" : "🔵"} {toNadi.label}
+                </span>
+              );
+            })()}
           </div>
 
           <div

@@ -39,8 +39,27 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Semantic Vedic UI Tokens */
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-text-1: var(--text-1);
+  --color-text-2: var(--text-2);
+  --color-text-3: var(--text-3);
+  --color-border-subtle: var(--border-subtle);
+  --color-auspicious: var(--auspicious);
+  --color-auspicious-subtle: var(--auspicious-subtle);
+  --color-inauspicious: var(--inauspicious);
+  --color-inauspicious-subtle: var(--inauspicious-subtle);
+  --color-caution: var(--caution);
+  --color-caution-subtle: var(--caution-subtle);
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+
   /* Vedic Spiritual Accent Tokens */
   --color-saffron: var(--saffron);
+  --color-saffron-lt: var(--saffron-lt);
   --color-saffron-light: var(--saffron-light);
   --color-saffron-dark: var(--saffron-dark);
   --color-indigo-temple: var(--indigo-temple);
@@ -56,106 +75,146 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --font-serif: "Noto Serif", "Cinzel", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", "Noto Sans Devanagari", system-ui, -apple-system, sans-serif;
+  --font-serif: "Noto Serif", "Noto Serif Devanagari", Georgia, serif;
   --font-devanagari: "Noto Sans Devanagari", "Noto Serif Devanagari", sans-serif;
 }
 
 :root {
   --radius: 0.75rem;
 
-  /* Parchment Light Mode (Warm sacred cream and deep stone ink) */
-  --background: #fbf9f5;
-  --foreground: #1c1917;
-  --card: #ffffff;
-  --card-foreground: #1c1917;
-  --popover: #ffffff;
-  --popover-foreground: #1c1917;
+  /* Parchment Light Mode — Semantic Surfaces & Text */
+  --surface-0: #FAF8F3;
+  --surface-1: #FFFFFF;
+  --surface-2: #F4F0E6;
+  --surface-3: #ECE6D8;
+  --text-1: #18181B;
+  --text-2: #52515E;
+  --text-3: #7A7889;
+  --border-subtle: #E6E2D8;
+
+  /* Auspiciousness & State Semantics (WCAG AA compliant) */
+  --auspicious: #0F766E;
+  --auspicious-subtle: #E3F6F3;
+  --inauspicious: #B4233C;
+  --inauspicious-subtle: #FDECEF;
+  --caution: #B45309;
+  --caution-subtle: #FEF3DC;
+  --info: #283593;
+  --info-subtle: #EEF0FB;
+
+  --background: #FAF8F3;
+  --foreground: #18181B;
+  --card: #FFFFFF;
+  --card-foreground: #18181B;
+  --popover: #FFFFFF;
+  --popover-foreground: #18181B;
 
   /* Primary: Sacred Saffron-Ochre */
-  --primary: #c25206;
-  --primary-foreground: #ffffff;
+  --primary: #D4680A;
+  --primary-foreground: #FFFFFF;
 
-  --secondary: #f4ede2;
-  --secondary-foreground: #431407;
+  --secondary: #F4F0E6;
+  --secondary-foreground: #18181B;
 
-  --muted: #f3efe8;
-  --muted-foreground: #78716c;
+  --muted: #F4F0E6;
+  --muted-foreground: #52515E;
 
-  --accent: #fef3c7;
-  --accent-foreground: #78350f;
+  --accent: #FEF0E0;
+  --accent-foreground: #78350F;
 
-  --destructive: #b91c1c;
-  --destructive-foreground: #ffffff;
+  --destructive: #B4233C;
+  --destructive-foreground: #FFFFFF;
 
-  --border: #e7e2d7;
-  --input: #e7e2d7;
-  --ring: #c25206;
+  --border: #E6E2D8;
+  --input: #E6E2D8;
+  --ring: #D4680A;
 
   /* Vedic Specific */
-  --saffron: #d95f08;
-  --saffron-light: #fff4eb;
-  --saffron-dark: #9a3d02;
-  --indigo-temple: #1e1b4b;
-  --amber-sacred: #d97706;
-  --parchment: #fbf9f5;
+  --saffron: #D4680A;
+  --saffron-lt: #FEF0E0;
+  --saffron-light: #FFF4EB;
+  --saffron-dark: #9A3D02;
+  --indigo-temple: #1A1F5E;
+  --amber-sacred: #D97706;
+  --parchment: #FAF8F3;
 
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1c1917;
-  --sidebar-primary: #c25206;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fbf6ee;
-  --sidebar-accent-foreground: #1c1917;
-  --sidebar-border: #e7e2d7;
-  --sidebar-ring: #c25206;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #18181B;
+  --sidebar-primary: #D4680A;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F4F0E6;
+  --sidebar-accent-foreground: #18181B;
+  --sidebar-border: #E6E2D8;
+  --sidebar-ring: #D4680A;
 }
 
 .dark,
 [data-theme="nightSky"],
 .theme-night-sky {
-  /* Night Sky Dark Mode (Cosmic deep indigo, obsidian navy, golden starlight) */
-  --background: #0b0f19;
-  --foreground: #f1f5f9;
-  --card: #121826;
-  --card-foreground: #f1f5f9;
-  --popover: #121826;
-  --popover-foreground: #f1f5f9;
+  /* Night Sky Dark Mode — Semantic Surfaces & Text */
+  --surface-0: #0B0F1E;
+  --surface-1: #12182C;
+  --surface-2: #18203A;
+  --surface-3: #202A4A;
+  --text-1: #F3F4F8;
+  --text-2: #B3B9CC;
+  --text-3: #7E869E;
+  --border-subtle: rgba(148, 163, 196, 0.16);
 
-  --primary: #f59e0b;
-  --primary-foreground: #0f172a;
+  /* Auspiciousness & State Semantics — Night Sky */
+  --auspicious: #2DD4BF;
+  --auspicious-subtle: rgba(45, 212, 191, 0.14);
+  --inauspicious: #FB7185;
+  --inauspicious-subtle: rgba(251, 113, 133, 0.14);
+  --caution: #FBBF24;
+  --caution-subtle: rgba(251, 191, 36, 0.14);
+  --info: #818CF8;
+  --info-subtle: rgba(129, 140, 248, 0.14);
 
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
+  --background: #0B0F1E;
+  --foreground: #F3F4F8;
+  --card: #12182C;
+  --card-foreground: #F3F4F8;
+  --popover: #12182C;
+  --popover-foreground: #F3F4F8;
 
-  --muted: #1a2234;
-  --muted-foreground: #94a3b8;
+  --primary: #F59E0B;
+  --primary-foreground: #0B0F1E;
 
-  --accent: #232d46;
-  --accent-foreground: #fbbf24;
+  --secondary: #18203A;
+  --secondary-foreground: #F3F4F8;
 
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --muted: #18203A;
+  --muted-foreground: #B3B9CC;
 
-  --border: rgba(148, 163, 184, 0.16);
-  --input: rgba(148, 163, 184, 0.2);
-  --ring: #f59e0b;
+  --accent: #202A4A;
+  --accent-foreground: #FBBF24;
+
+  --destructive: #FB7185;
+  --destructive-foreground: #0B0F1E;
+
+  --border: rgba(148, 163, 196, 0.16);
+  --input: rgba(148, 163, 196, 0.2);
+  --ring: #F59E0B;
 
   /* Vedic Specific in Dark */
-  --saffron: #f59e0b;
+  --saffron: #F59E0B;
+  --saffron-lt: rgba(245, 158, 11, 0.15);
   --saffron-light: rgba(245, 158, 11, 0.12);
-  --saffron-dark: #fbbf24;
-  --indigo-temple: #312e81;
-  --amber-sacred: #fbbf24;
-  --parchment: #121826;
+  --saffron-dark: #FBBF24;
+  --indigo-temple: #312E81;
+  --amber-sacred: #FBBF24;
+  --parchment: #12182C;
 
-  --sidebar: #0e1424;
-  --sidebar-foreground: #f1f5f9;
-  --sidebar-primary: #f59e0b;
-  --sidebar-primary-foreground: #0f172a;
-  --sidebar-accent: #172036;
-  --sidebar-accent-foreground: #f1f5f9;
-  --sidebar-border: rgba(99, 102, 241, 0.2);
-  --sidebar-ring: #f59e0b;
+  --sidebar: #12182C;
+  --sidebar-foreground: #F3F4F8;
+  --sidebar-primary: #F59E0B;
+  --sidebar-primary-foreground: #0B0F1E;
+  --sidebar-accent: #18203A;
+  --sidebar-accent-foreground: #F3F4F8;
+  --sidebar-border: rgba(148, 163, 196, 0.16);
+  --sidebar-ring: #F59E0B;
 }
 
 @layer base {
@@ -164,61 +223,105 @@
   }
 
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    font-family:
+      "Plus Jakarta Sans",
+      "Noto Sans Devanagari",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
+    background-color: var(--surface-0);
+    color: var(--text-1);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    min-height: 100vh;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
   }
 
-  /* Safe Area Inset support for modern mobile devices (iPhone notch/pill) */
+  body.theme-night-sky,
+  [data-theme="nightSky"] body,
+  html.dark body {
+    background-color: var(--surface-0);
+    color: var(--text-1);
+  }
+
   :root {
     --safe-area-bottom: env(safe-area-inset-bottom, 0px);
     --safe-area-top: env(safe-area-inset-top, 0px);
   }
+
+  /* Prevent iOS auto-zoom on form focus */
+  @media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="search"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
-@layer base {
-  body {
-    font-family:
-      "Plus Jakarta Sans",
-      system-ui,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      Oxygen,
-      Ubuntu,
-      Cantarell,
-      sans-serif;
-    /* Default Parchment Theme */
-    background-color: #f6f4f0;
-    background-image:
-      radial-gradient(at 0% 0%, rgba(251, 237, 203, 0.4) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(235, 225, 240, 0.4) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(251, 237, 203, 0.4) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(220, 230, 245, 0.4) 0px, transparent 50%);
-    background-attachment: fixed;
-    color: #292524; /* stone-800 */
-    min-height: 100vh;
-    transition:
-      background-color 0.3s ease,
-      color 0.3s ease;
-  }
+/* Enforce 12px minimum typography floor across legacy micro-labels */
+.text-\[8px\],
+.text-\[9px\],
+.text-\[10px\],
+.text-\[11px\] {
+  font-size: 0.75rem !important;
+  line-height: 1.15rem !important;
+}
 
-  /* Night Sky Dark Theme (Deep Indigo & Charcoal for nighttime viewing) */
-  body.theme-night-sky,
-  [data-theme="nightSky"] body,
-  html.dark body {
-    background-color: #0b0f19;
-    background-image:
-      radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.75) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.85) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(30, 27, 75, 0.6) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(17, 24, 39, 0.8) 0px, transparent 50%);
-    background-attachment: fixed;
-    color: #f1f5f9;
-  }
+/* Typography Scale Utilities */
+.type-display {
+  font-family: var(--font-serif);
+  font-size: clamp(1.625rem, 2.5vw, 2rem);
+  line-height: 1.28;
+  font-weight: 700;
+}
+
+.type-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2vw, 1.5rem);
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.type-heading {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.type-body {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+.type-label {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.type-caption {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.tabular-time {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 @layer utilities {

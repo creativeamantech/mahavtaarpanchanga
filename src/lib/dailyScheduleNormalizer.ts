@@ -14,7 +14,7 @@
  */
 
 import type { PanchangaResponse, TimingInterval, Segment } from "../types";
-import type { Language } from "../i18n";
+import { type Language, getRasiNadiLabel } from "../i18n";
 import { computeDailyHoras } from "./horaEngine";
 import { computeSwaraYoga, parseTimeToMinutes } from "../swaraYoga";
 import { calculateTithiSwaraInfo } from "./tithiSwaraEngine";
@@ -1286,6 +1286,10 @@ export function normalizeDailySchedule(
       else if (pe.type === "direct") pType = "planetary-direct";
       else if (pe.type === "combust") pType = "planetary-combustion";
 
+      const rasiNadi =
+        pe.type === "rasi" ? getRasiNadiLabel(pe.toName || pe.toValue, lang) : null;
+      const nadiSuffix = rasiNadi ? ` · ${rasiNadi.label}` : "";
+
       events.push({
         id: `planetary-${pe.planetId || idx}-${pe.type}-${eventTimeMs}`,
         type: pType,
@@ -1293,11 +1297,11 @@ export function normalizeDailySchedule(
         category: "planetary",
         startTimeMs: eventTimeMs,
         endTimeMs: null,
-        title: `${pe.planetName} ${pe.specialName || pe.type.toUpperCase()}`,
-        subtitle: pe.description?.[lang] || pe.relativeText || `${pe.planetName} transit event`,
+        title: `${pe.planetName} → ${pe.toName || pe.toValue || pe.specialName || pe.type.toUpperCase()}${rasiNadi ? ` (${rasiNadi.shortLabel})` : ""}`,
+        subtitle: `${pe.description?.[lang] || pe.relativeText || `${pe.planetName} transit event`}${nadiSuffix}`,
         priority: EVENT_PRIORITIES[pType],
         colorTheme: getEventColorTheme(pType),
-        metadata: { ...pe },
+        metadata: { ...pe, nadi: rasiNadi?.nadi, nadiLabel: rasiNadi?.label },
       });
     });
   }

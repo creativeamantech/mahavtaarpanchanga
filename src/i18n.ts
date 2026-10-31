@@ -754,3 +754,111 @@ export function getLocalizedPaksha(pakshaName: string, lang: Language): string {
   if (!item) return pakshaName;
   return item[lang] || pakshaName;
 }
+
+export type RasiNadiType = "pingala" | "ida";
+
+/**
+ * Rashi-based Nadi mapping:
+ * Mesha (1): Pingala
+ * Vrishabha (2): Ida
+ * Mithuna (3): Pingala
+ * Karka (4): Ida
+ * Simha (5): Pingala
+ * Kanya (6): Ida
+ * Tula (7): Pingala
+ * Vrishchika (8): Ida
+ * Dhanu (9): Pingala
+ * Makara (10): Ida
+ * Kumbha (11): Pingala
+ * Meena (12): Ida
+ */
+export function getRasiNadi(
+  rasiNameOrNum: string | number | undefined | null,
+): RasiNadiType | null {
+  if (typeof rasiNameOrNum === "number" && rasiNameOrNum >= 1 && rasiNameOrNum <= 12) {
+    return rasiNameOrNum % 2 === 1 ? "pingala" : "ida";
+  }
+  if (!rasiNameOrNum) return null;
+  const s = String(rasiNameOrNum).toLowerCase().trim();
+
+  if (
+    s.includes("meṣa") ||
+    s.includes("mesha") ||
+    s.includes("aries") ||
+    s.includes("मेष") ||
+    s.includes("mithuna") ||
+    s.includes("gemini") ||
+    s.includes("मिथुन") ||
+    s.includes("siṃha") ||
+    s.includes("siṁha") ||
+    s.includes("simha") ||
+    s.includes("leo") ||
+    s.includes("सिंह") ||
+    s.includes("tulā") ||
+    s.includes("tula") ||
+    s.includes("libra") ||
+    s.includes("तुला") ||
+    s.includes("dhanu") ||
+    s.includes("sagittarius") ||
+    s.includes("धनु") ||
+    s.includes("kumbha") ||
+    s.includes("aquarius") ||
+    s.includes("कुम्भ") ||
+    s.includes("कुंभ")
+  ) {
+    return "pingala";
+  }
+
+  if (
+    s.includes("vṛṣabha") ||
+    s.includes("vrishabha") ||
+    s.includes("vrsabha") ||
+    s.includes("taurus") ||
+    s.includes("वृष") ||
+    s.includes("karka") ||
+    s.includes("cancer") ||
+    s.includes("कर्क") ||
+    s.includes("kanyā") ||
+    s.includes("kanya") ||
+    s.includes("virgo") ||
+    s.includes("कन्या") ||
+    s.includes("vṛścika") ||
+    s.includes("vrishchika") ||
+    s.includes("vrscika") ||
+    s.includes("scorpio") ||
+    s.includes("वृश्चिक") ||
+    s.includes("makara") ||
+    s.includes("capricorn") ||
+    s.includes("मकर") ||
+    s.includes("mīna") ||
+    s.includes("meena") ||
+    s.includes("mina") ||
+    s.includes("pisces") ||
+    s.includes("मीन")
+  ) {
+    return "ida";
+  }
+
+  return null;
+}
+
+export function getRasiNadiLabel(
+  rasiNameOrNum: string | number | undefined | null,
+  lang: Language,
+): { nadi: RasiNadiType; label: string; shortLabel: string } | null {
+  const nadi = getRasiNadi(rasiNameOrNum);
+  if (!nadi) return null;
+  if (nadi === "pingala") {
+    return {
+      nadi: "pingala",
+      label: lang === "hi" ? "पिंगला (सूर्य नाड़ी)" : "Pingala (Solar Nadi)",
+      shortLabel: lang === "hi" ? "पिंगला" : "Pingala",
+    };
+  }
+  return {
+    nadi: "ida",
+    label: lang === "hi" ? "इड़ा (चन्द्र नाड़ी)" : "Ida (Lunar Nadi)",
+    shortLabel: lang === "hi" ? "इड़ा" : "Ida",
+  };
+}
+

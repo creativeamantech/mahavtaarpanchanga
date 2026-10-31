@@ -317,11 +317,11 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
             {lang === "hi" ? "वर्ग:" : "Filter:"}
           </span>
           {[
-            { id: "all", labelHi: "सभी ऑप्शंस (13)", labelEn: "All (13)" },
+            { id: "all", labelHi: "सभी ऑप्शंस (12)", labelEn: "All (12)" },
             { id: "core", labelHi: "पंचांग व काल", labelEn: "Core Panchanga" },
             { id: "astrology", labelHi: "ज्योतिष व कुण्डली", labelEn: "Astrology" },
             { id: "esoteric", labelHi: "स्वरोदय व तत्व", labelEn: "Esoteric" },
-            { id: "calendar", labelHi: "कैलेंडर व पर्व", labelEn: "Calendar" },
+            { id: "calendar", labelHi: "पर्व व व्रत", labelEn: "Festivals" },
           ].map((cat) => (
             <button
               key={cat.id}

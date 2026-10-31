@@ -146,14 +146,8 @@ export const MobileMenuDrawer: React.FC<MobileMenuDrawerProps> = ({
       ],
     },
     {
-      title: lang === "hi" ? "मासिक पंचांग व पर्व" : "Calendar & Festivals",
+      title: lang === "hi" ? "पर्व एवं त्यौहार" : "Festivals & Vratas",
       items: [
-        {
-          id: "calendar" as ActiveView,
-          label: t.views.calendar,
-          desc: lang === "hi" ? "सम्पूर्ण मास की तिथियाँ, पक्ष व वार" : "Complete Month Calendar Grid",
-          icon: CalendarDays,
-        },
         {
           id: "festivals" as ActiveView,
           label: t.views.festivals,

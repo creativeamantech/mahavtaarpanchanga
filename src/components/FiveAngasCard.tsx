@@ -12,6 +12,7 @@ import {
   getLocalizedKarana,
   getLocalizedVaara,
 } from "../i18n";
+import { VedicTermTooltip } from "./VedicTermTooltip";
 
 interface FiveAngasCardProps {
   data: PanchangaResponse;
@@ -106,7 +107,9 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
           <h3
             className={`font-bold uppercase tracking-wider text-xs ${isNight ? "text-slate-300" : "text-stone-500"}`}
           >
-            {lang === "hi" ? "१. वार (दिन)" : "1. Vaara (Day)"}
+            <VedicTermTooltip term="vaara" lang={lang}>
+              {lang === "hi" ? "१. वार (दिन)" : "1. Vaara (Day)"}
+            </VedicTermTooltip>
           </h3>
         </div>
 
@@ -350,7 +353,14 @@ export const FiveAngasCard: React.FC<FiveAngasCardProps> = ({ data, lang, theme 
           <h3
             className={`font-bold uppercase tracking-wider text-xs ${isNight ? "text-slate-300" : "text-stone-500"}`}
           >
-            {index}. {title}
+            <VedicTermTooltip
+              term={
+                index === 2 ? "tithi" : index === 3 ? "nakshatra" : index === 4 ? "yoga" : "karana"
+              }
+              lang={lang}
+            >
+              {index}. {title}
+            </VedicTermTooltip>
           </h3>
         </div>
 

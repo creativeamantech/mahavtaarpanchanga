@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ShieldAlert, ShieldCheck, LayoutGrid, List } from "lucide-react";
 import type { PanchangaResponse, AppTheme } from "../types";
 import { type Language, translations } from "../i18n";
+import { VedicTermTooltip } from "./VedicTermTooltip";
 
 interface AuspiciousTimingsCardProps {
   data: PanchangaResponse;
@@ -88,7 +89,9 @@ export const AuspiciousTimingsCard: React.FC<AuspiciousTimingsCardProps> = ({
                   <span className="h-2 w-2 rounded-full bg-rose-500 shrink-0"></span>
                   <div>
                     <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
-                      {t.rahuKala}
+                      <VedicTermTooltip term="rahu_kala" lang={lang}>
+                        {t.rahuKala}
+                      </VedicTermTooltip>
                     </div>
                     <div className="text-[11px] text-stone-500 dark:text-slate-400">
                       {t.rahuKalaDesc}
@@ -107,7 +110,9 @@ export const AuspiciousTimingsCard: React.FC<AuspiciousTimingsCardProps> = ({
                     <span className="h-2 w-2 rounded-full bg-amber-500 shrink-0"></span>
                     <div>
                       <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
-                        {t.yamaganda}
+                        <VedicTermTooltip term="yamaganda" lang={lang}>
+                          {t.yamaganda}
+                        </VedicTermTooltip>
                       </div>
                       <div className="text-[11px] text-stone-500 dark:text-slate-400">
                         {t.yamagandaDesc}
@@ -225,7 +230,9 @@ export const AuspiciousTimingsCard: React.FC<AuspiciousTimingsCardProps> = ({
                     <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
                     <div>
                       <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
-                        {t.abhijit}
+                        <VedicTermTooltip term="abhijit" lang={lang}>
+                          {t.abhijit}
+                        </VedicTermTooltip>
                       </div>
                       <div className="text-[11px] text-stone-500 dark:text-slate-400">
                         {t.abhijitDesc}
@@ -245,7 +252,9 @@ export const AuspiciousTimingsCard: React.FC<AuspiciousTimingsCardProps> = ({
                     <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0"></span>
                     <div>
                       <div className="font-semibold text-xs sm:text-sm text-stone-900 dark:text-white">
-                        {t.amritaKala}
+                        <VedicTermTooltip term="amrit_kalam" lang={lang}>
+                          {t.amritaKala}
+                        </VedicTermTooltip>
                       </div>
                       <div className="text-[11px] text-stone-500 dark:text-slate-400">
                         {t.amritaKalaDesc}

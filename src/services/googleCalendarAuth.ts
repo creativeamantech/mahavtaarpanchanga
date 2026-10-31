@@ -14,7 +14,14 @@ import {
 } from "firebase/auth";
 import firebaseConfig from "../../firebase-applet-config.json";
 
-export const SCOPES = ["https://www.googleapis.com/auth/calendar.events"];
+export const SCOPES = [
+  "https://www.googleapis.com/auth/calendar.events",
+  "https://www.googleapis.com/auth/drive",
+  "https://www.googleapis.com/auth/drive.file",
+  "https://www.googleapis.com/auth/drive.readonly",
+  "https://www.googleapis.com/auth/spreadsheets",
+  "https://www.googleapis.com/auth/spreadsheets.readonly",
+];
 
 let app: any = null;
 let auth: any = null;

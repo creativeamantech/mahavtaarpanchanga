@@ -17,6 +17,7 @@ import { PlanetaryPositionsCard } from "./components/PlanetaryPositionsCard";
 import { PlanetTransitionsCard } from "./components/PlanetTransitionsCard";
 import { MonthlyCalendarView } from "./components/MonthlyCalendarView";
 import { GoogleCalendarSyncModal } from "./components/GoogleCalendarSyncModal";
+import { GoogleSheetsModal } from "./components/GoogleSheetsModal";
 import { LocationModal } from "./components/LocationModal";
 import { SettingsModal } from "./components/SettingsModal";
 import { PrintablePanchanga } from "./components/PrintablePanchanga";
@@ -28,6 +29,18 @@ import { FestivalsView } from "./components/FestivalsView";
 import { InvocationBanner } from "./components/InvocationBanner";
 import { NavagrahaView } from "./components/NavagrahaView";
 import { KundliView } from "./components/KundliView";
+import { MobileBottomNav } from "./components/MobileBottomNav";
+import { MobileMenuDrawer } from "./components/MobileMenuDrawer";
+import {
+  type AppUser,
+  getAuthenticatedUser,
+  logoutUser,
+  hasUserPermission,
+  VIEW_PERMISSIONS_MAP,
+} from "./services/userAuthService";
+import { LoginPortalView } from "./components/LoginPortalView";
+import { AccessDeniedCard } from "./components/AccessDeniedCard";
+import { AdminUsersManagementModal } from "./components/AdminUsersManagementModal";
 import { getAccessToken } from "./services/googleCalendarAuth";
 import {
   syncMultiDayPanchangaEvents,
@@ -64,6 +77,10 @@ import {
   Hourglass,
   Check,
   Home,
+  FileSpreadsheet,
+  ShieldCheck,
+  User as UserIcon,
+  LogOut,
 } from "lucide-react";
 import { type Language, translations } from "./i18n";
 import {
@@ -102,6 +119,7 @@ const NavItem = ({
   isActive,
   onClick,
   theme,
+  isCollapsed = false,
 }: {
   icon: React.ElementType;
   label: string;
@@ -110,11 +128,13 @@ const NavItem = ({
   isActive: boolean;
   onClick: () => void;
   theme: AppTheme;
+  isCollapsed?: boolean;
 }) => (
   <button
     type="button"
     onClick={onClick}
-    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left transition-all group relative overflow-hidden ${
+    title={isCollapsed ? label : undefined}
+    className={`w-full flex items-center ${isCollapsed ? "justify-center p-2" : "justify-between px-3 py-2.5"} rounded-xl text-left transition-all group relative overflow-hidden ${
       isActive
         ? theme === "nightSky"
           ? "text-amber-300 font-bold bg-indigo-950/80 border border-indigo-500/40 shadow-xs"
@@ -150,28 +170,30 @@ const NavItem = ({
       >
         <Icon className="w-4 h-4 shrink-0" />
       </div>
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs sm:text-[13px] font-semibold tracking-tight truncate leading-tight">
-          {label}
-        </span>
-        {subLabel && (
-          <span
-            className={`text-[10px] tracking-normal truncate leading-tight mt-0.5 ${
-              isActive
-                ? theme === "nightSky"
-                  ? "text-amber-300/80"
-                  : "text-amber-800/90 font-medium"
-                : theme === "nightSky"
-                  ? "text-slate-400/80 group-hover:text-slate-300"
-                  : "text-stone-500/80 group-hover:text-stone-700"
-            }`}
-          >
-            {subLabel}
+      {!isCollapsed && (
+        <div className="flex flex-col min-w-0 flex-1">
+          <span className="text-xs sm:text-[13px] font-semibold tracking-tight truncate leading-tight">
+            {label}
           </span>
-        )}
-      </div>
+          {subLabel && (
+            <span
+              className={`text-[10px] tracking-normal truncate leading-tight mt-0.5 ${
+                isActive
+                  ? theme === "nightSky"
+                    ? "text-amber-300/80"
+                    : "text-amber-800/90 font-medium"
+                  : theme === "nightSky"
+                    ? "text-slate-400/80 group-hover:text-slate-300"
+                    : "text-stone-500/80 group-hover:text-stone-700"
+              }`}
+            >
+              {subLabel}
+            </span>
+          )}
+        </div>
+      )}
     </div>
-    {badge && (
+    {badge && !isCollapsed && (
       <span
         className={`ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider shrink-0 ${
           isActive
@@ -234,15 +256,70 @@ export default function App() {
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCalendarSyncOpen, setIsCalendarSyncOpen] = useState(false);
+  const [isGoogleSheetsOpen, setIsGoogleSheetsOpen] = useState(false);
   const [isPrintOpen, setIsPrintOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDetectingGps, setIsDetectingGps] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Authentication & RBAC User State
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(() => getAuthenticatedUser());
+  const [isAdminUsersOpen, setIsAdminUsersOpen] = useState(false);
+
+  const handleLogout = useCallback(() => {
+    logoutUser();
+    setCurrentUser(null);
+  }, []);
 
   const [panchangaData, setPanchangaData] = useState<PanchangaResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const t = translations[lang];
+
+  // Desktop Keyboard Shortcuts (←/→ day, T today, / search, Esc close modals)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeTag = (e.target as HTMLElement)?.tagName;
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(activeTag)) return;
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        const parts = currentDate.split("/");
+        if (parts.length === 3) {
+          const d = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+          d.setDate(d.getDate() - 1);
+          const day = String(d.getDate()).padStart(2, "0");
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          setCurrentDate(`${day}/${month}/${d.getFullYear()}`);
+        }
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const parts = currentDate.split("/");
+        if (parts.length === 3) {
+          const d = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+          d.setDate(d.getDate() + 1);
+          const day = String(d.getDate()).padStart(2, "0");
+          const month = String(d.getMonth() + 1).padStart(2, "0");
+          setCurrentDate(`${day}/${month}/${d.getFullYear()}`);
+        }
+      } else if (e.key === "t" || e.key === "T") {
+        e.preventDefault();
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, "0");
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        setCurrentDate(`${day}/${month}/${now.getFullYear()}`);
+        showToast(lang === "hi" ? "आज के दिन पर लौटे" : "Jumped to Today");
+      } else if (e.key === "/") {
+        e.preventDefault();
+        setIsLocationOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentDate, lang]);
 
   // Sync theme with HTML root and body class
 
@@ -611,6 +688,26 @@ export default function App() {
     persistSettings(newLang, ayanamsa, monthSystem, currentCity, customCoords, theme);
   };
 
+  // If no user is authenticated, render the secure Login Portal Gateway
+  if (!currentUser) {
+    return (
+      <LoginPortalView
+        lang={lang}
+        onLangChange={handleLangChange}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+        onLoginSuccess={(user) => {
+          setCurrentUser(user);
+          showToast(
+            lang === "hi"
+              ? `स्वागतम्, ${user.fullName} (${user.role === "admin" ? "प्रशासक" : "उपयोगकर्ता"})!`
+              : `Welcome, ${user.fullName} (${user.role.toUpperCase()})!`,
+          );
+        }}
+      />
+    );
+  }
+
   return (
     <div
       id="app-root-container"
@@ -626,51 +723,71 @@ export default function App() {
 
       {/* Sidebar (Desktop Only) */}
       <aside
-        className={`hidden lg:flex flex-col w-72 backdrop-blur-xl border-r z-50 transition-colors ${
+        className={`hidden lg:flex flex-col ${
+          isSidebarCollapsed ? "w-20" : "w-72"
+        } backdrop-blur-xl border-r z-50 transition-all duration-300 ${
           theme === "nightSky"
             ? "bg-[#0e1424]/90 border-indigo-950/60 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.6)]"
             : "bg-white/80 border-amber-200/50 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.05)]"
         }`}
       >
         <div
-          className={`p-6 border-b ${theme === "nightSky" ? "border-indigo-950/60" : "border-amber-200/50"}`}
+          className={`p-4 border-b ${
+            theme === "nightSky" ? "border-indigo-950/60" : "border-amber-200/50"
+          } flex items-center justify-between`}
         >
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 overflow-hidden">
             <div
-              className={`flex h-11 w-11 items-center justify-center rounded-2xl shadow-md ring-1 ${
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl shadow-md ring-1 ${
                 theme === "nightSky"
                   ? "bg-gradient-to-br from-indigo-700 to-indigo-950 text-amber-300 ring-indigo-500/30"
                   : "bg-gradient-to-br from-amber-600 to-amber-800 text-white ring-amber-900/20"
               }`}
             >
-              <Sun className="h-6 w-6 text-amber-100" />
+              <Sun className="h-5 w-5 text-amber-100" />
             </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <h1
-                  className={`text-xl font-black tracking-tight font-serif-vedic ${
-                    theme === "nightSky" ? "text-white" : "text-stone-900"
+            {!isSidebarCollapsed && (
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center space-x-1.5">
+                  <h1
+                    className={`text-base font-black tracking-tight font-serif-vedic truncate ${
+                      theme === "nightSky" ? "text-white" : "text-stone-900"
+                    }`}
+                  >
+                    {t.appName}
+                  </h1>
+                  <span
+                    className={`inline-flex items-center rounded-full px-1.5 py-0.2 text-[9px] font-bold border uppercase shrink-0 ${
+                      theme === "nightSky"
+                        ? "bg-indigo-950/80 text-amber-300 border-indigo-700/60"
+                        : "bg-amber-100 text-amber-900 border-amber-300"
+                    }`}
+                  >
+                    Drik
+                  </span>
+                </div>
+                <p
+                  className={`text-[10px] font-sans truncate ${
+                    theme === "nightSky" ? "text-slate-400" : "text-stone-500"
                   }`}
                 >
-                  {t.appName}
-                </h1>
-                <span
-                  className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border font-devanagari uppercase ${
-                    theme === "nightSky"
-                      ? "bg-indigo-950/80 text-amber-300 border-indigo-700/60"
-                      : "bg-amber-100 text-amber-900 border-amber-300"
-                  }`}
-                >
-                  Drik
-                </span>
+                  {t.appSubtitle}
+                </p>
               </div>
-              <p
-                className={`text-[11px] font-sans mt-0.5 ${theme === "nightSky" ? "text-slate-400" : "text-stone-500"}`}
-              >
-                {t.appSubtitle}
-              </p>
-            </div>
+            )}
           </div>
+          <button
+            type="button"
+            onClick={() => setIsSidebarCollapsed((prev) => !prev)}
+            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            className="p-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-slate-800 text-stone-400 hover:text-stone-700 dark:hover:text-slate-200 transition-colors shrink-0 cursor-pointer"
+          >
+            {isSidebarCollapsed ? (
+              <ChevronRight className="w-4 h-4" />
+            ) : (
+              <ChevronLeft className="w-4 h-4" />
+            )}
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-4 hide-scrollbar">
@@ -862,7 +979,7 @@ export default function App() {
                   <div className="min-w-0 flex-1">
                     <div className="text-xs font-bold font-devanagari flex items-center justify-between">
                       <span>{lang === "hi" ? "Google Calendar सिंक" : "Google Calendar Sync"}</span>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 font-sans font-bold uppercase">
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 font-sans font-bold uppercase">
                         Sync
                       </span>
                     </div>
@@ -872,9 +989,99 @@ export default function App() {
                   </div>
                 </button>
               </div>
+
+              {/* Google Sheets Quick Export & Sync entry */}
+              <div className="pt-1.5">
+                <button
+                  type="button"
+                  onClick={() => setIsGoogleSheetsOpen(true)}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                    theme === "nightSky"
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-200 hover:bg-emerald-500/20"
+                      : "bg-emerald-50/80 border-emerald-200/90 text-emerald-950 hover:bg-emerald-100"
+                  }`}
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-600 shrink-0">
+                    <FileSpreadsheet className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-bold font-devanagari flex items-center justify-between">
+                      <span>{lang === "hi" ? "Google Sheets सिंक" : "Google Sheets Sync"}</span>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-600 font-sans font-bold uppercase">
+                        Sheets
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-stone-500 dark:text-slate-400 truncate">
+                      {lang === "hi" ? "पंचांग, होरा व ग्रह तालिका" : "Panchanga, Horas & Grahas"}
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              {/* Admin Access & Permission Control in Sidebar */}
+              {currentUser.role === "admin" && (
+                <div className="pt-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsAdminUsersOpen(true)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                      theme === "nightSky"
+                        ? "bg-amber-500/10 border-amber-500/30 text-amber-200 hover:bg-amber-500/20"
+                        : "bg-amber-50/80 border-amber-300/80 text-amber-950 hover:bg-amber-100"
+                    }`}
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-600 shrink-0">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold font-devanagari flex items-center justify-between">
+                        <span>
+                          {lang === "hi" ? "यूजर व एक्सेस नियंत्रण" : "User Access Control"}
+                        </span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 font-sans font-bold uppercase">
+                          Admin
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-stone-500 dark:text-slate-400 truncate">
+                        {lang === "hi" ? "गूगल शीट परमिशन मैट्रिक्स" : "Google Sheet RBAC"}
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
+
+        {/* User Account & Logout in Sidebar */}
+        <div
+          className={`p-3 mx-4 mb-2 rounded-xl border flex items-center justify-between gap-2 shrink-0 ${
+            theme === "nightSky"
+              ? "bg-indigo-950/40 border-indigo-900/50 text-slate-200"
+              : "bg-amber-50/70 border-amber-200/70 text-stone-800"
+          }`}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+              <UserIcon className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-xs font-bold truncate">{currentUser.fullName}</div>
+              <div className="text-[10px] text-stone-500 dark:text-slate-400 capitalize">
+                @{currentUser.username} • {currentUser.role}
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleLogout}
+            title={lang === "hi" ? "लॉगआउट" : "Logout"}
+            className="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 hover:text-rose-600 transition-colors cursor-pointer shrink-0"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+
         <div
           className={`p-5 border-t ${theme === "nightSky" ? "border-indigo-950/60" : "border-amber-200/50"}`}
         >
@@ -897,12 +1104,16 @@ export default function App() {
           isDetectingLocation={isDetectingGps}
           activeView={activeView}
           panchangaData={panchangaData}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          onOpenAdminUsers={() => setIsAdminUsersOpen(true)}
           onDateChange={setCurrentDate}
           onViewChange={setActiveView}
           onOpenLocation={() => setIsLocationOpen(true)}
           onDetectDeviceLocation={handleDetectDeviceLocation}
           onOpenSettings={() => setIsSettingsOpen(true)}
           onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
+          onOpenGoogleSheets={() => setIsGoogleSheetsOpen(true)}
           onPrint={() => setIsPrintOpen(true)}
           lang={lang}
           onLangChange={handleLangChange}
@@ -917,12 +1128,13 @@ export default function App() {
           lang={lang}
           theme={theme}
           orderedViews={navPreferences.orderedViews}
+          currentUser={currentUser}
         />
 
         {/* Scrollable Content */}
         <main
           id="main-content"
-          className="flex-1 w-full overflow-y-auto relative z-10 hide-scrollbar"
+          className="flex-1 w-full overflow-y-auto relative z-10 hide-scrollbar pb-24 lg:pb-8"
         >
           <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
             {/* Spiritual Context Banner (shown on standard views) */}
@@ -994,6 +1206,18 @@ export default function App() {
                   onSelectView={setActiveView}
                   onOpenSettings={() => setIsSettingsOpen(true)}
                   onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
+                  onOpenGoogleSheets={() => setIsGoogleSheetsOpen(true)}
+                />
+              </div>
+            ) : VIEW_PERMISSIONS_MAP[activeView] &&
+              !hasUserPermission(currentUser, VIEW_PERMISSIONS_MAP[activeView]!) ? (
+              <div className="max-w-4xl mx-auto py-8">
+                <AccessDeniedCard
+                  user={currentUser}
+                  requiredPermission={VIEW_PERMISSIONS_MAP[activeView]!}
+                  onReturnHome={() => setActiveView("home")}
+                  lang={lang}
+                  theme={theme}
                 />
               </div>
             ) : isLoading && !panchangaData ? (
@@ -1329,7 +1553,11 @@ export default function App() {
                     </div>
 
                     <section className="space-y-6">
-                      <VedicHorasView panchangaData={panchangaData} lang={lang} />
+                      <VedicHorasView
+                        panchangaData={panchangaData}
+                        lang={lang}
+                        onOpenGoogleSheets={() => setIsGoogleSheetsOpen(true)}
+                      />
                     </section>
                   </div>
                 )}
@@ -1362,6 +1590,7 @@ export default function App() {
                         }}
                         lang={lang}
                         onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
+                        onOpenGoogleSheets={() => setIsGoogleSheetsOpen(true)}
                       />
                     </section>
                   </div>
@@ -1409,6 +1638,26 @@ export default function App() {
         panchangaData={panchangaData}
         lang={lang}
         theme={theme}
+      />
+
+      <GoogleSheetsModal
+        isOpen={isGoogleSheetsOpen}
+        onClose={() => setIsGoogleSheetsOpen(false)}
+        panchangaData={panchangaData}
+        lang={lang}
+        theme={theme}
+      />
+
+      <AdminUsersManagementModal
+        isOpen={isAdminUsersOpen}
+        onClose={() => setIsAdminUsersOpen(false)}
+        lang={lang}
+        theme={theme}
+        currentUser={currentUser}
+        onUsersUpdated={() => {
+          const fresh = getAuthenticatedUser();
+          setCurrentUser(fresh);
+        }}
       />
 
       <LocationModal
@@ -1472,6 +1721,37 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Vedic Modules Drawer */}
+      <MobileMenuDrawer
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        activeView={activeView}
+        onSelectView={setActiveView}
+        lang={lang}
+        onLangChange={handleLangChange}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+        onPrint={() => setIsPrintOpen(true)}
+        currentUser={currentUser}
+        onOpenAdminUsers={() => setIsAdminUsersOpen(true)}
+      />
+
+      {/* Mobile Safe Area Bottom Utility Dock */}
+      <MobileBottomNav
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onOpenLocation={() => setIsLocationOpen(true)}
+        onOpenCalendarSync={() => setIsCalendarSyncOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenMenu={() => setIsMobileMenuOpen(true)}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onOpenAdminUsers={() => setIsAdminUsersOpen(true)}
+        onOpenAuth={() => setIsGoogleSheetsOpen(true)}
+        lang={lang}
+        theme={theme}
+      />
     </div>
   );
 }

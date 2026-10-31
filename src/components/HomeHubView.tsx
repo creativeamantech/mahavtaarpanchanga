@@ -32,6 +32,7 @@ import {
   Sun,
   Moon,
   Wind,
+  FileSpreadsheet,
 } from "lucide-react";
 
 interface HomeHubViewProps {
@@ -43,6 +44,7 @@ interface HomeHubViewProps {
   onSelectView: (view: ActiveView) => void;
   onOpenSettings?: () => void;
   onOpenCalendarSync?: () => void;
+  onOpenGoogleSheets?: () => void;
 }
 
 export const HomeHubView: React.FC<HomeHubViewProps> = ({
@@ -53,6 +55,7 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
   onUpdateNavPreferences,
   onSelectView,
   onOpenCalendarSync,
+  onOpenGoogleSheets,
 }) => {
   const isNight = theme === "nightSky";
 
@@ -273,16 +276,28 @@ export const HomeHubView: React.FC<HomeHubViewProps> = ({
                       {lang === "hi" ? "सूर्यास्त" : "Sunset"}: {data.sunset || "—"}
                     </span>
                   </div>
-                  {onOpenCalendarSync && (
-                    <button
-                      type="button"
-                      onClick={onOpenCalendarSync}
-                      className="mt-1 w-full py-1.5 px-2.5 rounded-xl border border-amber-400/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{lang === "hi" ? "Google Calendar में सिंक करें" : "Sync to Google Calendar"}</span>
-                    </button>
-                  )}
+                  <div className="flex flex-col sm:flex-row gap-1.5 mt-1">
+                    {onOpenCalendarSync && (
+                      <button
+                        type="button"
+                        onClick={onOpenCalendarSync}
+                        className="flex-1 py-1.5 px-2 rounded-xl border border-amber-400/50 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>{lang === "hi" ? "कैलेंडर सिंक" : "Calendar Sync"}</span>
+                      </button>
+                    )}
+                    {onOpenGoogleSheets && (
+                      <button
+                        type="button"
+                        onClick={onOpenGoogleSheets}
+                        className="flex-1 py-1.5 px-2 rounded-xl border border-emerald-400/50 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <FileSpreadsheet className="w-3.5 h-3.5" />
+                        <span>{lang === "hi" ? "गूगल शीट्स" : "Google Sheets"}</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
             })()}

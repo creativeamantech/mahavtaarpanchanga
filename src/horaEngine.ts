@@ -297,3 +297,25 @@ export function resolveCurrentHora(nowMs: number, data: PanchangaResponse): Curr
     tattvaRemainingMs,
   };
 }
+
+/**
+ * Convenient helper to calculate all 24 horas directly from PanchangaResponse
+ */
+export function calculateDailyHoras(panchangaData: PanchangaResponse): DailyHoras {
+  const sunrise = panchangaData.sunrise_ms || (panchangaData.sunrise ? new Date(panchangaData.sunrise).getTime() : Date.now());
+  const sunset = panchangaData.sunset_ms || (panchangaData.sunset ? new Date(panchangaData.sunset).getTime() : sunrise + 43200000);
+  const nextSunrise = panchangaData.next_sunrise_ms || sunrise + 86400000;
+  const weekday = panchangaData.weekday ?? 0;
+  const tithiNum = panchangaData.tithi?.[0]?.number || 1;
+  const tz = panchangaData.timezone || "Asia/Kolkata";
+
+  return computeDailyHoras(
+    panchangaData.date,
+    sunrise,
+    sunset,
+    nextSunrise,
+    weekday,
+    tithiNum,
+    tz,
+  );
+}

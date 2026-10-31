@@ -15,9 +15,11 @@ import { exportHorasToExcel } from "../services/excelExportService";
 export function VedicHorasView({
   panchangaData,
   lang,
+  onOpenGoogleSheets,
 }: {
   panchangaData: PanchangaResponse;
   lang: Language;
+  onOpenGoogleSheets?: () => void;
 }) {
   const [dailyHoras, setDailyHoras] = useState<DailyHoras | null>(null);
   const [now, setNow] = useState(Date.now());
@@ -462,13 +464,26 @@ export function VedicHorasView({
                 : "Classical planetary rulers, matched nadis (Ida/Pingala/Sushumna) & element sub-durations"}
             </p>
           </div>
-          <button
-            onClick={() => exportHorasToExcel(dailyHoras, panchangaData.date, lang)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all shrink-0 cursor-pointer"
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>{lang === "hi" ? "एक्सेल डाउनलोड (.xlsx)" : "Export Excel (.xlsx)"}</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {onOpenGoogleSheets && (
+              <button
+                type="button"
+                onClick={onOpenGoogleSheets}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-sm transition-all shrink-0 cursor-pointer"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                <span>{lang === "hi" ? "Google Sheets एक्सपोर्ट" : "Export Google Sheets"}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => exportHorasToExcel(dailyHoras, panchangaData.date, lang)}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all shrink-0 cursor-pointer"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>{lang === "hi" ? "एक्सेल (.xlsx)" : "Export Excel (.xlsx)"}</span>
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">

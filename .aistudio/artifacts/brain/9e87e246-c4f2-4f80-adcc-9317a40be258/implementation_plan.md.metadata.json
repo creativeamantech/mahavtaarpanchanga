@@ -1,0 +1,6 @@
+{
+  "summary":  "Implementation plan for mobile UI/UX overhaul:\n1. Re-architect MobileBottomNav into a 6-item utility dock: Location, Calendar (Month view), Sync, Hamburger Menu, Settings, and Auth (Sign In / Sign Out).\n2. Create MobileMenuDrawer component housing all Vedic astrology and almanac modules neatly categorized.\n3. Clean up the mobile header by moving redundant icons to the bottom dock and drawer, ensuring touch targets >= 44px and zero clutter.",
+  "updatedAt":  "2026-10-31T03:37:20.804106379Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

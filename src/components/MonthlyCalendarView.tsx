@@ -8,10 +8,12 @@ import {
   Sparkles,
   Clock,
   ArrowRight,
+  FileSpreadsheet,
 } from "lucide-react";
-import type { MonthSystem, MonthlyPanchangaDay } from "../types";
+import type { MonthSystem, MonthlyPanchangaDay, AppTheme } from "../types";
 import { type Language, translations, getLocalizedVaara } from "../i18n";
 import { getMonthCacheKey, loadCachedMonth, saveCachedMonth } from "../lib/panchangaCache";
+import { CalendarDaySheet } from "./CalendarDaySheet";
 
 interface MonthlyCalendarViewProps {
   currentDateStr: string;
@@ -26,7 +28,9 @@ interface MonthlyCalendarViewProps {
   ayanamsa: string;
   onSelectDate: (dateStr: string) => void;
   lang: Language;
+  theme?: AppTheme;
   onOpenCalendarSync?: () => void;
+  onOpenGoogleSheets?: () => void;
 }
 
 const MONTH_NAMES_EN = [
@@ -109,7 +113,9 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   ayanamsa,
   onSelectDate,
   lang,
+  theme = "parchment",
   onOpenCalendarSync,
+  onOpenGoogleSheets,
 }) => {
   const t = translations[lang];
 
@@ -120,6 +126,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [filterMode, setFilterMode] = useState<"all" | "special" | "sukla" | "krishna">("all");
   const [inspectedDay, setInspectedDay] = useState<MonthlyPanchangaDay | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false);
 
   // Sync year/month when currentDateStr changes
   useEffect(() => {
@@ -322,6 +329,20 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
             >
               <ChevronRight className="h-4 w-4" />
             </button>
+
+            {onOpenGoogleSheets && (
+              <button
+                type="button"
+                onClick={onOpenGoogleSheets}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer ml-1"
+                title={lang === "hi" ? "मासिक पंचांग Google Sheets में निर्यात करें" : "Export Monthly Almanac to Google Sheets"}
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">
+                  {lang === "hi" ? "Google Sheets" : "Sheets"}
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -407,33 +428,36 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   id={`calendar-cell-${dayData.day}`}
                   onClick={() => {
                     setInspectedDay(dayData);
+                    if (window.innerWidth < 1024) {
+                      setIsSheetOpen(true);
+                    }
                   }}
                   onDoubleClick={() => {
                     onSelectDate(dayData.date);
                   }}
-                  className={`min-h-[105px] border-t border-l border-stone-200 p-2 text-left cursor-pointer transition-all relative flex flex-col justify-between ${
+                  className={`min-h-[72px] sm:min-h-[105px] border-t border-l border-stone-200 dark:border-indigo-950/40 p-1 sm:p-2 text-left cursor-pointer transition-all relative flex flex-col justify-between select-none ${
                     isInspected
-                      ? "bg-amber-100/70 ring-2 ring-amber-600 ring-inset z-10 shadow-xs"
+                      ? "bg-amber-100/70 dark:bg-amber-950/40 ring-2 ring-amber-600 ring-inset z-10 shadow-xs"
                       : isSelected
-                        ? "bg-amber-50 ring-1 ring-amber-400 ring-inset"
+                        ? "bg-amber-50 dark:bg-amber-950/30 ring-1 ring-amber-400 ring-inset"
                         : isPurnima
-                          ? "bg-amber-50/50 hover:bg-amber-100/40"
+                          ? "bg-amber-50/50 dark:bg-amber-950/20 hover:bg-amber-100/40"
                           : isAmavasya
-                            ? "bg-stone-100/70 hover:bg-stone-200/50"
+                            ? "bg-stone-100/70 dark:bg-slate-900/60 hover:bg-stone-200/50"
                             : isEkadashi
-                              ? "bg-emerald-50/50 hover:bg-emerald-100/40"
-                              : "bg-white hover:bg-amber-50/40"
+                              ? "bg-emerald-50/50 dark:bg-emerald-950/20 hover:bg-emerald-100/40"
+                              : "bg-white dark:bg-slate-900/30 hover:bg-amber-50/40"
                   }`}
                 >
                   {/* Top: Day number & Special Badges */}
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-sm font-extrabold ${
+                      className={`text-xs sm:text-sm font-extrabold ${
                         isInspected
-                          ? "text-amber-950 font-black"
+                          ? "text-amber-950 dark:text-amber-300 font-black"
                           : isSunday
-                            ? "text-rose-700"
-                            : "text-stone-900"
+                            ? "text-rose-700 dark:text-rose-400"
+                            : "text-stone-900 dark:text-slate-100"
                       }`}
                     >
                       {dayData.day}
@@ -442,39 +466,39 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                     <div className="flex items-center space-x-1">
                       {isPurnima && (
                         <span
-                          className="h-2.5 w-2.5 rounded-full bg-amber-400 border border-amber-600 shadow-2xs"
+                          className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-amber-400 border border-amber-600 shadow-2xs"
                           title="Pūrṇimā (Full Moon)"
                         />
                       )}
                       {isAmavasya && (
                         <span
-                          className="h-2.5 w-2.5 rounded-full bg-stone-800 border border-stone-600 shadow-2xs"
+                          className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-stone-800 border border-stone-600 shadow-2xs"
                           title="Amāvāsyā (New Moon)"
                         />
                       )}
                       {isEkadashi && (
                         <span
-                          className="h-2.5 w-2.5 rotate-45 bg-emerald-600 shadow-2xs"
+                          className="h-2 w-2 sm:h-2.5 sm:w-2.5 rotate-45 bg-emerald-600 shadow-2xs"
                           title="Ekādaśī Vrata"
                         />
                       )}
-                      <span className="text-[10px] text-stone-400 font-mono">
+                      <span className="hidden sm:inline text-[10px] text-stone-400 dark:text-slate-500 font-mono">
                         {dayData.sunrise?.slice(0, 5)}
                       </span>
                     </div>
                   </div>
 
                   {/* Middle: Tithi & Nakshatra */}
-                  <div className="my-1 space-y-0.5">
+                  <div className="my-0.5 sm:my-1 space-y-0.5">
                     <div
-                      className={`text-xs font-bold truncate ${
+                      className={`text-[10px] sm:text-xs font-bold truncate leading-tight ${
                         isPurnima
-                          ? "text-amber-900 font-black"
+                          ? "text-amber-900 dark:text-amber-300 font-black"
                           : isAmavasya
-                            ? "text-stone-900 font-black"
+                            ? "text-stone-900 dark:text-slate-200 font-black"
                             : isEkadashi
-                              ? "text-emerald-900 font-black"
-                              : "text-amber-950"
+                              ? "text-emerald-900 dark:text-emerald-400 font-black"
+                              : "text-amber-950 dark:text-slate-200"
                       }`}
                       title={dayData.tithi}
                     >
@@ -485,7 +509,7 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                         ?.replace("कृष्ण पक्ष ", "कृ. ")}
                     </div>
                     <div
-                      className="text-[11px] text-stone-600 truncate font-devanagari"
+                      className="hidden sm:block text-[11px] text-stone-600 dark:text-slate-400 truncate font-devanagari"
                       title={dayData.nakshatra}
                     >
                       {dayData.nakshatra}
@@ -493,14 +517,15 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
                   </div>
 
                   {/* Bottom: Vaara & Rahu */}
-                  <div className="text-[10px] text-stone-400 flex items-center justify-between border-t border-stone-100/90 pt-1 font-mono">
-                    <span className="truncate">{dayData.vaara?.slice(0, 4)}</span>
+                  <div className="text-[9px] sm:text-[10px] text-stone-400 dark:text-slate-500 flex items-center justify-between border-t border-stone-100/90 dark:border-slate-800/80 pt-0.5 sm:pt-1 font-mono">
+                    <span className="truncate">{dayData.vaara?.slice(0, 3)}</span>
                     {dayData.rahu_kala && (
                       <span
-                        className="text-rose-600 font-semibold truncate"
+                        className="text-rose-600 dark:text-rose-400 font-semibold truncate text-[8px] sm:text-[10px]"
                         title={`Rāhu: ${dayData.rahu_kala.start}-${dayData.rahu_kala.end}`}
                       >
-                        R: {dayData.rahu_kala.start?.slice(0, 5)}
+                        <span className="hidden sm:inline">R: </span>
+                        {dayData.rahu_kala.start?.slice(0, 5)}
                       </span>
                     )}
                   </div>
@@ -658,6 +683,16 @@ export const MonthlyCalendarView: React.FC<MonthlyCalendarViewProps> = ({
           </div>
         </div>
       )}
+
+      {/* Mobile Day Details Bottom Sheet */}
+      <CalendarDaySheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        day={inspectedDay}
+        onSelectDateForFullPanchanga={onSelectDate}
+        lang={lang}
+        theme={theme}
+      />
     </div>
   );
 };

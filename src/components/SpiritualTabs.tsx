@@ -2,6 +2,8 @@ import React from "react";
 import { type ActiveView } from "./Header";
 import { type Language, translations } from "../i18n";
 import type { AppTheme } from "../types";
+import { Lock } from "lucide-react";
+import { type AppUser, hasUserPermission, VIEW_PERMISSIONS_MAP } from "../services/userAuthService";
 
 interface SpiritualTabsProps {
   activeView: ActiveView;
@@ -9,6 +11,7 @@ interface SpiritualTabsProps {
   lang: Language;
   theme?: AppTheme;
   orderedViews?: ActiveView[];
+  currentUser?: AppUser | null;
 }
 
 export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
@@ -17,6 +20,7 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
   lang,
   theme = "parchment",
   orderedViews,
+  currentUser,
 }) => {
   const t = translations[lang];
   const isNight = theme === "nightSky";
@@ -140,6 +144,11 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
         <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto cat-nav-scroll py-1">
           {tabs.map((tab) => {
             const isActive = activeView === tab.id;
+            const requiredPerm = VIEW_PERMISSIONS_MAP[tab.id];
+            const isLocked = Boolean(
+              requiredPerm && currentUser && !hasUserPermission(currentUser, requiredPerm),
+            );
+
             return (
               <button
                 key={tab.id}
@@ -158,6 +167,7 @@ export const SpiritualTabs: React.FC<SpiritualTabsProps> = ({
               >
                 <span className="text-sm sm:text-base shrink-0 leading-none">{tab.icon}</span>
                 <span>{tab.label}</span>
+                {isLocked && <Lock className="w-3 h-3 text-rose-400/80 shrink-0 ml-0.5" />}
               </button>
             );
           })}

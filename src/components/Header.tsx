@@ -10,11 +10,16 @@ import {
   Printer,
   Calendar as CalendarIcon,
   Home,
+  FileSpreadsheet,
+  User as UserIcon,
+  LogOut,
+  ShieldCheck,
 } from "lucide-react";
 import { type Language, translations } from "../i18n";
 import type { AppTheme, PanchangaResponse } from "../types";
 import { PWAInstallButton } from "./PWAInstallButton";
 import { getLocalizedMasa, getLocalizedPaksha, getLocalizedVaara } from "../i18n";
+import type { AppUser } from "../services/userAuthService";
 
 export type ActiveView =
   | "home"
@@ -39,12 +44,16 @@ interface HeaderProps {
   isDetectingLocation?: boolean;
   activeView: ActiveView;
   panchangaData?: PanchangaResponse | null;
+  currentUser?: AppUser | null;
+  onLogout?: () => void;
+  onOpenAdminUsers?: () => void;
   onDateChange: (newDateStr: string) => void;
   onViewChange: (view: ActiveView) => void;
   onOpenLocation: () => void;
   onDetectDeviceLocation?: () => void;
   onOpenSettings: () => void;
   onOpenCalendarSync?: () => void;
+  onOpenGoogleSheets?: () => void;
   onPrint: () => void;
   lang: Language;
   onLangChange: (lang: Language) => void;
@@ -59,12 +68,16 @@ export const Header: React.FC<HeaderProps> = ({
   isDetectingLocation = false,
   activeView = "home",
   panchangaData,
+  currentUser,
+  onLogout,
+  onOpenAdminUsers,
   onDateChange,
   onViewChange,
   onOpenLocation,
   onDetectDeviceLocation,
   onOpenSettings,
   onOpenCalendarSync,
+  onOpenGoogleSheets,
   onPrint,
   lang,
   onLangChange,
@@ -314,18 +327,36 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </button>
 
-            {/* Google Calendar Sync Button */}
+            {/* Google Calendar Sync Button (Desktop/Tablet) */}
             {onOpenCalendarSync && (
               <button
                 type="button"
                 onClick={onOpenCalendarSync}
-                className="flex h-7 w-7 sm:h-8 sm:w-auto sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-[#F0C96A] transition-colors shrink-0"
+                className="hidden sm:flex h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/90 hover:text-[#F0C96A] transition-colors shrink-0 cursor-pointer"
                 title={lang === "hi" ? "गूगल कैलेंडर दैनिक सिंक" : "Google Calendar Daily Sync"}
                 aria-label={lang === "hi" ? "गूगल कैलेंडर सिंक" : "Google Calendar Sync"}
               >
-                <CalendarIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#F0C96A]" />
-                <span className="hidden sm:inline text-[10px] sm:text-xs font-semibold">
-                  {lang === "hi" ? "सिंक" : "Sync"}
+                <CalendarIcon className="h-4 w-4 text-[#F0C96A]" />
+                <span className="text-xs font-semibold">
+                  {lang === "hi" ? "कैलेंडर" : "Calendar"}
+                </span>
+              </button>
+            )}
+
+            {/* Google Sheets Sync & Export Button */}
+            {onOpenGoogleSheets && (
+              <button
+                type="button"
+                onClick={onOpenGoogleSheets}
+                className="hidden md:flex h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-emerald-300 hover:text-white transition-colors shrink-0 cursor-pointer"
+                title={
+                  lang === "hi" ? "गूगल शीट्स एक्सपोर्ट व सिंक" : "Google Sheets Export & Sync"
+                }
+                aria-label={lang === "hi" ? "गूगल शीट्स" : "Google Sheets"}
+              >
+                <FileSpreadsheet className="h-4 w-4 text-emerald-400" />
+                <span className="text-xs font-semibold">
+                  {lang === "hi" ? "शीट्स" : "Sheets"}
                 </span>
               </button>
             )}
@@ -346,15 +377,67 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onOpenSettings}
-              className="flex h-7 w-7 sm:h-8 sm:w-auto sm:px-2 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
+              className="hidden sm:flex h-8 px-2 items-center justify-center gap-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-white/80 transition-colors shrink-0"
               title={t.settings}
               aria-label={t.settings}
             >
-              <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline text-[10px] sm:text-xs font-semibold">
+              <Settings className="h-4 w-4" />
+              <span className="text-xs font-semibold">
                 {lang === "hi" ? "सेटिंग्स" : "Settings"}
               </span>
             </button>
+
+            {/* Admin Management Button (Visible if user has admin role) */}
+            {currentUser?.role === "admin" && onOpenAdminUsers && (
+              <button
+                type="button"
+                onClick={onOpenAdminUsers}
+                className="hidden sm:flex h-8 px-2.5 items-center justify-center gap-1.5 rounded-lg bg-amber-500/25 hover:bg-amber-500/40 border border-amber-400/60 text-amber-300 hover:text-white transition-all shadow-xs cursor-pointer"
+                title={lang === "hi" ? "यूजर एवं एक्सेस प्रबंधन" : "User & Access Management"}
+                aria-label={lang === "hi" ? "एडमिन" : "Admin"}
+              >
+                <ShieldCheck className="h-4 w-4 text-amber-400" />
+                <span className="text-xs font-bold uppercase tracking-wider">
+                  {lang === "hi" ? "एडमिन" : "Admin"}
+                </span>
+              </button>
+            )}
+
+            {/* Logged In User Pill & Logout (Desktop/Tablet) */}
+            {currentUser && (
+              <div className="hidden sm:flex items-center gap-1 pl-1 border-l border-white/15 shrink-0">
+                <div
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/10 border border-white/15 text-xs text-white/90"
+                  title={`${currentUser.fullName} (${currentUser.username}) - ${currentUser.role}`}
+                >
+                  <UserIcon className="h-3.5 w-3.5 text-amber-400" />
+                  <span className="text-[11px] font-semibold max-w-[90px] truncate">
+                    {currentUser.fullName.split(" ")[0]}
+                  </span>
+                  <span
+                    className={`text-[9px] font-extrabold px-1 py-0.2 rounded uppercase ${
+                      currentUser.role === "admin"
+                        ? "bg-amber-400/20 text-amber-300 border border-amber-400/30"
+                        : "bg-white/15 text-white/80"
+                    }`}
+                  >
+                    {currentUser.role}
+                  </span>
+                </div>
+
+                {onLogout && (
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/15 hover:bg-rose-500/30 border border-rose-400/40 text-rose-300 hover:text-white transition-colors cursor-pointer shrink-0"
+                    title={lang === "hi" ? "लॉगआउट करें" : "Sign Out"}
+                    aria-label="Logout"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
 
             <PWAInstallButton />
           </div>

@@ -217,28 +217,37 @@ export const LocationModal: React.FC<LocationModalProps> = ({
     onClose();
   };
 
+  const QUICK_CITIES: CityLocation[] = [
+    { name: "New Delhi, IN", country: "IN", latitude: 28.6139, longitude: 77.209, timezone: "Asia/Kolkata" },
+    { name: "Varanasi, IN", country: "IN", latitude: 25.3176, longitude: 82.9739, timezone: "Asia/Kolkata" },
+    { name: "Ujjain, IN", country: "IN", latitude: 23.1765, longitude: 75.7885, timezone: "Asia/Kolkata" },
+    { name: "Bengaluru, IN", country: "IN", latitude: 12.9716, longitude: 77.5946, timezone: "Asia/Kolkata" },
+    { name: "Mumbai, IN", country: "IN", latitude: 19.076, longitude: 72.8777, timezone: "Asia/Kolkata" },
+    { name: "Haridwar, IN", country: "IN", latitude: 29.9457, longitude: 78.1642, timezone: "Asia/Kolkata" },
+  ];
+
   return (
     <div
       id="location-modal-backdrop"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/70 p-0 sm:p-4 backdrop-blur-md animate-in fade-in duration-200"
     >
       <div
         id="location-modal-dialog"
-        className="w-full max-w-lg rounded-[1.5rem] border border-stone-200/60 bg-stone-50/95 backdrop-blur-xl p-6 sm:p-8 shadow-2xl max-h-[90vh] flex flex-col relative"
+        className="w-full h-full sm:h-auto sm:max-h-[88vh] sm:max-w-lg rounded-none sm:rounded-3xl border border-stone-200/60 dark:border-indigo-900/40 bg-white dark:bg-[#0e1424] p-4 sm:p-6 shadow-2xl flex flex-col relative overflow-hidden"
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between border-b border-stone-100 pb-4">
-          <div className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-800">
-              <MapPin className="h-4 w-4" />
+        <div className="flex items-center justify-between border-b border-stone-200/70 dark:border-indigo-900/50 pb-3">
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
+              <MapPin className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-stone-900 font-serif-vedic">
+              <h3 className="text-base font-bold text-stone-900 dark:text-slate-100 font-serif-vedic">
                 {t.changeLocation}
               </h3>
-              <p className="text-xs text-stone-500 font-sans">
+              <p className="text-xs text-stone-500 dark:text-slate-400 font-sans">
                 {lang === "hi"
-                  ? "सटीक प्रत्यक्ष गणना हेतु अपना नगर या डिवाइस स्थान चुनें"
+                  ? "सटीक प्रत्यक्ष गणना हेतु नगर या डिवाइस स्थान चुनें"
                   : `Currently active: ${currentCity}`}
               </p>
             </div>
@@ -246,7 +255,8 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           <button
             onClick={onClose}
             id="close-location-modal-btn"
-            className="rounded-lg p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors"
+            className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 dark:hover:bg-slate-800 hover:text-stone-700 dark:hover:text-slate-200 transition-colors touch-target-min flex items-center justify-center"
+            aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
@@ -425,23 +435,64 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         {/* TAB 2: Search Cities */}
         {activeTab === "search" && (
           <div className="mt-4 flex-1 flex flex-col min-h-0 space-y-3">
-            {/* Search Input */}
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-stone-400" />
+            {/* Quick GPS shortcut */}
+            <button
+              type="button"
+              onClick={handleDetectDeviceLocation}
+              disabled={isDetectingGps}
+              className="w-full py-2.5 px-3 rounded-xl border border-amber-300/80 bg-amber-50/80 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 text-xs font-bold flex items-center justify-center gap-2 hover:bg-amber-100 transition-colors touch-target-min cursor-pointer shrink-0"
+            >
+              {isDetectingGps ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
+                  <span>{lang === "hi" ? "जीपीएस से स्थान प्राप्त कर रहे हैं..." : "Detecting GPS location..."}</span>
+                </>
+              ) : (
+                <>
+                  <Navigation className="w-4 h-4 text-amber-600" />
+                  <span>{lang === "hi" ? "वर्तमान डिवाइस जीपीएस का उपयोग करें" : "Use My Current Device Location"}</span>
+                </>
+              )}
+            </button>
+
+            {/* Search Input - 16px to prevent iOS Safari auto-zoom */}
+            <div className="relative shrink-0">
+              <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-stone-400" />
               <input
                 id="city-search-input"
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t.searchPlaceholder}
-                className="w-full rounded-xl border border-stone-300 bg-white pl-9 pr-4 py-2 text-sm text-stone-900 focus:border-amber-600 focus:bg-white focus:outline-none shadow-2xs"
+                className="w-full rounded-xl border border-stone-300 dark:border-indigo-900/50 bg-white dark:bg-slate-900/60 pl-10 pr-4 py-2.5 text-base sm:text-sm text-stone-900 dark:text-slate-100 focus:border-amber-600 focus:ring-1 focus:ring-amber-500 focus:outline-none shadow-xs"
               />
             </div>
 
+            {/* Quick Vedic Cities chips */}
+            {!searchTerm.trim() && (
+              <div className="space-y-1.5 shrink-0">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 dark:text-slate-500">
+                  {lang === "hi" ? "प्रमुख तीर्थ एवं नगर" : "Major Cities"}
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {QUICK_CITIES.map((c) => (
+                    <button
+                      key={c.name}
+                      type="button"
+                      onClick={() => handleSelect(c)}
+                      className="px-2.5 py-1 rounded-lg text-xs font-medium bg-stone-100 dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-amber-950/60 text-stone-700 dark:text-slate-300 transition-colors cursor-pointer"
+                    >
+                      {c.name.split(",")[0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Results list */}
-            <div className="flex-1 overflow-y-auto divide-y divide-stone-100 pr-1 max-h-60 border border-stone-200/60 rounded-xl bg-white p-1">
+            <div className="flex-1 overflow-y-auto divide-y divide-stone-100 dark:divide-slate-800 pr-1 border border-stone-200/60 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-900/40 p-1">
               {isLoadingCities ? (
-                <div className="py-6 text-center text-xs text-stone-500 flex items-center justify-center gap-2">
+                <div className="py-8 text-center text-xs text-stone-500 flex items-center justify-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-amber-600" />
                   <span>Searching global cities...</span>
                 </div>
@@ -451,23 +502,23 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                     key={`${city.name}-${city.country}`}
                     type="button"
                     onClick={() => handleSelect(city)}
-                    className="w-full text-left py-2 px-2.5 hover:bg-amber-50/80 rounded-lg flex items-center justify-between transition-colors group"
+                    className="w-full text-left py-2.5 px-3 hover:bg-amber-50/80 dark:hover:bg-indigo-950/40 rounded-lg flex items-center justify-between transition-colors group cursor-pointer"
                   >
                     <div>
-                      <div className="text-sm font-bold text-stone-900 group-hover:text-amber-900">
+                      <div className="text-sm font-bold text-stone-900 dark:text-slate-100 group-hover:text-amber-800 dark:group-hover:text-amber-300">
                         {city.name}
                       </div>
-                      <div className="text-xs text-stone-400">
+                      <div className="text-xs text-stone-400 dark:text-slate-500">
                         {city.latitude.toFixed(2)}°, {city.longitude.toFixed(2)}° • {city.timezone}
                       </div>
                     </div>
-                    <span className="text-xs font-mono font-semibold text-stone-400 group-hover:text-amber-700 bg-stone-50 px-2 py-0.5 rounded-md border border-stone-200/60">
+                    <span className="text-xs font-mono font-semibold text-stone-400 group-hover:text-amber-700 bg-stone-50 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-stone-200/60 dark:border-slate-700">
                       {city.country}
                     </span>
                   </button>
                 ))
               ) : (
-                <div className="py-6 text-center text-xs text-stone-500">
+                <div className="py-8 text-center text-xs text-stone-500">
                   No cities found. You can enter custom coordinates in the next tab.
                 </div>
               )}
@@ -477,9 +528,9 @@ export const LocationModal: React.FC<LocationModalProps> = ({
 
         {/* TAB 3: Custom Coordinates */}
         {activeTab === "custom" && (
-          <form onSubmit={handleCustomSubmit} className="mt-4 space-y-3 flex-1 overflow-y-auto">
+          <form onSubmit={handleCustomSubmit} className="mt-4 space-y-3.5 flex-1 overflow-y-auto pr-1">
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-stone-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 Location Label
               </label>
               <input
@@ -487,14 +538,14 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 value={customName}
                 onChange={(e) => setCustomName(e.target.value)}
                 placeholder="e.g. My Home Observatory"
-                className="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 focus:border-amber-600 focus:outline-none"
+                className="w-full rounded-xl border border-stone-300 dark:border-indigo-900/50 bg-white dark:bg-slate-900/60 px-3.5 py-2.5 text-base sm:text-sm text-stone-900 dark:text-slate-100 focus:border-amber-600 focus:ring-1 focus:ring-amber-500 focus:outline-none"
                 required
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-stone-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                   Latitude (° North)
                 </label>
                 <input
@@ -502,13 +553,13 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   value={customLat}
                   onChange={(e) => setCustomLat(e.target.value)}
                   placeholder="12.9719"
-                  className="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 font-mono focus:border-amber-600 focus:outline-none"
+                  className="w-full rounded-xl border border-stone-300 dark:border-indigo-900/50 bg-white dark:bg-slate-900/60 px-3.5 py-2.5 text-base sm:text-sm text-stone-900 dark:text-slate-100 font-mono focus:border-amber-600 focus:ring-1 focus:ring-amber-500 focus:outline-none"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-bold text-stone-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                   Longitude (° East)
                 </label>
                 <input
@@ -516,14 +567,14 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   value={customLon}
                   onChange={(e) => setCustomLon(e.target.value)}
                   placeholder="77.5937"
-                  className="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 font-mono focus:border-amber-600 focus:outline-none"
+                  className="w-full rounded-xl border border-stone-300 dark:border-indigo-900/50 bg-white dark:bg-slate-900/60 px-3.5 py-2.5 text-base sm:text-sm text-stone-900 dark:text-slate-100 font-mono focus:border-amber-600 focus:ring-1 focus:ring-amber-500 focus:outline-none"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-stone-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                 IANA Timezone
               </label>
               <input
@@ -531,22 +582,22 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 value={customTz}
                 onChange={(e) => setCustomTz(e.target.value)}
                 placeholder="Asia/Kolkata"
-                className="w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 font-mono focus:border-amber-600 focus:outline-none"
+                className="w-full rounded-xl border border-stone-300 dark:border-indigo-900/50 bg-white dark:bg-slate-900/60 px-3.5 py-2.5 text-base sm:text-sm text-stone-900 dark:text-slate-100 font-mono focus:border-amber-600 focus:ring-1 focus:ring-amber-500 focus:outline-none"
                 required
               />
             </div>
 
-            <div className="pt-2 flex justify-end space-x-3">
+            <div className="pt-3 flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-xl border border-stone-300 px-4 py-2 text-xs font-bold text-stone-700 hover:bg-stone-50"
+                className="rounded-xl border border-stone-300 dark:border-slate-700 px-4 py-2.5 text-xs font-bold text-stone-700 dark:text-slate-300 hover:bg-stone-50 dark:hover:bg-slate-800 touch-target-min cursor-pointer"
               >
                 {t.cancel}
               </button>
               <button
                 type="submit"
-                className="rounded-xl bg-amber-700 px-4 py-2 text-xs font-bold text-white hover:bg-amber-800 shadow-xs"
+                className="rounded-xl bg-amber-600 hover:bg-amber-700 active:scale-[0.98] px-5 py-2.5 text-xs font-bold text-white shadow-xs touch-target-min cursor-pointer"
               >
                 Apply Coordinates
               </button>

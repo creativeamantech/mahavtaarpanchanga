@@ -24,7 +24,7 @@ function requiredEnv(name: string): string {
 
 function config() {
   return {
-    spreadsheetId: requiredEnv("PANCHANGA_USERS_SPREADSHEET_ID"),
+    spreadsheetId: requiredEnv("PANCHANGA_AUTH_SPREADSHEET_ID"),
     lovableApiKey: requiredEnv("LOVABLE_API_KEY"),
     sheetsApiKey: requiredEnv("GOOGLE_SHEETS_API_KEY"),
     sessionSecret: requiredEnv("PANCHANGA_SESSION_SECRET"),

@@ -1,11 +1,14 @@
-import { createHmac, randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
+import { createHmac, createSign, randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 
 const scrypt = promisify(scryptCallback);
-const GATEWAY = "https://connector-gateway.lovable.dev/google_sheets/v4";
+const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+const GOOGLE_SHEETS_API = "https://sheets.googleapis.com/v4";
+const GOOGLE_SHEETS_SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const SESSION_COOKIE = "mahavtaar_panchanga_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 12;
 
+type ServiceAccount = { client_email: string; private_key: string };
 type UserRow = {
   userId: string; fullName: string; username: string; passwordHash: string;
   role: "admin" | "user" | "viewer"; status: string;
@@ -23,29 +26,92 @@ function requiredEnv(name: string): string {
 }
 
 function config() {
+  let serviceAccount: ServiceAccount;
+  try {
+    serviceAccount = JSON.parse(requiredEnv("GOOGLE_SERVICE_ACCOUNT_JSON")) as ServiceAccount;
+  } catch {
+    throw new Error("Authentication configuration missing or invalid: GOOGLE_SERVICE_ACCOUNT_JSON");
+  }
+  if (!serviceAccount.client_email || !serviceAccount.private_key) {
+    throw new Error("Authentication configuration missing or invalid: GOOGLE_SERVICE_ACCOUNT_JSON");
+  }
   return {
     spreadsheetId: requiredEnv("PANCHANGA_AUTH_SPREADSHEET_ID"),
-    lovableApiKey: requiredEnv("LOVABLE_API_KEY"),
-    sheetsApiKey: requiredEnv("GOOGLE_SHEETS_API_KEY"),
+    serviceAccount: {
+      client_email: serviceAccount.client_email,
+      private_key: serviceAccount.private_key.replace(/\\n/g, "\n"),
+    },
     sessionSecret: requiredEnv("PANCHANGA_SESSION_SECRET"),
   };
 }
 
-async function sheetsRequest(path: string, init?: RequestInit): Promise<any> {
+function base64url(value: string | Buffer): string {
+  return Buffer.from(value).toString("base64url");
+}
+
+let cachedAccessToken: { token: string; expiresAt: number } | undefined;
+
+async function getGoogleAccessToken(): Promise<string> {
   const c = config();
-  const response = await fetch(`${GATEWAY}/spreadsheets/${c.spreadsheetId}/${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${c.lovableApiKey}`,
-      "X-Connection-Api-Key": c.sheetsApiKey,
-      ...(init?.body ? { "Content-Type": "application/json" } : {}),
-      ...init?.headers,
-    },
+  if (cachedAccessToken && cachedAccessToken.expiresAt > Date.now() + 60_000) {
+    return cachedAccessToken.token;
+  }
+
+  const now = Math.floor(Date.now() / 1000);
+  const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const claim = base64url(JSON.stringify({
+    iss: c.serviceAccount.client_email,
+    scope: GOOGLE_SHEETS_SCOPE,
+    aud: GOOGLE_TOKEN_URL,
+    iat: now,
+    exp: now + 3600,
+  }));
+  const unsigned = `${header}.${claim}`;
+  const signer = createSign("RSA-SHA256");
+  signer.update(unsigned);
+  signer.end();
+  const assertion = `${unsigned}.${signer.sign(c.serviceAccount.private_key).toString("base64url")}`;
+
+  const response = await fetch(GOOGLE_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion,
+    }),
     cache: "no-store",
   });
   if (!response.ok) {
-    const detail = await response.text();
-    console.error("Google Sheets auth gateway error", response.status, detail.slice(0, 300));
+    console.error("Google OAuth token request failed", response.status, (await response.text()).slice(0, 300));
+    throw new Error("Google Sheets authentication is temporarily unavailable.");
+  }
+  const tokenData = await response.json() as { access_token?: string; expires_in?: number };
+  if (!tokenData.access_token) throw new Error("Google OAuth response did not include an access token.");
+  cachedAccessToken = {
+    token: tokenData.access_token,
+    expiresAt: Date.now() + (tokenData.expires_in ?? 3600) * 1000,
+  };
+  return tokenData.access_token;
+}
+
+async function sheetsRequest(range: string, init?: RequestInit): Promise<any> {
+  const c = config();
+  const accessToken = await getGoogleAccessToken();
+  const url = `${GOOGLE_SHEETS_API}/spreadsheets/${encodeURIComponent(c.spreadsheetId)}/values/${encodeURIComponent(range)}`;
+  const response = await fetch(
+    init?.method === "PUT" ? `${url}?valueInputOption=RAW` : url,
+    {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        ...(init?.body ? { "Content-Type": "application/json" } : {}),
+        ...init?.headers,
+      },
+      cache: "no-store",
+    },
+  );
+  if (!response.ok) {
+    console.error("Google Sheets API request failed", response.status, (await response.text()).slice(0, 300));
     throw new Error("User directory is temporarily unavailable.");
   }
   return response.status === 204 ? null : response.json();
@@ -67,15 +133,15 @@ function parseUser(row: string[], index: number): UserRow {
 }
 
 async function findUser(username: string): Promise<UserRow | undefined> {
-  const result = await sheetsRequest("values/Users!A2:Q1000");
+  const result = await sheetsRequest("Users!A2:Q1000");
   const rows: string[][] = result.values ?? [];
   return rows.map(parseUser).find((user) => user.username === username);
 }
 
 async function updateUserCells(rowNumber: number, range: string, values: unknown[][]): Promise<void> {
-  const encodedRange = encodeURIComponent(`Users!${range}`);
-  await sheetsRequest(`values/${encodedRange}?valueInputOption=RAW`, {
-    method: "PUT", body: JSON.stringify({ range: `Users!${range}`, majorDimension: "ROWS", values }),
+  await sheetsRequest(`Users!${range}`, {
+    method: "PUT",
+    body: JSON.stringify({ range: `Users!${range}`, majorDimension: "ROWS", values }),
   });
 }
 
@@ -133,12 +199,12 @@ export async function authenticate(usernameInput: string, password: string): Pro
     throw new Error("Invalid username or password.");
   }
   const user = await findUser(username);
-  // Perform a dummy scrypt on missing users to reduce username timing leaks.
   if (!user) {
     await scrypt(password, randomBytes(16), 32);
     throw new Error("Invalid username or password.");
   }
   if (user.status !== "active") throw new Error("This account is inactive. Contact the administrator.");
+  if (user.validUntil && Number.isNaN(Date.parse(user.validUntil))) throw new Error("Account expiry date is invalid. Contact the administrator.");
   if (user.validUntil && Date.parse(user.validUntil) < Date.now()) throw new Error("This account has expired.");
   if (user.lockedUntil && Date.parse(user.lockedUntil) > Date.now()) throw new Error("Account temporarily locked. Try again later.");
   if (!(await verifyPassword(password, user.passwordHash))) {

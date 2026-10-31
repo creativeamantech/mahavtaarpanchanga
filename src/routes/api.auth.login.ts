@@ -27,7 +27,7 @@ export const Route = createFileRoute("/api/auth/login")({
         });
       } catch (error) {
         const message = error instanceof Error ? error.message : "Authentication failed.";
-        const status = message.includes("configuration missing") || message.includes("directory") ? 503 : 401;
+        const status = message.includes("configuration missing") || message.includes("directory") || message.includes("temporarily unavailable") ? 503 : 401;
         return Response.json({ error: status === 401 ? message : "Authentication service is not configured." }, {
           status, headers: { "Cache-Control": "no-store" },
         });

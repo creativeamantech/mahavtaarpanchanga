@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "repository": "creativeamantech/mahavtaarpanchanga",
+    "commit": "e65f81caa7fedad0bcbfaf59335d70d8729d39a4",
+    "enginePath": "src/lib/panchangaEngine.server.ts",
+    "astronomyEngineVersion": "2.1.19",
+    "generatedAtUtc": "2026-11-19T08:21:11.237Z"
+  },
+  "fixtureCount": 41,
+  "fixtures": [
+    {
+      "id": "bhopal-2026-03-20",
+      "file": "bhopal-2026-03-20.json",
+      "city": "Bhopal",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "bhopal-2026-06-21",
+      "file": "bhopal-2026-06-21.json",
+      "city": "Bhopal",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "bhopal-2026-11-19",
+      "file": "bhopal-2026-11-19.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "indore-2026-03-20",
+      "file": "indore-2026-03-20.json",
+      "city": "Indore",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "indore-2026-06-21",
+      "file": "indore-2026-06-21.json",
+      "city": "Indore",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "indore-2026-11-19",
+      "file": "indore-2026-11-19.json",
+      "city": "Indore",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "ujjain-2026-03-20",
+      "file": "ujjain-2026-03-20.json",
+      "city": "Ujjain",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "ujjain-2026-06-21",
+      "file": "ujjain-2026-06-21.json",
+      "city": "Ujjain",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "ujjain-2026-11-19",
+      "file": "ujjain-2026-11-19.json",
+      "city": "Ujjain",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "varanasi-2026-03-20",
+      "file": "varanasi-2026-03-20.json",
+      "city": "Varanasi",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "varanasi-2026-06-21",
+      "file": "varanasi-2026-06-21.json",
+      "city": "Varanasi",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "varanasi-2026-11-19",
+      "file": "varanasi-2026-11-19.json",
+      "city": "Varanasi",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "delhi-2026-03-20",
+      "file": "delhi-2026-03-20.json",
+      "city": "Delhi",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "delhi-2026-06-21",
+      "file": "delhi-2026-06-21.json",
+      "city": "Delhi",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "delhi-2026-11-19",
+      "file": "delhi-2026-11-19.json",
+      "city": "Delhi",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "chennai-2026-03-20",
+      "file": "chennai-2026-03-20.json",
+      "city": "Chennai",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "chennai-2026-06-21",
+      "file": "chennai-2026-06-21.json",
+      "city": "Chennai",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "chennai-2026-11-19",
+      "file": "chennai-2026-11-19.json",
+      "city": "Chennai",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "london-2026-03-20",
+      "file": "london-2026-03-20.json",
+      "city": "London",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "london-2026-06-21",
+      "file": "london-2026-06-21.json",
+      "city": "London",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "london-2026-11-19",
+      "file": "london-2026-11-19.json",
+      "city": "London",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "new-york-2026-03-20",
+      "file": "new-york-2026-03-20.json",
+      "city": "New York",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "new-york-2026-06-21",
+      "file": "new-york-2026-06-21.json",
+      "city": "New York",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "new-york-2026-11-19",
+      "file": "new-york-2026-11-19.json",
+      "city": "New York",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "singapore-2026-03-20",
+      "file": "singapore-2026-03-20.json",
+      "city": "Singapore",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "singapore-2026-06-21",
+      "file": "singapore-2026-06-21.json",
+      "city": "Singapore",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "singapore-2026-11-19",
+      "file": "singapore-2026-11-19.json",
+      "city": "Singapore",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "sydney-2026-03-20",
+      "file": "sydney-2026-03-20.json",
+      "city": "Sydney",
+      "date": "2026-03-20",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "sydney-2026-06-21",
+      "file": "sydney-2026-06-21.json",
+      "city": "Sydney",
+      "date": "2026-06-21",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "sydney-2026-11-19",
+      "file": "sydney-2026-11-19.json",
+      "city": "Sydney",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "bhopal-2026-03-20-purnimanta",
+      "file": "bhopal-2026-03-20-purnimanta.json",
+      "city": "Bhopal",
+      "date": "2026-03-20",
+      "monthSystem": "purnimanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "bhopal-2026-06-21-purnimanta",
+      "file": "bhopal-2026-06-21-purnimanta.json",
+      "city": "Bhopal",
+      "date": "2026-06-21",
+      "monthSystem": "purnimanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "bhopal-2026-11-19-purnimanta",
+      "file": "bhopal-2026-11-19-purnimanta.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "purnimanta",
+      "coordinateSelection": "citra"
+    },
+    {
+      "id": "bhopal-2026-11-19-revati",
+      "file": "bhopal-2026-11-19-revati.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "revati"
+    },
+    {
+      "id": "bhopal-2026-11-19-rohini",
+      "file": "bhopal-2026-11-19-rohini.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "rohini"
+    },
+    {
+      "id": "bhopal-2026-11-19-pushya",
+      "file": "bhopal-2026-11-19-pushya.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "pushya"
+    },
+    {
+      "id": "bhopal-2026-11-19-mula",
+      "file": "bhopal-2026-11-19-mula.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "mula"
+    },
+    {
+      "id": "bhopal-2026-11-19-krishnamurti",
+      "file": "bhopal-2026-11-19-krishnamurti.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "krishnamurti"
+    },
+    {
+      "id": "bhopal-2026-11-19-raman",
+      "file": "bhopal-2026-11-19-raman.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "raman"
+    },
+    {
+      "id": "bhopal-2026-11-19-tropical",
+      "file": "bhopal-2026-11-19-tropical.json",
+      "city": "Bhopal",
+      "date": "2026-11-19",
+      "monthSystem": "amanta",
+      "coordinateSelection": "tropical"
+    },
+    {
+      "id": "bhopal-2023-07-18-lunar-month-probe",
+      "file": "bhopal-2023-07-18-lunar-month-probe.json",
+      "city": "Bhopal",
+      "date": "2023-07-18",
+      "monthSystem": "amanta",
+      "coordinateSelection": "citra"
+    }
+  ]
+}

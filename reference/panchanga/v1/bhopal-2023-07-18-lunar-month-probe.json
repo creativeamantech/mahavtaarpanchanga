@@ -1,0 +1,2007 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "repository": "creativeamantech/mahavtaarpanchanga",
+    "commit": "e65f81caa7fedad0bcbfaf59335d70d8729d39a4",
+    "enginePath": "src/lib/panchangaEngine.server.ts",
+    "astronomyEngineVersion": "2.1.19",
+    "generatedAtUtc": "2026-11-19T08:21:11.237Z"
+  },
+  "scenario": {
+    "id": "bhopal-2023-07-18-lunar-month-probe",
+    "description": "Historical lunar-month probe; record source output without assuming Adhika Masa status",
+    "date": "2023-07-18",
+    "city": "Bhopal",
+    "latitude": 23.2599,
+    "longitude": 77.4126,
+    "timezone": "Asia/Kolkata",
+    "monthSystem": "amanta",
+    "coordinateSelection": "citra"
+  },
+  "expected": {
+    "city": "Bhopal",
+    "date": "18/07/2023",
+    "timezone": "Asia/Kolkata",
+    "jd": 2460143.51277,
+    "sunrise_jd": 8598.51277,
+    "coordinate_mode": "sidereal",
+    "coordinate_label": "Chitra Paksha (Lahiri)",
+    "ayanamsa": "Chitra Paksha (Lahiri)",
+    "ayanamsa_key": "citra",
+    "ayanamsa_degrees": 24.185976,
+    "month_system": "amanta",
+    "month_system_label": "Amānta (New Moon to New Moon)",
+    "samvatsara": "Śobhakṛt",
+    "samvatsara_north": "Śobhakṛt",
+    "ayana": "Dakṣiṇāyana",
+    "drik_ayana": "Dakṣiṇāyana",
+    "masa": "Āṣāḍha",
+    "masa_number": 4,
+    "is_adhika": false,
+    "rtu": "Grīṣma Ṛtu",
+    "drik_rtu": "Varṣā Ṛtu",
+    "vaara": "Maṅgalavāra",
+    "weekday": 2,
+    "kali_day": 1871678,
+    "saka_year": 1945,
+    "kali_year": 5124,
+    "vikrama_year": 2080,
+    "sunrise": "05:48:23",
+    "sunset": "19:04:36",
+    "next_sunrise": "29:48:49",
+    "sunrise_hours": 5.806571944444444,
+    "sunset_hours": 19.0767175,
+    "next_sunrise_hours": 29.813734166666666,
+    "previous_sunrise_ms": 1689553078020,
+    "previous_sunset_ms": 1689600892134,
+    "sunrise_ms": 1689639503659,
+    "sunset_ms": 1689687276183,
+    "next_sunrise_ms": 1689725929443,
+    "moonrise": "05:55:33",
+    "moonrise_status": "ok",
+    "moonset": "19:53:14",
+    "moonset_status": "ok",
+    "day_duration": "13:16:12",
+    "night_duration": "10:44:13",
+    "paksha": "Śukla",
+    "rahu_kala": {
+      "start": "15:45:33",
+      "end": "17:25:04",
+      "startTimeMs": 1689675333052,
+      "endTimeMs": 1689681304617.5,
+      "name": "Rāhu Kāla"
+    },
+    "yamaganda": {
+      "start": "09:07:26",
+      "end": "10:46:58",
+      "startTimeMs": 1689651446790,
+      "endTimeMs": 1689657418355.5,
+      "name": "Yamagaṇḍa"
+    },
+    "gulika_kala": {
+      "start": "12:26:29",
+      "end": "14:06:01",
+      "startTimeMs": 1689663389921,
+      "endTimeMs": 1689669361486.5,
+      "name": "Gulikā Kāla"
+    },
+    "abhijit_muhurta": {
+      "start": "11:59:57",
+      "end": "12:53:02",
+      "startTimeMs": 1689661797503.5334,
+      "endTimeMs": 1689664982338.4666,
+      "name": "Abhijit Muhūrta"
+    },
+    "brahma_muhurta": {
+      "start": "04:12:23",
+      "end": "05:00:23",
+      "startTimeMs": 1689633743659,
+      "endTimeMs": 1689636623659,
+      "name": "Brahma Muhūrta"
+    },
+    "amrita_kala": [
+      {
+        "start": "13:24:23",
+        "end": "15:00:23",
+        "name": "Amṛta Kāla"
+      }
+    ],
+    "durmuhurta": [
+      {
+        "start": "08:27:38",
+        "end": "09:20:42"
+      },
+      {
+        "start": "23:22:17",
+        "end": "24:15:22"
+      }
+    ],
+    "varjyam": [
+      {
+        "start": "07:48:23",
+        "end": "09:24:23",
+        "name": "Varjyam"
+      }
+    ],
+    "gauri_choghadiya_day": [
+      {
+        "name": "Roga",
+        "start": "05:48:23",
+        "end": "07:27:55"
+      },
+      {
+        "name": "Udvega",
+        "start": "07:27:55",
+        "end": "09:07:26"
+      },
+      {
+        "name": "Chara",
+        "start": "09:07:26",
+        "end": "10:46:58"
+      },
+      {
+        "name": "Labha",
+        "start": "10:46:58",
+        "end": "12:26:29"
+      },
+      {
+        "name": "Amrita",
+        "start": "12:26:29",
+        "end": "14:06:01"
+      },
+      {
+        "name": "Kala",
+        "start": "14:06:01",
+        "end": "15:45:33"
+      },
+      {
+        "name": "Shubha",
+        "start": "15:45:33",
+        "end": "17:25:04"
+      },
+      {
+        "name": "Roga",
+        "start": "17:25:04",
+        "end": "19:04:36"
+      }
+    ],
+    "gauri_choghadiya_night": [
+      {
+        "name": "Roga",
+        "start": "19:04:36",
+        "end": "20:25:07"
+      },
+      {
+        "name": "Udvega",
+        "start": "20:25:07",
+        "end": "21:45:39"
+      },
+      {
+        "name": "Chara",
+        "start": "21:45:39",
+        "end": "23:06:11"
+      },
+      {
+        "name": "Labha",
+        "start": "23:06:11",
+        "end": "24:26:42"
+      },
+      {
+        "name": "Amrita",
+        "start": "24:26:42",
+        "end": "25:47:14"
+      },
+      {
+        "name": "Kala",
+        "start": "25:47:14",
+        "end": "27:07:46"
+      },
+      {
+        "name": "Shubha",
+        "start": "27:07:46",
+        "end": "28:28:17"
+      },
+      {
+        "name": "Roga",
+        "start": "28:28:17",
+        "end": "29:48:49"
+      }
+    ],
+    "tithi": [
+      {
+        "number": 1,
+        "name": "Śukla pakṣa prathamā",
+        "ends": "26:10:21",
+        "endTimeMs": 1689712821578,
+        "tithiSwara": {
+          "paksha": "shukla",
+          "tithiNumber": 1,
+          "tithiCycleNumber": 1,
+          "startNadi": "ida",
+          "endNadi": "pingala",
+          "startEvent": null,
+          "endEvent": {
+            "type": "end",
+            "nadi": "pingala",
+            "nadiLabel": "Pingala (Right Nostril)",
+            "startTimeMs": 1689709221578,
+            "endTimeMs": 1689712821578,
+            "formattedStart": "01:10 AM",
+            "formattedEnd": "02:10 AM",
+            "formattedRange": "01:10 AM → 02:10 AM",
+            "durationMs": 3600000,
+            "durationMinutes": 60,
+            "hasOverlap": false
+          },
+          "hasOverlap": false
+        }
+      },
+      {
+        "number": 2,
+        "name": "Śukla pakṣa dvitīyā",
+        "ends": null,
+        "startTimeMs": 1689712821578,
+        "starts": "Jul 19, 02:10 AM",
+        "tithiSwara": {
+          "paksha": "shukla",
+          "tithiNumber": 2,
+          "tithiCycleNumber": 2,
+          "startNadi": "ida",
+          "endNadi": "pingala",
+          "startEvent": {
+            "type": "start",
+            "nadi": "ida",
+            "nadiLabel": "Ida (Left Nostril)",
+            "startTimeMs": 1689712821578,
+            "endTimeMs": 1689716421578,
+            "formattedStart": "02:10 AM",
+            "formattedEnd": "03:10 AM",
+            "formattedRange": "02:10 AM → 03:10 AM",
+            "durationMs": 3600000,
+            "durationMinutes": 60,
+            "hasOverlap": false
+          },
+          "endEvent": null,
+          "hasOverlap": false
+        }
+      }
+    ],
+    "nakshatra": [
+      {
+        "number": 8,
+        "name": "Puṣya",
+        "ends": null,
+        "startTimeMs": 1689637290573,
+        "starts": "Jul 18, 05:11 AM",
+        "nakshatraSwara": {
+          "nakshatraNumber": 8,
+          "nakshatraName": "Pushya",
+          "startNadi": "ida",
+          "endNadi": "pingala",
+          "startNostril": "Left",
+          "endNostril": "Right",
+          "startEvent": {
+            "type": "start",
+            "nadi": "ida",
+            "nadiLabel": "Ida (Left Nostril / Lunar)",
+            "startTimeMs": 1689637290573,
+            "endTimeMs": 1689640890573,
+            "durationMinutes": 60,
+            "formattedStart": "05:11 AM",
+            "formattedEnd": "06:11 AM",
+            "formattedRange": "05:11 AM → 06:11 AM",
+            "hasOverlap": false,
+            "isActive": false
+          },
+          "endEvent": null,
+          "hasOverlap": false
+        }
+      }
+    ],
+    "yoga": [
+      {
+        "number": 14,
+        "name": "Harṣaṇa",
+        "ends": "09:36:01",
+        "startTimeMs": 1689564467477,
+        "endTimeMs": 1689653161422,
+        "starts": "Jul 17, 08:57 AM"
+      },
+      {
+        "number": 15,
+        "name": "Vajra",
+        "ends": null,
+        "startTimeMs": 1689653161422,
+        "starts": "Jul 18, 09:36 AM"
+      }
+    ],
+    "karana": [
+      {
+        "number": 1,
+        "name": "Kiṃstughna",
+        "ends": "13:04:20",
+        "endTimeMs": 1689665660348
+      },
+      {
+        "number": 2,
+        "name": "Bava",
+        "ends": "26:10:22",
+        "startTimeMs": 1689665660348,
+        "endTimeMs": 1689712822017,
+        "starts": "Jul 18, 01:04 PM"
+      }
+    ],
+    "planets": [
+      {
+        "id": "sun",
+        "name": "Sun",
+        "sanskritName": "Sūrya",
+        "longitude": 115.16569574748044,
+        "siderealLongitude": 90.97971941509923,
+        "rasi": "karkāṭaka",
+        "rasiNumber": 4,
+        "degreesInRasi": "0° 58' 46\"",
+        "nakshatra": "Punarvasū",
+        "nakshatraNumber": 7,
+        "pada": 4,
+        "isRetrograde": false
+      },
+      {
+        "id": "moon",
+        "name": "Moon",
+        "sanskritName": "Candra",
+        "longitude": 117.82666789463075,
+        "siderealLongitude": 93.64069156224957,
+        "rasi": "karkāṭaka",
+        "rasiNumber": 4,
+        "degreesInRasi": "3° 38' 26\"",
+        "nakshatra": "Puṣya",
+        "nakshatraNumber": 8,
+        "pada": 1,
+        "isRetrograde": false
+      },
+      {
+        "id": "mars",
+        "name": "Mars",
+        "sanskritName": "Maṅgala",
+        "longitude": 154.59521658503593,
+        "siderealLongitude": 130.40924025265474,
+        "rasi": "siṃha",
+        "rasiNumber": 5,
+        "degreesInRasi": "10° 24' 33\"",
+        "nakshatra": "Maghā",
+        "nakshatraNumber": 10,
+        "pada": 4,
+        "isRetrograde": false
+      },
+      {
+        "id": "mercury",
+        "name": "Mercury",
+        "sanskritName": "Budha",
+        "longitude": 132.73758740097168,
+        "siderealLongitude": 108.55161106859049,
+        "rasi": "karkāṭaka",
+        "rasiNumber": 4,
+        "degreesInRasi": "18° 33' 05\"",
+        "nakshatra": "Āśleṣā",
+        "nakshatraNumber": 9,
+        "pada": 1,
+        "isRetrograde": false
+      },
+      {
+        "id": "jupiter",
+        "name": "Jupiter",
+        "sanskritName": "Guru",
+        "longitude": 41.958706182919606,
+        "siderealLongitude": 17.772729850538383,
+        "rasi": "meṣa",
+        "rasiNumber": 1,
+        "degreesInRasi": "17° 46' 21\"",
+        "nakshatra": "Bharaṇī",
+        "nakshatraNumber": 2,
+        "pada": 2,
+        "isRetrograde": false
+      },
+      {
+        "id": "venus",
+        "name": "Venus",
+        "sanskritName": "Śukra",
+        "longitude": 148.12478042765747,
+        "siderealLongitude": 123.93880409527628,
+        "rasi": "siṃha",
+        "rasiNumber": 5,
+        "degreesInRasi": "3° 56' 19\"",
+        "nakshatra": "Maghā",
+        "nakshatraNumber": 10,
+        "pada": 2,
+        "isRetrograde": false
+      },
+      {
+        "id": "saturn",
+        "name": "Saturn",
+        "sanskritName": "Śani",
+        "longitude": 336.4804349453197,
+        "siderealLongitude": 312.29445861293857,
+        "rasi": "kumbha",
+        "rasiNumber": 11,
+        "degreesInRasi": "12° 17' 40\"",
+        "nakshatra": "Śatabhiṣā",
+        "nakshatraNumber": 24,
+        "pada": 2,
+        "isRetrograde": true
+      },
+      {
+        "id": "rahu",
+        "name": "Rahu",
+        "sanskritName": "Rāhu",
+        "longitude": 29.721011312519124,
+        "siderealLongitude": 5.535034980137937,
+        "rasi": "meṣa",
+        "rasiNumber": 1,
+        "degreesInRasi": "5° 32' 06\"",
+        "nakshatra": "Aśvinī",
+        "nakshatraNumber": 1,
+        "pada": 2,
+        "isRetrograde": true
+      },
+      {
+        "id": "ketu",
+        "name": "Ketu",
+        "sanskritName": "Ketu",
+        "longitude": 209.72101131251912,
+        "siderealLongitude": 185.53503498013788,
+        "rasi": "tulā",
+        "rasiNumber": 7,
+        "degreesInRasi": "5° 32' 06\"",
+        "nakshatra": "Cittā",
+        "nakshatraNumber": 14,
+        "pada": 4,
+        "isRetrograde": true
+      }
+    ],
+    "sun_rasi": "karkāṭaka",
+    "moon_rasi": "karkāṭaka",
+    "swara_yoga": {
+      "dayNumber": 1,
+      "tithiName": "Pratipada",
+      "paksha": "Shukla Paksha",
+      "sunriseSwara": "ida",
+      "sunsetSwara": "pingala",
+      "sunriseNostril": "Left",
+      "sunsetNostril": "Right",
+      "moonriseSwara": "pingala",
+      "moonsetSwara": "ida",
+      "moonriseNostril": "Right",
+      "moonsetNostril": "Left",
+      "sunriseWindow": {
+        "start": "05:48",
+        "end": "06:48",
+        "windowFormatted": "05:48 – 06:48",
+        "ruleDescription": {
+          "en": "Starts at Sunrise, runs for 1 hour",
+          "hi": "सूर्योदय से 1 घंटे तक प्रवहमान रहता है",
+          "sa": "सूर्योदयात् आरभ्य १ होरापर्यन्तं प्रवहति"
+        }
+      },
+      "sunsetWindow": {
+        "start": "18:05",
+        "end": "19:05",
+        "windowFormatted": "18:05 – 19:05",
+        "ruleDescription": {
+          "en": "Starts 1 hour before Sunset, runs until Sunset",
+          "hi": "सूर्यास्त से 1 घंटा पहले प्रारंभ होता है",
+          "sa": "सूर्यास्तात् १ होरा पूर्वम् आरभ्य सूर्यास्तपर्यन्तं प्रवहति"
+        }
+      },
+      "moonriseWindow": {
+        "start": "05:56",
+        "end": "06:56",
+        "windowFormatted": "05:56 – 06:56",
+        "ruleDescription": {
+          "en": "Starts at Moonrise, runs for 1 hour (Opposite of Sunrise)",
+          "hi": "चन्द्रोदय से 1 घंटे तक प्रवहमान रहता है (सूर्योदय का विपरीत)",
+          "sa": "चन्द्रोदयात् आरभ्य १ होरापर्यन्तं प्रवहति (सूर्योदयविपरीतम्)"
+        }
+      },
+      "moonsetWindow": {
+        "start": "18:53",
+        "end": "19:53",
+        "windowFormatted": "18:53 – 19:53",
+        "ruleDescription": {
+          "en": "Starts 1 hour before Moonset, runs until Moonset (Opposite of Sunset)",
+          "hi": "चन्द्रास्त से 1 घंटा पहले प्रारंभ होता है (सूर्यास्त का विपरीत)",
+          "sa": "चन्द्रास्तात् १ होरा पूर्वम् आरभ्य चन्द्रास्तपर्यन्तं प्रवहति (सूर्यास्तविपरीतम्)"
+        }
+      }
+    },
+    "planet_transitions": {
+      "planets": [
+        {
+          "planetId": "sun",
+          "planetName": "Sun",
+          "sanskritName": "Sūrya",
+          "symbol": "☉",
+          "currentRasi": "कर्क",
+          "currentRasiNumber": 4,
+          "degreesInRasi": "0° 58' 46\"",
+          "degreesInRasiNum": 0.9797194150992254,
+          "progressPercent": 3,
+          "currentNakshatra": "पुनर्वसु",
+          "currentNakshatraNumber": 7,
+          "currentPada": 4,
+          "isRetrograde": false,
+          "isCombust": false,
+          "nextRasiTransit": {
+            "id": "sun-rasi-1692259537252",
+            "planetId": "sun",
+            "planetName": "Sun",
+            "sanskritName": "Sūrya",
+            "symbol": "☉",
+            "type": "rasi",
+            "timestamp": "2023-08-17T08:05:37.252Z",
+            "dateStr": "17/08/2023",
+            "timeStr": "13:35:37",
+            "dayOfWeek": "Thursday",
+            "relativeText": "in 30d 7h",
+            "isToday": false,
+            "fromValue": "Cancer",
+            "toValue": "Leo",
+            "fromName": "कर्क",
+            "toName": "सिंह",
+            "specialName": "Siṁha Saṅkrānti",
+            "punyaKala": {
+              "start": "07:11:37",
+              "end": "19:59:37",
+              "name": "Siṁha Saṅkrānti Puṇyakāla"
+            },
+            "mahaPunyaKala": {
+              "start": "11:59:37",
+              "end": "15:11:37",
+              "name": "Siṁha Saṅkrānti Mahāpuṇyakāla"
+            },
+            "description": {
+              "en": "Sūrya enters Leo marking sacred Siṁha Saṅkrānti. Auspicious period for solar worship, charity (Dāna), ancestor homage (Tarpaṇa), and spiritual sadhana.",
+              "hi": "सूर्य का सिंह में प्रवेश — पावन Siṁha Saṅkrānti। सूर्य तर्पण, दान-पुण्य, पितृ शांति एवं जप-तप हेतु विशेष फलदायी।",
+              "sa": "सूर्यस्य सिंहप्रवेशः (Siṁha Saṅkrānti)। पितृतर्पण-दान-जप-सूर्यपूजनार्थं महापुण्यप्रदः कालः।"
+            }
+          },
+          "nextNakshatraTransit": {
+            "id": "sun-nak-1689852550534",
+            "planetId": "sun",
+            "planetName": "Sun",
+            "sanskritName": "Sūrya",
+            "symbol": "☉",
+            "type": "nakshatra",
+            "timestamp": "2023-07-20T11:29:10.534Z",
+            "dateStr": "20/07/2023",
+            "timeStr": "16:59:10",
+            "dayOfWeek": "Thursday",
+            "relativeText": "in 2d 11h",
+            "isToday": false,
+            "fromValue": "Punarvasu",
+            "toValue": "Pushya",
+            "fromName": "पुनर्वसु",
+            "toName": "पुष्य",
+            "description": {
+              "en": "Sun enters Pushya Nakṣatra (पुष्य). Shifts subtle cosmic resonance and lunar-planetary vibration.",
+              "hi": "Sūrya का पुष्य नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+              "sa": "Sūryaस्य पुष्यनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+            }
+          }
+        },
+        {
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "currentRasi": "कर्क",
+          "currentRasiNumber": 4,
+          "degreesInRasi": "3° 38' 26\"",
+          "degreesInRasiNum": 3.6406915622495717,
+          "progressPercent": 12,
+          "currentNakshatra": "पुष्य",
+          "currentNakshatraNumber": 8,
+          "currentPada": 1,
+          "isRetrograde": false,
+          "isCombust": false,
+          "nextRasiTransit": {
+            "id": "moon-rasi-1689830725534",
+            "planetId": "moon",
+            "planetName": "Moon",
+            "sanskritName": "Candra",
+            "symbol": "☽",
+            "type": "rasi",
+            "timestamp": "2023-07-20T05:25:25.534Z",
+            "dateStr": "20/07/2023",
+            "timeStr": "10:55:25",
+            "dayOfWeek": "Thursday",
+            "relativeText": "in 2d 5h",
+            "isToday": false,
+            "fromValue": "Cancer",
+            "toValue": "Leo",
+            "fromName": "कर्क",
+            "toName": "सिंह",
+            "description": {
+              "en": "Candra enters Leo (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+              "hi": "चन्द्रमा का सिंह में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+              "sa": "चन्द्रस्य सिंहप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+            }
+          },
+          "nextNakshatraTransit": {
+            "id": "moon-nak-1689733694284",
+            "planetId": "moon",
+            "planetName": "Moon",
+            "sanskritName": "Candra",
+            "symbol": "☽",
+            "type": "nakshatra",
+            "timestamp": "2023-07-19T02:28:14.284Z",
+            "dateStr": "19/07/2023",
+            "timeStr": "07:58:14",
+            "dayOfWeek": "Wednesday",
+            "relativeText": "in 1d 2h",
+            "isToday": false,
+            "fromValue": "Pushya",
+            "toValue": "Ashlesha",
+            "fromName": "पुष्य",
+            "toName": "आश्लेषा",
+            "description": {
+              "en": "Moon enters Ashlesha Nakṣatra (आश्लेषा). Shifts subtle cosmic resonance and lunar-planetary vibration.",
+              "hi": "Candra का आश्लेषा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+              "sa": "Candraस्य आश्लेषानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+            }
+          }
+        },
+        {
+          "planetId": "mars",
+          "planetName": "Mars",
+          "sanskritName": "Maṅgala",
+          "symbol": "♂",
+          "currentRasi": "सिंह",
+          "currentRasiNumber": 5,
+          "degreesInRasi": "10° 24' 33\"",
+          "degreesInRasiNum": 10.40924025265474,
+          "progressPercent": 35,
+          "currentNakshatra": "मघा",
+          "currentNakshatraNumber": 10,
+          "currentPada": 4,
+          "isRetrograde": false,
+          "isCombust": false,
+          "combustDistanceDeg": 39.4,
+          "nextRasiTransit": {
+            "id": "mars-rasi-1692354522409",
+            "planetId": "mars",
+            "planetName": "Mars",
+            "sanskritName": "Maṅgala",
+            "symbol": "♂",
+            "type": "rasi",
+            "timestamp": "2023-08-18T10:28:42.409Z",
+            "dateStr": "18/08/2023",
+            "timeStr": "15:58:42",
+            "dayOfWeek": "Friday",
+            "relativeText": "in 31d 10h",
+            "isToday": false,
+            "fromValue": "Leo",
+            "toValue": "Virgo",
+            "fromName": "सिंह",
+            "toName": "कन्या",
+            "description": {
+              "en": "Maṅgala enters Virgo. Energizes courage, physical vigor, property ventures, and bold undertakings.",
+              "hi": "मंगल का कन्या में प्रवेश। साहस, पराक्रम, भूमि व ऊर्जा संबंधी कार्यों पर प्रभाव।",
+              "sa": "मङ्गलस्य कन्याप्रवेशः। पराक्रम-ऊर्जा-विजयकार्यार्थं फलप्रदः।"
+            }
+          },
+          "nextNakshatraTransit": {
+            "id": "mars-nak-1690050550534",
+            "planetId": "mars",
+            "planetName": "Mars",
+            "sanskritName": "Maṅgala",
+            "symbol": "♂",
+            "type": "nakshatra",
+            "timestamp": "2023-07-22T18:29:10.534Z",
+            "dateStr": "22/07/2023",
+            "timeStr": "23:59:10",
+            "dayOfWeek": "Saturday",
+            "relativeText": "in 4d 18h",
+            "isToday": false,
+            "fromValue": "Magha",
+            "toValue": "Purva Phalguni",
+            "fromName": "मघा",
+            "toName": "पूर्वाफाल्गुनी",
+            "description": {
+              "en": "Mars enters Purva Phalguni Nakṣatra (पूर्वाफाल्गुनी). Shifts subtle cosmic resonance and lunar-planetary vibration.",
+              "hi": "Maṅgala का पूर्वा फाल्गुनी नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+              "sa": "Maṅgalaस्य पूर्वाफाल्गुनीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+            }
+          }
+        },
+        {
+          "planetId": "mercury",
+          "planetName": "Mercury",
+          "sanskritName": "Budha",
+          "symbol": "☿",
+          "currentRasi": "कर्क",
+          "currentRasiNumber": 4,
+          "degreesInRasi": "18° 33' 05\"",
+          "degreesInRasiNum": 18.55161106859049,
+          "progressPercent": 62,
+          "currentNakshatra": "आश्लेषा",
+          "currentNakshatraNumber": 9,
+          "currentPada": 1,
+          "isRetrograde": false,
+          "isCombust": false,
+          "combustDistanceDeg": 17.6,
+          "nextRasiTransit": {
+            "id": "mercury-rasi-1690239810690",
+            "planetId": "mercury",
+            "planetName": "Mercury",
+            "sanskritName": "Budha",
+            "symbol": "☿",
+            "type": "rasi",
+            "timestamp": "2023-07-24T23:03:30.690Z",
+            "dateStr": "25/07/2023",
+            "timeStr": "04:33:30",
+            "dayOfWeek": "Tuesday",
+            "relativeText": "in 6d 22h",
+            "isToday": false,
+            "fromValue": "Cancer",
+            "toValue": "Leo",
+            "fromName": "कर्क",
+            "toName": "सिंह",
+            "description": {
+              "en": "Budha enters Leo. Enhances intellect, commercial negotiations, speech, and mathematical precision.",
+              "hi": "बुध का सिंह में प्रवेश। बुद्धि, वाणी, व्यापार व कलात्मक निर्णयों के लिए अनुकूल।",
+              "sa": "बुधस्य सिंहप्रवेशः। बुद्धि-विद्या-वाणिज्य-संवादार्थं शुभकरः।"
+            }
+          },
+          "nextNakshatraTransit": {
+            "id": "mercury-nak-1690239803659",
+            "planetId": "mercury",
+            "planetName": "Mercury",
+            "sanskritName": "Budha",
+            "symbol": "☿",
+            "type": "nakshatra",
+            "timestamp": "2023-07-24T23:03:23.659Z",
+            "dateStr": "25/07/2023",
+            "timeStr": "04:33:23",
+            "dayOfWeek": "Tuesday",
+            "relativeText": "in 6d 22h",
+            "isToday": false,
+            "fromValue": "Ashlesha",
+            "toValue": "Magha",
+            "fromName": "आश्लेषा",
+            "toName": "मघा",
+            "description": {
+              "en": "Mercury enters Magha Nakṣatra (मघा). Shifts subtle cosmic resonance and lunar-planetary vibration.",
+              "hi": "Budha का मघा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+              "sa": "Budhaस्य मघानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+            }
+          }
+        },
+        {
+          "planetId": "jupiter",
+          "planetName": "Jupiter",
+          "sanskritName": "Guru",
+          "symbol": "♃",
+          "currentRasi": "मेष",
+          "currentRasiNumber": 1,
+          "degreesInRasi": "17° 46' 21\"",
+          "degreesInRasiNum": 17.772729850538383,
+          "progressPercent": 59,
+          "currentNakshatra": "भरणी",
+          "currentNakshatraNumber": 2,
+          "currentPada": 2,
+          "isRetrograde": false,
+          "isCombust": false,
+          "combustDistanceDeg": 73.2,
+          "nextRasiTransit": {
+            "id": "jupiter-rasi-1714549513815",
+            "planetId": "jupiter",
+            "planetName": "Jupiter",
+            "sanskritName": "Guru",
+            "symbol": "♃",
+            "type": "rasi",
+            "timestamp": "2024-05-01T07:45:13.815Z",
+            "dateStr": "01/05/2024",
+            "timeStr": "13:15:13",
+            "dayOfWeek": "Wednesday",
+            "relativeText": "in 288d 7h",
+            "isToday": false,
+            "fromValue": "Aries",
+            "toValue": "Taurus",
+            "fromName": "मेष",
+            "toName": "वृषभ",
+            "description": {
+              "en": "Guru (Bṛhaspati) enters Taurus. Major divine blessing for wisdom, dharma, progeny, higher knowledge, and auspicious ceremonies.",
+              "hi": "देवगुरु बृहस्पति का वृषभ में प्रवेश। ज्ञान, धर्म, संतति एवं मांगलिक आयोजनों के लिए अत्यंत कल्याणकारी।",
+              "sa": "गुरोः वृषभप्रवेशः। धर्म-विद्या-माङ्गलिककार्याणां कृते परमशुभप्रदः।"
+            }
+          }
+        },
+        {
+          "planetId": "venus",
+          "planetName": "Venus",
+          "sanskritName": "Śukra",
+          "symbol": "♀",
+          "currentRasi": "सिंह",
+          "currentRasiNumber": 5,
+          "degreesInRasi": "3° 56' 19\"",
+          "degreesInRasiNum": 3.938804095276282,
+          "progressPercent": 13,
+          "currentNakshatra": "मघा",
+          "currentNakshatraNumber": 10,
+          "currentPada": 2,
+          "isRetrograde": false,
+          "isCombust": false,
+          "combustDistanceDeg": 33,
+          "nextRasiTransit": {
+            "id": "venus-rasi-1691385791940",
+            "planetId": "venus",
+            "planetName": "Venus",
+            "sanskritName": "Śukra",
+            "symbol": "♀",
+            "type": "rasi",
+            "timestamp": "2023-08-07T05:23:11.940Z",
+            "dateStr": "07/08/2023",
+            "timeStr": "10:53:11",
+            "dayOfWeek": "Monday",
+            "relativeText": "in 20d 5h",
+            "isToday": false,
+            "fromValue": "Leo",
+            "toValue": "Cancer",
+            "fromName": "सिंह",
+            "toName": "कर्क",
+            "description": {
+              "en": "Śukra enters Cancer. Auspicious for creative arts, aesthetic grace, marital harmony, and prosperity.",
+              "hi": "शुक्र का कर्क में प्रवेश। सुख-समृद्धि, कला, सौंदर्य एवं दांपत्य सौहार्द को बढ़ाता है।",
+              "sa": "शुक्रस्य कर्कप्रवेशः। सौन्दर्य-समृद्धि-कलानां कृते शुभप्रदः।"
+            }
+          },
+          "nextNakshatraTransit": {
+            "id": "venus-nak-1691385784909",
+            "planetId": "venus",
+            "planetName": "Venus",
+            "sanskritName": "Śukra",
+            "symbol": "♀",
+            "type": "nakshatra",
+            "timestamp": "2023-08-07T05:23:04.909Z",
+            "dateStr": "07/08/2023",
+            "timeStr": "10:53:04",
+            "dayOfWeek": "Monday",
+            "relativeText": "in 20d 5h",
+            "isToday": false,
+            "fromValue": "Magha",
+            "toValue": "Ashlesha",
+            "fromName": "मघा",
+            "toName": "आश्लेषा",
+            "description": {
+              "en": "Venus enters Ashlesha Nakṣatra (आश्लेषा). Shifts subtle cosmic resonance and lunar-planetary vibration.",
+              "hi": "Śukra का आश्लेषा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+              "sa": "Śukraस्य आश्लेषानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+            }
+          }
+        },
+        {
+          "planetId": "saturn",
+          "planetName": "Saturn",
+          "sanskritName": "Śani",
+          "symbol": "♄",
+          "currentRasi": "कुम्भ",
+          "currentRasiNumber": 11,
+          "degreesInRasi": "12° 17' 40\"",
+          "degreesInRasiNum": 12.29445861293857,
+          "progressPercent": 41,
+          "currentNakshatra": "शतभिषा",
+          "currentNakshatraNumber": 24,
+          "currentPada": 2,
+          "isRetrograde": true,
+          "isCombust": false,
+          "combustDistanceDeg": 138.7,
+          "nextRasiTransit": {
+            "id": "saturn-rasi-1743266144284",
+            "planetId": "saturn",
+            "planetName": "Saturn",
+            "sanskritName": "Śani",
+            "symbol": "♄",
+            "type": "rasi",
+            "timestamp": "2025-03-29T16:35:44.284Z",
+            "dateStr": "29/03/2025",
+            "timeStr": "22:05:44",
+            "dayOfWeek": "Saturday",
+            "relativeText": "in 620d 16h",
+            "isToday": false,
+            "fromValue": "Aquarius",
+            "toValue": "Pisces",
+            "fromName": "कुम्भ",
+            "toName": "मीन",
+            "description": {
+              "en": "Śani enters Pisces. Karmic milestone; rewards perseverance, justice, discipline, and devotion to righteous conduct.",
+              "hi": "शनि देव का मीन में प्रवेश। महत्वपूर्ण कर्मफल गोचर; अनुशासन, संयम व धर्मपालन का संदेश।",
+              "sa": "शनेः मीनप्रवेशः। कर्मफल-संयम-न्यायधर्मपालनार्थं विशेषकालः।"
+            }
+          },
+          "nextNakshatraTransit": {
+            "id": "saturn-nak-1697339903659",
+            "planetId": "saturn",
+            "planetName": "Saturn",
+            "sanskritName": "Śani",
+            "symbol": "♄",
+            "type": "nakshatra",
+            "timestamp": "2023-10-15T03:18:23.659Z",
+            "dateStr": "15/10/2023",
+            "timeStr": "08:48:23",
+            "dayOfWeek": "Sunday",
+            "relativeText": "in 89d 3h",
+            "isToday": false,
+            "fromValue": "Shatabhisha",
+            "toValue": "Dhanishta",
+            "fromName": "शतभिषा",
+            "toName": "धनिष्ठा",
+            "description": {
+              "en": "Saturn enters Dhanishta Nakṣatra (धनिष्ठा). Shifts subtle cosmic resonance and lunar-planetary vibration.",
+              "hi": "Śani का धनिष्ठा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+              "sa": "Śaniस्य धनिष्ठानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+            }
+          }
+        },
+        {
+          "planetId": "rahu",
+          "planetName": "Rahu",
+          "sanskritName": "Rāhu",
+          "symbol": "☊",
+          "currentRasi": "मेष",
+          "currentRasiNumber": 1,
+          "degreesInRasi": "5° 32' 06\"",
+          "degreesInRasiNum": 5.535034980137937,
+          "progressPercent": 18,
+          "currentNakshatra": "अश्विनी",
+          "currentNakshatraNumber": 1,
+          "currentPada": 2,
+          "isRetrograde": true,
+          "isCombust": false,
+          "nextRasiTransit": {
+            "id": "rahu-rasi-1698664021627",
+            "planetId": "rahu",
+            "planetName": "Rahu",
+            "sanskritName": "Rāhu",
+            "symbol": "☊",
+            "type": "rasi",
+            "timestamp": "2023-10-30T11:07:01.627Z",
+            "dateStr": "30/10/2023",
+            "timeStr": "16:37:01",
+            "dayOfWeek": "Monday",
+            "relativeText": "in 104d 10h",
+            "isToday": false,
+            "fromValue": "Aries",
+            "toValue": "Pisces",
+            "fromName": "मेष",
+            "toName": "मीन",
+            "description": {
+              "en": "Rāhu retrogrades into Pisces. Significant nodal shift guiding karmic purification and spiritual transformation.",
+              "hi": "Rāhu का वक्री गति से मीन में प्रवेश। आध्यात्मिक मंथन व गहन जीवन परिवर्तन का काल।",
+              "sa": "राहोः/केतोः वक्रगत्या मीनप्रवेशः। आत्मनिरीक्षण-आध्यात्मिकपरिवर्तनार्थं कारकः।"
+            }
+          },
+          "nextNakshatraTransit": {
+            "id": "rahu-nak-1698664028659",
+            "planetId": "rahu",
+            "planetName": "Rahu",
+            "sanskritName": "Rāhu",
+            "symbol": "☊",
+            "type": "nakshatra",
+            "timestamp": "2023-10-30T11:07:08.659Z",
+            "dateStr": "30/10/2023",
+            "timeStr": "16:37:08",
+            "dayOfWeek": "Monday",
+            "relativeText": "in 104d 10h",
+            "isToday": false,
+            "fromValue": "Ashwini",
+            "toValue": "Revati",
+            "fromName": "अश्विनी",
+            "toName": "रेवती",
+            "description": {
+              "en": "Rahu enters Revati Nakṣatra (रेवती). Shifts subtle cosmic resonance and lunar-planetary vibration.",
+              "hi": "Rāhu का रेवती नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+              "sa": "Rāhuस्य रेवतीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+            }
+          }
+        },
+        {
+          "planetId": "ketu",
+          "planetName": "Ketu",
+          "sanskritName": "Ketu",
+          "symbol": "☋",
+          "currentRasi": "तुला",
+          "currentRasiNumber": 7,
+          "degreesInRasi": "5° 32' 06\"",
+          "degreesInRasiNum": 5.53503498013788,
+          "progressPercent": 18,
+          "currentNakshatra": "चित्रा",
+          "currentNakshatraNumber": 14,
+          "currentPada": 4,
+          "isRetrograde": true,
+          "isCombust": false,
+          "nextRasiTransit": {
+            "id": "ketu-rasi-1698664021627",
+            "planetId": "ketu",
+            "planetName": "Ketu",
+            "sanskritName": "Ketu",
+            "symbol": "☋",
+            "type": "rasi",
+            "timestamp": "2023-10-30T11:07:01.627Z",
+            "dateStr": "30/10/2023",
+            "timeStr": "16:37:01",
+            "dayOfWeek": "Monday",
+            "relativeText": "in 104d 10h",
+            "isToday": false,
+            "fromValue": "Libra",
+            "toValue": "Virgo",
+            "fromName": "तुला",
+            "toName": "कन्या",
+            "description": {
+              "en": "Ketu retrogrades into Virgo. Significant nodal shift guiding karmic purification and spiritual transformation.",
+              "hi": "Ketu का वक्री गति से कन्या में प्रवेश। आध्यात्मिक मंथन व गहन जीवन परिवर्तन का काल।",
+              "sa": "राहोः/केतोः वक्रगत्या कन्याप्रवेशः। आत्मनिरीक्षण-आध्यात्मिकपरिवर्तनार्थं कारकः।"
+            }
+          }
+        }
+      ],
+      "upcomingEvents": [
+        {
+          "id": "moon-rasi-1689830725534",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-07-20T05:25:25.534Z",
+          "dateStr": "20/07/2023",
+          "timeStr": "10:55:25",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 2d 5h",
+          "isToday": false,
+          "fromValue": "Cancer",
+          "toValue": "Leo",
+          "fromName": "कर्क",
+          "toName": "सिंह",
+          "description": {
+            "en": "Candra enters Leo (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का सिंह में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य सिंहप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "sun-nak-1689852550534",
+          "planetId": "sun",
+          "planetName": "Sun",
+          "sanskritName": "Sūrya",
+          "symbol": "☉",
+          "type": "nakshatra",
+          "timestamp": "2023-07-20T11:29:10.534Z",
+          "dateStr": "20/07/2023",
+          "timeStr": "16:59:10",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 2d 11h",
+          "isToday": false,
+          "fromValue": "Punarvasu",
+          "toValue": "Pushya",
+          "fromName": "पुनर्वसु",
+          "toName": "पुष्य",
+          "description": {
+            "en": "Sun enters Pushya Nakṣatra (पुष्य). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Sūrya का पुष्य नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Sūryaस्य पुष्यनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1690049566159",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-07-22T18:12:46.159Z",
+          "dateStr": "22/07/2023",
+          "timeStr": "23:42:46",
+          "dayOfWeek": "Saturday",
+          "relativeText": "in 4d 17h",
+          "isToday": false,
+          "fromValue": "Leo",
+          "toValue": "Virgo",
+          "fromName": "सिंह",
+          "toName": "कन्या",
+          "description": {
+            "en": "Candra enters Virgo (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का कन्या में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य कन्याप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "mars-nak-1690050536471",
+          "planetId": "mars",
+          "planetName": "Mars",
+          "sanskritName": "Maṅgala",
+          "symbol": "♂",
+          "type": "nakshatra",
+          "timestamp": "2023-07-22T18:28:56.471Z",
+          "dateStr": "22/07/2023",
+          "timeStr": "23:58:56",
+          "dayOfWeek": "Saturday",
+          "relativeText": "in 4d 18h",
+          "isToday": false,
+          "fromValue": "Magha",
+          "toValue": "Purva Phalguni",
+          "fromName": "मघा",
+          "toName": "पूर्वाफाल्गुनी",
+          "description": {
+            "en": "Mars enters Purva Phalguni Nakṣatra (पूर्वाफाल्गुनी). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Maṅgala का पूर्वा फाल्गुनी नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Maṅgalaस्य पूर्वाफाल्गुनीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "mercury-rasi-1690239810690",
+          "planetId": "mercury",
+          "planetName": "Mercury",
+          "sanskritName": "Budha",
+          "symbol": "☿",
+          "type": "rasi",
+          "timestamp": "2023-07-24T23:03:30.690Z",
+          "dateStr": "25/07/2023",
+          "timeStr": "04:33:30",
+          "dayOfWeek": "Tuesday",
+          "relativeText": "in 6d 22h",
+          "isToday": false,
+          "fromValue": "Cancer",
+          "toValue": "Leo",
+          "fromName": "कर्क",
+          "toName": "सिंह",
+          "description": {
+            "en": "Budha enters Leo. Enhances intellect, commercial negotiations, speech, and mathematical precision.",
+            "hi": "बुध का सिंह में प्रवेश। बुद्धि, वाणी, व्यापार व कलात्मक निर्णयों के लिए अनुकूल।",
+            "sa": "बुधस्य सिंहप्रवेशः। बुद्धि-विद्या-वाणिज्य-संवादार्थं शुभकरः।"
+          }
+        },
+        {
+          "id": "mercury-nak-1690239810690",
+          "planetId": "mercury",
+          "planetName": "Mercury",
+          "sanskritName": "Budha",
+          "symbol": "☿",
+          "type": "nakshatra",
+          "timestamp": "2023-07-24T23:03:30.690Z",
+          "dateStr": "25/07/2023",
+          "timeStr": "04:33:30",
+          "dayOfWeek": "Tuesday",
+          "relativeText": "in 6d 22h",
+          "isToday": false,
+          "fromValue": "Ashlesha",
+          "toValue": "Magha",
+          "fromName": "आश्लेषा",
+          "toName": "मघा",
+          "description": {
+            "en": "Mercury enters Magha Nakṣatra (मघा). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Budha का मघा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Budhaस्य मघानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1690263794284",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-07-25T05:43:14.284Z",
+          "dateStr": "25/07/2023",
+          "timeStr": "11:13:14",
+          "dayOfWeek": "Tuesday",
+          "relativeText": "in 7d 5h",
+          "isToday": false,
+          "fromValue": "Virgo",
+          "toValue": "Libra",
+          "fromName": "कन्या",
+          "toName": "तुला",
+          "description": {
+            "en": "Candra enters Libra (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का तुला में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य तुलाप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1690466322409",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-07-27T13:58:42.409Z",
+          "dateStr": "27/07/2023",
+          "timeStr": "19:28:42",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 9d 13h",
+          "isToday": false,
+          "fromValue": "Libra",
+          "toValue": "Scorpio",
+          "fromName": "तुला",
+          "toName": "वृश्चिक",
+          "description": {
+            "en": "Candra enters Scorpio (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का वृश्चिक में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य वृश्चिकप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1690653916159",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-07-29T18:05:16.159Z",
+          "dateStr": "29/07/2023",
+          "timeStr": "23:35:16",
+          "dayOfWeek": "Saturday",
+          "relativeText": "in 11d 17h",
+          "isToday": false,
+          "fromValue": "Scorpio",
+          "toValue": "Sagittarius",
+          "fromName": "वृश्चिक",
+          "toName": "धनु",
+          "description": {
+            "en": "Candra enters Sagittarius (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का धनु में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य धनुप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1690829191159",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-07-31T18:46:31.159Z",
+          "dateStr": "01/08/2023",
+          "timeStr": "00:16:31",
+          "dayOfWeek": "Tuesday",
+          "relativeText": "in 13d 18h",
+          "isToday": false,
+          "fromValue": "Sagittarius",
+          "toValue": "Capricorn",
+          "fromName": "धनु",
+          "toName": "मकर",
+          "description": {
+            "en": "Candra enters Capricorn (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मकर में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मकरप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1690998981784",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-02T17:56:21.784Z",
+          "dateStr": "02/08/2023",
+          "timeStr": "23:26:21",
+          "dayOfWeek": "Wednesday",
+          "relativeText": "in 15d 17h",
+          "isToday": false,
+          "fromValue": "Capricorn",
+          "toValue": "Aquarius",
+          "fromName": "मकर",
+          "toName": "कुम्भ",
+          "description": {
+            "en": "Candra enters Aquarius (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का कुम्भ में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य कुम्भप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "sun-nak-1691058332565",
+          "planetId": "sun",
+          "planetName": "Sun",
+          "sanskritName": "Sūrya",
+          "symbol": "☉",
+          "type": "nakshatra",
+          "timestamp": "2023-08-03T10:25:32.565Z",
+          "dateStr": "03/08/2023",
+          "timeStr": "15:55:32",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 16d 10h",
+          "isToday": false,
+          "fromValue": "Pushya",
+          "toValue": "Ashlesha",
+          "fromName": "पुष्य",
+          "toName": "आश्लेषा",
+          "description": {
+            "en": "Sun enters Ashlesha Nakṣatra (आश्लेषा). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Sūrya का आश्लेषा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Sūryaस्य आश्लेषानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "mercury-nak-1691072866159",
+          "planetId": "mercury",
+          "planetName": "Mercury",
+          "sanskritName": "Budha",
+          "symbol": "☿",
+          "type": "nakshatra",
+          "timestamp": "2023-08-03T14:27:46.159Z",
+          "dateStr": "03/08/2023",
+          "timeStr": "19:57:46",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 16d 14h",
+          "isToday": false,
+          "fromValue": "Magha",
+          "toValue": "Purva Phalguni",
+          "fromName": "मघा",
+          "toName": "पूर्वाफाल्गुनी",
+          "description": {
+            "en": "Mercury enters Purva Phalguni Nakṣatra (पूर्वाफाल्गुनी). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Budha का पूर्वा फाल्गुनी नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Budhaस्य पूर्वाफाल्गुनीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1691171275534",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-04T17:47:55.534Z",
+          "dateStr": "04/08/2023",
+          "timeStr": "23:17:55",
+          "dayOfWeek": "Friday",
+          "relativeText": "in 17d 17h",
+          "isToday": false,
+          "fromValue": "Aquarius",
+          "toValue": "Pisces",
+          "fromName": "कुम्भ",
+          "toName": "मीन",
+          "description": {
+            "en": "Candra enters Pisces (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मीन में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मीनप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1691352850534",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-06T20:14:10.534Z",
+          "dateStr": "07/08/2023",
+          "timeStr": "01:44:10",
+          "dayOfWeek": "Monday",
+          "relativeText": "in 19d 19h",
+          "isToday": false,
+          "fromValue": "Pisces",
+          "toValue": "Aries",
+          "fromName": "मीन",
+          "toName": "मेष",
+          "description": {
+            "en": "Candra enters Aries (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मेष में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मेषप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "venus-rasi-1691385791940",
+          "planetId": "venus",
+          "planetName": "Venus",
+          "sanskritName": "Śukra",
+          "symbol": "♀",
+          "type": "rasi",
+          "timestamp": "2023-08-07T05:23:11.940Z",
+          "dateStr": "07/08/2023",
+          "timeStr": "10:53:11",
+          "dayOfWeek": "Monday",
+          "relativeText": "in 20d 5h",
+          "isToday": false,
+          "fromValue": "Leo",
+          "toValue": "Cancer",
+          "fromName": "सिंह",
+          "toName": "कर्क",
+          "description": {
+            "en": "Śukra enters Cancer. Auspicious for creative arts, aesthetic grace, marital harmony, and prosperity.",
+            "hi": "शुक्र का कर्क में प्रवेश। सुख-समृद्धि, कला, सौंदर्य एवं दांपत्य सौहार्द को बढ़ाता है।",
+            "sa": "शुक्रस्य कर्कप्रवेशः। सौन्दर्य-समृद्धि-कलानां कृते शुभप्रदः।"
+          }
+        },
+        {
+          "id": "venus-nak-1691385791940",
+          "planetId": "venus",
+          "planetName": "Venus",
+          "sanskritName": "Śukra",
+          "symbol": "♀",
+          "type": "nakshatra",
+          "timestamp": "2023-08-07T05:23:11.940Z",
+          "dateStr": "07/08/2023",
+          "timeStr": "10:53:11",
+          "dayOfWeek": "Monday",
+          "relativeText": "in 20d 5h",
+          "isToday": false,
+          "fromValue": "Magha",
+          "toValue": "Ashlesha",
+          "fromName": "मघा",
+          "toName": "आश्लेषा",
+          "description": {
+            "en": "Venus enters Ashlesha Nakṣatra (आश्लेषा). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Śukra का आश्लेषा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Śukraस्य आश्लेषानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1691547194284",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-09T02:13:14.284Z",
+          "dateStr": "09/08/2023",
+          "timeStr": "07:43:14",
+          "dayOfWeek": "Wednesday",
+          "relativeText": "in 22d 1h",
+          "isToday": false,
+          "fromValue": "Aries",
+          "toValue": "Taurus",
+          "fromName": "मेष",
+          "toName": "वृषभ",
+          "description": {
+            "en": "Candra enters Taurus (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का वृषभ में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य वृषभप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1691753350534",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-11T11:29:10.534Z",
+          "dateStr": "11/08/2023",
+          "timeStr": "16:59:10",
+          "dayOfWeek": "Friday",
+          "relativeText": "in 24d 11h",
+          "isToday": false,
+          "fromValue": "Taurus",
+          "toValue": "Gemini",
+          "fromName": "वृषभ",
+          "toName": "मिथुन",
+          "description": {
+            "en": "Candra enters Gemini (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मिथुन में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मिथुनप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "mars-nak-1691899129440",
+          "planetId": "mars",
+          "planetName": "Mars",
+          "sanskritName": "Maṅgala",
+          "symbol": "♂",
+          "type": "nakshatra",
+          "timestamp": "2023-08-13T03:58:49.440Z",
+          "dateStr": "13/08/2023",
+          "timeStr": "09:28:49",
+          "dayOfWeek": "Sunday",
+          "relativeText": "in 26d 3h",
+          "isToday": false,
+          "fromValue": "Purva Phalguni",
+          "toValue": "Uttara Phalguni",
+          "fromName": "पूर्वाफाल्गुनी",
+          "toName": "उत्तराफाल्गुनी",
+          "description": {
+            "en": "Mars enters Uttara Phalguni Nakṣatra (उत्तराफाल्गुनी). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Maṅgala का उत्तरा फाल्गुनी नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Maṅgalaस्य उत्तराफाल्गुनीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1691967353659",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-13T22:55:53.659Z",
+          "dateStr": "14/08/2023",
+          "timeStr": "04:25:53",
+          "dayOfWeek": "Monday",
+          "relativeText": "in 26d 22h",
+          "isToday": false,
+          "fromValue": "Gemini",
+          "toValue": "Cancer",
+          "fromName": "मिथुन",
+          "toName": "कर्क",
+          "description": {
+            "en": "Candra enters Cancer (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का कर्क में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य कर्कप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1692185266159",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-16T11:27:46.159Z",
+          "dateStr": "16/08/2023",
+          "timeStr": "16:57:46",
+          "dayOfWeek": "Wednesday",
+          "relativeText": "in 29d 11h",
+          "isToday": false,
+          "fromValue": "Cancer",
+          "toValue": "Leo",
+          "fromName": "कर्क",
+          "toName": "सिंह",
+          "description": {
+            "en": "Candra enters Leo (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का सिंह में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य सिंहप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "sun-rasi-1692259537252",
+          "planetId": "sun",
+          "planetName": "Sun",
+          "sanskritName": "Sūrya",
+          "symbol": "☉",
+          "type": "rasi",
+          "timestamp": "2023-08-17T08:05:37.252Z",
+          "dateStr": "17/08/2023",
+          "timeStr": "13:35:37",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 30d 7h",
+          "isToday": false,
+          "fromValue": "Cancer",
+          "toValue": "Leo",
+          "fromName": "कर्क",
+          "toName": "सिंह",
+          "specialName": "Siṁha Saṅkrānti",
+          "punyaKala": {
+            "start": "07:11:37",
+            "end": "19:59:37",
+            "name": "Siṁha Saṅkrānti Puṇyakāla"
+          },
+          "mahaPunyaKala": {
+            "start": "11:59:37",
+            "end": "15:11:37",
+            "name": "Siṁha Saṅkrānti Mahāpuṇyakāla"
+          },
+          "description": {
+            "en": "Sūrya enters Leo marking sacred Siṁha Saṅkrānti. Auspicious period for solar worship, charity (Dāna), ancestor homage (Tarpaṇa), and spiritual sadhana.",
+            "hi": "सूर्य का सिंह में प्रवेश — पावन Siṁha Saṅkrānti। सूर्य तर्पण, दान-पुण्य, पितृ शांति एवं जप-तप हेतु विशेष फलदायी।",
+            "sa": "सूर्यस्य सिंहप्रवेशः (Siṁha Saṅkrānti)। पितृतर्पण-दान-जप-सूर्यपूजनार्थं महापुण्यप्रदः कालः।"
+          }
+        },
+        {
+          "id": "sun-nak-1692259537252",
+          "planetId": "sun",
+          "planetName": "Sun",
+          "sanskritName": "Sūrya",
+          "symbol": "☉",
+          "type": "nakshatra",
+          "timestamp": "2023-08-17T08:05:37.252Z",
+          "dateStr": "17/08/2023",
+          "timeStr": "13:35:37",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 30d 7h",
+          "isToday": false,
+          "fromValue": "Ashlesha",
+          "toValue": "Magha",
+          "fromName": "आश्लेषा",
+          "toName": "मघा",
+          "description": {
+            "en": "Sun enters Magha Nakṣatra (मघा). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Sūrya का मघा नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Sūryaस्य मघानक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "mars-rasi-1692354522409",
+          "planetId": "mars",
+          "planetName": "Mars",
+          "sanskritName": "Maṅgala",
+          "symbol": "♂",
+          "type": "rasi",
+          "timestamp": "2023-08-18T10:28:42.409Z",
+          "dateStr": "18/08/2023",
+          "timeStr": "15:58:42",
+          "dayOfWeek": "Friday",
+          "relativeText": "in 31d 10h",
+          "isToday": false,
+          "fromValue": "Leo",
+          "toValue": "Virgo",
+          "fromName": "सिंह",
+          "toName": "कन्या",
+          "description": {
+            "en": "Maṅgala enters Virgo. Energizes courage, physical vigor, property ventures, and bold undertakings.",
+            "hi": "मंगल का कन्या में प्रवेश। साहस, पराक्रम, भूमि व ऊर्जा संबंधी कार्यों पर प्रभाव।",
+            "sa": "मङ्गलस्य कन्याप्रवेशः। पराक्रम-ऊर्जा-विजयकार्यार्थं फलप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1692403881784",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-19T00:11:21.784Z",
+          "dateStr": "19/08/2023",
+          "timeStr": "05:41:21",
+          "dayOfWeek": "Saturday",
+          "relativeText": "in 31d 23h",
+          "isToday": false,
+          "fromValue": "Leo",
+          "toValue": "Virgo",
+          "fromName": "सिंह",
+          "toName": "कन्या",
+          "description": {
+            "en": "Candra enters Virgo (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का कन्या में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य कन्याप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "mercury-nak-1692410062252",
+          "planetId": "mercury",
+          "planetName": "Mercury",
+          "sanskritName": "Budha",
+          "symbol": "☿",
+          "type": "nakshatra",
+          "timestamp": "2023-08-19T01:54:22.252Z",
+          "dateStr": "19/08/2023",
+          "timeStr": "07:24:22",
+          "dayOfWeek": "Saturday",
+          "relativeText": "in 32d 1h",
+          "isToday": false,
+          "fromValue": "Purva Phalguni",
+          "toValue": "Uttara Phalguni",
+          "fromName": "पूर्वाफाल्गुनी",
+          "toName": "उत्तराफाल्गुनी",
+          "description": {
+            "en": "Mercury enters Uttara Phalguni Nakṣatra (उत्तराफाल्गुनी). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Budha का उत्तरा फाल्गुनी नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Budhaस्य उत्तराफाल्गुनीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1692619234909",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-21T12:00:34.909Z",
+          "dateStr": "21/08/2023",
+          "timeStr": "17:30:34",
+          "dayOfWeek": "Monday",
+          "relativeText": "in 34d 11h",
+          "isToday": false,
+          "fromValue": "Virgo",
+          "toValue": "Libra",
+          "fromName": "कन्या",
+          "toName": "तुला",
+          "description": {
+            "en": "Candra enters Libra (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का तुला में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य तुलाप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1692825869284",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-23T21:24:29.284Z",
+          "dateStr": "24/08/2023",
+          "timeStr": "02:54:29",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 36d 21h",
+          "isToday": false,
+          "fromValue": "Libra",
+          "toValue": "Scorpio",
+          "fromName": "तुला",
+          "toName": "वृश्चिक",
+          "description": {
+            "en": "Candra enters Scorpio (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का वृश्चिक में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य वृश्चिकप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1693019284909",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-26T03:08:04.909Z",
+          "dateStr": "26/08/2023",
+          "timeStr": "08:38:04",
+          "dayOfWeek": "Saturday",
+          "relativeText": "in 39d 2h",
+          "isToday": false,
+          "fromValue": "Scorpio",
+          "toValue": "Sagittarius",
+          "fromName": "वृश्चिक",
+          "toName": "धनु",
+          "description": {
+            "en": "Candra enters Sagittarius (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का धनु में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य धनुप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1693199397409",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-28T05:09:57.409Z",
+          "dateStr": "28/08/2023",
+          "timeStr": "10:39:57",
+          "dayOfWeek": "Monday",
+          "relativeText": "in 41d 4h",
+          "isToday": false,
+          "fromValue": "Sagittarius",
+          "toValue": "Capricorn",
+          "fromName": "धनु",
+          "toName": "मकर",
+          "description": {
+            "en": "Candra enters Capricorn (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मकर में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मकरप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "mercury-nak-1693211751315",
+          "planetId": "mercury",
+          "planetName": "Mercury",
+          "sanskritName": "Budha",
+          "symbol": "☿",
+          "type": "nakshatra",
+          "timestamp": "2023-08-28T08:35:51.315Z",
+          "dateStr": "28/08/2023",
+          "timeStr": "14:05:51",
+          "dayOfWeek": "Monday",
+          "relativeText": "in 41d 8h",
+          "isToday": false,
+          "fromValue": "Uttara Phalguni",
+          "toValue": "Purva Phalguni",
+          "fromName": "उत्तराफाल्गुनी",
+          "toName": "पूर्वाफाल्गुनी",
+          "description": {
+            "en": "Mercury enters Purva Phalguni Nakṣatra (पूर्वाफाल्गुनी). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Budha का पूर्वा फाल्गुनी नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Budhaस्य पूर्वाफाल्गुनीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1693370959909",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-08-30T04:49:19.909Z",
+          "dateStr": "30/08/2023",
+          "timeStr": "10:19:19",
+          "dayOfWeek": "Wednesday",
+          "relativeText": "in 43d 4h",
+          "isToday": false,
+          "fromValue": "Capricorn",
+          "toValue": "Aquarius",
+          "fromName": "मकर",
+          "toName": "कुम्भ",
+          "description": {
+            "en": "Candra enters Aquarius (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का कुम्भ में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य कुम्भप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "sun-nak-1693454709127",
+          "planetId": "sun",
+          "planetName": "Sun",
+          "sanskritName": "Sūrya",
+          "symbol": "☉",
+          "type": "nakshatra",
+          "timestamp": "2023-08-31T04:05:09.127Z",
+          "dateStr": "31/08/2023",
+          "timeStr": "09:35:09",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 44d 3h",
+          "isToday": false,
+          "fromValue": "Magha",
+          "toValue": "Purva Phalguni",
+          "fromName": "मघा",
+          "toName": "पूर्वाफाल्गुनी",
+          "description": {
+            "en": "Sun enters Purva Phalguni Nakṣatra (पूर्वाफाल्गुनी). Shifts subtle cosmic resonance and vibrational influence.",
+            "hi": "Sūrya का पूर्वा फाल्गुनी नक्षत्र में प्रवेश। सूक्ष्म ऊर्जा एवं नक्षत्र चरण प्रभाव में परिवर्तन।",
+            "sa": "Sūryaस्य पूर्वाफाल्गुनीनक्षत्रे प्रवेशः। सूक्ष्मतरङ्गपरिवर्तनं जनयति।"
+          }
+        },
+        {
+          "id": "moon-rasi-1693541200534",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-09-01T04:06:40.534Z",
+          "dateStr": "01/09/2023",
+          "timeStr": "09:36:40",
+          "dayOfWeek": "Friday",
+          "relativeText": "in 45d 3h",
+          "isToday": false,
+          "fromValue": "Aquarius",
+          "toValue": "Pisces",
+          "fromName": "कुम्भ",
+          "toName": "मीन",
+          "description": {
+            "en": "Candra enters Pisces (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मीन में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मीनप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1693717741159",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-09-03T05:09:01.159Z",
+          "dateStr": "03/09/2023",
+          "timeStr": "10:39:01",
+          "dayOfWeek": "Sunday",
+          "relativeText": "in 47d 4h",
+          "isToday": false,
+          "fromValue": "Pisces",
+          "toValue": "Aries",
+          "fromName": "मीन",
+          "toName": "मेष",
+          "description": {
+            "en": "Candra enters Aries (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मेष में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मेषप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1693906263034",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-09-05T09:31:03.034Z",
+          "dateStr": "05/09/2023",
+          "timeStr": "15:01:03",
+          "dayOfWeek": "Tuesday",
+          "relativeText": "in 49d 9h",
+          "isToday": false,
+          "fromValue": "Aries",
+          "toValue": "Taurus",
+          "fromName": "मेष",
+          "toName": "वृषभ",
+          "description": {
+            "en": "Candra enters Taurus (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का वृषभ में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य वृषभप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1694108594284",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-09-07T17:43:14.284Z",
+          "dateStr": "07/09/2023",
+          "timeStr": "23:13:14",
+          "dayOfWeek": "Thursday",
+          "relativeText": "in 51d 17h",
+          "isToday": false,
+          "fromValue": "Taurus",
+          "toValue": "Gemini",
+          "fromName": "वृषभ",
+          "toName": "मिथुन",
+          "description": {
+            "en": "Candra enters Gemini (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का मिथुन में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य मिथुनप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1694321725534",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-09-10T04:55:25.534Z",
+          "dateStr": "10/09/2023",
+          "timeStr": "10:25:25",
+          "dayOfWeek": "Sunday",
+          "relativeText": "in 54d 4h",
+          "isToday": false,
+          "fromValue": "Gemini",
+          "toValue": "Cancer",
+          "fromName": "मिथुन",
+          "toName": "कर्क",
+          "description": {
+            "en": "Candra enters Cancer (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का कर्क में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य कर्कप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1694539919284",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-09-12T17:31:59.284Z",
+          "dateStr": "12/09/2023",
+          "timeStr": "23:01:59",
+          "dayOfWeek": "Tuesday",
+          "relativeText": "in 56d 17h",
+          "isToday": false,
+          "fromValue": "Cancer",
+          "toValue": "Leo",
+          "fromName": "कर्क",
+          "toName": "सिंह",
+          "description": {
+            "en": "Candra enters Leo (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का सिंह में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य सिंहप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        },
+        {
+          "id": "moon-rasi-1694757972409",
+          "planetId": "moon",
+          "planetName": "Moon",
+          "sanskritName": "Candra",
+          "symbol": "☽",
+          "type": "rasi",
+          "timestamp": "2023-09-15T06:06:12.409Z",
+          "dateStr": "15/09/2023",
+          "timeStr": "11:36:12",
+          "dayOfWeek": "Friday",
+          "relativeText": "in 59d 5h",
+          "isToday": false,
+          "fromValue": "Leo",
+          "toValue": "Virgo",
+          "fromName": "सिंह",
+          "toName": "कन्या",
+          "description": {
+            "en": "Candra enters Virgo (Chandra Gochara). Influences mental tranquility, emotional rhythm, and daily astrological favorability.",
+            "hi": "चन्द्रमा का कन्या में प्रवेश (चंद्र गोचर)। मनोबल, मानसिक शांति व दैनिक शुभ कार्यों को प्रभावित करता है।",
+            "sa": "चन्द्रस्य कन्याप्रवेशः। मनोवृत्ति-सौभाग्य-दैनिकगोचरप्रभावाय शुभप्रदः।"
+          }
+        }
+      ],
+      "todayEvents": []
+    }
+  }
+}

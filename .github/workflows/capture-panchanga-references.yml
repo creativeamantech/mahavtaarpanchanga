@@ -2,6 +2,11 @@ name: Capture Panchanga Golden References
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/capture-panchanga-reference.ts"
+      - ".github/workflows/capture-panchanga-references.yml"
 
 permissions:
   contents: read

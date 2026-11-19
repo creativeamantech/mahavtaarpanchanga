@@ -9,7 +9,7 @@ on:
       - ".github/workflows/capture-panchanga-references.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   capture:
@@ -25,6 +25,15 @@ jobs:
         run: bun run scripts/capture-panchanga-reference.ts
         env:
           SOURCE_COMMIT: ${{ github.sha }}
+      - name: Commit versioned reference corpus
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reference/panchanga/v1/
+          if ! git diff --cached --quiet; then
+            git commit -m "test: capture Panchanga golden reference corpus"
+            git push
+          fi
       - name: Upload reference corpus
         uses: actions/upload-artifact@v4
         with:
